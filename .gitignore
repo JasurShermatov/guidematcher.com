@@ -1,0 +1,16 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Django env files
+.env
+.env.*
+
+# IDE (Pycharm, VSCode)
+.idea/
+.vscode/
+
+
+
+# MacOS keraksiz fayllari
+.DS_Store

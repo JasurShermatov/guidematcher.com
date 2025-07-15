@@ -15,7 +15,9 @@ from apps.users.serializers import (
 )
 
 
-# ───────────────────────────── Auth
+from drf_spectacular.utils import extend_schema
+
+@extend_schema(tags=["users"])
 class LoginView(TokenObtainPairView):
     serializer_class = AuthTokenSerializer
 

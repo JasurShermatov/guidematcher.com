@@ -1,4 +1,3 @@
-# config/urls.py
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -36,6 +35,8 @@ api_v1_patterns = [
     path("disputes/", include("apps.disputes.urls")),
     # Common (mamlakat, til, xizmat turlari va h.k.)
     path("common/", include("apps.common.urls")),
+    # 📩 Accounts (email verification, registration helpers)
+    path("accounts/", include("apps.accounts.urls")),  # 👈 Qo‘shildi
 ]
 
 urlpatterns = [

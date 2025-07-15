@@ -23,7 +23,9 @@ from apps.profiles.filters import CustomerProfileFilter
 from apps.profiles.permissions import IsOwnerOrReadOnly
 
 
-# ─────────── CustomerProfile ───────────
+from drf_spectacular.utils import extend_schema
+
+@extend_schema(tags=["profiles"])
 class CustomerProfileViewSet(viewsets.ModelViewSet):
     """
     /profiles/customers/                  – list (public)

@@ -1,28 +1,31 @@
-# Python image
-FROM python:3.10
+# ---------- Base image ----------
+FROM python:3.10-slim
 
-# App papkasi
+# ---------- Env vars ----------
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_NO_CACHE_DIR=on
+
+# ---------- Workdir ----------
 WORKDIR /app
 
-# Python sozlamalari
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# System package-larni o‘rnatish
-RUN apt-get update && apt-get install -y \
-    netcat-openbsd \
-    gcc \
-    postgresql-client \
+# ---------- OS deps (eng yengil variant) ----------
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      netcat-openbsd \
+      gcc \
+      libpq-dev \
  && rm -rf /var/lib/apt/lists/*
 
-# requirements.txt faylni copy qilish va install
+# ---------- Python deps (cache-friendly) ----------
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Proyekt fayllarni ko‘chirish
+# ---------- Project source ----------
 COPY . .
 
-# Entry point faylni ko‘chirish va ruxsat berish
+# ---------- Entrypoint ----------
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

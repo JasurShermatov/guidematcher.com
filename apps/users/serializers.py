@@ -1,4 +1,3 @@
-# apps/users/serializers.py
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.utils import timezone
@@ -13,9 +12,9 @@ from apps.common.utils import generate_random_code
 User = get_user_model()
 
 
-# ───────────────────────────── Auth tokens
+# ───────────────────────────── JWT
 class AuthTokenSerializer(TokenObtainPairSerializer):
-    """JWT’ga qo‘shimcha user ma’lumotlari joylaymiz"""
+    """JWT’ga qo‘shimcha user ma’lumotlari."""
 
     @classmethod
     def get_token(cls, user):
@@ -38,10 +37,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         password = validated_data.pop("password")
         user = User.objects.create_user(**validated_data)
         user.set_password(password)
-        user.is_active = True  # e-mail tekshirilguncha ham login bo‘la oladi
+        user.is_active = True
         user.save()
 
-        # e-mail verification code
         code = generate_random_code()
         EmailVerification.objects.create(
             user=user,
@@ -49,11 +47,11 @@ class RegisterSerializer(serializers.ModelSerializer):
             code=code,
             expires_at=timezone.now() + timezone.timedelta(minutes=30),
         )
-        # Celery task (yoki sinchiklab utils)
+
+        # Celery (yoki sinchiklab utils) – mavjud bo‘lsa
         from apps.users.tasks import send_verification_email
 
         send_verification_email.delay(user.email, code)
-
         return user
 
 
@@ -116,8 +114,7 @@ class GoogleAuthSerializer(serializers.Serializer):
     def validate(self, attrs):
         try:
             info = id_token.verify_oauth2_token(
-                attrs["id_token"],
-                google_requests.Request(),
+                attrs["id_token"], google_requests.Request()
             )
         except Exception:
             raise serializers.ValidationError("Invalid Google token.")
@@ -125,7 +122,7 @@ class GoogleAuthSerializer(serializers.Serializer):
         email = info.get("email")
         if not email:
             raise serializers.ValidationError("Google e-mail topilmadi.")
-        self.info = info
+
         self.user, _ = User.objects.get_or_create(
             email=email,
             defaults={
@@ -139,10 +136,7 @@ class GoogleAuthSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         refresh = AuthTokenSerializer.get_token(self.user)
-        return {
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
-        }
+        return {"refresh": str(refresh), "access": str(refresh.access_token)}
 
 
 # ───────────────────────────── Password reset
@@ -156,11 +150,10 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
     def save(self, **kwargs):
         from django.contrib.auth.tokens import default_token_generator
+        from apps.users.tasks import send_password_reset_email
 
         user = User.objects.get(email=self.validated_data["email"])
         token = default_token_generator.make_token(user)
-        from apps.users.tasks import send_password_reset_email
-
         send_password_reset_email.delay(user.email, token)
         return token
 
@@ -187,7 +180,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         return self.user
 
 
-# ───────────────────────────── Profile
+# ───────────────────────────── Profile & Short
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -213,3 +206,23 @@ class ProfileSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+
+
+class UserShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "first_name", "last_name", "avatar")
+
+
+# ───────────────────────────── Eksport
+__all__ = [
+    "AuthTokenSerializer",
+    "RegisterSerializer",
+    "VerifyEmailSerializer",
+    "ResendVerificationSerializer",
+    "GoogleAuthSerializer",
+    "PasswordResetRequestSerializer",
+    "PasswordResetConfirmSerializer",
+    "ProfileSerializer",
+    "UserShortSerializer",
+]

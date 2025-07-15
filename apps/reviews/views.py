@@ -16,6 +16,7 @@ from apps.reviews.serializers import (
 )
 from apps.reviews.permissions import IsClientOwner, IsProviderOwner
 from apps.common.permissions import IsVerifiedUser  # avval yaratilgan
+from apps.reviews.filters import ReviewFilter
 
 
 # ───────────────────────────────────────── Review

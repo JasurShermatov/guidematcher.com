@@ -3,14 +3,10 @@ __pycache__/
 *.py[cod]
 
 # Django env files
-.env
-.env.*
+.env     # .env faylni yashiramiz, lekin .env.example ni saqlaymiz
 
 # IDE (Pycharm, VSCode)
 .idea/
-.vscode/
-
-
 
 # MacOS keraksiz fayllari
 .DS_Store

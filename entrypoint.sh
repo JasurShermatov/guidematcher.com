@@ -1,17 +1,28 @@
 #!/bin/bash
+set -e
 
-# Kodni avtomatik formatlash
-black .
+echo "🔧  POSTGRES_HOST=$POSTGRES_HOST  POSTGRES_PORT=$POSTGRES_PORT"
 
-# PostgreSQL tayyor bo‘lguncha kutish
-echo "Waiting for postgres..."
-while ! nc -z db 5432; do
+
+if [ "$DJANGO_DEBUG" = "True" ] && command -v black >/dev/null 2>&1; then
+  echo "🎨  Running black …"
+  black .
+fi
+
+: "${POSTGRES_HOST:=db}"
+: "${POSTGRES_PORT:=5432}"
+
+echo "⏳  Waiting for PostgreSQL at ${POSTGRES_HOST}:${POSTGRES_PORT} …"
+while ! nc -z "$POSTGRES_HOST" "$POSTGRES_PORT"; do
   sleep 1
 done
-echo "PostgreSQL started"
+echo "✅  PostgreSQL is up!"
 
-# Django migration va collectstatic
-python manage.py migrate
+echo "🚀  Applying migrations …"
+python manage.py migrate --noinput
+
+echo "📦  Collecting static files …"
 python manage.py collectstatic --noinput
 
+echo "🚦  Starting: $*"
 exec "$@"

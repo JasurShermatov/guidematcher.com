@@ -11,7 +11,6 @@ from apps.common.serializers import (
 )
 
 
-# ─────────── umumiy permission ───────────
 class ReadOnlyOrAdmin(permissions.BasePermission):
     """
     SAFE_METHODS -> har kim.
@@ -24,7 +23,9 @@ class ReadOnlyOrAdmin(permissions.BasePermission):
         return request.user.is_authenticated and request.user.is_staff
 
 
-# ─────────── Country ───────────
+from drf_spectacular.utils import extend_schema
+
+@extend_schema(tags=["common"])
 class CountryViewSet(viewsets.ModelViewSet):
     queryset = Country.objects.filter(is_active=True)
     serializer_class = CountrySerializer

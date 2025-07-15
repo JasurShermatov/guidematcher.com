@@ -15,8 +15,9 @@ from apps.chat.serializers import (
 )
 from apps.common.permissions import IsChatParticipant
 
+from drf_spectacular.utils import extend_schema
 
-# ─────────────── ChatRoomViewSet ───────────────
+@extend_schema(tags=["chat"])
 class ChatRoomViewSet(viewsets.ModelViewSet):
     """
     list/create direct|booking|support rooms

@@ -17,7 +17,9 @@ from apps.common.permissions import (
     IsOwnerOrReadOnly,
 )
 
+from drf_spectacular.utils import extend_schema
 
+@extend_schema(tags=["booking"])
 class BookingViewSet(viewsets.ModelViewSet):
     """
     CRUD + custom actions (accept / reject / cancel / complete) for bookings.

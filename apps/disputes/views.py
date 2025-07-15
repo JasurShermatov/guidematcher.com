@@ -16,8 +16,9 @@ from apps.disputes.serializers import (
 )
 from apps.common.permissions import IsDisputeParticipant, IsAdmin
 
+from drf_spectacular.utils import extend_schema
 
-# ─────────── helper: log action ───────────
+@extend_schema(tags=["disputes"])
 def _log_action(dispute, performed_by, action_type, desc, old=None, new=None):
     DisputeAction.objects.create(
         dispute=dispute,

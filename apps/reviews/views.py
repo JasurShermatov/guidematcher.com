@@ -19,7 +19,9 @@ from apps.common.permissions import IsVerifiedUser  # avval yaratilgan
 from apps.reviews.filters import ReviewFilter
 
 
-# ───────────────────────────────────────── Review
+from drf_spectacular.utils import extend_schema
+
+@extend_schema(tags=["reviews"])
 class ReviewViewSet(viewsets.ModelViewSet):
     """
     list   – hamma ko‘rishi mumkin (faqat published)

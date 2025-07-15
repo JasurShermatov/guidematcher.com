@@ -68,11 +68,18 @@ class UserNotificationTypeSettingsSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "notification_type"]
 
 
-# ─────────── EmailLog (admin only) ───────────
 class EmailLogSerializer(serializers.ModelSerializer):
     user = UserShortSerializer(read_only=True)
 
     class Meta:
         model = EmailLog
         fields = "__all__"
-        read_only_fields = fields
+        read_only_fields = (
+            "id",
+            "user",
+            "subject",
+            "body",
+            "status",
+            "response",
+            "created_at",
+        )

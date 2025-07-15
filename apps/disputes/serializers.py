@@ -1,7 +1,8 @@
 from rest_framework import serializers
+
 from apps.disputes.models import Dispute, DisputeEvidence, DisputeMessage, DisputeAction
 from apps.users.serializers import UserShortSerializer
-from apps.bookings.serializers import BookingShortSerializer  # qisqa booking
+from apps.bookings.serializers import BookingShortSerializer
 
 
 # ─────────── DisputeAction (read-only) ───────────
@@ -11,7 +12,13 @@ class DisputeActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = DisputeAction
         fields = "__all__"
-        read_only_fields = fields
+        read_only_fields = (
+            "id",
+            "dispute",
+            "action",
+            "performed_by",
+            "created_at",
+        )
 
 
 # ─────────── Evidence ───────────
@@ -20,7 +27,7 @@ class EvidenceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DisputeEvidence
-        fields = [
+        fields = (
             "id",
             "dispute",
             "evidence_type",
@@ -33,38 +40,40 @@ class EvidenceSerializer(serializers.ModelSerializer):
             "verified_by",
             "verified_at",
             "created_at",
-        ]
-        read_only_fields = [
+        )
+        read_only_fields = (
             "id",
             "submitted_by",
+            "file_size",
             "is_verified",
             "verified_by",
             "verified_at",
             "created_at",
-            "file_size",
-        ]
+        )
 
+    # ≤ 25 MB tekshiruv
     def validate_file(self, file):
-        self.instance  # noqa: just trigger access if needed
-        file_size = file.size
-        if file_size > 25 * 1024 * 1024:  # 25 MB
+        if file.size > 25 * 1024 * 1024:
             raise serializers.ValidationError("Max 25 MB.")
         return file
 
     def create(self, validated):
-        validated["submitted_by"] = self.context["request"].user
-        validated["file_size"] = validated["file"].size
+        user = self.context["request"].user
+        validated.update(
+            submitted_by=user,
+            file_size=validated["file"].size,
+        )
         return super().create(validated)
 
 
-# ─────────── Message ───────────
+# ─────────── DisputeMessage ───────────
 class DisputeMessageSerializer(serializers.ModelSerializer):
     sender = UserShortSerializer(read_only=True)
     attachments = EvidenceSerializer(many=True, read_only=True)
 
     class Meta:
         model = DisputeMessage
-        fields = [
+        fields = (
             "id",
             "dispute",
             "sender",
@@ -72,15 +81,15 @@ class DisputeMessageSerializer(serializers.ModelSerializer):
             "is_internal",
             "attachments",
             "created_at",
-        ]
-        read_only_fields = ["id", "sender", "attachments", "created_at"]
+        )
+        read_only_fields = ("id", "sender", "attachments", "created_at")
 
     def create(self, validated):
         validated["sender"] = self.context["request"].user
         return super().create(validated)
 
 
-# ─────────── Dispute ───────────
+# ─────────── Dispute (asosiy) ───────────
 class DisputeSerializer(serializers.ModelSerializer):
     reporter = UserShortSerializer(read_only=True)
     respondent = UserShortSerializer(read_only=True)
@@ -90,7 +99,7 @@ class DisputeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dispute
         fields = "__all__"
-        read_only_fields = [
+        read_only_fields = (
             "id",
             "reporter",
             "status",
@@ -103,4 +112,4 @@ class DisputeSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "actions",
-        ]
+        )

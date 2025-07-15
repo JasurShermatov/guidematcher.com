@@ -1,25 +1,19 @@
 import os
 from pathlib import Path
 from datetime import timedelta
+import environ  # ⚠️ to‘g‘ri import
 
-import environ
-
-# ────────────────────────────
-# Base paths & env
-# ────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, []),
 )
-environ.Env.read_env(BASE_DIR / ".env")  # ← .env ni yuklaymiz
+environ.Env.read_env(BASE_DIR / ".env")
 
-# ────────────────────────────
-# Core
-# ────────────────────────────
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = env.bool("DEBUG")
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
+
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = env("TIME_ZONE", default="UTC")

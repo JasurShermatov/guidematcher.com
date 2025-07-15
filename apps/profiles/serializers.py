@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from apps.common.models import Language, ServiceType, City
 from apps.profiles.models import (
     ClientProfile,
@@ -46,6 +47,7 @@ class ClientProfileSerializer(serializers.ModelSerializer):
             "preferred_contact",
             "created_at",
         ]
+        read_only_fields = ["id", "user", "created_at"]
 
 
 # ─────────── Portfolio (nested) ───────────
@@ -53,7 +55,7 @@ class PortfolioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Portfolio
         fields = ("id", "image", "title", "description", "order", "created_at")
-        read_only_fields = ["id", "created_at", "order"]
+        read_only_fields = ("id", "created_at", "order")
 
 
 # ─────────── VerificationDocument ───────────
@@ -76,31 +78,31 @@ class VerificationDocumentSerializer(serializers.ModelSerializer):
             "verified_at",
             "created_at",
         ]
-        read_only_fields = [
+        read_only_fields = (
             "id",
             "is_verified",
             "verified_by",
             "verified_at",
             "created_at",
-        ]
+        )
 
 
 # ─────────── Availability ───────────
 class AvailabilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Availability
-        fields = [
+        fields = (
             "id",
             "date",
             "is_available",
             "start_time",
             "end_time",
             "note",
-        ]
-        read_only_fields = ["id"]
+        )
+        read_only_fields = ("id",)
 
 
-# ─────────── CustomerProfile (main) ───────────
+# ─────────── CustomerProfile (to‘liq) ───────────
 class CustomerProfileSerializer(serializers.ModelSerializer):
     user = UserShortSerializer(read_only=True)
     languages = LanguageSerializer(many=True, read_only=True)
@@ -134,7 +136,7 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             "created_at",
             "portfolio_items",
         ]
-        read_only_fields = [
+        read_only_fields = (
             "id",
             "user",
             "verification_status",
@@ -142,13 +144,44 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             "total_reviews",
             "total_bookings",
             "created_at",
-        ]
+        )
 
-    # update / create – owner ga ruxsat
-    def update(self, instance, validated_data):
-        return super().update(instance, validated_data)
 
-    def create(self, validated_data):
-        # create only once per user
-        user = self.context["request"].user
-        return CustomerProfile.objects.create(user=user, **validated_data)
+# ─────────── SHORT variantlar (importlar uchun) ───────────
+class CustomerProfileShortSerializer(serializers.ModelSerializer):
+    user = UserShortSerializer(read_only=True)
+    average_rating = serializers.DecimalField(
+        max_digits=3, decimal_places=2, read_only=True
+    )
+
+    class Meta:
+        model = CustomerProfile
+        fields = ("id", "user", "average_rating", "is_verified")
+        read_only_fields = ("id", "user", "average_rating", "is_verified")
+
+
+class ClientProfileShortSerializer(serializers.ModelSerializer):
+    user = UserShortSerializer(read_only=True)
+
+    class Meta:
+        model = ClientProfile
+        fields = ("id", "user")
+        read_only_fields = ("id", "user")
+
+
+# ─────────── Modul eksportlari ───────────
+__all__ = [
+    # helper
+    "LanguageSerializer",
+    "ServiceTypeSerializer",
+    "CitySerializer",
+    # main
+    "ClientProfileSerializer",
+    "CustomerProfileSerializer",
+    "PortfolioSerializer",
+    "VerificationDocumentSerializer",
+    "AvailabilitySerializer",
+    # short
+    "CustomerProfileShortSerializer",
+    "ClientProfileShortSerializer",
+]

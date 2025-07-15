@@ -2,8 +2,9 @@
 __pycache__/
 *.py[cod]
 
-# Django env files
-.env     # .env faylni yashiramiz, lekin .env.example ni saqlaymiz
+
+# Media files
+media/     # media papka gitga tushmaydi (user upload'lar)
 
 # IDE (Pycharm, VSCode)
 .idea/

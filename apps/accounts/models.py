@@ -1,15 +1,19 @@
 from django.db import models
 from django.utils import timezone
 
+
 class EmailVerification(models.Model):
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     code = models.CharField(max_length=6)
-    is_used = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)   # foydalanilganmi
+    verified = models.BooleanField(default=False)  # yakuniy tasdiq (ixtiyoriy)
 
-    def is_expired(self):
-        return self.expires_at < timezone.now()
+    def is_expired(self) -> bool:
+        return timezone.now() >= self.expires_at
 
-    def __str__(self):
-        return f"{self.email} - {self.code} ({'used' if self.is_used else 'active'})"
+    def mark_used(self, save=True):
+        self.is_used = True
+        if save:
+            self.save(update_fields=["is_used"])

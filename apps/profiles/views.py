@@ -25,6 +25,7 @@ from apps.profiles.permissions import IsOwnerOrReadOnly
 
 from drf_spectacular.utils import extend_schema
 
+
 @extend_schema(tags=["profiles"])
 class CustomerProfileViewSet(viewsets.ModelViewSet):
     """

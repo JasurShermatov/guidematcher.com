@@ -14,21 +14,21 @@ env = environ.Env(
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, []),
 )
-environ.Env.read_env(BASE_DIR / ".env")          # .env ni o‘qish
+environ.Env.read_env(BASE_DIR / ".env")  # .env ni o'qish
 
 # ─── Asosiy parol va debug ─────────────────────────────────────
-SECRET_KEY       = env("DJANGO_SECRET_KEY")
-DEBUG            = env.bool("DEBUG")
-ALLOWED_HOSTS    = env.list("ALLOWED_HOSTS")
+SECRET_KEY = env("DJANGO_SECRET_KEY")
+DEBUG = env.bool("DEBUG")
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
 # ─── Global lokallashuv ────────────────────────────────────────
-LANGUAGE_CODE    = "en-us"
-TIME_ZONE        = env("TIME_ZONE", default="UTC")
-USE_I18N         = True
-USE_TZ           = True
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = env("TIME_ZONE", default="UTC")
+USE_I18N = True
+USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-AUTH_USER_MODEL    = "users.User"
+AUTH_USER_MODEL = "users.User"
 
 # ╭──────────────────────────────────────────────────────────────╮
 # | 1. Installed apps                                           |
@@ -48,8 +48,8 @@ THIRD_PARTY_APPS = [
     "django_filters",
     "corsheaders",
     "drf_spectacular",
-    "django_celery_results",        # Celery natijalarini DB’da saqlash
-    # "channels",                   # WebSocket fazasida yoqasiz
+    "django_celery_results",  # Celery natijalarini DB'da saqlash
+    "channels",  # WebSocket fazasida yoqasiz
 ]
 
 LOCAL_APPS = [
@@ -71,7 +71,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # ╰──────────────────────────────────────────────────────────────╯
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",          # prod static
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # prod static
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -80,13 +80,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
-# ╭──────────────────────────────────────────────────────────────╮
-# | 3. URL / WSGI / ASGI                                        |
-# ╰──────────────────────────────────────────────────────────────╯
-ROOT_URLCONF   = "config.urls"
-WSGI_APPLICATION = "config.wsgi.application"
-# ASGI_APPLICATION = "config.asgi.application"     # Channels-ga o‘tganda
 
 # ╭──────────────────────────────────────────────────────────────╮
 # | 4. Templates                                                |
@@ -113,11 +106,11 @@ TEMPLATES = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME":     env("POSTGRES_DB",       default="postgres"),
-        "USER":     env("POSTGRES_USER",     default="postgres"),
+        "NAME": env("POSTGRES_DB", default="postgres"),
+        "USER": env("POSTGRES_USER", default="postgres"),
         "PASSWORD": env("POSTGRES_PASSWORD", default="postgres"),
-        "HOST":     env("POSTGRES_HOST",     default="db"),
-        "PORT":     env("POSTGRES_PORT",     default="5432"),
+        "HOST": env("POSTGRES_HOST", default="db"),
+        "PORT": env("POSTGRES_PORT", default="5432"),
     }
 }
 
@@ -126,28 +119,39 @@ DATABASES = {
 # ╰──────────────────────────────────────────────────────────────╯
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# Static katalogini tekshirish
+if not os.path.exists(BASE_DIR / "static"):
+    os.makedirs(BASE_DIR / "static", exist_ok=True)
+
+STATICFILES_DIRS = [BASE_DIR / "static"] if os.path.exists(BASE_DIR / "static") else []
+
 STATICFILES_STORAGE = (
     "whitenoise.storage.CompressedManifestStaticFilesStorage"
     if not DEBUG
     else "django.contrib.staticfiles.storage.StaticFilesStorage"
 )
 
-MEDIA_URL  = "/media/"
+MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # ╭──────────────────────────────────────────────────────────────╮
 # | 7. CORS                                                     |
 # ╰──────────────────────────────────────────────────────────────╯
-CORS_ALLOWED_ORIGINS  = env.list("CORS_ALLOWED_ORIGINS", default=[])
+CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 CORS_ALLOW_CREDENTIALS = True
 
 # ╭──────────────────────────────────────────────────────────────╮
 # | 8. Password validation                                      |
 # ╰──────────────────────────────────────────────────────────────╯
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 8}},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 8},
+    },
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
@@ -157,7 +161,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # ╰──────────────────────────────────────────────────────────────╯
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework_simplejwt.authentication.JWTAuthentication"],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication"
+    ],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
@@ -165,9 +171,9 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME":  timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "ROTATE_REFRESH_TOKENS":  True,
+    "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
@@ -175,25 +181,40 @@ SIMPLE_JWT = {
 # | 10. drf-spectacular (Swagger / Redoc)                       |
 # ╰──────────────────────────────────────────────────────────────╯
 SPECTACULAR_SETTINGS = {
-    "TITLE":       "GuideMatcher API",
+    "TITLE": "GuideMatcher API",
     "DESCRIPTION": "TravMatch platform REST API",
-    "VERSION":     "1.0.0",
+    "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
 # ╭──────────────────────────────────────────────────────────────╮
-# | 11. E-mail (SendGrid / SMTP)                                |
+# | 11. E-mail (Gmail SMTP)                                     |
 # ╰──────────────────────────────────────────────────────────────╯
-EMAIL_BACKEND       = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST          = env("EMAIL_HOST", default="smtp.sendgrid.net")
-EMAIL_PORT          = env.int("EMAIL_PORT", default=587)
-EMAIL_USE_TLS       = True
-EMAIL_HOST_USER     = env("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL  = env("DEFAULT_FROM_EMAIL", default="noreply@guidematcher.com")
+# Development uchun console yoki real SMTP
+if DEBUG and env.bool("EMAIL_DEBUG_MODE", default=True):
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = env(
+        "EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
+    )
+
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Gmail uchun maxsus sozlamalar
+if "gmail" in EMAIL_HOST:
+    EMAIL_USE_TLS = True
+    EMAIL_USE_SSL = False
+    EMAIL_PORT = 587
 
 # ╭──────────────────────────────────────────────────────────────╮
-# | 12. Redis cache (foydali, optional)                         |
+# | 12. Redis cache                                             |
 # ╰──────────────────────────────────────────────────────────────╯
 CACHES = {
     "default": {
@@ -205,23 +226,21 @@ CACHES = {
 # ╭──────────────────────────────────────────────────────────────╮
 # | 13. Celery konfiguratsiyasi                                 |
 # ╰──────────────────────────────────────────────────────────────╯
-CELERY_BROKER_URL        = env("CELERY_BROKER_URL", default="redis://redis:6379/0")
-CELERY_RESULT_BACKEND    = "django-db"       # django-celery-results
-CELERY_ACCEPT_CONTENT    = ["json"]
-CELERY_TASK_SERIALIZER   = "json"
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://redis:6379/0")
+CELERY_RESULT_BACKEND = env("REDIS_URL", default="redis://redis:6379/1")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
-CELERY_TIMEZONE          = TIME_ZONE
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 daqiqa
 
-# Misol uchun: xatlar ketishini fonda yuborish
-# CELERY_BEAT_SCHEDULE = {
-#     "clear-expired-verification-codes": {
-#         "task": "apps.accounts.tasks.clear_expired_verifications",
-#         "schedule": crontab(minute=0, hour="*/6"),
-#     },
-# }
+# Development uchun
+CELERY_TASK_ALWAYS_EAGER = env.bool("CELERY_TASK_ALWAYS_EAGER", default=False)
+CELERY_TASK_EAGER_PROPAGATES = True
 
 # ╭──────────────────────────────────────────────────────────────╮
-# | 14. Sentry (prod)                                           |
+# | 15. Sentry (prod)                                           |
 # ╰──────────────────────────────────────────────────────────────╯
 SENTRY_DSN = env("SENTRY_DSN", default="")
 if SENTRY_DSN and not DEBUG:
@@ -234,3 +253,23 @@ if SENTRY_DSN and not DEBUG:
         traces_sample_rate=0.2,
         send_default_pii=False,
     )
+
+
+# ╭──────────────────────────────────────────────────────────────╮
+# | 3. URL / WSGI / ASGI                                        |
+# ╰──────────────────────────────────────────────────────────────╯
+# ↓ bor joyida
+ROOT_URLCONF = "config.urls"
+WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = "config.asgi.application"  # <-- uncomment / qo‘sh
+
+# ... (pastroqda) ...
+# CHANNEL_LAYERS qo‘shamiz
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [env("CHANNEL_REDIS_URL", default="redis://redis:6379/2")],
+        },
+    },
+}

@@ -25,6 +25,7 @@ class ReadOnlyOrAdmin(permissions.BasePermission):
 
 from drf_spectacular.utils import extend_schema
 
+
 @extend_schema(tags=["common"])
 class CountryViewSet(viewsets.ModelViewSet):
     queryset = Country.objects.filter(is_active=True)

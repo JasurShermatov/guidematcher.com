@@ -25,6 +25,7 @@ from apps.notifications.serializers import (
 
 from drf_spectacular.utils import extend_schema
 
+
 @extend_schema(tags=["notifications"])
 class NotificationTypeViewSet(
     mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet

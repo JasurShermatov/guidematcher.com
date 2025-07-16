@@ -53,3 +53,6 @@ django-celery-results
 wcwidth==0.2.13
 whitenoise==6.9.0
 redis>=4.0.0
+channels>=4.1
+channels-redis>=4.2
+daphne>=4.0

@@ -2,8 +2,7 @@ x-env: &default-env
   env_file: .env
 
 services:
-  # ---------- DATABASE ----------
-  db:  # 🟢 SERVIS NOMI "db" deb saqlansin!
+  db:
     image: postgres:15-alpine
     restart: unless-stopped
     environment:
@@ -20,18 +19,19 @@ services:
     ports:
       - "5432:5432"
 
-  # ---------- REDIS ----------
   redis:
     image: redis:7-alpine
     restart: unless-stopped
     ports:
       - "6379:6379"
 
-  # ---------- DJANGO BACKEND ----------
   backend:
     build: .
     <<: *default-env
-    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    restart: unless-stopped
+    # entrypoint.sh image ichida (default)
+    command: >
+      daphne -b 0.0.0.0 -p 8000 config.asgi:application
     volumes:
       - .:/app
       - static_data:/app/staticfiles
@@ -44,23 +44,27 @@ services:
       redis:
         condition: service_started
 
-  # ---------- CELERY WORKER ----------
   celery:
     build: .
     <<: *default-env
-    command: ["celery", "-A", "config", "worker", "-l", "info", "--concurrency=4"]
+    restart: unless-stopped
+    entrypoint: ""   # <-- entrypoint.sh ni bypass (ixtiyoriy, tavsiya)
+    command: celery -A config worker -l info --concurrency=4
     depends_on:
-      redis:
-        condition: service_started
       backend:
         condition: service_started
+      redis:
+        condition: service_started
 
-  # ---------- CELERY BEAT ----------
   celery-beat:
     build: .
     <<: *default-env
-    command: ["celery", "-A", "config", "beat", "-l", "info"]
+    restart: unless-stopped
+    entrypoint: ""   # <-- entrypoint.sh ni bypass
+    command: celery -A config beat -l info
     depends_on:
+      backend:
+        condition: service_started
       redis:
         condition: service_started
 

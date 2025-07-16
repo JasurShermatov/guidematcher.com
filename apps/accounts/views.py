@@ -16,7 +16,10 @@ class RequestCodeView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         ev = serializer.save()
-        return Response({"detail": "Kod yuborildi.", "expires_at": ev.expires_at}, status=status.HTTP_201_CREATED)
+        return Response(
+            {"detail": "Kod yuborildi.", "expires_at": ev.expires_at},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class RegisterView(generics.CreateAPIView):

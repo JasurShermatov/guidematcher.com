@@ -19,6 +19,7 @@ from apps.common.permissions import (
 
 from drf_spectacular.utils import extend_schema
 
+
 @extend_schema(tags=["booking"])
 class BookingViewSet(viewsets.ModelViewSet):
     """

@@ -21,6 +21,7 @@ from apps.reviews.filters import ReviewFilter
 
 from drf_spectacular.utils import extend_schema
 
+
 @extend_schema(tags=["reviews"])
 class ReviewViewSet(viewsets.ModelViewSet):
     """

@@ -18,6 +18,7 @@ from apps.common.permissions import IsDisputeParticipant, IsAdmin
 
 from drf_spectacular.utils import extend_schema
 
+
 @extend_schema(tags=["disputes"])
 def _log_action(dispute, performed_by, action_type, desc, old=None, new=None):
     DisputeAction.objects.create(

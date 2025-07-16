@@ -7,7 +7,7 @@ class EmailVerification(models.Model):
     code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
-    is_used = models.BooleanField(default=False)   # foydalanilganmi
+    is_used = models.BooleanField(default=False)  # foydalanilganmi
     verified = models.BooleanField(default=False)  # yakuniy tasdiq (ixtiyoriy)
 
     def is_expired(self) -> bool:

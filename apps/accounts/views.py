@@ -1,13 +1,19 @@
-# apps/accounts/views.py
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from drf_spectacular.utils import extend_schema
+from rest_framework_simplejwt.views import TokenObtainPairView
 
+from apps.users.serializers import AuthTokenSerializer
 from .serializers import RequestVerificationCodeSerializer, RegisterSerializer
 
 
-@extend_schema(tags=["Accounts"])
+@extend_schema(tags=["accounts"])
+class LoginView(TokenObtainPairView):
+    serializer_class = AuthTokenSerializer
+
+
+@extend_schema(tags=["accounts"])
 class RequestCodeView(generics.CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class = RequestVerificationCodeSerializer
@@ -22,6 +28,7 @@ class RequestCodeView(generics.CreateAPIView):
         )
 
 
+@extend_schema(tags=["accounts"])
 class RegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer

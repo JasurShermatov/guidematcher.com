@@ -1,20 +1,22 @@
+# apps/users/serializers.py
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from google.oauth2 import id_token
-from google.auth.transport import requests as google_requests
 
-from apps.users.models import EmailVerification
-from apps.common.utils import generate_random_code
+# Google auth (ixtiyoriy)
+from google.oauth2 import id_token as google_id_token
+from google.auth.transport import requests as google_requests
 
 User = get_user_model()
 
 
 # ───────────────────────────── JWT
 class AuthTokenSerializer(TokenObtainPairSerializer):
-    """JWT’ga qo‘shimcha user ma’lumotlari."""
+    """
+    JWT refresh/access tokenlarini qaytaradi va foydalanuvchi haqidagi
+    qo'shimcha claim'larni token ichiga qo'shadi.
+    """
 
     @classmethod
     def get_token(cls, user):
@@ -25,86 +27,42 @@ class AuthTokenSerializer(TokenObtainPairSerializer):
         return token
 
 
-# ───────────────────────────── Register
+# ───────────────────────────── Register (internal)
+# Public registratsiya `apps.accounts` orqali (kod + tasdiq).
+# Ushbu serializer developer/admin/test uchun qoldirilgan.
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
+    role = serializers.ChoiceField(
+        choices=User.UserRole.choices,
+        default=User.UserRole.CLIENT,
+        required=False,
+    )
 
     class Meta:
         model = User
-        fields = ("email", "first_name", "last_name", "password", "country")
+        fields = ("email", "first_name", "last_name", "password", "role", "country")
 
     def create(self, validated_data):
         password = validated_data.pop("password")
-        user = User.objects.create_user(**validated_data)
-        user.set_password(password)
-        user.is_active = True
-        user.save()
 
-        code = generate_random_code()
-        EmailVerification.objects.create(
-            user=user,
-            email=user.email,
-            code=code,
-            expires_at=timezone.now() + timezone.timedelta(minutes=30),
-        )
+        # create_user parolni hashlaydi va saqlaydi
+        user = User.objects.create_user(password=password, **validated_data)
+        user.is_active = True  # ehtiyot chora: active bo'lsin
+        user.save(update_fields=["is_active"])
 
-        # Celery (yoki sinchiklab utils) – mavjud bo‘lsa
-        from apps.users.tasks import send_verification_email
+        # E-mail verifikatsiya -> accounts servisiga delegatsiya
+        if not user.is_verified:
+            try:
+                from apps.accounts.services import (
+                    create_and_send_email_verification_code,
+                )
 
-        send_verification_email.delay(user.email, code)
+                create_and_send_email_verification_code(user)
+            except Exception:  # noqa: BLE001
+                # TODO: logger.warning("Verification send failed", exc_info=True)
+                pass
+
         return user
-
-
-# ───────────────────────────── Verify / Resend
-class VerifyEmailSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    code = serializers.CharField(max_length=6)
-
-    def validate(self, attrs):
-        try:
-            ver = EmailVerification.objects.get(
-                email=attrs["email"], code=attrs["code"], is_used=False
-            )
-        except EmailVerification.DoesNotExist:
-            raise serializers.ValidationError("Kod noto‘g‘ri yoki ishlatilgan.")
-        if ver.is_expired:
-            raise serializers.ValidationError("Kod eskirgan.")
-        attrs["verification"] = ver
-        return attrs
-
-    def save(self, **kwargs):
-        ver = self.validated_data["verification"]
-        ver.is_used = True
-        ver.save(update_fields=["is_used"])
-        ver.user.is_verified = True
-        ver.user.save(update_fields=["is_verified"])
-        return ver.user
-
-
-class ResendVerificationSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-
-    def validate_email(self, value):
-        user = User.objects.filter(email=value).first()
-        if not user:
-            raise serializers.ValidationError("E-mail topilmadi.")
-        if user.is_verified:
-            raise serializers.ValidationError("E-mail allaqachon tasdiqlangan.")
-        self.user = user
-        return value
-
-    def save(self, **kwargs):
-        code = generate_random_code()
-        EmailVerification.objects.create(
-            user=self.user,
-            email=self.user.email,
-            code=code,
-            expires_at=timezone.now() + timezone.timedelta(minutes=30),
-        )
-        from apps.users.tasks import send_verification_email
-
-        send_verification_email.delay(self.user.email, code)
-        return self.user
 
 
 # ───────────────────────────── Google Login
@@ -112,11 +70,12 @@ class GoogleAuthSerializer(serializers.Serializer):
     id_token = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
+        raw_token = attrs["id_token"]
         try:
-            info = id_token.verify_oauth2_token(
-                attrs["id_token"], google_requests.Request()
+            info = google_id_token.verify_oauth2_token(
+                raw_token, google_requests.Request()
             )
-        except Exception:
+        except Exception:  # noqa: BLE001
             raise serializers.ValidationError("Invalid Google token.")
 
         email = info.get("email")
@@ -128,7 +87,7 @@ class GoogleAuthSerializer(serializers.Serializer):
             defaults={
                 "first_name": info.get("given_name", ""),
                 "last_name": info.get("family_name", ""),
-                "is_verified": True,
+                "is_verified": True,  # Google hisobini verified deb qabul qilamiz
                 "google_id": info.get("sub"),
             },
         )
@@ -139,7 +98,7 @@ class GoogleAuthSerializer(serializers.Serializer):
         return {"refresh": str(refresh), "access": str(refresh.access_token)}
 
 
-# ───────────────────────────── Password reset
+# ───────────────────────────── Password reset (delegated to accounts)
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -150,11 +109,13 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
     def save(self, **kwargs):
         from django.contrib.auth.tokens import default_token_generator
-        from apps.users.tasks import send_password_reset_email
+        from apps.accounts.services import send_password_reset  # siz yozadigan servis
 
         user = User.objects.get(email=self.validated_data["email"])
         token = default_token_generator.make_token(user)
-        send_password_reset_email.delay(user.email, token)
+        send_password_reset(
+            user, token
+        )  # servis reset URL yasab, Celery task chaqiradi
         return token
 
 
@@ -168,15 +129,18 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     def validate(self, attrs):
         from django.contrib.auth.tokens import default_token_generator
 
-        user = User.objects.filter(email=attrs["email"]).first()
-        if not user or not default_token_generator.check_token(user, attrs["token"]):
+        email = attrs["email"]
+        token = attrs["token"]
+
+        user = User.objects.filter(email=email).first()
+        if not user or not default_token_generator.check_token(user, token):
             raise serializers.ValidationError("Token yaroqsiz.")
         self.user = user
         return attrs
 
     def save(self, **kwargs):
         self.user.set_password(self.validated_data["new_password"])
-        self.user.save()
+        self.user.save(update_fields=["password"])
         return self.user
 
 
@@ -214,12 +178,9 @@ class UserShortSerializer(serializers.ModelSerializer):
         fields = ("id", "first_name", "last_name", "avatar")
 
 
-# ───────────────────────────── Eksport
 __all__ = [
     "AuthTokenSerializer",
     "RegisterSerializer",
-    "VerifyEmailSerializer",
-    "ResendVerificationSerializer",
     "GoogleAuthSerializer",
     "PasswordResetRequestSerializer",
     "PasswordResetConfirmSerializer",

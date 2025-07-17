@@ -273,3 +273,9 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+
+FRONTEND_PASSWORD_RESET_URL = env.str(
+    "FRONTEND_PASSWORD_RESET_URL",
+    default="http://localhost:3000/reset-password",
+)

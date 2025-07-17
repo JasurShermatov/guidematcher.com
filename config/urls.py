@@ -16,37 +16,40 @@ from drf_spectacular.views import (
 )
 
 # ──────────────────────────────────────────────
-# Version-langan API marshrutlari
+# API v1 marshrutlari — modullar bo‘yicha
 # ──────────────────────────────────────────────
 api_v1_patterns = [
-    # Auth (registratsiya, verification, password‐reset …)
+    # 📩 Accounts: Login / Register / Email verification
+    path("accounts/", include("apps.accounts.urls")),
+    # 👤 Users: Google login, password reset, profile
     path("auth/", include("apps.users.urls")),
-    # Profillar
-    path("profiles/", include("apps.profiles.urls")),
-    # Booking
-    path("bookings/", include("apps.bookings.urls")),
-    # Chat
-    path("chat/", include("apps.chat.urls")),
-    # Reviewlar
-    path("reviews/", include("apps.reviews.urls")),
-    # Notificationlar
-    path("notifications/", include("apps.notifications.urls")),
-    # Disputelar
-    path("disputes/", include("apps.disputes.urls")),
-    # Common (mamlakat, til, xizmat turlari va h.k.)
+    # 🌍 Common data: countries, languages, services, etc.
     path("common/", include("apps.common.urls")),
-    # 📩 Accounts (email verification, registration helpers)
-    path("accounts/", include("apps.accounts.urls")),  # 👈 Qo‘shildi
+    # 📦 Booking
+    path("bookings/", include("apps.bookings.urls")),
+    # 💬 Chat / Messages
+    path("chat/", include("apps.chat.urls")),
+    # ⭐ Reviews
+    path("reviews/", include("apps.reviews.urls")),
+    # 🔔 Notifications
+    path("notifications/", include("apps.notifications.urls")),
+    # ⚖️ Disputes
+    path("disputes/", include("apps.disputes.urls")),
+    # 🧑 Profiles (public profiles if separated from auth)
+    path("profiles/", include("apps.profiles.urls")),
 ]
 
+# ──────────────────────────────────────────────
+# Umumiy loyihaviy URLConf
+# ──────────────────────────────────────────────
 urlpatterns = [
-    # Django admin
+    # Admin panel
     path("admin/", admin.site.urls),
-    # JWT tokenlar
+    # JWT (qo‘shimcha token endpointlar)
     path("api/v1/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/v1/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/v1/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
-    # OpenAPI – yaml/json
+    # OpenAPI schema (json/yaml)
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     # Swagger UI
     path(
@@ -56,12 +59,12 @@ urlpatterns = [
     ),
     # ReDoc
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
-    # Version 1 API drf-router/path-lari
+    # API V1 versionlangan yo‘llar
     path("api/v1/", include(api_v1_patterns)),
 ]
 
 # ──────────────────────────────────────────────
-# Media & static — faqat DEBUG =True da
+# Media & Static fayllar (faqat DEBUG=True holatda)
 # ──────────────────────────────────────────────
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

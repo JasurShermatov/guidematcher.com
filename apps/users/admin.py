@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, EmailVerification, LoginAttempt
+from .models import User, LoginAttempt
 
 
 @admin.register(User)
@@ -70,14 +70,6 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ("role", "is_active", "is_verified", "country")
     ordering = ("-date_joined",)
     readonly_fields = ("date_joined", "last_login_ip")
-
-
-@admin.register(EmailVerification)
-class EmailVerificationAdmin(admin.ModelAdmin):
-    list_display = ("user", "email", "code", "is_used", "expires_at", "created_at")
-    search_fields = ("email", "code", "user__email")
-    list_filter = ("is_used",)
-    readonly_fields = ("created_at",)
 
 
 @admin.register(LoginAttempt)

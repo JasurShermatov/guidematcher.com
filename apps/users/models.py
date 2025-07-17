@@ -1,15 +1,22 @@
-# apps/users/models.py
+"""
+User modeli.
+
+Eslatma:
+    E-mail verifikatsiya endi `apps.accounts` ilovasida.
+    Users app faqat foydalanuvchi identifikatsiyasi va profilga mas'ul.
+"""
 
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+
 from apps.common.models import BaseModel, Country
 from .managers import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin, BaseModel):
-    """Custom user model with email authentication"""
+    """Custom user model with e-mail login & role support."""
 
     class UserRole(models.TextChoices):
         CLIENT = "client", _("Client (Tourist)")
@@ -17,6 +24,7 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         ADMIN = "admin", _("Admin")
         SUPERADMIN = "superadmin", _("Superadmin")
 
+    # --- Auth / identity ---
     email = models.EmailField(unique=True, verbose_name=_("Email address"))
     phone = models.CharField(max_length=20, blank=True, verbose_name=_("Phone number"))
     first_name = models.CharField(max_length=150, verbose_name=_("First name"))
@@ -36,12 +44,14 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         verbose_name=_("Country of origin"),
     )
 
-    # Status fields
+    # --- Status flags ---
     is_active = models.BooleanField(default=True, verbose_name=_("Active status"))
     is_staff = models.BooleanField(default=False, verbose_name=_("Staff status"))
-    is_verified = models.BooleanField(default=False, verbose_name=_("Email verified"))
+    is_verified = models.BooleanField(
+        default=False, verbose_name=_("Email verified")
+    )  # accounts app tasdiqlaydi
 
-    # Auth related
+    # --- Dates / meta ---
     date_joined = models.DateTimeField(
         default=timezone.now, verbose_name=_("Date joined")
     )
@@ -49,7 +59,7 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         null=True, blank=True, verbose_name=_("Last login IP")
     )
 
-    # Social auth
+    # --- Social auth IDs ---
     google_id = models.CharField(
         max_length=255, blank=True, unique=True, null=True, verbose_name=_("Google ID")
     )
@@ -64,7 +74,7 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         max_length=255, blank=True, unique=True, null=True, verbose_name=_("Apple ID")
     )
 
-    # Additional
+    # --- UI / extra ---
     avatar = models.ImageField(
         upload_to="avatars/%Y/%m/",
         blank=True,
@@ -84,63 +94,40 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         verbose_name_plural = _("Users")
         ordering = ["-date_joined"]
 
-    def __str__(self):
+    def __str__(self) -> str:  # type: ignore[override]
         return self.get_full_name() or self.email
 
-    def get_full_name(self):
-        """Return the full name of the user"""
+    # ----- Helpers -----
+    def get_full_name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()
 
-    def get_short_name(self):
-        """Return the short name of the user"""
+    def get_short_name(self) -> str:
         return self.first_name
 
     @property
-    def is_client(self):
+    def is_client(self) -> bool:
         return self.role == self.UserRole.CLIENT
 
     @property
-    def is_customer(self):
+    def is_customer(self) -> bool:
         return self.role == self.UserRole.CUSTOMER
 
     @property
-    def is_admin(self):
+    def is_admin(self) -> bool:
         return self.role in [self.UserRole.ADMIN, self.UserRole.SUPERADMIN]
 
     @property
-    def is_superadmin(self):
+    def is_superadmin(self) -> bool:
         return self.role == self.UserRole.SUPERADMIN
 
 
-class EmailVerification(BaseModel):
-    """Email verification codes"""
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="email_verifications",
-        verbose_name=_("User"),
-    )
-    email = models.EmailField(verbose_name=_("Email"))
-    code = models.CharField(max_length=6, verbose_name=_("Verification code"))
-    is_used = models.BooleanField(default=False, verbose_name=_("Is used"))
-    expires_at = models.DateTimeField(verbose_name=_("Expires at"))
-
-    class Meta:
-        verbose_name = _("Email verification")
-        verbose_name_plural = _("Email verifications")
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return f"{self.user.email} - {self.code}"
-
-    @property
-    def is_expired(self):
-        return timezone.now() > self.expires_at
-
-
+# (Ixtiyoriy) LoginAttempt ni vaqtincha users’da qoldiramiz.
+# Agar accounts/security app’iga ko‘chirmoqchi bo‘lsangiz xabar bering.
 class LoginAttempt(BaseModel):
-    """Track login attempts for security"""
+    """
+    Xavfsizlik uchun login urinishlarini log qiladi.
+    (Brute force, bloklash, statistik tahlil uchun.)
+    """
 
     email = models.EmailField(verbose_name=_("Email"))
     ip_address = models.GenericIPAddressField(verbose_name=_("IP address"))
@@ -159,5 +146,5 @@ class LoginAttempt(BaseModel):
             models.Index(fields=["ip_address", "created_at"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:  # type: ignore[override]
         return f"{self.email} - {self.created_at}"

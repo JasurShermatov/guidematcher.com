@@ -1,5 +1,3 @@
-# apps/chat/models.py
-
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from apps.common.models import BaseModel
@@ -7,7 +5,7 @@ from apps.users.models import User
 
 
 class ChatRoom(BaseModel):
-    """Chat rooms between users"""
+    """Chat rooms between users / system"""
 
     class RoomType(models.TextChoices):
         DIRECT = "direct", _("Direct message")
@@ -25,7 +23,7 @@ class ChatRoom(BaseModel):
     )
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
 
-    # For booking-related chats
+    # for booking chats
     booking = models.ForeignKey(
         "bookings.Booking",
         on_delete=models.SET_NULL,
@@ -39,33 +37,34 @@ class ChatRoom(BaseModel):
         verbose_name = _("Chat room")
         verbose_name_plural = _("Chat rooms")
         ordering = ["-updated_at"]
-        indexes = [
-            models.Index(fields=["room_type", "is_active"]),
-        ]
+        indexes = [models.Index(fields=["room_type", "is_active"])]
 
+    # ─────────────────────── helpers
     def __str__(self):
         if self.room_type == self.RoomType.DIRECT:
             users = list(self.participants.all()[:2])
             if len(users) == 2:
-                return f"Chat: {users[0].get_full_name()} - {users[1].get_full_name()}"
-        return f"Chat Room {self.id}"
+                return f"{users[0].get_full_name()} ↔ {users[1].get_full_name()}"
+        return f"ChatRoom {self.pk}"
 
-    def get_other_participant(self, user):
-        """Get the other participant in a direct chat"""
+    def other_participant(self, user):
         if self.room_type == self.RoomType.DIRECT:
             return self.participants.exclude(id=user.id).first()
         return None
 
 
+# ──────────────────────────────────────────────────────────────────────
 class Message(BaseModel):
-    """Chat messages"""
+    """Chat messages (text / media / system)"""
 
     class MessageType(models.TextChoices):
-        TEXT = "text", _("Text message")
+        TEXT = "text", _("Text")
         IMAGE = "image", _("Image")
-        FILE = "file", _("File")
+        FILE = "file", _("File (doc/zip)")
+        AUDIO = "audio", _("Audio / voice")
+        VIDEO = "video", _("Video")
         LOCATION = "location", _("Location")
-        SYSTEM = "system", _("System message")
+        SYSTEM = "system", _("System")
 
     room = models.ForeignKey(
         ChatRoom,
@@ -84,67 +83,46 @@ class Message(BaseModel):
         max_length=20,
         choices=MessageType.choices,
         default=MessageType.TEXT,
-        verbose_name=_("Message type"),
+        verbose_name=_("Type"),
     )
 
-    # Content
-    text = models.TextField(blank=True, verbose_name=_("Text content"))
+    # ───── raw content ─────
+    text = models.TextField(blank=True, verbose_name=_("Text"))
     image = models.ImageField(
-        upload_to="chat/images/%Y/%m/",
-        blank=True,
-        null=True,
-        verbose_name=_("Image"),
-        help_text=_("JPEG, PNG, max 10MB"),
-    )
+        upload_to="chat/images/%Y/%m/", blank=True, null=True, verbose_name=_("Image")
+    )  # max 10 MB
     file = models.FileField(
         upload_to="chat/files/%Y/%m/",
         blank=True,
         null=True,
-        verbose_name=_("File"),
-        help_text=_("PDF, DOC, DOCX, max 25MB"),
-    )
-    file_name = models.CharField(
-        max_length=255, blank=True, verbose_name=_("Original file name")
-    )
-    file_size = models.PositiveIntegerField(
-        null=True, blank=True, verbose_name=_("File size (bytes)")
-    )
+        verbose_name=_("File / media"),
+    )  # max 25 MB
+    file_name = models.CharField(max_length=255, blank=True)
+    file_size = models.PositiveIntegerField(null=True, blank=True)
 
-    # Location
+    # location
     latitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
-        null=True,
-        blank=True,
-        verbose_name=_("Latitude"),
+        max_digits=9, decimal_places=6, null=True, blank=True
     )
     longitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
-        null=True,
-        blank=True,
-        verbose_name=_("Longitude"),
+        max_digits=9, decimal_places=6, null=True, blank=True
     )
-    location_name = models.CharField(
-        max_length=255, blank=True, verbose_name=_("Location name")
-    )
+    location_name = models.CharField(max_length=255, blank=True)
 
-    # Status
-    is_edited = models.BooleanField(default=False, verbose_name=_("Is edited"))
-    edited_at = models.DateTimeField(null=True, blank=True, verbose_name=_("Edited at"))
-    is_deleted = models.BooleanField(default=False, verbose_name=_("Is deleted"))
-    deleted_at = models.DateTimeField(
-        null=True, blank=True, verbose_name=_("Deleted at")
-    )
+    # flags
+    is_edited = models.BooleanField(default=False)
+    edited_at = models.DateTimeField(null=True, blank=True)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
-    # Reply
+    # reply-thread
     reply_to = models.ForeignKey(
         "self",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="replies",
-        verbose_name=_("Reply to message"),
+        verbose_name=_("Reply to"),
     )
 
     class Meta:
@@ -157,11 +135,12 @@ class Message(BaseModel):
         ]
 
     def __str__(self):
-        return f"{self.get_message_type_display()} from {self.sender}"
+        return f"{self.get_message_type_display()} ({self.pk})"
 
 
+# ──────────────────────────────────────────────────────────────────────
 class MessageRead(BaseModel):
-    """Track message read status"""
+    """Read-receipt"""
 
     message = models.ForeignKey(
         Message,
@@ -175,43 +154,29 @@ class MessageRead(BaseModel):
         related_name="read_messages",
         verbose_name=_("User"),
     )
-    read_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Read at"))
+    read_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = _("Message read receipt")
-        verbose_name_plural = _("Message read receipts")
         unique_together = [["message", "user"]]
-        indexes = [
-            models.Index(fields=["user", "read_at"]),
-        ]
-
-    def __str__(self):
-        return f"{self.user} read message at {self.read_at}"
+        indexes = [models.Index(fields=["user", "read_at"])]
+        verbose_name = _("Read receipt")
+        verbose_name_plural = _("Read receipts")
 
 
 class UserTypingStatus(models.Model):
-    """Track user typing status in real-time"""
+    """Realtime typing indicator (per-room)"""
 
     room = models.ForeignKey(
-        ChatRoom,
-        on_delete=models.CASCADE,
-        related_name="typing_statuses",
-        verbose_name=_("Chat room"),
+        ChatRoom, on_delete=models.CASCADE, related_name="typing_statuses"
     )
     user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="typing_statuses",
-        verbose_name=_("User"),
+        User, on_delete=models.CASCADE, related_name="typing_statuses"
     )
-    is_typing = models.BooleanField(default=False, verbose_name=_("Is typing"))
-    last_typed_at = models.DateTimeField(auto_now=True, verbose_name=_("Last typed at"))
+    is_typing = models.BooleanField(default=False)
+    last_typed_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = _("User typing status")
-        verbose_name_plural = _("User typing statuses")
         unique_together = [["room", "user"]]
 
     def __str__(self):
-        status = "typing" if self.is_typing else "not typing"
-        return f"{self.user} is {status} in {self.room}"
+        return f"{self.user} – {'typing' if self.is_typing else 'idle'}"

@@ -1,7 +1,11 @@
+# ◀️  “version:” kaliti keraksiz – Compose v2+ da avtomatik aniqlanadi
+
 x-env: &default-env
-  env_file: .env
+  env_file:
+    - .env
 
 services:
+  # ───────────── Database ─────────────
   db:
     image: postgres:15-alpine
     restart: unless-stopped
@@ -12,24 +16,25 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
       interval: 5s
       timeout: 3s
       retries: 5
     ports:
       - "5432:5432"
 
+  # ───────────── Redis ────────────────
   redis:
     image: redis:7-alpine
     restart: unless-stopped
     ports:
       - "6379:6379"
 
+  # ───────────── Django / ASGI ────────
   backend:
     build: .
     <<: *default-env
     restart: unless-stopped
-    # entrypoint.sh image ichida (default)
     command: >
       daphne -b 0.0.0.0 -p 8000 config.asgi:application
     volumes:
@@ -43,12 +48,19 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+    healthcheck:
+      # Django health: settings'da simple view (`/health/`) yoki manage.py check
+      test: ["CMD-SHELL", "curl -sSf http://localhost:8000/health/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
+  # ───────────── Celery worker ────────
   celery:
     build: .
     <<: *default-env
     restart: unless-stopped
-    entrypoint: ""   # <-- entrypoint.sh ni bypass (ixtiyoriy, tavsiya)
+    entrypoint: ""
     command: celery -A config worker -l info --concurrency=4
     depends_on:
       backend:
@@ -56,12 +68,13 @@ services:
       redis:
         condition: service_started
 
+  # ───────────── Celery Beat ──────────
   celery-beat:
     build: .
     <<: *default-env
     restart: unless-stopped
-    entrypoint: ""   # <-- entrypoint.sh ni bypass
-    command: celery -A config beat -l info
+    entrypoint: ""
+    command: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     depends_on:
       backend:
         condition: service_started

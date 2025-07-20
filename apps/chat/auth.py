@@ -1,3 +1,4 @@
+#  apps/chat/auth.py
 from urllib.parse import parse_qs
 from django.contrib.auth.models import AnonymousUser
 

@@ -19,6 +19,11 @@ import {
   FiX 
 } from 'react-icons/fi';
 import './HomePage.css';
+import desktopImage1 from '../images/desktop-image-1.jpeg';
+import desktopImage2 from '../images/desktop-image-2.jpg';
+import desktopImage3 from '../images/desktop-image-3.jpg';
+import desktopImage4 from '../images/desktop-image-4.jpg';
+import desktopImage5 from '../images/desktop-image-5.avif';
 
 const HomePage = () => {
   const [searchLocation, setSearchLocation] = useState('');
@@ -28,6 +33,7 @@ const HomePage = () => {
   const [isLearnMoreOpen, setIsLearnMoreOpen] = useState(false);
   const [isDestinationModalOpen, setIsDestinationModalOpen] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
 
   const popularDestinations = [
@@ -72,6 +78,14 @@ const HomePage = () => {
     { number: 3, title: 'Experience', description: 'Enjoy authentic local experiences.', icon: <FiHeart />, color: 'from-green-500 to-teal-500' }
   ];
 
+  const heroImages = [
+    desktopImage1,
+    desktopImage2,
+    desktopImage3,
+    desktopImage4,
+    desktopImage5
+  ];
+
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
@@ -100,6 +114,13 @@ const HomePage = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isLearnMoreOpen, isDestinationModalOpen]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
+
   const handleFindGuide = () => {
     navigate('/find-guides', { state: { location: searchLocation, service: searchService } });
   };
@@ -126,7 +147,7 @@ const HomePage = () => {
     <div className="homepage">
       {/* Hero Section */}
       <section className="homepage-hero">
-        <div className="homepage-hero-background">
+        <div className="homepage-hero-background" style={{ backgroundImage: `url(${heroImages[currentImageIndex]})` }}>
           <div className="homepage-hero-gradient"></div>
         </div>
         <div className="homepage-container homepage-hero-content">

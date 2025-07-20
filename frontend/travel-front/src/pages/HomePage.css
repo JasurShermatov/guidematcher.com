@@ -69,8 +69,18 @@ body {
 .homepage-hero-background {
   position: absolute;
   inset: 0;
-  background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') center/cover no-repeat;
-  filter: brightness(0.5);
+  /* background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') center/cover no-repeat; */
+  /* filter: brightness(0.5); */
+  background-size: cover;
+  background-position: center;
+  animation: fade 6s infinite;
+}
+
+@keyframes fade {
+  0% { opacity: 1; }
+  33% { opacity: 0.3; }
+  66% { opacity: 0.3; }
+  100% { opacity: 1; }
 }
 
 .homepage-hero-gradient {

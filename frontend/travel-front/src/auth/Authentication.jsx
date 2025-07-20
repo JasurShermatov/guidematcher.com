@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { FiX, FiMail, FiLock, FiUser, FiLogIn, FiCheckSquare, FiSquare, FiGlobe, FiMapPin } from 'react-icons/fi';
+import React, { useState, useEffect, useRef } from 'react';
+import { FiX, FiMail, FiLock, FiUser, FiLogIn, FiCheckSquare, FiSquare, FiGlobe, FiCheck } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { loginUser, requestCode, verifyCode } from '../api/api';
 import './Authentication.css';
 
 const Authentication = ({ setIsAuthenticated, setUser }) => {
@@ -10,21 +11,49 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [registerForm, setRegisterForm] = useState({
     role: 'Client',
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
     email: '',
     password: '',
-    confirmPassword: '',
+    confirm_password: '',
     country: '',
-    city: ''
   });
+  const [verificationCode, setVerificationCode] = useState('');
   const [checkboxes, setCheckboxes] = useState({
     personalData: false,
     terms: false,
-    travelTips: false
+    travelTips: false,
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [verificationStep, setVerificationStep] = useState(false);
+  const [countrySuggestions, setCountrySuggestions] = useState([]);
+  const countryInputRef = useRef(null);
   const navigate = useNavigate();
+
+  const countries = [
+    'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia',
+    'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin',
+    'Bhutan', 'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi',
+    'Cabo Verde', 'Cambodia', 'Cameroon', 'Canada', 'Central African Republic', 'Chad', 'Chile', 'China', 'Colombia',
+    'Comoros', 'Congo (Congo-Brazzaville)', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czechia', 'Denmark', 'Djibouti',
+    'Dominica', 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador', 'Equatorial Guinea', 'Eritrea', 'Estonia',
+    'Eswatini', 'Ethiopia', 'Fiji', 'Finland', 'France', 'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana', 'Greece',
+    'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti', 'Honduras', 'Hungary', 'Iceland', 'India',
+    'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya',
+    'Kiribati', 'Kuwait', 'Kyrgyzstan', 'Laos', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya', 'Liechtenstein',
+    'Lithuania', 'Luxembourg', 'Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Marshall Islands',
+    'Mauritania', 'Mauritius', 'Mexico', 'Micronesia', 'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco',
+    'Mozambique', 'Myanmar', 'Namibia', 'Nauru', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria',
+    'North Korea', 'North Macedonia', 'Norway', 'Oman', 'Pakistan', 'Palau', 'Palestine', 'Panama', 'Papua New Guinea',
+    'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar', 'Romania', 'Russia', 'Rwanda', 'Saint Kitts and Nevis',
+    'Saint Lucia', 'Saint Vincent and the Grenadines', 'Samoa', 'San Marino', 'Sao Tome and Principe', 'Saudi Arabia',
+    'Senegal', 'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'Solomon Islands', 'Somalia',
+    'South Africa', 'South Korea', 'South Sudan', 'Spain', 'Sri Lanka', 'Sudan', 'Suriname', 'Sweden', 'Switzerland',
+    'Syria', 'Taiwan', 'Tajikistan', 'Tanzania', 'Thailand', 'Timor-Leste', 'Togo', 'Tonga', 'Trinidad and Tobago',
+    'Tunisia', 'Turkey', 'Turkmenistan', 'Tuvalu', 'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom',
+    'United States', 'Uruguay', 'Uzbekistan', 'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'
+  ];
 
   const handleLoginChange = (e) => {
     setLoginForm({ ...loginForm, [e.target.name]: e.target.value });
@@ -32,8 +61,22 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
   };
 
   const handleRegisterChange = (e) => {
-    setRegisterForm({ ...registerForm, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setRegisterForm({ ...registerForm, [name]: value });
     setError('');
+
+    if (name === 'country') {
+      const filteredSuggestions = countries.filter(country =>
+        country.toLowerCase().startsWith(value.toLowerCase())
+      ).slice(0, 5); // Maksimum 5 ta taklif
+      setCountrySuggestions(filteredSuggestions);
+    }
+  };
+
+  const handleCountrySelect = (country) => {
+    setRegisterForm({ ...registerForm, country });
+    setCountrySuggestions([]);
+    if (countryInputRef.current) countryInputRef.current.focus();
   };
 
   const handleCheckboxChange = (e) => {
@@ -41,72 +84,114 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     setError('');
   };
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
+
     if (!loginForm.email || !loginForm.password) {
-      setError('Please fill in all fields');
+      setError('Iltimos, barcha maydonlarni to‘ldiring');
+      setLoading(false);
       return;
     }
-    setTimeout(() => {
-      if (loginForm.email === 'user123@gmail.com' && loginForm.password === '123') {
-        setIsAuthenticated(true);
-        setUser({ email: 'user123@gmail.com', username: 'Client User', role: 'Client' });
-        navigate('/account');
-      } else if (loginForm.email === 'git321@gmail.com' && loginForm.password === '321') {
-        setIsAuthenticated(true);
-        setUser({
-          email: 'git321@gmail.com',
-          username: 'Guide User',
-          role: 'Customer',
-          firstName: 'Ali',
-          lastName: 'Valiyev',
-          country: 'Uzbekistan',
-          city: 'Tashkent'
-        });
-        navigate('/account');
-      } else {
-        setError('Invalid email or password');
-      }
-    }, 500);
+
+    try {
+      const data = await loginUser(loginForm);
+      localStorage.setItem('access_token', data.access);
+      localStorage.setItem('refresh_token', data.refresh);
+      setIsAuthenticated(true);
+      setUser({
+        id: data.user.id,
+        role: data.user.role,
+        username: `${data.user.first_name} ${data.user.last_name}`,
+        email: data.user.email,
+        first_name: data.user.first_name,
+        last_name: data.user.last_name,
+        country: data.user.country || '',
+        city: data.user.city || '',
+      });
+      navigate('/account');
+    } catch (error) {
+      setError(error.message || 'Email yoki parol noto‘g‘ri');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    const { role, firstName, lastName, email, password, confirmPassword, country, city } = registerForm;
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      setError('Please fill in all required fields');
+    setError('');
+    setLoading(true);
+
+    const { role, first_name, last_name, email, password, confirm_password, country } = registerForm;
+
+    if (!first_name || !last_name || !email || !password || !confirm_password) {
+      setError('Iltimos, barcha majburiy maydonlarni to‘ldiring');
+      setLoading(false);
       return;
     }
-    if (role === 'Customer' && (!country || !city)) {
-      setError('Please fill in country and city');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
+    if (password !== confirm_password) {
+      setError('Parollar mos kelmadi');
+      setLoading(false);
       return;
     }
     if (!checkboxes.personalData || !checkboxes.terms) {
-      setError('You must agree to the personal data processing and terms');
+      setError('Shaxsiy ma‘lumotlarni qayta ishlash va shartlarga rozilik berishingiz kerak');
+      setLoading(false);
       return;
     }
-    // Mock registration
-    setTimeout(() => {
+
+    try {
+      await requestCode(email);           // 1) e-mailga kod yuborish
+      setVerificationStep(true);          // 2) verify step’iga o‘tish
+    } catch (error) {
+      setError(error.message || 'Ro‘yxatdan o‘tishda xatolik yuz berdi');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyCode = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    if (!verificationCode) {
+      setError('Iltimos, tasdiqlash kodini kiriting');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      await verifyCode({
+        role: registerForm.role,
+        first_name: registerForm.first_name,
+        last_name: registerForm.last_name,
+        email: registerForm.email,
+        password: registerForm.password,
+        country: registerForm.country,
+        code: verificationCode,
+      });
       setActiveTab('login');
-      setLoginForm({ email, password });
+      setLoginForm({ email: registerForm.email, password: registerForm.password });
       setRegisterForm({
         role: 'Client',
-        firstName: '',
-        lastName: '',
+        first_name: '',
+        last_name: '',
         email: '',
         password: '',
-        confirmPassword: '',
+        confirm_password: '',
         country: '',
-        city: ''
       });
+      setVerificationCode('');
       setCheckboxes({ personalData: false, terms: false, travelTips: false });
-      setError('');
-      alert('Registration successful! Please log in.');
-    }, 500);
+      setVerificationStep(false);
+      alert('Tasdiqlash muvaffaqiyatli! Iltimos, tizimga kiring.');
+    } catch (error) {
+      setError(error.message || 'Tasdiqlash kodida xatolik yuz berdi');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSocialLogin = (provider) => {
@@ -115,6 +200,8 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
 
   const closeModal = () => {
     navigate(-1);
+    setVerificationStep(false);
+    setCountrySuggestions([]);
   };
 
   useEffect(() => {
@@ -150,6 +237,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
           </button>
         </div>
         {error && <p className="auth-error" role="alert">{error}</p>}
+        {loading && <p className="auth-loading">Yuklanmoqda...</p>}
         {activeTab === 'login' ? (
           <div className="auth-content">
             <h2 id="auth-title">Sign In to TravMatch</h2>
@@ -184,7 +272,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                   aria-required="true"
                 />
               </div>
-              <button type="submit" className="auth-submit-btn">
+              <button type="submit" className="auth-submit-btn" disabled={loading}>
                 <FiLogIn /> Sign In
               </button>
             </form>
@@ -200,172 +288,188 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         ) : (
           <div className="auth-content">
             <h2 id="auth-title">Create Your TravMatch Account</h2>
-            <form className="auth-form" onSubmit={handleRegisterSubmit}>
-              <div className="auth-form-group">
-                <label htmlFor="register-role">
-                  <FiUser /> Role
-                </label>
-                <select
-                  id="register-role"
-                  name="role"
-                  value={registerForm.role}
-                  onChange={handleRegisterChange}
-                  className="auth-input"
-                  aria-required="true"
-                >
-                  <option value="Client">Client (Mijoz)</option>
-                  <option value="Customer">Customer (Xizmat ko'rsatuvchi)</option>
-                </select>
-              </div>
-              <div className="auth-name-grid">
+            {!verificationStep ? (
+              <form className="auth-form" onSubmit={handleRegisterSubmit}>
                 <div className="auth-form-group">
-                  <label htmlFor="register-firstName">
-                    <FiUser /> First Name
+                  <label htmlFor="register-role">
+                    <FiUser /> Role
                   </label>
-                  <input
-                    id="register-firstName"
-                    type="text"
-                    name="firstName"
-                    value={registerForm.firstName}
+                  <select
+                    id="register-role"
+                    name="role"
+                    value={registerForm.role}
                     onChange={handleRegisterChange}
-                    placeholder="Enter your first name"
                     className="auth-input"
                     aria-required="true"
-                  />
+                  >
+                    <option value="Client">Client (Mijoz)</option>
+                    <option value="Customer">Customer (Xizmat ko'rsatuvchi)</option>
+                  </select>
                 </div>
-                <div className="auth-form-group">
-                  <label htmlFor="register-lastName">
-                    <FiUser /> Last Name
-                  </label>
-                  <input
-                    id="register-lastName"
-                    type="text"
-                    name="lastName"
-                    value={registerForm.lastName}
-                    onChange={handleRegisterChange}
-                    placeholder="Enter your last name"
-                    className="auth-input"
-                    aria-required="true"
-                  />
-                </div>
-              </div>
-              <div className="auth-form-group">
-                <label htmlFor="register-email">
-                  <FiMail /> Email
-                </label>
-                <input
-                  id="register-email"
-                  type="email"
-                  name="email"
-                  value={registerForm.email}
-                  onChange={handleRegisterChange}
-                  placeholder="Enter your email"
-                  className="auth-input"
-                  aria-required="true"
-                />
-              </div>
-              <div className="auth-form-group">
-                <label htmlFor="register-password">
-                  <FiLock /> Password
-                </label>
-                <input
-                  id="register-password"
-                  type="password"
-                  name="password"
-                  value={registerForm.password}
-                  onChange={handleRegisterChange}
-                  placeholder="Enter your password"
-                  className="auth-input"
-                  aria-required="true"
-                />
-              </div>
-              <div className="auth-form-group">
-                <label htmlFor="register-confirm-password">
-                  <FiLock /> Confirm Password
-                </label>
-                <input
-                  id="register-confirm-password"
-                  type="password"
-                  name="confirmPassword"
-                  value={registerForm.confirmPassword}
-                  onChange={handleRegisterChange}
-                  placeholder="Confirm your password"
-                  className="auth-input"
-                  aria-required="true"
-                />
-              </div>
-              {registerForm.role === 'Customer' && (
-                <div className="auth-location-grid">
+                <div className="auth-name-grid">
                   <div className="auth-form-group">
-                    <label htmlFor="register-country">
-                      <FiGlobe /> Country
+                    <label htmlFor="register-first_name">
+                      <FiUser /> First Name
                     </label>
                     <input
-                      id="register-country"
+                      id="register-first_name"
                       type="text"
-                      name="country"
-                      value={registerForm.country}
+                      name="first_name"
+                      value={registerForm.first_name}
                       onChange={handleRegisterChange}
-                      placeholder="Enter your country"
+                      placeholder="Enter your first name"
                       className="auth-input"
                       aria-required="true"
                     />
                   </div>
                   <div className="auth-form-group">
-                    <label htmlFor="register-city">
-                      <FiMapPin /> City
+                    <label htmlFor="register-last_name">
+                      <FiUser /> Last Name
                     </label>
                     <input
-                      id="register-city"
+                      id="register-last_name"
                       type="text"
-                      name="city"
-                      value={registerForm.city}
+                      name="last_name"
+                      value={registerForm.last_name}
                       onChange={handleRegisterChange}
-                      placeholder="Enter your city"
+                      placeholder="Enter your last name"
                       className="auth-input"
                       aria-required="true"
                     />
                   </div>
                 </div>
-              )}
-              <div className="auth-checkbox-group">
-                <label className="auth-checkbox-label">
+                <div className="auth-form-group">
+                  <label htmlFor="register-email">
+                    <FiMail /> Email
+                  </label>
                   <input
-                    type="checkbox"
-                    name="personalData"
-                    checked={checkboxes.personalData}
-                    onChange={handleCheckboxChange}
+                    id="register-email"
+                    type="email"
+                    name="email"
+                    value={registerForm.email}
+                    onChange={handleRegisterChange}
+                    placeholder="Enter your email"
+                    className="auth-input"
                     aria-required="true"
                   />
-                  {checkboxes.personalData ? <FiCheckSquare /> : <FiSquare />}
-                  I agree to the processing of my personal data.
-                </label>
-                <label className="auth-checkbox-label">
+                </div>
+                <div className="auth-form-group">
+                  <label htmlFor="register-password">
+                    <FiLock /> Password
+                  </label>
                   <input
-                    type="checkbox"
-                    name="terms"
-                    checked={checkboxes.terms}
-                    onChange={handleCheckboxChange}
+                    id="register-password"
+                    type="password"
+                    name="password"
+                    value={registerForm.password}
+                    onChange={handleRegisterChange}
+                    placeholder="Enter your password"
+                    className="auth-input"
                     aria-required="true"
                   />
-                  {checkboxes.terms ? <FiCheckSquare /> : <FiSquare />}
-                  I accept TravMatch's Terms and Conditions.
-                </label>
-                <label className="auth-checkbox-label">
+                </div>
+                <div className="auth-form-group">
+                  <label htmlFor="register-confirm_password">
+                    <FiLock /> Confirm Password
+                  </label>
                   <input
-                    type="checkbox"
-                    name="travelTips"
-                    checked={checkboxes.travelTips}
-                    onChange={handleCheckboxChange}
+                    id="register-confirm_password"
+                    type="password"
+                    name="confirm_password"
+                    value={registerForm.confirm_password}
+                    onChange={handleRegisterChange}
+                    placeholder="Confirm your password"
+                    className="auth-input"
+                    aria-required="true"
                   />
-                  {checkboxes.travelTips ? <FiCheckSquare /> : <FiSquare />}
-                  I agree to receive travel tips and promotions.
-                </label>
-              </div>
-              <button type="submit" className="auth-submit-btn">
-                <FiLogIn /> Register
-              </button>
-            </form>
+                </div>
+                <div className="auth-form-group">
+                  <label htmlFor="register-country">
+                    <FiGlobe /> Country
+                  </label>
+                  <input
+                    id="register-country"
+                    type="text"
+                    name="country"
+                    value={registerForm.country}
+                    onChange={handleRegisterChange}
+                    placeholder="Enter your country"
+                    className="auth-input"
+                    ref={countryInputRef}
+                    aria-required="true"
+                  />
+                  {countrySuggestions.length > 0 && (
+                    <ul className="country-suggestions">
+                      {countrySuggestions.map((country, index) => (
+                        <li key={index} onClick={() => handleCountrySelect(country)}>
+                          {country}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="auth-checkbox-group">
+                  <label className="auth-checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="personalData"
+                      checked={checkboxes.personalData}
+                      onChange={handleCheckboxChange}
+                      aria-required="true"
+                    />
+                    {checkboxes.personalData ? <FiCheckSquare /> : <FiSquare />}
+                    I agree to the processing of my personal data.
+                  </label>
+                  <label className="auth-checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="terms"
+                      checked={checkboxes.terms}
+                      onChange={handleCheckboxChange}
+                      aria-required="true"
+                    />
+                    {checkboxes.terms ? <FiCheckSquare /> : <FiSquare />}
+                    I accept TravMatch's Terms and Conditions.
+                  </label>
+                  <label className="auth-checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="travelTips"
+                      checked={checkboxes.travelTips}
+                      onChange={handleCheckboxChange}
+                    />
+                    {checkboxes.travelTips ? <FiCheckSquare /> : <FiSquare />}
+                    I agree to receive travel tips and promotions.
+                  </label>
+                </div>
+                <button type="submit" className="auth-submit-btn" disabled={loading}>
+                  <FiLogIn /> Register
+                </button>
+              </form>
+            ) : (
+              <form className="auth-form" onSubmit={handleVerifyCode}>
+                <h3>Verify Your Email</h3>
+                <p>Please check your email ({registerForm.email}) for the verification code.</p>
+                <div className="auth-form-group">
+                  <label htmlFor="verification-code">
+                    <FiCheck /> Verification Code
+                  </label>
+                  <input
+                    id="verification-code"
+                    type="text"
+                    name="verificationCode"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    placeholder="Enter the code"
+                    className="auth-input"
+                    aria-required="true"
+                  />
+                </div>
+                <button type="submit" className="auth-submit-btn" disabled={loading}>
+                  <FiCheck /> Verify
+                </button>
+              </form>
+            )}
           </div>
         )}
       </div>

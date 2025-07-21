@@ -89,22 +89,7 @@ services:
       redis:
         condition: service_started
 
-  # ───────────── Celery Beat ──────────
-  celery-beat:
-    build: .
-    <<: *default-env
-    restart: unless-stopped
-    entrypoint: ""
 
-    command: celery -A config beat -l info
-
-    command: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-
-    depends_on:
-      backend:
-        condition: service_started
-      redis:
-        condition: service_started
 
   frontend:
     build:

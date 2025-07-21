@@ -1,3 +1,6 @@
+
+# docker-compose.yml
+=======
 # ◀️  “version:” kaliti keraksiz – Compose v2+ da avtomatik aniqlanadi
 
 x-env: &default-env
@@ -35,6 +38,9 @@ services:
     build: .
     <<: *default-env
     restart: unless-stopped
+
+    entrypoint: /entrypoint.sh
+
     command: >
       daphne -b 0.0.0.0 -p 8000 config.asgi:application
     volumes:
@@ -83,6 +89,20 @@ services:
       redis:
         condition: service_started
 
+
+
+  frontend:
+    build:
+      context: ./frontend/travel-front
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:8000/api/v1/}
+    restart: unless-stopped
+    ports:
+      - "3003:80"
+    depends_on:
+      backend:
+        condition: service_started
 
 volumes:
   postgres_data:

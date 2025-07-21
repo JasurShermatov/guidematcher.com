@@ -50,7 +50,6 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "django_celery_results",  # Celery natijalarini DB'da saqlash
     "channels",  # WebSocket fazasida yoqasiz
-    "django_celery_beat",
 ]
 
 LOCAL_APPS = [

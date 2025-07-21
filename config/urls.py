@@ -18,6 +18,17 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
     SpectacularRedocView,
 )
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def healthcheck_view(request, *args, **kwargs):
+    return Response({"status": "ok"}, status=status.HTTP_200_OK)
+
 
 # ─── API v1 – modular routing ──────────────────────────────────
 api_v1_patterns = [
@@ -54,6 +65,7 @@ urlpatterns = [
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     # Modular API v1
     path("api/v1/", include(api_v1_patterns)),
+    path("health/", healthcheck_view, name="health"),  # Health check endpoint
 ]
 
 # ─── Media / Static for development ────────────────────────────

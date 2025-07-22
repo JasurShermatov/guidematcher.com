@@ -1,20 +1,14 @@
-
-# docker-compose.yml
-=======
-# ◀️  “version:” kaliti keraksiz – Compose v2+ da avtomatik aniqlanadi
-
 x-env: &default-env
   env_file:
     - .env
 
 services:
-  # ───────────── Database ─────────────
   db:
     image: postgres:15-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB:       ${POSTGRES_DB}
-      POSTGRES_USER:     ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -25,22 +19,22 @@ services:
       retries: 5
     ports:
       - "5432:5432"
+    networks:
+      - app-network
 
-  # ───────────── Redis ────────────────
   redis:
     image: redis:7-alpine
     restart: unless-stopped
     ports:
       - "6379:6379"
+    networks:
+      - app-network
 
-  # ───────────── Django / ASGI ────────
   backend:
     build: .
     <<: *default-env
     restart: unless-stopped
-
     entrypoint: /entrypoint.sh
-
     command: >
       daphne -b 0.0.0.0 -p 8000 config.asgi:application
     volumes:
@@ -55,13 +49,13 @@ services:
       redis:
         condition: service_started
     healthcheck:
-      # Django health: settings'da simple view (`/health/`) yoki manage.py check
       test: ["CMD-SHELL", "curl -sSf http://localhost:8000/health/ || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 5
+    networks:
+      - app-network
 
-  # ───────────── Celery worker ────────
   celery:
     build: .
     <<: *default-env
@@ -73,23 +67,8 @@ services:
         condition: service_started
       redis:
         condition: service_started
-
-  # ───────────── Celery Beat ──────────
-  celery-beat:
-    build: .
-    <<: *default-env
-    restart: unless-stopped
-    entrypoint: ""
-
-    command: celery -A config beat -l info
-
-    command: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-
-    depends_on:
-      backend:
-        condition: service_started
-      redis:
-        condition: service_started
+    networks:
+      - app-network
 
   frontend:
     build:
@@ -103,8 +82,14 @@ services:
     depends_on:
       backend:
         condition: service_started
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
   static_data:
   media_data:
+
+networks:
+  app-network:
+    driver: bridge

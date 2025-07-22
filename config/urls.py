@@ -19,6 +19,8 @@ from drf_spectacular.views import (
     SpectacularRedocView,
 )
 
+from config.settings import health_check
+
 # ─── API v1 – modular routing ──────────────────────────────────
 api_v1_patterns = [
     path(
@@ -54,6 +56,7 @@ urlpatterns = [
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     # Modular API v1
     path("api/v1/", include(api_v1_patterns)),
+    path("health/", health_check, name="health"),
 ]
 
 # ─── Media / Static for development ────────────────────────────

@@ -1,30 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { FiX, FiMail, FiLock, FiUser, FiLogIn, FiCheckSquare, FiSquare, FiGlobe, FiCheck } from 'react-icons/fi';
-import { FcGoogle } from 'react-icons/fc';
-import { FaFacebook } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import { loginUser, requestCode, verifyCode } from '../api/api';
-import './Authentication.css';
+import React, { useState, useEffect, useRef } from "react";
+import { FiX, FiMail, FiLock, FiUser, FiLogIn, FiCheckSquare, FiSquare, FiGlobe, FiCheck } from "react-icons/fi";
+import { FcGoogle } from "react-icons/fc";
+import { FaFacebook } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { loginUser, requestCode, registerUser } from "../api/api";
+import "./Authentication.css";
 
 const Authentication = ({ setIsAuthenticated, setUser }) => {
-  const [activeTab, setActiveTab] = useState('login');
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
+  const [activeTab, setActiveTab] = useState("login");
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [registerForm, setRegisterForm] = useState({
-    role: 'Client',
-    first_name: '',
-    last_name: '',
-    email: '',
-    password: '',
-    confirm_password: '',
-    country: '',
+    role: "Client",
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+    confirm_password: "",
+    country: "",
   });
-  const [verificationCode, setVerificationCode] = useState('');
+  const [verificationCode, setVerificationCode] = useState("");
   const [checkboxes, setCheckboxes] = useState({
     personalData: false,
     terms: false,
     travelTips: false,
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [verificationStep, setVerificationStep] = useState(false);
   const [countrySuggestions, setCountrySuggestions] = useState([]);
@@ -32,43 +32,44 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
   const navigate = useNavigate();
 
   const countries = [
-    'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia',
-    'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin',
-    'Bhutan', 'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi',
-    'Cabo Verde', 'Cambodia', 'Cameroon', 'Canada', 'Central African Republic', 'Chad', 'Chile', 'China', 'Colombia',
-    'Comoros', 'Congo (Congo-Brazzaville)', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czechia', 'Denmark', 'Djibouti',
-    'Dominica', 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador', 'Equatorial Guinea', 'Eritrea', 'Estonia',
-    'Eswatini', 'Ethiopia', 'Fiji', 'Finland', 'France', 'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana', 'Greece',
-    'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti', 'Honduras', 'Hungary', 'Iceland', 'India',
-    'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya',
-    'Kiribati', 'Kuwait', 'Kyrgyzstan', 'Laos', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya', 'Liechtenstein',
-    'Lithuania', 'Luxembourg', 'Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Marshall Islands',
-    'Mauritania', 'Mauritius', 'Mexico', 'Micronesia', 'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco',
-    'Mozambique', 'Myanmar', 'Namibia', 'Nauru', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria',
-    'North Korea', 'North Macedonia', 'Norway', 'Oman', 'Pakistan', 'Palau', 'Palestine', 'Panama', 'Papua New Guinea',
-    'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar', 'Romania', 'Russia', 'Rwanda', 'Saint Kitts and Nevis',
-    'Saint Lucia', 'Saint Vincent and the Grenadines', 'Samoa', 'San Marino', 'Sao Tome and Principe', 'Saudi Arabia',
-    'Senegal', 'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'Solomon Islands', 'Somalia',
-    'South Africa', 'South Korea', 'South Sudan', 'Spain', 'Sri Lanka', 'Sudan', 'Suriname', 'Sweden', 'Switzerland',
-    'Syria', 'Taiwan', 'Tajikistan', 'Tanzania', 'Thailand', 'Timor-Leste', 'Togo', 'Tonga', 'Trinidad and Tobago',
-    'Tunisia', 'Turkey', 'Turkmenistan', 'Tuvalu', 'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom',
-    'United States', 'Uruguay', 'Uzbekistan', 'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'
+    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
+    "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin",
+    "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
+    "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia",
+    "Comoros", "Congo (Congo-Brazzaville)", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia (Czech Republic)",
+    "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea",
+    "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany",
+    "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary",
+    "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan",
+    "Kazakhstan", "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kuwait", "Kyrgyzstan", "Laos", "Latvia",
+    "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi",
+    "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia",
+    "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar (Burma)", "Namibia", "Nauru",
+    "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Macedonia", "Norway", "Oman",
+    "Pakistan", "Palau", "Palestine State", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland",
+    "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines",
+    "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone",
+    "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Sudan", "Spain", "Sri Lanka",
+    "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste",
+    "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine",
+    "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City",
+    "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe",
   ];
 
   const handleLoginChange = (e) => {
     setLoginForm({ ...loginForm, [e.target.name]: e.target.value });
-    setError('');
+    setError("");
   };
 
   const handleRegisterChange = (e) => {
     const { name, value } = e.target;
     setRegisterForm({ ...registerForm, [name]: value });
-    setError('');
+    setError("");
 
-    if (name === 'country') {
-      const filteredSuggestions = countries.filter(country =>
-        country.toLowerCase().startsWith(value.toLowerCase())
-      ).slice(0, 5); // Maksimum 5 ta taklif
+    if (name === "country") {
+      const filteredSuggestions = countries
+        .filter((country) => country.toLowerCase().startsWith(value.toLowerCase()))
+        .slice(0, 5);
       setCountrySuggestions(filteredSuggestions);
     }
   };
@@ -81,24 +82,22 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
 
   const handleCheckboxChange = (e) => {
     setCheckboxes({ ...checkboxes, [e.target.name]: e.target.checked });
-    setError('');
+    setError("");
   };
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     if (!loginForm.email || !loginForm.password) {
-      setError('Iltimos, barcha maydonlarni to‘ldiring');
+      setError("Iltimos, barcha maydonlarni to‘ldiring");
       setLoading(false);
       return;
     }
 
     try {
       const data = await loginUser(loginForm);
-      localStorage.setItem('access_token', data.access);
-      localStorage.setItem('refresh_token', data.refresh);
       setIsAuthenticated(true);
       setUser({
         id: data.user.id,
@@ -107,12 +106,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         email: data.user.email,
         first_name: data.user.first_name,
         last_name: data.user.last_name,
-        country: data.user.country || '',
-        city: data.user.city || '',
+        country: data.user.country || "",
+        city: data.user.city || "",
       });
-      navigate('/account');
+      navigate("/account");
     } catch (error) {
-      setError(error.message || 'Email yoki parol noto‘g‘ri');
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -120,32 +119,39 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     const { role, first_name, last_name, email, password, confirm_password, country } = registerForm;
 
-    if (!first_name || !last_name || !email || !password || !confirm_password) {
-      setError('Iltimos, barcha majburiy maydonlarni to‘ldiring');
+    if (!first_name || !last_name || !email || !password || !confirm_password || !country) {
+      setError("Iltimos, barcha majburiy maydonlarni to‘ldiring");
       setLoading(false);
       return;
     }
     if (password !== confirm_password) {
-      setError('Parollar mos kelmadi');
+      setError("Parollar mos kelmadi");
       setLoading(false);
       return;
     }
     if (!checkboxes.personalData || !checkboxes.terms) {
-      setError('Shaxsiy ma‘lumotlarni qayta ishlash va shartlarga rozilik berishingiz kerak');
+      setError("Shaxsiy ma‘lumotlarni qayta ishlash va shartlarga rozilik berishingiz kerak");
+      setLoading(false);
+      return;
+    }
+    if (!/^\d{6}$/.test(password)) {
+      setError("Parol 6 xonali raqam bo‘lishi kerak");
       setLoading(false);
       return;
     }
 
     try {
-      await requestCode(email);           // 1) e-mailga kod yuborish
-      setVerificationStep(true);          // 2) verify step’iga o‘tish
+      console.log("Sending requestCode with:", { email });
+      await requestCode({ email });
+      setVerificationStep(true);
     } catch (error) {
-      setError(error.message || 'Ro‘yxatdan o‘tishda xatolik yuz berdi');
+      console.error("RequestCode error:", error.response?.data);
+      setError(error.message || "Kod so‘rovida xatolik yuz berdi");
     } finally {
       setLoading(false);
     }
@@ -153,42 +159,50 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
 
   const handleVerifyCode = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     if (!verificationCode) {
-      setError('Iltimos, tasdiqlash kodini kiriting');
+      setError("Iltimos, tasdiqlash kodini kiriting");
+      setLoading(false);
+      return;
+    }
+
+    const { role, first_name, last_name, email, password, confirm_password, country } = registerForm;
+    if (!country || country.trim() === "") {
+      setError("Iltimos, mamlakatni tanlang");
+      setLoading(false);
+      return;
+    }
+    if (!/^\d{6}$/.test(password)) {
+      setError("Parol 6 xonali raqam bo‘lishi kerak");
       setLoading(false);
       return;
     }
 
     try {
-      await verifyCode({
-        role: registerForm.role,
-        first_name: registerForm.first_name,
-        last_name: registerForm.last_name,
-        email: registerForm.email,
-        password: registerForm.password,
-        country: registerForm.country,
-        code: verificationCode,
-      });
-      setActiveTab('login');
-      setLoginForm({ email: registerForm.email, password: registerForm.password });
+      console.log("Verifying code with payload:", { role, first_name, last_name, email, password, country, code: verificationCode });
+      const payload = { role, first_name, last_name, email, password, country, code: verificationCode };
+      const response = await registerUser(payload);
+      console.log("Register response:", response);
+      setActiveTab("login");
+      setLoginForm({ email, password });
       setRegisterForm({
-        role: 'Client',
-        first_name: '',
-        last_name: '',
-        email: '',
-        password: '',
-        confirm_password: '',
-        country: '',
+        role: "Client",
+        first_name: "",
+        last_name: "",
+        email: "",
+        password: "",
+        confirm_password: "",
+        country: "",
       });
-      setVerificationCode('');
+      setVerificationCode("");
       setCheckboxes({ personalData: false, terms: false, travelTips: false });
       setVerificationStep(false);
-      alert('Tasdiqlash muvaffaqiyatli! Iltimos, tizimga kiring.');
+      setError("Ro‘yxatdan o‘tish muvaffaqiyatli! Iltimos, tizimga kiring.");
     } catch (error) {
-      setError(error.message || 'Tasdiqlash kodida xatolik yuz berdi');
+      console.error("Register error:", error.response?.data);
+      setError(error.message || (error.response?.data?.detail || "Kod tasdiqlashda xatolik yuz berdi"));
     } finally {
       setLoading(false);
     }
@@ -202,16 +216,17 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     navigate(-1);
     setVerificationStep(false);
     setCountrySuggestions([]);
+    setError("");
   };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         closeModal();
       }
     };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   return (
@@ -222,23 +237,27 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         </button>
         <div className="auth-tabs">
           <button
-            className={`auth-tab ${activeTab === 'login' ? 'auth-tab-active' : ''}`}
-            onClick={() => setActiveTab('login')}
-            aria-selected={activeTab === 'login'}
+            className={`auth-tab ${activeTab === "login" ? "auth-tab-active" : ""}`}
+            onClick={() => setActiveTab("login")}
+            aria-selected={activeTab === "login"}
           >
             Sign In
           </button>
           <button
-            className={`auth-tab ${activeTab === 'register' ? 'auth-tab-active' : ''}`}
-            onClick={() => setActiveTab('register')}
-            aria-selected={activeTab === 'register'}
+            className={`auth-tab ${activeTab === "register" ? "auth-tab-active" : ""}`}
+            onClick={() => setActiveTab("register")}
+            aria-selected={activeTab === "register"}
           >
             Register
           </button>
         </div>
         {error && <p className="auth-error" role="alert">{error}</p>}
-        {loading && <p className="auth-loading">Yuklanmoqda...</p>}
-        {activeTab === 'login' ? (
+        {loading && (
+          <div className="auth-loading">
+            <div className="spinner"></div> Yuklanmoqda...
+          </div>
+        )}
+        {activeTab === "login" ? (
           <div className="auth-content">
             <h2 id="auth-title">Sign In to TravMatch</h2>
             <form className="auth-form" onSubmit={handleLoginSubmit}>
@@ -255,6 +274,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                   placeholder="Enter your email"
                   className="auth-input"
                   aria-required="true"
+                  disabled={loading}
                 />
               </div>
               <div className="auth-form-group">
@@ -267,9 +287,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                   name="password"
                   value={loginForm.password}
                   onChange={handleLoginChange}
-                  placeholder="Enter your password"
+                  placeholder="Enter your 6-digit password"
                   className="auth-input"
                   aria-required="true"
+                  disabled={loading}
+                  pattern="\d{6}"
+                  title="Parol 6 xonali raqam bo‘lishi kerak"
                 />
               </div>
               <button type="submit" className="auth-submit-btn" disabled={loading}>
@@ -277,10 +300,10 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
               </button>
             </form>
             <div className="auth-social">
-              <button className="auth-social-btn" onClick={() => handleSocialLogin('Google')}>
+              <button className="auth-social-btn" onClick={() => handleSocialLogin("Google")} disabled={loading}>
                 <FcGoogle /> Google
               </button>
-              <button className="auth-social-btn" onClick={() => handleSocialLogin('Facebook')}>
+              <button className="auth-social-btn" onClick={() => handleSocialLogin("Facebook")} disabled={loading}>
                 <FaFacebook /> Facebook
               </button>
             </div>
@@ -301,9 +324,10 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                     onChange={handleRegisterChange}
                     className="auth-input"
                     aria-required="true"
+                    disabled={loading}
                   >
                     <option value="Client">Client (Mijoz)</option>
-                    <option value="Customer">Customer (Xizmat ko'rsatuvchi)</option>
+                    <option value="Customer">Customer (Xizmat ko‘rsatuvchi)</option>
                   </select>
                 </div>
                 <div className="auth-name-grid">
@@ -320,6 +344,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                       placeholder="Enter your first name"
                       className="auth-input"
                       aria-required="true"
+                      disabled={loading}
                     />
                   </div>
                   <div className="auth-form-group">
@@ -335,6 +360,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                       placeholder="Enter your last name"
                       className="auth-input"
                       aria-required="true"
+                      disabled={loading}
                     />
                   </div>
                 </div>
@@ -351,6 +377,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                     placeholder="Enter your email"
                     className="auth-input"
                     aria-required="true"
+                    disabled={loading}
                   />
                 </div>
                 <div className="auth-form-group">
@@ -363,9 +390,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                     name="password"
                     value={registerForm.password}
                     onChange={handleRegisterChange}
-                    placeholder="Enter your password"
+                    placeholder="Enter your 6-digit password"
                     className="auth-input"
                     aria-required="true"
+                    disabled={loading}
+                    pattern="\d{6}"
+                    title="Parol 6 xonali raqam bo‘lishi kerak"
                   />
                 </div>
                 <div className="auth-form-group">
@@ -378,9 +408,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                     name="confirm_password"
                     value={registerForm.confirm_password}
                     onChange={handleRegisterChange}
-                    placeholder="Confirm your password"
+                    placeholder="Confirm your 6-digit password"
                     className="auth-input"
                     aria-required="true"
+                    disabled={loading}
+                    pattern="\d{6}"
+                    title="Parol 6 xonali raqam bo‘lishi kerak"
                   />
                 </div>
                 <div className="auth-form-group">
@@ -397,11 +430,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                     className="auth-input"
                     ref={countryInputRef}
                     aria-required="true"
+                    disabled={loading}
                   />
                   {countrySuggestions.length > 0 && (
                     <ul className="country-suggestions">
                       {countrySuggestions.map((country, index) => (
-                        <li key={index} onClick={() => handleCountrySelect(country)}>
+                        <li key={index} onClick={() => handleCountrySelect(country)} role="option" aria-selected="false">
                           {country}
                         </li>
                       ))}
@@ -416,9 +450,10 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                       checked={checkboxes.personalData}
                       onChange={handleCheckboxChange}
                       aria-required="true"
+                      disabled={loading}
                     />
                     {checkboxes.personalData ? <FiCheckSquare /> : <FiSquare />}
-                    I agree to the processing of my personal data.
+                    Shaxsiy ma‘lumotlarni qayta ishlashga roziman.
                   </label>
                   <label className="auth-checkbox-label">
                     <input
@@ -427,9 +462,10 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                       checked={checkboxes.terms}
                       onChange={handleCheckboxChange}
                       aria-required="true"
+                      disabled={loading}
                     />
                     {checkboxes.terms ? <FiCheckSquare /> : <FiSquare />}
-                    I accept TravMatch's Terms and Conditions.
+                    TravMatch shartlariga roziman.
                   </label>
                   <label className="auth-checkbox-label">
                     <input
@@ -437,9 +473,10 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                       name="travelTips"
                       checked={checkboxes.travelTips}
                       onChange={handleCheckboxChange}
+                      disabled={loading}
                     />
                     {checkboxes.travelTips ? <FiCheckSquare /> : <FiSquare />}
-                    I agree to receive travel tips and promotions.
+                    Sayohat maslahatlari va aksiyalarni olishga roziman.
                   </label>
                 </div>
                 <button type="submit" className="auth-submit-btn" disabled={loading}>
@@ -448,11 +485,11 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
               </form>
             ) : (
               <form className="auth-form" onSubmit={handleVerifyCode}>
-                <h3>Verify Your Email</h3>
-                <p>Please check your email ({registerForm.email}) for the verification code.</p>
+                <h3>Email Tasdiqlash</h3>
+                <p>Iltimos, emailingizga ({registerForm.email}) yuborilgan tasdiqlash kodini kiriting.</p>
                 <div className="auth-form-group">
                   <label htmlFor="verification-code">
-                    <FiCheck /> Verification Code
+                    <FiCheck /> Tasdiqlash Kodi
                   </label>
                   <input
                     id="verification-code"
@@ -460,13 +497,14 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                     name="verificationCode"
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value)}
-                    placeholder="Enter the code"
+                    placeholder="Kodni kiriting"
                     className="auth-input"
                     aria-required="true"
+                    disabled={loading}
                   />
                 </div>
                 <button type="submit" className="auth-submit-btn" disabled={loading}>
-                  <FiCheck /> Verify
+                  <FiCheck /> Tasdiqlash
                 </button>
               </form>
             )}

@@ -8,6 +8,15 @@ from datetime import timedelta
 
 import environ
 
+from django.http import HttpResponse
+from django.views.decorators.http import require_safe
+
+
+@require_safe
+def health_check(request):
+    return HttpResponse("OK", status=200)
+
+
 # ─── Bazaviy kataloglar ────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
@@ -278,5 +287,7 @@ CHANNEL_LAYERS = {
 
 FRONTEND_PASSWORD_RESET_URL = env.str(
     "FRONTEND_PASSWORD_RESET_URL",
-    default="http://localhost:3000/reset-password",
+    default="http://localhost:3003/reset-password",
 )
+
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0")

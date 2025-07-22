@@ -1,24 +1,17 @@
-# config/asgi.py
 import os
 import django
-from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
+from channels.routing import ProtocolTypeRouter, URLRouter
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-django.setup()  # ← models, signals va s-chiziqlar to‘liq yuklanadi
+django.setup()
 
-# HTTP stack
-django_asgi_app = get_asgi_application()
-
-# WebSocket stack
-from apps.chat.routing import websocket_urlpatterns  # noqa: E402  (import order)
-from apps.chat.middleware import JWTAuthMiddlewareStack  # <— query-string JWT o‘rash
+from apps.chat.routing import websocket_urlpatterns
+from apps.chat.middleware import JWTAuthMiddlewareStack
 
 application = ProtocolTypeRouter(
     {
-        "http": django_asgi_app,
-        "websocket": JWTAuthMiddlewareStack(  # Django session → JWT
-            URLRouter(websocket_urlpatterns)
-        ),
+        "http": get_asgi_application(),
+        "websocket": JWTAuthMiddlewareStack(URLRouter(websocket_urlpatterns)),
     }
 )

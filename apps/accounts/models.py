@@ -23,6 +23,3 @@ class EmailVerification(models.Model):
             self.verified = True
         if save:
             self.save(update_fields=["is_used", "verified"])
-
-
-

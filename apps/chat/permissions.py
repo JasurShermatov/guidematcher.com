@@ -13,7 +13,7 @@ class IsChatParticipant(permissions.BasePermission):
             return False
 
         # Get room_pk from URL kwargs
-        room_pk = view.kwargs.get('room_pk') or view.kwargs.get('pk')
+        room_pk = view.kwargs.get("room_pk") or view.kwargs.get("pk")
         if not room_pk:
             return True  # Let view handle this
 
@@ -25,11 +25,11 @@ class IsChatParticipant(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         # For message objects, check room participation
-        if hasattr(obj, 'room'):
+        if hasattr(obj, "room"):
             return obj.room.participants.filter(id=request.user.id).exists()
 
         # For room objects
-        if hasattr(obj, 'participants'):
+        if hasattr(obj, "participants"):
             return obj.participants.filter(id=request.user.id).exists()
 
         return False

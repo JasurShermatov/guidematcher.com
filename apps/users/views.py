@@ -76,7 +76,9 @@ class ProfileViewSet(viewsets.ViewSet):
         cache.set(f"user:{user.pk}", user, timeout=3600)
         return Response(serializer.data)
 
-    @action(detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated])
+    @action(
+        detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated]
+    )
     @extend_schema(responses=UserShortSerializer)
     def short(self, request):
         serializer = self.get_serializer(self.get_object())

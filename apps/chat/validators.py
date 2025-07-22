@@ -18,10 +18,12 @@ def validate_image_file(image):
         raise ValidationError("Image dimensions cannot exceed 4096x4096 pixels")
 
     # Check file type
-    valid_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp']
-    ext = image.name.lower().split('.')[-1]
+    valid_extensions = ["jpg", "jpeg", "png", "gif", "webp"]
+    ext = image.name.lower().split(".")[-1]
     if ext not in valid_extensions:
-        raise ValidationError(f"Invalid image format. Allowed: {', '.join(valid_extensions)}")
+        raise ValidationError(
+            f"Invalid image format. Allowed: {', '.join(valid_extensions)}"
+        )
 
 
 def validate_document_file(file):
@@ -35,13 +37,26 @@ def validate_document_file(file):
 
     # Check file type
     valid_extensions = [
-        'pdf', 'doc', 'docx', 'txt', 'rtf',  # Documents
-        'mp3', 'wav', 'ogg', 'm4a',  # Audio
-        'mp4', 'avi', 'mov', 'mkv',  # Video
-        'zip', 'rar', '7z',  # Archives
+        "pdf",
+        "doc",
+        "docx",
+        "txt",
+        "rtf",  # Documents
+        "mp3",
+        "wav",
+        "ogg",
+        "m4a",  # Audio
+        "mp4",
+        "avi",
+        "mov",
+        "mkv",  # Video
+        "zip",
+        "rar",
+        "7z",  # Archives
     ]
 
-    ext = file.name.lower().split('.')[-1]
+    ext = file.name.lower().split(".")[-1]
     if ext not in valid_extensions:
-        raise ValidationError(f"Invalid file format. Allowed: {', '.join(valid_extensions)}")
-
+        raise ValidationError(
+            f"Invalid file format. Allowed: {', '.join(valid_extensions)}"
+        )

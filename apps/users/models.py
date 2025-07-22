@@ -30,7 +30,9 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     )
 
     # Denormalized fields
-    full_name = models.CharField(max_length=301, blank=True, verbose_name=_("Full name"))
+    full_name = models.CharField(
+        max_length=301, blank=True, verbose_name=_("Full name")
+    )
     country = models.ForeignKey(
         Country,
         on_delete=models.PROTECT,
@@ -39,7 +41,9 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         related_name="users",
         verbose_name=_("Country of origin"),
     )
-    country_name = models.CharField(max_length=128, blank=True, verbose_name=_("Country name"))
+    country_name = models.CharField(
+        max_length=128, blank=True, verbose_name=_("Country name")
+    )
 
     # Status flags
     is_active = models.BooleanField(default=True, verbose_name=_("Active status"))
@@ -47,8 +51,12 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     is_verified = models.BooleanField(default=False, verbose_name=_("Email verified"))
 
     # Metadata
-    date_joined = models.DateTimeField(default=timezone.now, verbose_name=_("Date joined"))
-    last_login_ip = models.GenericIPAddressField(null=True, blank=True, verbose_name=_("Last login IP"))
+    date_joined = models.DateTimeField(
+        default=timezone.now, verbose_name=_("Date joined")
+    )
+    last_login_ip = models.GenericIPAddressField(
+        null=True, blank=True, verbose_name=_("Last login IP")
+    )
 
     # UI
     avatar = models.ImageField(

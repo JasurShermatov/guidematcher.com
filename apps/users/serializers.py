@@ -15,6 +15,7 @@ class AuthTokenSerializer(TokenObtainPairSerializer):
     JWT access va refresh tokenlarni qaytaradi, foydalanuvchi haqidagi
     muhim ma'lumotlarni token ichiga joylaydi.
     """
+
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
@@ -46,7 +47,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         if not user.is_verified:
             try:
-                from apps.accounts.services import create_and_send_email_verification_code
+                from apps.accounts.services import (
+                    create_and_send_email_verification_code,
+                )
+
                 create_and_send_email_verification_code(user)
             except Exception:
                 pass
@@ -65,7 +69,9 @@ class GoogleAuthSerializer(serializers.Serializer):
                 raw_token, google_requests.Request()
             )
         except Exception:
-            raise serializers.ValidationError("Google token yaroqsiz yoki muddati o'tgan.")
+            raise serializers.ValidationError(
+                "Google token yaroqsiz yoki muddati o'tgan."
+            )
 
         email = info.get("email")
         if not email:
@@ -109,14 +115,18 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 class PasswordResetConfirmSerializer(serializers.Serializer):
     email = serializers.EmailField()
     token = serializers.CharField()
-    new_password = serializers.CharField(write_only=True, validators=[validate_password])
+    new_password = serializers.CharField(
+        write_only=True, validators=[validate_password]
+    )
 
     def validate(self, attrs):
         from django.contrib.auth.tokens import default_token_generator
 
         user = User.objects.filter(email=attrs["email"]).first()
         if not user or not default_token_generator.check_token(user, attrs["token"]):
-            raise serializers.ValidationError("Token yaroqsiz yoki foydalanuvchi topilmadi.")
+            raise serializers.ValidationError(
+                "Token yaroqsiz yoki foydalanuvchi topilmadi."
+            )
 
         self.user = user
         return attrs

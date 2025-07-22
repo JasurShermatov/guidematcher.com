@@ -1,14 +1,8 @@
-
-# docker-compose.yml
-=======
-# ◀️  “version:” kaliti keraksiz – Compose v2+ da avtomatik aniqlanadi
-
 x-env: &default-env
   env_file:
     - .env
 
 services:
-  # ───────────── Database ─────────────
   db:
     image: postgres:15-alpine
     restart: unless-stopped
@@ -25,22 +19,22 @@ services:
       retries: 5
     ports:
       - "5432:5432"
+    networks:
+      - app-network
 
-  # ───────────── Redis ────────────────
   redis:
     image: redis:7-alpine
     restart: unless-stopped
     ports:
       - "6379:6379"
+    networks:
+      - app-network
 
-  # ───────────── Django / ASGI ────────
   backend:
     build: .
     <<: *default-env
     restart: unless-stopped
-
     entrypoint: /entrypoint.sh
-
     command: >
       daphne -b 0.0.0.0 -p 8000 config.asgi:application
     volumes:
@@ -56,11 +50,18 @@ services:
       redis:
         condition: service_started
     healthcheck:
+
+      test: ["CMD-SHELL", "curl -sSf http://localhost:8000/health/ || exit 1"]
+
       # Django health: settings'da simple view (`/health/`) yoki manage.py check
       test: [ "CMD-SHELL", "curl -sSf http://localhost:8000/health/ || exit 1" ]
+
       interval: 30s
       timeout: 5s
       retries: 5
+    networks:
+      - app-network
+
 
   bot:
     build:
@@ -77,6 +78,7 @@ services:
 
 
   # ───────────── Celery worker ────────
+
   celery:
     build: .
     <<: *default-env
@@ -89,6 +91,8 @@ services:
       redis:
         condition: service_started
 
+    networks:
+      - app-network
 
 
   frontend:
@@ -103,8 +107,14 @@ services:
     depends_on:
       backend:
         condition: service_started
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
   static_data:
   media_data:
+
+networks:
+  app-network:
+    driver: bridge

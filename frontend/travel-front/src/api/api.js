@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "axios"; // Api qimsi
 
 const API_URL = process.env.REACT_APP_API_URL || "http://backend:8000/api/v1/";
 

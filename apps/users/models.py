@@ -1,11 +1,4 @@
-"""
-User modeli.
-
-Eslatma:
-    E-mail verifikatsiya endi `apps.accounts` ilovasida.
-    Users app faqat foydalanuvchi identifikatsiyasi va profilga mas'ul.
-"""
-
+#  apps/users/model.py
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone

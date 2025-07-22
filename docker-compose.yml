@@ -13,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER}" ]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -43,18 +43,41 @@ services:
       - media_data:/app/media
     ports:
       - "8000:8000"
+      - "587:587"
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_started
     healthcheck:
+
       test: ["CMD-SHELL", "curl -sSf http://localhost:8000/health/ || exit 1"]
+
+      # Django health: settings'da simple view (`/health/`) yoki manage.py check
+      test: [ "CMD-SHELL", "curl -sSf http://localhost:8000/health/ || exit 1" ]
+
       interval: 30s
       timeout: 5s
       retries: 5
     networks:
       - app-network
+
+
+  bot:
+    build:
+      context: ./bot
+      dockerfile: DockerfileBot
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - .:/bot
+    depends_on:
+      backend:
+        condition: service_healthy
+
+
+  # ───────────── Celery worker ────────
 
   celery:
     build: .
@@ -67,8 +90,10 @@ services:
         condition: service_started
       redis:
         condition: service_started
+
     networks:
       - app-network
+
 
   frontend:
     build:

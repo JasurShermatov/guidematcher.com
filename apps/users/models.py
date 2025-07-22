@@ -1,8 +1,9 @@
-#  apps/users/model.py
+
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.core.cache import cache
 
 from apps.common.models import BaseModel, Country
 from .managers import UserManager
@@ -17,9 +18,8 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         ADMIN = "admin", _("Admin")
         SUPERADMIN = "superadmin", _("Superadmin")
 
-    # --- Auth / identity ---
+    # Identity
     email = models.EmailField(unique=True, verbose_name=_("Email address"))
-    phone = models.CharField(max_length=20, blank=True, verbose_name=_("Phone number"))
     first_name = models.CharField(max_length=150, verbose_name=_("First name"))
     last_name = models.CharField(max_length=150, verbose_name=_("Last name"))
     role = models.CharField(
@@ -28,6 +28,9 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         default=UserRole.CLIENT,
         verbose_name=_("User role"),
     )
+
+    # Denormalized fields
+    full_name = models.CharField(max_length=301, blank=True, verbose_name=_("Full name"))
     country = models.ForeignKey(
         Country,
         on_delete=models.PROTECT,
@@ -36,44 +39,24 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         related_name="users",
         verbose_name=_("Country of origin"),
     )
+    country_name = models.CharField(max_length=128, blank=True, verbose_name=_("Country name"))
 
-    # --- Status flags ---
+    # Status flags
     is_active = models.BooleanField(default=True, verbose_name=_("Active status"))
     is_staff = models.BooleanField(default=False, verbose_name=_("Staff status"))
-    is_verified = models.BooleanField(
-        default=False, verbose_name=_("Email verified")
-    )  # accounts app tasdiqlaydi
+    is_verified = models.BooleanField(default=False, verbose_name=_("Email verified"))
 
-    # --- Dates / meta ---
-    date_joined = models.DateTimeField(
-        default=timezone.now, verbose_name=_("Date joined")
-    )
-    last_login_ip = models.GenericIPAddressField(
-        null=True, blank=True, verbose_name=_("Last login IP")
-    )
+    # Metadata
+    date_joined = models.DateTimeField(default=timezone.now, verbose_name=_("Date joined"))
+    last_login_ip = models.GenericIPAddressField(null=True, blank=True, verbose_name=_("Last login IP"))
 
-    # --- Social auth IDs ---
-    google_id = models.CharField(
-        max_length=255, blank=True, unique=True, null=True, verbose_name=_("Google ID")
-    )
-    facebook_id = models.CharField(
-        max_length=255,
-        blank=True,
-        unique=True,
-        null=True,
-        verbose_name=_("Facebook ID"),
-    )
-    apple_id = models.CharField(
-        max_length=255, blank=True, unique=True, null=True, verbose_name=_("Apple ID")
-    )
-
-    # --- UI / extra ---
+    # UI
     avatar = models.ImageField(
         upload_to="avatars/%Y/%m/",
         blank=True,
         null=True,
         verbose_name=_("Avatar"),
-        help_text=_("Maximum file size: 5MB"),
+        help_text=_("Max file size: 5MB"),
     )
     bio = models.TextField(blank=True, verbose_name=_("Biography"))
 
@@ -87,15 +70,15 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         verbose_name_plural = _("Users")
         ordering = ["-date_joined"]
 
-    def __str__(self) -> str:  # type: ignore[override]
-        return self.get_full_name() or self.email
+    def __str__(self) -> str:
+        return self.full_name or self.email
 
-    # ----- Helpers -----
-    def get_full_name(self) -> str:
-        return f"{self.first_name} {self.last_name}".strip()
-
-    def get_short_name(self) -> str:
-        return self.first_name
+    def save(self, *args, **kwargs):
+        self.full_name = f"{self.first_name} {self.last_name}".strip()
+        if self.country:
+            self.country_name = self.country.name
+        super().save(*args, **kwargs)
+        cache.set(f"user:{self.pk}", self, timeout=3600)  # cache 1 soat
 
     @property
     def is_client(self) -> bool:
@@ -112,32 +95,3 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     @property
     def is_superadmin(self) -> bool:
         return self.role == self.UserRole.SUPERADMIN
-
-
-# (Ixtiyoriy) LoginAttempt ni vaqtincha users’da qoldiramiz.
-# Agar accounts/security app’iga ko‘chirmoqchi bo‘lsangiz xabar bering.
-class LoginAttempt(BaseModel):
-    """
-    Xavfsizlik uchun login urinishlarini log qiladi.
-    (Brute force, bloklash, statistik tahlil uchun.)
-    """
-
-    email = models.EmailField(verbose_name=_("Email"))
-    ip_address = models.GenericIPAddressField(verbose_name=_("IP address"))
-    user_agent = models.TextField(blank=True, verbose_name=_("User agent"))
-    is_successful = models.BooleanField(default=False, verbose_name=_("Is successful"))
-    failure_reason = models.CharField(
-        max_length=255, blank=True, verbose_name=_("Failure reason")
-    )
-
-    class Meta:
-        verbose_name = _("Login attempt")
-        verbose_name_plural = _("Login attempts")
-        ordering = ["-created_at"]
-        indexes = [
-            models.Index(fields=["email", "created_at"]),
-            models.Index(fields=["ip_address", "created_at"]),
-        ]
-
-    def __str__(self) -> str:  # type: ignore[override]
-        return f"{self.email} - {self.created_at}"

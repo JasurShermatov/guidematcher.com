@@ -1,13 +1,16 @@
 # apps/users/views.py
-from rest_framework import generics, permissions, status, viewsets
+from rest_framework import generics, permissions, status, viewsets, mixins
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema
+from django.core.cache import cache
 
 from apps.users.serializers import (
     GoogleAuthSerializer,
     PasswordResetRequestSerializer,
     PasswordResetConfirmSerializer,
     ProfileSerializer,
+    UserShortSerializer,
 )
 
 
@@ -44,11 +47,39 @@ class PasswordResetConfirmView(generics.GenericAPIView):
 
 
 @extend_schema(tags=["users"])
-class ProfileViewSet(
-    viewsets.GenericViewSet, generics.RetrieveAPIView, generics.UpdateAPIView
-):
-    serializer_class = ProfileSerializer
+class ProfileViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_serializer_class(self):
+        if self.action == "short":
+            return UserShortSerializer
+        return ProfileSerializer
+
     def get_object(self):
-        return self.request.user
+        user = cache.get(f"user:{self.request.user.pk}")
+        if not user:
+            user = self.request.user
+            cache.set(f"user:{user.pk}", user, timeout=3600)
+        return user
+
+    @extend_schema(responses=ProfileSerializer)
+    def retrieve(self, request):
+        serializer = self.get_serializer(self.get_object())
+        return Response(serializer.data)
+
+    @extend_schema(request=ProfileSerializer, responses=ProfileSerializer)
+    def update(self, request):
+        user = self.get_object()
+        serializer = self.get_serializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        cache.set(f"user:{user.pk}", user, timeout=3600)
+        return Response(serializer.data)
+
+    @action(
+        detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated]
+    )
+    @extend_schema(responses=UserShortSerializer)
+    def short(self, request):
+        serializer = self.get_serializer(self.get_object())
+        return Response(serializer.data)

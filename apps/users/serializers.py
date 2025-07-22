@@ -3,19 +3,17 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
-# Google auth (ixtiyoriy)
 from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
 
 User = get_user_model()
 
 
-# ───────────────────────────── JWT
+# ─────────────── JWT Token Serializer
 class AuthTokenSerializer(TokenObtainPairSerializer):
     """
-    JWT refresh/access tokenlarini qaytaradi va foydalanuvchi haqidagi
-    qo'shimcha claim'larni token ichiga qo'shadi.
+    JWT access va refresh tokenlarni qaytaradi, foydalanuvchi haqidagi
+    muhim ma'lumotlarni token ichiga joylaydi.
     """
 
     @classmethod
@@ -23,13 +21,12 @@ class AuthTokenSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
         token["role"] = user.role
         token["email"] = user.email
+        token["full_name"] = user.full_name
         token["avatar"] = user.avatar.url if user.avatar else None
         return token
 
 
-# ───────────────────────────── Register (internal)
-# Public registratsiya `apps.accounts` orqali (kod + tasdiq).
-# Ushbu serializer developer/admin/test uchun qoldirilgan.
+# ─────────────── Developer/Test uchun Register
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
     role = serializers.ChoiceField(
@@ -44,13 +41,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop("password")
-
-        # create_user parolni hashlaydi va saqlaydi
         user = User.objects.create_user(password=password, **validated_data)
-        user.is_active = True  # ehtiyot chora: active bo'lsin
+        user.is_active = True
         user.save(update_fields=["is_active"])
 
-        # E-mail verifikatsiya -> accounts servisiga delegatsiya
         if not user.is_verified:
             try:
                 from apps.accounts.services import (
@@ -58,14 +52,13 @@ class RegisterSerializer(serializers.ModelSerializer):
                 )
 
                 create_and_send_email_verification_code(user)
-            except Exception:  # noqa: BLE001
-                # TODO: logger.warning("Verification send failed", exc_info=True)
+            except Exception:
                 pass
 
         return user
 
 
-# ───────────────────────────── Google Login
+# ─────────────── Google Auth
 class GoogleAuthSerializer(serializers.Serializer):
     id_token = serializers.CharField(write_only=True)
 
@@ -75,8 +68,10 @@ class GoogleAuthSerializer(serializers.Serializer):
             info = google_id_token.verify_oauth2_token(
                 raw_token, google_requests.Request()
             )
-        except Exception:  # noqa: BLE001
-            raise serializers.ValidationError("Invalid Google token.")
+        except Exception:
+            raise serializers.ValidationError(
+                "Google token yaroqsiz yoki muddati o'tgan."
+            )
 
         email = info.get("email")
         if not email:
@@ -87,7 +82,7 @@ class GoogleAuthSerializer(serializers.Serializer):
             defaults={
                 "first_name": info.get("given_name", ""),
                 "last_name": info.get("family_name", ""),
-                "is_verified": True,  # Google hisobini verified deb qabul qilamiz
+                "is_verified": True,
                 "google_id": info.get("sub"),
             },
         )
@@ -98,24 +93,22 @@ class GoogleAuthSerializer(serializers.Serializer):
         return {"refresh": str(refresh), "access": str(refresh.access_token)}
 
 
-# ───────────────────────────── Password reset (delegated to accounts)
+# ─────────────── Parolni tiklash (delegated)
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
     def validate_email(self, value):
         if not User.objects.filter(email=value, is_active=True).exists():
-            raise serializers.ValidationError("Foydalanuvchi topilmadi.")
+            raise serializers.ValidationError("Aktiv foydalanuvchi topilmadi.")
         return value
 
     def save(self, **kwargs):
         from django.contrib.auth.tokens import default_token_generator
-        from apps.accounts.services import send_password_reset  # siz yozadigan servis
+        from apps.accounts.services import send_password_reset
 
         user = User.objects.get(email=self.validated_data["email"])
         token = default_token_generator.make_token(user)
-        send_password_reset(
-            user, token
-        )  # servis reset URL yasab, Celery task chaqiradi
+        send_password_reset(user, token)
         return token
 
 
@@ -129,12 +122,12 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     def validate(self, attrs):
         from django.contrib.auth.tokens import default_token_generator
 
-        email = attrs["email"]
-        token = attrs["token"]
+        user = User.objects.filter(email=attrs["email"]).first()
+        if not user or not default_token_generator.check_token(user, attrs["token"]):
+            raise serializers.ValidationError(
+                "Token yaroqsiz yoki foydalanuvchi topilmadi."
+            )
 
-        user = User.objects.filter(email=email).first()
-        if not user or not default_token_generator.check_token(user, token):
-            raise serializers.ValidationError("Token yaroqsiz.")
         self.user = user
         return attrs
 
@@ -144,8 +137,10 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         return self.user
 
 
-# ───────────────────────────── Profile & Short
+# ─────────────── Profile
 class ProfileSerializer(serializers.ModelSerializer):
+    country_name = serializers.CharField(read_only=True)
+
     class Meta:
         model = User
         fields = (
@@ -153,29 +148,31 @@ class ProfileSerializer(serializers.ModelSerializer):
             "email",
             "first_name",
             "last_name",
-            "phone",
-            "country",
+            "full_name",
             "avatar",
             "bio",
             "role",
             "is_verified",
-            "created_at",
-            "updated_at",
+            "country",
+            "country_name",
+            "date_joined",
         )
         read_only_fields = (
             "id",
             "email",
             "role",
             "is_verified",
-            "created_at",
-            "updated_at",
+            "full_name",
+            "country_name",
+            "date_joined",
         )
 
 
+# ─────────────── Mini user info
 class UserShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "first_name", "last_name", "avatar")
+        fields = ("id", "full_name", "avatar")
 
 
 __all__ = [

@@ -67,11 +67,8 @@ urlpatterns = [
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     # Modular API v1
     path("api/v1/", include(api_v1_patterns)),
-
     path("health/", health_check, name="health"),
-
     path("health/", healthcheck_view, name="health"),  # Health check endpoint
-
 ]
 
 # ─── Media / Static for development ────────────────────────────

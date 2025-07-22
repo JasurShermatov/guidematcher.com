@@ -1,6 +1,6 @@
-#  apps/users/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+
 from apps.users.views import (
     GoogleLoginView,
     PasswordResetRequestView,
@@ -9,15 +9,22 @@ from apps.users.views import (
 )
 
 router = DefaultRouter()
-router.register("profile", ProfileViewSet, basename="profile")
+router.register(r"profiles", ProfileViewSet, basename="profiles")
 
 urlpatterns = [
-    path("google-login/", GoogleLoginView.as_view(), name="google-login"),
-    path("password/reset/", PasswordResetRequestView.as_view(), name="password-reset"),
+    # OAuth Login
+    path("auth/google/", GoogleLoginView.as_view(), name="auth-google-login"),
+    # Password Reset Flow
     path(
-        "password/reset/confirm/",
-        PasswordResetConfirmView.as_view(),
-        name="password-reset-confirm",
+        "auth/password/reset/",
+        PasswordResetRequestView.as_view(),
+        name="auth-password-reset",
     ),
+    path(
+        "auth/password/reset/confirm/",
+        PasswordResetConfirmView.as_view(),
+        name="auth-password-reset-confirm",
+    ),
+    # API endpoints
     path("", include(router.urls)),
 ]

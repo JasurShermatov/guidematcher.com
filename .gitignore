@@ -2,7 +2,7 @@
 __pycache__/
 *.py[cod]
 *.log
-
+logs
 # Media files
 media/     # media papka gitga tushmaydi (user upload'lar)
 

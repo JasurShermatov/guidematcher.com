@@ -1,7 +1,7 @@
 # Python cache
 __pycache__/
 *.py[cod]
-
+*.log
 
 # Media files
 media/     # media papka gitga tushmaydi (user upload'lar)

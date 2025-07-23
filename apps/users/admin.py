@@ -4,9 +4,5 @@ from .models import User
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_filter = ("email",
-                   "first_name",
-                   "last_name",
-                   "is_staff",
-                   )
+    list_filter = ("email", "first_name", "last_name", "is_staff")
     search_fields = ("email", "first_name", "last_name")

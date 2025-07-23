@@ -10,9 +10,9 @@ from .models import User
 
 class RoleFilter(SimpleListFilter):
     """Custom role filter for admin"""
-
     title = "User Role"
     parameter_name = "role"
+
 
     def lookups(self, request, model_admin):
         return User.UserRole.choices
@@ -309,6 +309,7 @@ class UserAdmin(BaseUserAdmin):
 
     # ═══ CUSTOM DISPLAY METHODS ═══
     @admin.display(description="Login Info", ordering="login_identifier")
+
     def get_login_info(self, obj):
         """Display login identifier with user link"""
         try:
@@ -321,6 +322,7 @@ class UserAdmin(BaseUserAdmin):
 
             if user:
                 user_url = reverse("admin:users_user_change", args=[user.pk])
+
                 return format_html(
                     '<a href="{}" style="text-decoration:none;"><strong>{}</strong></a><br><small style="color:#666;">{}</small>',
                     user_url,
@@ -371,6 +373,7 @@ class UserAdmin(BaseUserAdmin):
         """IP location info (basic)"""
         # Simple IP classification
         if obj.ip_address:
+
             if obj.ip_address.startswith("127.") or obj.ip_address.startswith(
                 "192.168."
             ):
@@ -394,6 +397,7 @@ class UserAdmin(BaseUserAdmin):
         cutoff_date = timezone.now() - timedelta(days=90)
         count, _ = LoginAttempt.objects.filter(created_at__lt=cutoff_date).delete()
 
+
         self.message_user(request, f"Cleaned {count} old login attempts.")
 
     @admin.action(description="📊 Export security report")
@@ -404,7 +408,9 @@ class UserAdmin(BaseUserAdmin):
 
         self.message_user(
             request,
+
             f"Report: {success_count} successful, {failed_count} failed attempts in selection.",
+
         )
 
     actions = [clean_old_attempts, export_security_report]
@@ -440,3 +446,4 @@ class UserAdmin(BaseUserAdmin):
 admin.site.site_header = "Tourism Platform Admin"
 admin.site.site_title = "Tourism Admin"
 admin.site.index_title = "Dashboard"
+

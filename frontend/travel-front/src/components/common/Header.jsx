@@ -13,6 +13,7 @@ import {
   FiCheck,
   FiLogOut
 } from 'react-icons/fi';
+import { logoutUser } from '../../api/api'; // API'dan logoutUser import qilindi
 import './Header.css';
 
 const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
@@ -68,13 +69,11 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
 
     updateTheme();
 
-    // Update theme every minute for auto mode
     if (theme === 'auto') {
       const interval = setInterval(updateTheme, 60000);
       return () => clearInterval(interval);
     }
 
-    // Listen for system theme changes in default mode
     if (theme === 'default') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       const handler = (e) => root.setAttribute('data-theme', e.matches ? 'dark' : 'light');
@@ -124,11 +123,20 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
     setIsLangDropdownOpen(false);
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUser(null);
-    setIsAvatarDropdownOpen(false);
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      setIsAuthenticated(false);
+      setUser(null);
+      setIsAvatarDropdownOpen(false);
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error.message);
+      setIsAuthenticated(false);
+      setUser(null);
+      setIsAvatarDropdownOpen(false);
+      navigate('/');
+    }
   };
 
   const menuItems = [
@@ -343,7 +351,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                 </button>
               ) : (
                 <>
-                  <button className="header-btn header-mobile-auth-btn header-register-btn">Register</button>
+                  <Link to="/register" className="header-btn header-mobile-auth-btn header-register-btn">Register</Link>
                   <Link to="/login" className="header-btn header-mobile-auth-btn header-signin-btn">Sign In</Link>
                 </>
               )}

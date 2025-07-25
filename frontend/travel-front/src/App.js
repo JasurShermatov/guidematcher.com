@@ -1,36 +1,59 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import HomePage from './pages/HomePage';
-import PopularDestination from './pages/PopularDestination';
-import FindGuide from './menues/FindGuide';
 import Authentication from './auth/Authentication';
 import UserAccount from './account/UserAccount';
-import GuideAccount from './account/GuideAccount';
+import { getCurrentUser } from './api/api';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
 
-  // Determine which account component to render based on user.role
+  // Sahifa yuklanganda autentifikatsiya holatini tekshirish
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        try {
+          const userData = await getCurrentUser();
+          setIsAuthenticated(true);
+          setUser({
+            id: userData.id,
+            role: userData.role,
+            username: userData.full_name,
+            email: userData.email,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            country: userData.country_name || "",
+            city: userData.city || "",
+          });
+        } catch (error) {
+          console.error("Failed to fetch user:", error);
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+          setIsAuthenticated(false);
+        }
+      }
+    };
+    checkAuth();
+  }, []);
+
+  // Account component
   const AccountComponent = () => {
     if (!isAuthenticated || !user) return <HomePage />;
-    if (user.role === 'Client') return <UserAccount user={user} setIsAuthenticated={setIsAuthenticated} />;
-    if (user.role === 'Customer') return <GuideAccount user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated} />;
-    return <HomePage />;
+    return <UserAccount user={user} setIsAuthenticated={setIsAuthenticated} setUser={setUser} />;
   };
 
   return (
     <BrowserRouter>
       <div className="App">
-        <Header isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} setUser={setUser} />
+        <Header isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} user={user} setUser={setUser} />
         <main className="main-content">
           <Routes>
-            <Route path="/" element={<AccountComponent />} />
-            <Route path="/find-guides" element={<FindGuide isAuthenticated={isAuthenticated} />} />
-            <Route path="/popular-destinations" element={<PopularDestination />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<Authentication setIsAuthenticated={setIsAuthenticated} setUser={setUser} />} />
             <Route path="/account" element={<AccountComponent />} />
           </Routes>

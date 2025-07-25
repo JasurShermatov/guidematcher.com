@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FiX, FiMail, FiLock, FiUser, FiLogIn, FiCheckSquare, FiSquare, FiGlobe, FiCheck } from "react-icons/fi";
+import { FiX, FiMail, FiLock, FiUser, FiLogIn, FiCheckSquare, FiSquare, FiGlobe, FiCheck, FiEye, FiEyeOff } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { loginUser, requestCode, registerUser } from "../api/api";
+import { loginUser, requestCode, registerUser, getCurrentUser } from "../api/api";
 import "./Authentication.css";
+
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 const Authentication = ({ setIsAuthenticated, setUser }) => {
   const [activeTab, setActiveTab] = useState("login");
@@ -25,9 +27,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     travelTips: false,
   });
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [verificationStep, setVerificationStep] = useState(false);
   const [countrySuggestions, setCountrySuggestions] = useState([]);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const countryInputRef = useRef(null);
   const navigate = useNavigate();
 
@@ -53,24 +58,68 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste",
     "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine",
     "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City",
-    "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe",
+    "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
   ];
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        try {
+          const userData = await getCurrentUser();
+          setIsAuthenticated(true);
+          setUser({
+            id: userData.id,
+            role: userData.role,
+            username: userData.full_name,
+            email: userData.email,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            country: userData.country || "",
+            city: userData.city || "",
+            bio: userData.bio || "",
+          });
+          navigate("/account");
+        } catch (error) {
+          console.error("Failed to fetch user:", error);
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+          setIsAuthenticated(false);
+        }
+      }
+    };
+    checkAuth();
+  }, [setIsAuthenticated, setUser, navigate]);
 
   const handleLoginChange = (e) => {
     setLoginForm({ ...loginForm, [e.target.name]: e.target.value });
     setError("");
+    setSuccessMessage("");
   };
 
   const handleRegisterChange = (e) => {
     const { name, value } = e.target;
     setRegisterForm({ ...registerForm, [name]: value });
     setError("");
+    setSuccessMessage("");
 
     if (name === "country") {
       const filteredSuggestions = countries
         .filter((country) => country.toLowerCase().startsWith(value.toLowerCase()))
         .slice(0, 5);
       setCountrySuggestions(filteredSuggestions);
+    }
+
+    if (name === "password" || name === "confirm_password") {
+      if (value && !passwordRegex.test(value)) {
+        setError(
+          "Parol kamida 8 belgidan iborat bo‘lishi, katta harf, kichik harf, raqam va maxsus belgi (@$!%*?&) o‘z ichiga olishi kerak."
+        );
+      } else if (registerForm.password && registerForm.confirm_password && registerForm.password !== registerForm.confirm_password) {
+        setError("Parollar mos kelmadi.");
+      } else {
+        setError("");
+      }
     }
   };
 
@@ -83,35 +132,41 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
   const handleCheckboxChange = (e) => {
     setCheckboxes({ ...checkboxes, [e.target.name]: e.target.checked });
     setError("");
+    setSuccessMessage("");
   };
+
+  const toggleShowPassword = () => setShowPassword(!showPassword);
+  const toggleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
     setLoading(true);
 
     if (!loginForm.email || !loginForm.password) {
-      setError("Iltimos, barcha maydonlarni to‘ldiring");
+      setError("Iltimos, barcha maydonlarni to‘ldiring.");
+      setLoading(false);
+      return;
+    }
+
+    if (!passwordRegex.test(loginForm.password)) {
+      setError(
+        "Parol kamida 8 belgidan iborat bo‘lishi, katta harf, kichik harf, raqam va maxsus belgi (@$!%*?&) o‘z ichiga olishi kerak."
+      );
       setLoading(false);
       return;
     }
 
     try {
       const data = await loginUser(loginForm);
+      localStorage.setItem("access_token", data.access);
+      localStorage.setItem("refresh_token", data.refresh);
       setIsAuthenticated(true);
-      setUser({
-        id: data.user.id,
-        role: data.user.role,
-        username: `${data.user.first_name} ${data.user.last_name}`,
-        email: data.user.email,
-        first_name: data.user.first_name,
-        last_name: data.user.last_name,
-        country: data.user.country || "",
-        city: data.user.city || "",
-      });
+      setUser(data.user);
       navigate("/account");
     } catch (error) {
-      setError(error.message);
+      setError(error.message || "Kirishda xatolik yuz berdi. Email yoki parolni tekshiring.");
     } finally {
       setLoading(false);
     }
@@ -120,27 +175,33 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
     setLoading(true);
 
     const { role, first_name, last_name, email, password, confirm_password, country } = registerForm;
 
     if (!first_name || !last_name || !email || !password || !confirm_password || !country) {
-      setError("Iltimos, barcha majburiy maydonlarni to‘ldiring");
+      setError("Iltimos, barcha majburiy maydonlarni to‘ldiring.");
       setLoading(false);
       return;
     }
+
     if (password !== confirm_password) {
-      setError("Parollar mos kelmadi");
+      setError("Parollar mos kelmadi.");
       setLoading(false);
       return;
     }
+
+    if (!passwordRegex.test(password)) {
+      setError(
+        "Parol kamida 8 belgidan iborat bo‘lishi, katta harf, kichik harf, raqam va maxsus belgi (@$!%*?&) o‘z ichiga olishi kerak."
+      );
+      setLoading(false);
+      return;
+    }
+
     if (!checkboxes.personalData || !checkboxes.terms) {
-      setError("Shaxsiy ma‘lumotlarni qayta ishlash va shartlarga rozilik berishingiz kerak");
-      setLoading(false);
-      return;
-    }
-    if (!/^\d{6}$/.test(password)) {
-      setError("Parol 6 xonali raqam bo‘lishi kerak");
+      setError("Shaxsiy ma‘lumotlarni qayta ishlash va shartlarga rozilik berishingiz kerak.");
       setLoading(false);
       return;
     }
@@ -148,11 +209,14 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     try {
       console.log("Sending requestCode with:", { email });
       await requestCode({ email });
+      setSuccessMessage("Tasdiqlash kodi emailingizga yuborildi.");
       setVerificationStep(true);
+      setLoading(false); // Loading holatini o'chirish
     } catch (error) {
-      console.error("RequestCode error:", error.response?.data);
-      setError(error.message || "Kod so‘rovida xatolik yuz berdi");
-    } finally {
+      const errorMsg = error.message.includes("already exists")
+        ? "Bu email allaqachon ro'yxatdan o'tgan. Iltimos, boshqa email ishlating yoki tizimga kiring."
+        : error.message || "Kod so‘rovida xatolik yuz berdi.";
+      setError(errorMsg);
       setLoading(false);
     }
   };
@@ -160,33 +224,54 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
   const handleVerifyCode = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
     setLoading(true);
 
     if (!verificationCode) {
-      setError("Iltimos, tasdiqlash kodini kiriting");
+      setError("Iltimos, tasdiqlash kodini kiriting.");
       setLoading(false);
       return;
     }
 
-    const { role, first_name, last_name, email, password, confirm_password, country } = registerForm;
-    if (!country || country.trim() === "") {
-      setError("Iltimos, mamlakatni tanlang");
+    if (!/^\d{6}$/.test(verificationCode)) {
+      setError("Tasdiqlash kodi 6 xonali raqam bo‘lishi kerak.");
       setLoading(false);
       return;
     }
-    if (!/^\d{6}$/.test(password)) {
-      setError("Parol 6 xonali raqam bo‘lishi kerak");
+
+    const { role, first_name, last_name, email, password, country } = registerForm;
+    if (!country || country.trim() === "") {
+      setError("Iltimos, mamlakatni tanlang.");
       setLoading(false);
       return;
     }
 
     try {
       console.log("Verifying code with payload:", { role, first_name, last_name, email, password, country, code: verificationCode });
-      const payload = { role, first_name, last_name, email, password, country, code: verificationCode };
-      const response = await registerUser(payload);
-      console.log("Register response:", response);
-      setActiveTab("login");
-      setLoginForm({ email, password });
+      const response = await registerUser({
+        role,
+        first_name,
+        last_name,
+        email,
+        password,
+        country,
+        code: verificationCode,
+      });
+      localStorage.setItem("access_token", response.access_token);
+      localStorage.setItem("refresh_token", response.refresh_token);
+      setIsAuthenticated(true);
+      setUser({
+        id: response.user.id,
+        role: response.user.role,
+        username: response.user.full_name,
+        email: response.user.email,
+        first_name: response.user.first_name,
+        last_name: response.user.last_name,
+        country: response.user.country || "",
+        city: "",
+      });
+      setSuccessMessage("Ro‘yxatdan o‘tish muvaffaqiyatli!");
+      navigate("/account");
       setRegisterForm({
         role: "Client",
         first_name: "",
@@ -199,10 +284,29 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
       setVerificationCode("");
       setCheckboxes({ personalData: false, terms: false, travelTips: false });
       setVerificationStep(false);
-      setError("Ro‘yxatdan o‘tish muvaffaqiyatli! Iltimos, tizimga kiring.");
     } catch (error) {
-      console.error("Register error:", error.response?.data);
-      setError(error.message || (error.response?.data?.detail || "Kod tasdiqlashda xatolik yuz berdi"));
+      const errorMsg = error.message.includes("already exists")
+        ? "Bu email allaqachon ro'yxatdan o'tgan. Iltimos, tizimga kiring."
+        : error.message.includes("expired")
+        ? "Tasdiqlash kodi muddati tugagan. Iltimos, qaytadan kod so‘rang."
+        : error.message.includes("invalid")
+        ? "Noto‘g‘ri tasdiqlash kodi. Iltimos, tekshiring."
+        : error.message || "Ro‘yxatdan o‘tishda xatolik yuz berdi.";
+      setError(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    setError("");
+    setSuccessMessage("");
+    setLoading(true);
+    try {
+      await requestCode({ email: registerForm.email });
+      setSuccessMessage("Yangi tasdiqlash kodi emailingizga yuborildi.");
+    } catch (error) {
+      setError("Kod qayta yuborishda xatolik yuz berdi.");
     } finally {
       setLoading(false);
     }
@@ -217,13 +321,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     setVerificationStep(false);
     setCountrySuggestions([]);
     setError("");
+    setSuccessMessage("");
   };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
-        closeModal();
-      }
+      if (e.key === "Escape") closeModal();
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
@@ -252,6 +355,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
           </button>
         </div>
         {error && <p className="auth-error" role="alert">{error}</p>}
+        {successMessage && <p className="auth-success" role="alert">{successMessage}</p>}
         {loading && (
           <div className="auth-loading">
             <div className="spinner"></div> Yuklanmoqda...
@@ -281,19 +385,27 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                 <label htmlFor="login-password">
                   <FiLock /> Password
                 </label>
-                <input
-                  id="login-password"
-                  type="password"
-                  name="password"
-                  value={loginForm.password}
-                  onChange={handleLoginChange}
-                  placeholder="Enter your 6-digit password"
-                  className="auth-input"
-                  aria-required="true"
-                  disabled={loading}
-                  pattern="\d{6}"
-                  title="Parol 6 xonali raqam bo‘lishi kerak"
-                />
+                <div className="password-container">
+                  <input
+                    id="login-password"
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={loginForm.password}
+                    onChange={handleLoginChange}
+                    placeholder="Enter your password"
+                    className="auth-input"
+                    aria-required="true"
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password"
+                    onClick={toggleShowPassword}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <FiEyeOff /> : <FiEye />}
+                  </button>
+                </div>
               </div>
               <button type="submit" className="auth-submit-btn" disabled={loading}>
                 <FiLogIn /> Sign In
@@ -384,37 +496,53 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                   <label htmlFor="register-password">
                     <FiLock /> Password
                   </label>
-                  <input
-                    id="register-password"
-                    type="password"
-                    name="password"
-                    value={registerForm.password}
-                    onChange={handleRegisterChange}
-                    placeholder="Enter your 6-digit password"
-                    className="auth-input"
-                    aria-required="true"
-                    disabled={loading}
-                    pattern="\d{6}"
-                    title="Parol 6 xonali raqam bo‘lishi kerak"
-                  />
+                  <div className="password-container">
+                    <input
+                      id="register-password"
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={registerForm.password}
+                      onChange={handleRegisterChange}
+                      placeholder="Enter your password"
+                      className="auth-input"
+                      aria-required="true"
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className="toggle-password"
+                      onClick={toggleShowPassword}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <FiEyeOff /> : <FiEye />}
+                    </button>
+                  </div>
                 </div>
                 <div className="auth-form-group">
                   <label htmlFor="register-confirm_password">
                     <FiLock /> Confirm Password
                   </label>
-                  <input
-                    id="register-confirm_password"
-                    type="password"
-                    name="confirm_password"
-                    value={registerForm.confirm_password}
-                    onChange={handleRegisterChange}
-                    placeholder="Confirm your 6-digit password"
-                    className="auth-input"
-                    aria-required="true"
-                    disabled={loading}
-                    pattern="\d{6}"
-                    title="Parol 6 xonali raqam bo‘lishi kerak"
-                  />
+                  <div className="password-container">
+                    <input
+                      id="register-confirm_password"
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirm_password"
+                      value={registerForm.confirm_password}
+                      onChange={handleRegisterChange}
+                      placeholder="Confirm your password"
+                      className="auth-input"
+                      aria-required="true"
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className="toggle-password"
+                      onClick={toggleShowConfirmPassword}
+                      aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                    >
+                      {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                    </button>
+                  </div>
                 </div>
                 <div className="auth-form-group">
                   <label htmlFor="register-country">
@@ -486,25 +614,34 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             ) : (
               <form className="auth-form" onSubmit={handleVerifyCode}>
                 <h3>Email Tasdiqlash</h3>
-                <p>Iltimos, emailingizga ({registerForm.email}) yuborilgan tasdiqlash kodini kiriting.</p>
+                <p>Iltimos, emailingizga ({registerForm.email}) yuborilgan 6 xonali tasdiqlash kodini kiriting.</p>
                 <div className="auth-form-group">
                   <label htmlFor="verification-code">
                     <FiCheck /> Tasdiqlash Kodi
                   </label>
                   <input
                     id="verification-code"
-                    type="text"
-                    name="verificationCode"
+                    type="number"
                     value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value)}
-                    placeholder="Kodni kiriting"
+                    onChange={(e) => setVerificationCode(e.target.value.slice(0, 6))}
+                    placeholder="6 xonali kodni kiriting"
                     className="auth-input"
                     aria-required="true"
+                    autoFocus
+                    maxLength="6"
                     disabled={loading}
                   />
                 </div>
                 <button type="submit" className="auth-submit-btn" disabled={loading}>
                   <FiCheck /> Tasdiqlash
+                </button>
+                <button
+                  type="button"
+                  className="auth-resend-btn"
+                  onClick={handleResendCode}
+                  disabled={loading}
+                >
+                  Kodi Qayta Yuborish
                 </button>
               </form>
             )}

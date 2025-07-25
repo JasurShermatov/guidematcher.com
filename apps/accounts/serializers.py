@@ -1,17 +1,14 @@
-#  apps/accounts/serializer
 import datetime
 import secrets
 import string
 
 from django.utils import timezone
 from rest_framework import serializers
-
-from apps.users.models import User
+from apps.users.models import User, Country
 from apps.accounts.models import EmailVerification
 from apps.accounts.tasks import send_verification_email
 
-
-DEFAULT_EXPIRE_SECONDS = 100  # TODO: settings.ACCOUNTS_CODE_EXPIRE_SECONDS
+DEFAULT_EXPIRE_SECONDS = 300  # 5 daqiqa
 
 
 def generate_code(length: int = 6) -> str:
@@ -23,10 +20,6 @@ class RequestVerificationCodeSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         email = validated_data["email"].lower().strip()
-
-        # Agar user allaqachon mavjud bo'lsa va verified bo'lsa - optional policy:
-        # if User.objects.filter(email=email, is_verified=True).exists():
-        #     raise serializers.ValidationError({"email": "Bu email allaqachon ro'yxatdan o'tgan."})
 
         code = generate_code()
         expires_at = timezone.now() + datetime.timedelta(seconds=DEFAULT_EXPIRE_SECONDS)
@@ -49,6 +42,8 @@ class RequestVerificationCodeSerializer(serializers.Serializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     code = serializers.CharField(write_only=True, max_length=6)
+    role = serializers.CharField(max_length=20)
+    country = serializers.CharField(max_length=100)
 
     class Meta:
         model = User
@@ -66,48 +61,72 @@ class RegisterSerializer(serializers.ModelSerializer):
         }
 
     def validate_password(self, value):
-        # Minimal policy; qo'shimcha Django validators ham ishlatish mumkin
-        if sum(c.isdigit() for c in value) < 1 or sum(c.isupper() for c in value) < 1:
+        if not (
+            any(c.islower() for c in value)
+            and any(c.isupper() for c in value)
+            and any(c.isdigit() for c in value)
+            and any(c in "@$!%*?&" for c in value)
+        ):
             raise serializers.ValidationError(
-                "Parolda kamida 1 ta raqam va 1 ta katta harf bo‘lishi shart."
+                "Parolda kamida 1 ta kichik harf, 1 ta katta harf, 1 ta raqam va 1 ta maxsus belgi (@$!%*?&) bo‘lishi shart."
+            )
+        return value
+
+    def validate_role(self, value):
+        valid_roles = ["Client", "Customer"]
+        if value not in valid_roles:
+            raise serializers.ValidationError(
+                f"Role {valid_roles} dan biri bo‘lishi kerak."
+            )
+        return value
+
+    def validate_country(self, value):
+        if not value or value.strip() == "":
+            raise serializers.ValidationError(
+                "Mamlakat maydoni bo‘sh bo‘lmasligi kerak."
             )
         return value
 
     def validate(self, attrs):
         email = attrs.get("email").lower().strip()
         code = attrs.pop("code")
+        country_name = attrs.pop("country")
 
-        # 1) user mavjud emasligiga ishonch hosil qilamiz
         if User.objects.filter(email=email).exists():
             raise serializers.ValidationError(
-                {"email": "Bu email bilan foydalanuvchi mavjud."}
+                {"email": "Bu email bilan foydalanuvchi allaqachon ro'yxatdan o'tgan."}
             )
 
-        # 2) kodni tekshirish
         try:
             ev = EmailVerification.objects.get(email=email, code=code, is_used=False)
         except EmailVerification.DoesNotExist:
-            raise serializers.ValidationError({"code": "Kod noto‘g‘ri yoki topilmadi."})
+            raise serializers.ValidationError(
+                {"code": "Tasdiqlash kodi noto‘g‘ri yoki ishlatilgan."}
+            )
 
         if ev.is_expired():
-            raise serializers.ValidationError({"code": "Kod muddati tugagan."})
+            raise serializers.ValidationError(
+                {"code": "Tasdiqlash kodi muddati tugagan."}
+            )
 
-        # register bosqichida keyin ishlatish uchun saqlaymiz
+        try:
+            country_instance = Country.objects.get(name__iexact=country_name)
+        except Country.DoesNotExist:
+            country_instance = Country.objects.create(name=country_name)
+        attrs["country"] = country_instance
+
         self.ev = ev
-        attrs["email"] = email  # normalize qilingan
+        attrs["email"] = email
         return attrs
 
     def create(self, validated_data):
         password = validated_data.pop("password")
-
-        # User yaratish: manager orqali (normalize + default flags)
         user = User.objects.create_user(**validated_data)
         user.set_password(password)
-        user.is_verified = True  # tasdiqlandi
+        user.is_verified = True
         user.is_active = True
         user.save()
 
-        # kodni ishlatilgan deb belgilaymiz
         self.ev.mark_used(save=False)
         self.ev.verified = True
         self.ev.save(update_fields=["is_used", "verified"])

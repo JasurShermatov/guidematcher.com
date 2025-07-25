@@ -434,3 +434,1768 @@ TypeError: '>=' not supported between instances of 'datetime.datetime' and 'None
 [2025-07-22 22:33:29,656] INFO apps.chat.apps: Chat WebSocket consumers loaded
 [2025-07-22 22:33:29,656] INFO apps.chat.apps: Chat periodic tasks registered
 [2025-07-22 22:33:29,657] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 00:42:13,360] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 00:42:13,459] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 00:42:13,460] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 00:42:13,460] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 00:42:14,996] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 00:42:15,091] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 00:42:15,092] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 00:42:15,092] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 00:42:15,915] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 00:42:15,981] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 00:42:15,982] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 00:42:15,982] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 00:43:47,962] WARNING django.request: Not Found: /favicon.ico
+[2025-07-24 00:43:47,962] WARNING django.request: Not Found: /favicon.ico
+[2025-07-24 01:07:34,132] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 01:07:34,236] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 01:07:34,237] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 01:07:34,237] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 01:07:35,148] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 01:07:35,244] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 01:07:35,245] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 01:07:35,245] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 01:07:36,082] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 01:07:36,150] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 01:07:36,151] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 01:07:36,151] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 01:22:04,201] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 01:22:04,304] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 01:22:04,305] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 01:22:04,306] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 01:22:05,228] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 01:22:05,325] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 01:22:05,326] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 01:22:05,326] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 01:22:06,153] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 01:22:06,221] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 01:22:06,222] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 01:22:06,222] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 01:35:43,241] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 01:35:43,360] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 01:35:43,361] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 01:35:43,362] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 01:35:44,569] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 01:35:44,678] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 01:35:44,679] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 01:35:44,679] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 01:35:45,555] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 01:35:45,629] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 01:35:45,630] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 01:35:45,630] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 01:37:02,366] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-24 01:37:02,366] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-24 01:38:16,734] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-24 01:38:16,734] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-24 01:43:48,272] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 01:43:48,389] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 01:43:48,391] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 01:43:48,391] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 01:43:49,371] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 01:43:49,472] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 01:43:49,474] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 01:43:49,474] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 01:43:50,316] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 01:43:50,386] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 01:43:50,387] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 01:43:50,387] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 01:46:18,009] ERROR django.request: Internal Server Error: /api/v1/accounts/register/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/mixins.py", line 24, in perform_create
+    serializer.save()
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+  File "/app/apps/accounts/serializers.py", line 114, in create
+    user = User.objects.create_user(**validated_data)
+  File "/app/apps/users/managers.py", line 22, in create_user
+    return self._create_user(email, password, **extra_fields)
+  File "/app/apps/users/managers.py", line 13, in _create_user
+    user = self.model(email=email, **extra_fields)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 545, in __init__
+    _setattr(self, field.name, rel_obj)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/fields/related_descriptors.py", line 291, in __set__
+    raise ValueError(
+ValueError: Cannot assign "'Uzbekistan'": "User.country" must be a "Country" instance.
+[2025-07-24 01:46:18,009] ERROR django.request: Internal Server Error: /api/v1/accounts/register/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/mixins.py", line 24, in perform_create
+    serializer.save()
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+  File "/app/apps/accounts/serializers.py", line 114, in create
+    user = User.objects.create_user(**validated_data)
+  File "/app/apps/users/managers.py", line 22, in create_user
+    return self._create_user(email, password, **extra_fields)
+  File "/app/apps/users/managers.py", line 13, in _create_user
+    user = self.model(email=email, **extra_fields)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 545, in __init__
+    _setattr(self, field.name, rel_obj)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/fields/related_descriptors.py", line 291, in __set__
+    raise ValueError(
+ValueError: Cannot assign "'Uzbekistan'": "User.country" must be a "Country" instance.
+[2025-07-24 02:22:03,914] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 02:22:04,019] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 02:22:04,020] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 02:22:04,020] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 02:22:04,965] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 02:22:05,064] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 02:22:05,065] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 02:22:05,065] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 02:22:05,916] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 02:22:05,984] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 02:22:05,985] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 02:22:05,985] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 02:35:56,881] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 02:35:56,993] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 02:35:56,995] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 02:35:56,995] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 02:35:57,900] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 02:35:57,999] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 02:35:58,000] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 02:35:58,000] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 02:35:58,790] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 02:35:58,857] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 02:35:58,858] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 02:35:58,858] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 02:43:40,539] WARNING django.request: Unauthorized: /api/v1/accounts/login/
+[2025-07-24 02:43:40,539] WARNING django.request: Unauthorized: /api/v1/accounts/login/
+[2025-07-24 02:43:40,807] WARNING django.request: Unauthorized: /api/v1/accounts/login/
+[2025-07-24 02:43:40,807] WARNING django.request: Unauthorized: /api/v1/accounts/login/
+[2025-07-24 02:56:45,291] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 02:56:45,394] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 02:56:45,395] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 02:56:45,395] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 02:56:46,351] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 02:56:46,447] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 02:56:46,448] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 02:56:46,448] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 02:56:47,265] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 02:56:47,332] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 02:56:47,333] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 02:56:47,333] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 03:04:05,522] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 03:04:05,639] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 03:04:05,640] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 03:04:05,640] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 03:04:06,631] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 03:04:06,733] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 03:04:06,735] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 03:04:06,735] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-24 03:04:07,594] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-24 03:04:07,670] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-24 03:04:07,671] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-24 03:04:07,671] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:10:24,279] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:10:24,403] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:10:24,404] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:10:24,405] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:10:25,429] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:10:25,519] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:10:25,521] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:10:25,521] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:10:26,305] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:10:26,366] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:10:26,367] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:10:26,367] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:20:23,993] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:20:24,105] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:20:24,107] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:20:24,107] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:20:25,202] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:20:25,304] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:20:25,305] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:20:25,306] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:20:26,298] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:20:26,393] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:20:26,395] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:20:26,395] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:23:40,039] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:23:40,158] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:23:40,160] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:23:40,160] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:23:41,426] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:23:41,568] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:23:41,570] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:23:41,570] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:23:42,822] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:23:42,907] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:23:42,909] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:23:42,909] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:33:59,091] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:33:59,215] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:33:59,216] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:33:59,216] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:34:00,341] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:34:00,456] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:34:00,457] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:34:00,457] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:34:01,621] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:34:01,716] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:34:01,717] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:34:01,717] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:36:26,874] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:36:26,992] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:36:26,993] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:36:26,994] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:36:28,091] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:36:28,192] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:36:28,193] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:36:28,194] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 01:36:29,037] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 01:36:29,104] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 01:36:29,105] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 01:36:29,106] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 02:34:16,223] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 02:34:16,409] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 02:34:16,410] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 02:34:16,411] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 02:34:17,800] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 02:34:17,925] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 02:34:17,927] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 02:34:17,927] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 02:34:19,211] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 02:34:19,291] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 02:34:19,291] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 02:34:19,292] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 02:38:55,040] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 02:38:55,167] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 02:38:55,168] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 02:38:55,168] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 02:38:56,317] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 02:38:56,425] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 02:38:56,426] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 02:38:56,426] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 02:38:57,315] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 02:38:57,387] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 02:38:57,388] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 02:38:57,388] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 02:42:11,047] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 02:42:11,184] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 02:42:11,186] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 02:42:11,186] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 02:42:12,685] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 02:42:12,822] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 02:42:12,824] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 02:42:12,824] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 02:42:13,980] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 02:42:14,064] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 02:42:14,066] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 02:42:14,066] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 02:54:49,098] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 02:54:49,214] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 02:54:49,216] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 02:54:49,216] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 02:54:50,203] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 02:54:50,312] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 02:54:50,313] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 02:54:50,313] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 02:54:51,177] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 02:54:51,252] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 02:54:51,253] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 02:54:51,253] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 02:55:23,438] WARNING django.request: Not Found: /favicon.ico
+[2025-07-25 02:55:23,438] WARNING django.request: Not Found: /favicon.ico
+[2025-07-25 03:15:56,953] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 03:15:57,089] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 03:15:57,091] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 03:15:57,091] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 03:15:58,199] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 03:15:58,318] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 03:15:58,319] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 03:15:58,319] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 03:15:59,324] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 03:15:59,416] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 03:15:59,418] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 03:15:59,418] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 03:24:18,660] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 03:24:18,781] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 03:24:18,782] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 03:24:18,782] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 03:24:19,825] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 03:24:19,936] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 03:24:19,937] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 03:24:19,937] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 03:24:20,846] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 03:24:20,925] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 03:24:20,927] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 03:24:20,927] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 03:25:32,619] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-25 03:25:32,619] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-25 18:47:56,999] WARNING django.request: Not Found: /favicon.ico
+[2025-07-25 18:47:56,999] WARNING django.request: Not Found: /favicon.ico
+[2025-07-25 19:26:04,315] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 19:26:04,436] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 19:26:04,437] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 19:26:04,437] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 19:26:05,474] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 19:26:05,577] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 19:26:05,578] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 19:26:05,578] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 19:26:06,495] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 19:26:06,568] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 19:26:06,570] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 19:26:06,570] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 19:27:55,845] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-25 19:27:55,845] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-25 19:27:55,859] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-25 19:27:55,859] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-25 19:28:01,167] WARNING django.request: Bad Request: /api/v1/accounts/logout/
+[2025-07-25 19:28:01,167] WARNING django.request: Bad Request: /api/v1/accounts/logout/
+[2025-07-25 19:37:00,233] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 19:37:00,359] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 19:37:00,360] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 19:37:00,360] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 19:37:01,468] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 19:37:01,571] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 19:37:01,572] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 19:37:01,572] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 19:37:02,505] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 19:37:02,581] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 19:37:02,583] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 19:37:02,583] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:01:03,018] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:01:03,141] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:01:03,142] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:01:03,142] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:01:05,296] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:01:05,431] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:01:05,432] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:01:05,433] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:01:07,296] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:01:07,408] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:01:07,409] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:01:07,410] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:01:09,364] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:01:09,487] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:01:09,489] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:01:09,489] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:01:11,986] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:01:12,111] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:01:12,112] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:01:12,113] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:01:15,264] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:01:15,386] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:01:15,387] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:01:15,388] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:01:20,044] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:01:20,148] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:01:20,149] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:01:20,149] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:01:28,096] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:01:28,215] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:01:28,217] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:01:28,217] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:01:42,486] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:01:42,589] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:01:42,590] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:01:42,590] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:02:09,693] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:02:09,812] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:02:09,813] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:02:09,814] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:03:02,602] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:03:02,733] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:03:02,734] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:03:02,734] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:04:04,637] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:04:04,771] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:04:04,772] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:04:04,773] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:05:06,431] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:05:06,537] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:05:06,538] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:05:06,538] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:06:07,921] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:06:08,024] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:06:08,025] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:06:08,025] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:07:09,543] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:07:09,661] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:07:09,662] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:07:09,662] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:07:10,795] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:07:10,915] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:07:10,916] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:07:10,916] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-25 22:07:11,974] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-25 22:07:12,054] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-25 22:07:12,055] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-25 22:07:12,055] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 02:52:25,718] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 02:52:25,880] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 02:52:25,882] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 02:52:25,882] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 02:52:27,156] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 02:52:27,294] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 02:52:27,295] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 02:52:27,295] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 02:52:28,419] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 02:52:28,516] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 02:52:28,517] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 02:52:28,517] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 02:52:45,901] WARNING django.request: Not Found: /favicon.ico
+[2025-07-26 02:52:45,901] WARNING django.request: Not Found: /favicon.ico
+[2025-07-26 02:53:26,137] ERROR django.request: Internal Server Error: /api/v1/accounts/request-code/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+  File "/app/apps/accounts/views.py", line 26, in create
+    ev = serializer.save()
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+  File "/app/apps/accounts/serializers.py", line 37, in create
+    send_verification_email.delay(
+  File "/usr/local/lib/python3.10/site-packages/celery/app/task.py", line 444, in delay
+    return self.apply_async(args, kwargs)
+  File "/usr/local/lib/python3.10/site-packages/celery/app/task.py", line 559, in apply_async
+    check_arguments(*(args or ()), **(kwargs or {}))
+TypeError: send_verification_email() got an unexpected keyword argument 'expires_in_seconds'
+[2025-07-26 02:53:26,137] ERROR django.request: Internal Server Error: /api/v1/accounts/request-code/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+  File "/app/apps/accounts/views.py", line 26, in create
+    ev = serializer.save()
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+  File "/app/apps/accounts/serializers.py", line 37, in create
+    send_verification_email.delay(
+  File "/usr/local/lib/python3.10/site-packages/celery/app/task.py", line 444, in delay
+    return self.apply_async(args, kwargs)
+  File "/usr/local/lib/python3.10/site-packages/celery/app/task.py", line 559, in apply_async
+    check_arguments(*(args or ()), **(kwargs or {}))
+TypeError: send_verification_email() got an unexpected keyword argument 'expires_in_seconds'
+[2025-07-26 02:54:54,563] ERROR django.request: Internal Server Error: /api/v1/accounts/request-code/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+  File "/app/apps/accounts/views.py", line 26, in create
+    ev = serializer.save()
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+  File "/app/apps/accounts/serializers.py", line 37, in create
+    send_verification_email.delay(
+  File "/usr/local/lib/python3.10/site-packages/celery/app/task.py", line 444, in delay
+    return self.apply_async(args, kwargs)
+  File "/usr/local/lib/python3.10/site-packages/celery/app/task.py", line 559, in apply_async
+    check_arguments(*(args or ()), **(kwargs or {}))
+TypeError: send_verification_email() got an unexpected keyword argument 'expires_in_seconds'
+[2025-07-26 02:54:54,563] ERROR django.request: Internal Server Error: /api/v1/accounts/request-code/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+  File "/app/apps/accounts/views.py", line 26, in create
+    ev = serializer.save()
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+  File "/app/apps/accounts/serializers.py", line 37, in create
+    send_verification_email.delay(
+  File "/usr/local/lib/python3.10/site-packages/celery/app/task.py", line 444, in delay
+    return self.apply_async(args, kwargs)
+  File "/usr/local/lib/python3.10/site-packages/celery/app/task.py", line 559, in apply_async
+    check_arguments(*(args or ()), **(kwargs or {}))
+TypeError: send_verification_email() got an unexpected keyword argument 'expires_in_seconds'
+[2025-07-26 03:01:36,059] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:01:36,184] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:01:36,185] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:01:36,185] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:01:38,315] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:01:38,455] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:01:38,457] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:01:38,457] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:01:40,445] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:01:40,569] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:01:40,570] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:01:40,570] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:01:42,601] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:01:42,725] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:01:42,726] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:01:42,726] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:01:45,376] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:01:45,539] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:01:45,542] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:01:45,542] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:01:49,052] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:01:49,184] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:01:49,185] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:01:49,185] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:01:54,181] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:01:54,295] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:01:54,296] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:01:54,296] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:02:45,985] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:02:46,115] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:02:46,116] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:02:46,116] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:02:48,256] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:02:48,393] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:02:48,395] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:02:48,395] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:02:50,449] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:02:50,587] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:02:50,589] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:02:50,589] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:02:52,800] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:02:52,945] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:02:52,947] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:02:52,947] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:02:55,638] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:02:55,778] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:02:55,779] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:02:55,779] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:02:59,051] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:02:59,182] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:02:59,183] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:02:59,183] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:03:04,130] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:03:04,263] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:03:04,265] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:03:04,265] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:03:12,292] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:03:12,414] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:03:12,415] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:03:12,415] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:03:26,843] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:03:26,975] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:03:26,977] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:03:26,977] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:03:54,444] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:03:54,588] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:03:54,589] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:03:54,589] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:04:47,614] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:04:47,742] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:04:47,743] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:04:47,743] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:04:48,907] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:04:49,034] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:04:49,036] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:04:49,036] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:04:50,106] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:04:50,192] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:04:50,193] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:04:50,193] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:05:27,880] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:05:28,009] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:05:28,010] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:05:28,010] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:05:29,207] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:05:29,332] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:05:29,333] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:05:29,334] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:05:30,359] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:05:30,437] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:05:30,438] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:05:30,438] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:05:38,380] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:38,380] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:38,422] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:38,422] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:38,587] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:38,587] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:38,606] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:38,606] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:38,741] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:38,741] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:38,761] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:38,761] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:38,869] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:38,869] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:38,890] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:38,890] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:39,081] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:39,081] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:39,096] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:39,096] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:39,218] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:39,218] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:39,238] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:39,238] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:39,346] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:39,346] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:39,369] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:39,369] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:39,499] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:39,499] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:39,531] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:39,531] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:39,647] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:39,647] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:39,670] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:39,670] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:39,776] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:39,776] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:39,798] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:39,798] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:39,921] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:39,921] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:39,949] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:39,949] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:40,060] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:40,060] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:40,084] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:40,084] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:40,217] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:40,217] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:40,240] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:40,240] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:40,349] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:40,349] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:40,378] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:40,378] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:40,514] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:40,514] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:40,534] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:40,534] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:40,664] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:40,664] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:40,683] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:40,683] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:40,811] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:40,811] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:40,839] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:40,839] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:40,970] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:40,970] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:41,003] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:41,003] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:41,116] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:41,116] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:41,134] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:41,134] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:41,285] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:41,285] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:41,301] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:41,301] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:41,425] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:41,425] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:41,460] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:41,460] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:41,597] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:41,597] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:41,616] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:41,616] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:41,739] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:41,739] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:41,768] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:41,768] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:41,897] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:41,897] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:41,910] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:41,910] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:42,010] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:42,010] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:42,035] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:42,035] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:42,144] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:42,144] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:42,163] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:42,163] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:42,264] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:42,264] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:42,303] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:42,303] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:42,409] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:42,409] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:42,424] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:42,424] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:42,622] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:42,622] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:42,637] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:42,637] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:42,753] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:42,753] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:42,769] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:42,769] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:42,913] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:42,913] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:42,934] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:42,934] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:43,043] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:43,043] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:43,058] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:43,058] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:43,156] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:43,156] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:43,174] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:43,174] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:43,308] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:43,308] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:43,327] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:43,327] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:43,473] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:43,473] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:43,489] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:43,489] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:43,626] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:43,626] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:43,666] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:43,666] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:43,789] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:43,789] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:43,808] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:43,808] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:43,939] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:43,939] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:43,963] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:43,963] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:44,077] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:44,077] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:44,102] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:44,102] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:44,240] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:44,240] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:44,289] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:44,289] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:44,399] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:44,399] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:44,418] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:44,418] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:44,559] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:44,559] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:44,612] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:44,612] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:44,792] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:44,792] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:44,811] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:44,811] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:44,930] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:44,930] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:44,958] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:44,958] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:45,082] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:45,082] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:45,112] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:45,112] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:45,399] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:45,399] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:45,419] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:45,419] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:45,529] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:45,529] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:45,548] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:45,548] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:45,704] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:45,704] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:45,724] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:45,724] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:45,874] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:45,874] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:45,906] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:45,906] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:46,044] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:46,044] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:46,132] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:46,132] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:46,155] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:46,155] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:46,290] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:46,290] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:46,319] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:46,319] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:46,463] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:46,463] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:46,481] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:46,481] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:46,590] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:46,590] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:46,609] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:46,609] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:46,726] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:46,726] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:46,755] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:46,755] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:46,919] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:46,919] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:46,945] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:46,945] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:47,057] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:47,057] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:47,074] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:47,074] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:47,196] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:47,196] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:47,216] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:47,216] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:47,347] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:47,347] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:47,376] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:47,376] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:47,497] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:47,497] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:47,514] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:47,514] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:47,640] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:47,640] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:47,660] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:47,660] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:47,771] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:47,771] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:47,790] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:47,790] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:47,899] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:47,899] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:47,915] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:47,915] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:48,058] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:48,058] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:48,071] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:48,071] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:48,177] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:48,177] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:48,192] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:48,192] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:48,337] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:48,337] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:48,352] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:48,352] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:48,472] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:48,472] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:48,515] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:48,515] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:48,640] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:48,640] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:48,662] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:48,662] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:48,797] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:48,797] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:48,821] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:48,821] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:48,989] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:48,989] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:49,014] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:49,014] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:49,183] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:49,183] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:49,208] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:49,208] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:49,362] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:49,362] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:49,379] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:49,379] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:49,499] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:49,499] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:49,517] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:49,517] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:49,640] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:49,640] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:49,742] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:49,742] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:49,772] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:49,772] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:49,911] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:49,911] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:49,939] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:49,939] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,044] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,044] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,062] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,062] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,175] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,175] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,190] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,190] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,308] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,308] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,328] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,328] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,438] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,438] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,463] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,463] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,574] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,574] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,592] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,592] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,705] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,705] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,722] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,722] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,840] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,840] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,859] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,859] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,976] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,976] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:50,993] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:50,993] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:51,125] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:51,125] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:51,146] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:51,146] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:51,278] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:51,278] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:51,299] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:51,299] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:51,414] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:51,414] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:51,440] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:51,440] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:51,571] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:51,571] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:51,587] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:51,587] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:51,700] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:51,700] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:51,721] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:51,721] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:51,842] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:51,842] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:51,867] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:51,867] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:51,968] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:51,968] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:51,985] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:51,985] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:52,103] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:52,103] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:52,118] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:52,118] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:52,225] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:52,225] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:52,239] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:52,239] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:52,364] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:52,364] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:52,392] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:52,392] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:52,505] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:52,505] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:52,520] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:52,520] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:52,647] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:52,647] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:52,672] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:52,672] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:52,784] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:52,784] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:52,799] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:52,799] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:52,953] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:52,953] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:52,976] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:52,976] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:53,204] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:53,204] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:53,333] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:53,333] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:53,359] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:53,359] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:53,578] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:53,578] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:53,594] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:53,594] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:53,717] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:53,717] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:53,731] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:53,731] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:53,867] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:53,867] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:53,892] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:53,892] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:54,041] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:54,041] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:54,081] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:54,081] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:54,221] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:54,221] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:54,244] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:54,244] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:54,367] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:54,367] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:54,384] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:54,384] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:54,526] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:54,526] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:54,542] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:54,542] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:54,668] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:54,668] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:54,685] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:54,685] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:54,809] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:54,809] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:54,835] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:54,835] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:54,947] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:54,947] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:54,972] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:54,972] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:55,090] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:55,090] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:55,108] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:55,108] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:55,225] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:55,225] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:55,252] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:55,252] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:55,381] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:55,381] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:55,404] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:55,404] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:55,536] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:55,536] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:55,555] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:55,555] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:55,674] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:55,674] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:55,705] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:55,705] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:55,836] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:55,836] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:55,856] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:55,856] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:55,980] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:55,980] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:55,997] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:55,997] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:56,135] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:56,135] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:56,172] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:56,172] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:56,308] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:56,308] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:56,331] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:56,331] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:56,464] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:56,464] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:56,488] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:56,488] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:56,604] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:56,604] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:56,629] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:56,629] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:56,752] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:56,752] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:56,778] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:56,778] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:56,922] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:56,922] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:56,940] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:56,940] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:57,071] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:57,071] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:57,102] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:57,102] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:57,272] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:57,272] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:57,294] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:57,294] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:57,413] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:57,413] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:57,428] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:57,428] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:57,559] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:57,559] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:57,584] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:57,584] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:57,737] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:57,737] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:57,754] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:57,754] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:57,926] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:57,926] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:57,970] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:57,970] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:58,182] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:58,182] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:58,209] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:58,209] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:58,362] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:58,362] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:58,423] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:58,423] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:58,588] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:58,588] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:58,630] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:58,630] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:58,780] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:58,780] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:58,806] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:58,806] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:58,930] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:58,930] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:58,950] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:58,950] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:59,099] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:59,099] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:59,127] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:59,127] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:59,300] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:59,300] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:59,337] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:59,337] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:59,467] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:59,467] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:59,486] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:59,486] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:59,609] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:59,609] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:59,645] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:59,645] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:59,802] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:59,802] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:59,826] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:59,826] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:05:59,977] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:05:59,977] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:00,002] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:00,002] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:00,144] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:00,144] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:00,191] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:00,191] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:00,441] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:00,441] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:00,467] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:00,467] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:00,619] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:00,619] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:00,645] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:00,645] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:00,832] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:00,832] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:00,853] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:00,853] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:01,023] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:01,023] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:01,045] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:01,045] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:01,194] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:01,194] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:01,221] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:01,221] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:01,436] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:01,436] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:01,464] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:01,464] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:01,610] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:01,610] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:01,636] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:01,636] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:01,792] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:01,792] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:06:01,816] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:06:01,816] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:06,421] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:12:06,547] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:12:06,548] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:12:06,548] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:12:07,751] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:12:07,876] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:12:07,878] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:12:07,878] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:12:08,926] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:12:09,013] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:12:09,014] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:12:09,015] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:12:23,012] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,012] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,034] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,034] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,155] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,155] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,167] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,167] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,246] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,246] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,259] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,259] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,349] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,349] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,368] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,368] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,509] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,509] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,523] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,523] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,640] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,640] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,660] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,660] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,774] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,774] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,793] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,793] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,903] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,903] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:23,921] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:23,921] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,018] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,018] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,054] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,054] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,144] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,144] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,160] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,160] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,242] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,242] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,260] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,260] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,360] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,360] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,373] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,373] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,470] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,470] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,495] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,495] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,581] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,581] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,604] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,604] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,695] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,695] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,712] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,712] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,810] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,810] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,830] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,830] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,942] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,942] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:24,958] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:24,958] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:25,072] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:25,072] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:25,096] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:25,096] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:25,196] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:25,196] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:25,214] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:25,214] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:25,355] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:25,355] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:25,382] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:25,382] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:25,538] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:25,538] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:25,555] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:25,555] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:25,692] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:25,692] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:25,719] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:25,719] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:25,863] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:25,863] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:25,890] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:25,890] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:25,995] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:25,995] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,017] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,017] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,107] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,107] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,120] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,120] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,211] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,211] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,226] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,226] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,321] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,321] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,337] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,337] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,454] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,454] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,469] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,469] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,575] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,575] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,601] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,601] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,707] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,707] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,722] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,722] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,817] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,817] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,838] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,838] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,944] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,944] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:26,963] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:26,963] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:27,073] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:27,073] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:27,090] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:27,090] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:27,224] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:27,224] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:27,250] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:27,250] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:27,344] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:27,344] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:27,359] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:27,359] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:27,474] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:27,474] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:27,492] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:27,492] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:27,614] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:27,614] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:27,629] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:27,629] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:27,738] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:27,738] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:27,758] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:27,758] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:27,866] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:27,866] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:27,887] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:27,887] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,043] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,043] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,057] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,057] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,161] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,161] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,179] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,179] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,268] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,268] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,285] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,285] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,392] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,392] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,406] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,406] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,516] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,516] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,535] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,535] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,645] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,645] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,664] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,664] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,785] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,785] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,865] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,865] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,965] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,965] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:28,983] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:28,983] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:29,086] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:29,086] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:29,111] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:29,111] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:29,235] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:29,235] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:29,251] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:29,251] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:29,389] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:29,389] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:29,416] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:29,416] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:29,521] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:29,521] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:29,538] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:29,538] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:29,663] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:29,663] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:29,681] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:29,681] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:29,801] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:29,801] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:12:29,821] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:12:29,821] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:30:32,566] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:30:32,677] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:30:32,679] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:30:32,679] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:30:33,759] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:30:33,874] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:30:33,875] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:30:33,875] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:30:34,770] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:30:34,845] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:30:34,846] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:30:34,846] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:42:04,489] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:42:04,614] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:42:04,616] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:42:04,616] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:42:05,768] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:42:05,893] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:42:05,895] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:42:05,895] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:42:06,892] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:42:06,976] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:42:06,977] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:42:06,977] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:43:34,471] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-26 03:43:34,471] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-26 03:43:44,015] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:43:44,015] WARNING django.request: Unauthorized: /api/v1/profiles/
+[2025-07-26 03:43:44,041] ERROR apps.accounts.views: Refresh token error: {'refresh': [ErrorDetail(string='This field may not be null.', code='null')]}
+[2025-07-26 03:43:44,043] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:43:44,043] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-26 03:44:31,578] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-26 03:44:31,578] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-26 03:45:13,124] ERROR django.request: Internal Server Error: /api/v1/accounts/login/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/app/apps/accounts/views.py", line 23, in post
+    logger.info(f"User logged in: {data['user'].email}")
+KeyError: 'user'
+[2025-07-26 03:45:13,124] ERROR django.request: Internal Server Error: /api/v1/accounts/login/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/app/apps/accounts/views.py", line 23, in post
+    logger.info(f"User logged in: {data['user'].email}")
+KeyError: 'user'
+[2025-07-26 03:46:43,364] ERROR django.request: Internal Server Error: /api/v1/accounts/login/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/app/apps/accounts/views.py", line 23, in post
+    logger.info(f"User logged in: {data['user'].email}")
+KeyError: 'user'
+[2025-07-26 03:46:43,364] ERROR django.request: Internal Server Error: /api/v1/accounts/login/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/app/apps/accounts/views.py", line 23, in post
+    logger.info(f"User logged in: {data['user'].email}")
+KeyError: 'user'
+[2025-07-26 03:53:15,439] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:53:15,590] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:53:15,592] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:53:15,592] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:53:16,945] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:53:17,082] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:53:17,084] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:53:17,084] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:53:18,285] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:53:18,379] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:53:18,380] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:53:18,380] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:53:27,500] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-26 03:53:27,500] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-26 03:56:31,383] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:56:31,550] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:56:31,552] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:56:31,553] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:56:33,157] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:56:33,319] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:56:33,321] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:56:33,322] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:56:35,023] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 03:56:35,146] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 03:56:35,148] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 03:56:35,148] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 03:57:11,436] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-26 03:57:11,436] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-26 04:02:07,274] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:02:07,418] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:02:07,420] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:02:07,420] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:02:10,096] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:02:10,274] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:02:10,275] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:02:10,276] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:02:12,834] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:02:13,003] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:02:13,005] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:02:13,005] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:02:15,985] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:02:16,216] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:02:16,218] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:02:16,219] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:02:19,614] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:02:19,776] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:02:19,778] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:02:19,778] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:02:24,529] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:02:24,702] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:02:24,704] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:02:24,704] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:02:31,100] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:02:31,278] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:02:31,280] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:02:31,281] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:02:40,277] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:02:40,505] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:02:40,507] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:02:40,507] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:02:56,105] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:02:56,236] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:02:56,237] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:02:56,237] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:03:24,895] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:03:25,062] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:03:25,064] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:03:25,064] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:04:27,614] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:04:27,764] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:04:27,766] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:04:27,766] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:04:29,163] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:04:29,307] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:04:29,308] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:04:29,309] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:04:30,538] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:04:30,624] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:04:30,626] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:04:30,626] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:12:36,598] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:12:36,728] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:12:36,729] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:12:36,729] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:12:37,920] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:12:38,045] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:12:38,046] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:12:38,046] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:12:39,071] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:12:39,161] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:12:39,162] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:12:39,162] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:14:02,937] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-26 04:14:02,937] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-26 04:14:17,019] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-26 04:14:17,019] WARNING django.request: Bad Request: /api/v1/accounts/register/

@@ -1,3 +1,4 @@
+# apps/accounts/views.py
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -13,6 +14,8 @@ class LoginView(TokenObtainPairView):
     serializer_class = AuthTokenSerializer
 
     def post(self, request, *args, **kwargs):
+        # Ensure email is lowercased
+        request.data["email"] = request.data.get("email", "").lower().strip()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.user
@@ -20,6 +23,7 @@ class LoginView(TokenObtainPairView):
         access_token = str(refresh.access_token)
 
         response_data = {
+            "message": "Login successful.",
             "access_token": access_token,
             "refresh_token": str(refresh),
             "user": {
@@ -44,7 +48,10 @@ class RequestCodeView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         ev = serializer.save()
         return Response(
-            {"detail": "Kod yuborildi.", "expires_at": ev.expires_at},
+            {
+                "message": "Verification code sent successfully.",
+                "expires_at": ev.expires_at,
+            },
             status=status.HTTP_201_CREATED,
         )
 
@@ -63,7 +70,7 @@ class RegisterView(generics.CreateAPIView):
         access_token = str(refresh.access_token)
 
         response_data = {
-            "message": "Foydalanuvchi muvaffaqiyatli ro‘yxatdan o‘tdi",
+            "message": "User registered successfully.",
             "user": {
                 "id": user.id,
                 "email": user.email,
@@ -85,6 +92,7 @@ class CustomTokenRefreshView(TokenRefreshView):
         response = super().post(request, *args, **kwargs)
         return Response(
             {
+                "message": "Token refreshed successfully.",
                 "access_token": response.data["access"],
                 "refresh_token": request.data.get("refresh"),
             },

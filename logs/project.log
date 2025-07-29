@@ -2199,3 +2199,495 @@ KeyError: 'user'
 [2025-07-26 04:14:02,937] WARNING django.request: Bad Request: /api/v1/accounts/register/
 [2025-07-26 04:14:17,019] WARNING django.request: Bad Request: /api/v1/accounts/register/
 [2025-07-26 04:14:17,019] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-26 04:34:35,816] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:34:35,943] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:34:35,944] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:34:35,944] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:34:37,054] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:34:37,175] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:34:37,176] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:34:37,176] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:34:38,148] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-26 04:34:38,226] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-26 04:34:38,227] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-26 04:34:38,227] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-26 04:35:31,841] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-26 04:35:31,841] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 14:56:52,488] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 14:56:52,601] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 14:56:52,603] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 14:56:52,603] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 14:56:53,639] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 14:56:53,745] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 14:56:53,746] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 14:56:53,746] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 14:56:54,691] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 14:56:54,781] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 14:56:54,783] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 14:56:54,783] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 15:13:31,758] WARNING django.request: Not Found: /favicon.ico
+[2025-07-29 15:13:31,758] WARNING django.request: Not Found: /favicon.ico
+[2025-07-29 15:13:44,114] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 15:13:44,114] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 15:13:44,125] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 15:13:44,125] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 15:14:12,565] WARNING django.request: Unauthorized: /api/v1/accounts/login/
+[2025-07-29 15:14:12,565] WARNING django.request: Unauthorized: /api/v1/accounts/login/
+[2025-07-29 15:14:12,580] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-29 15:14:12,580] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-29 15:32:36,592] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 15:32:36,701] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 15:32:36,702] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 15:32:36,702] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 15:32:37,644] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 15:32:37,740] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 15:32:37,741] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 15:32:37,741] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 15:32:38,562] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 15:32:38,631] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 15:32:38,632] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 15:32:38,632] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 15:32:59,683] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 15:32:59,683] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 15:34:38,014] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:38,014] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:41,261] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:41,261] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:41,818] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:41,818] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:41,977] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:41,977] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:42,134] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:42,134] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:42,291] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:42,291] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:42,455] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:42,455] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:42,611] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:42,611] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:42,758] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:42,758] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:42,920] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:42,920] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:43,069] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:43,069] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:43,218] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:43,218] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:43,373] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:43,373] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:43,522] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:43,522] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:43,701] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:43,701] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:43,902] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:43,902] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:44,092] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:44,092] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:44,249] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:44,249] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:44,406] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:44,406] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:44,562] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:44,562] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:44,702] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:44,702] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:44,857] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:44,857] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-07-29 15:34:45,745] ERROR django.request: Internal Server Error: /api/v1/accounts/request-code/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "accounts_emailverification_email_key"
+DETAIL:  Key (email)=(feruzbekhamrayev2002@gmail.com) already exists.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+  File "/app/apps/accounts/views.py", line 49, in create
+    ev = serializer.save()
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+  File "/app/apps/accounts/serializers.py", line 49, in create
+    ev = EmailVerification.objects.create(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 902, in save
+    self.save_base(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 1008, in save_base
+    updated = self._save_table(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 1169, in _save_table
+    results = self._do_insert(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 1210, in _do_insert
+    return manager._insert(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/query.py", line 1868, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1882, in execute_sql
+    cursor.execute(sql, params)
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/usr/local/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+django.db.utils.IntegrityError: duplicate key value violates unique constraint "accounts_emailverification_email_key"
+DETAIL:  Key (email)=(feruzbekhamrayev2002@gmail.com) already exists.
+
+[2025-07-29 15:34:45,745] ERROR django.request: Internal Server Error: /api/v1/accounts/request-code/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "accounts_emailverification_email_key"
+DETAIL:  Key (email)=(feruzbekhamrayev2002@gmail.com) already exists.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+  File "/app/apps/accounts/views.py", line 49, in create
+    ev = serializer.save()
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+  File "/app/apps/accounts/serializers.py", line 49, in create
+    ev = EmailVerification.objects.create(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 902, in save
+    self.save_base(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 1008, in save_base
+    updated = self._save_table(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 1169, in _save_table
+    results = self._do_insert(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 1210, in _do_insert
+    return manager._insert(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/query.py", line 1868, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1882, in execute_sql
+    cursor.execute(sql, params)
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/usr/local/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+django.db.utils.IntegrityError: duplicate key value violates unique constraint "accounts_emailverification_email_key"
+DETAIL:  Key (email)=(feruzbekhamrayev2002@gmail.com) already exists.
+
+[2025-07-29 15:34:51,706] ERROR django.request: Internal Server Error: /api/v1/accounts/request-code/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "accounts_emailverification_email_key"
+DETAIL:  Key (email)=(feruzbekhamrayev2002@gmail.com) already exists.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+  File "/app/apps/accounts/views.py", line 49, in create
+    ev = serializer.save()
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+  File "/app/apps/accounts/serializers.py", line 49, in create
+    ev = EmailVerification.objects.create(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 902, in save
+    self.save_base(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 1008, in save_base
+    updated = self._save_table(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 1169, in _save_table
+    results = self._do_insert(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 1210, in _do_insert
+    return manager._insert(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/query.py", line 1868, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1882, in execute_sql
+    cursor.execute(sql, params)
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/usr/local/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+django.db.utils.IntegrityError: duplicate key value violates unique constraint "accounts_emailverification_email_key"
+DETAIL:  Key (email)=(feruzbekhamrayev2002@gmail.com) already exists.
+
+[2025-07-29 15:34:51,706] ERROR django.request: Internal Server Error: /api/v1/accounts/request-code/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "accounts_emailverification_email_key"
+DETAIL:  Key (email)=(feruzbekhamrayev2002@gmail.com) already exists.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+  File "/app/apps/accounts/views.py", line 49, in create
+    ev = serializer.save()
+  File "/usr/local/lib/python3.10/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+  File "/app/apps/accounts/serializers.py", line 49, in create
+    ev = EmailVerification.objects.create(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 902, in save
+    self.save_base(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 1008, in save_base
+    updated = self._save_table(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 1169, in _save_table
+    results = self._do_insert(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/base.py", line 1210, in _do_insert
+    return manager._insert(
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/query.py", line 1868, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+  File "/usr/local/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1882, in execute_sql
+    cursor.execute(sql, params)
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/usr/local/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/usr/local/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+django.db.utils.IntegrityError: duplicate key value violates unique constraint "accounts_emailverification_email_key"
+DETAIL:  Key (email)=(feruzbekhamrayev2002@gmail.com) already exists.
+
+[2025-07-29 15:51:49,564] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 15:51:49,662] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 15:51:49,664] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 15:51:49,664] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 15:51:50,801] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 15:51:50,900] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 15:51:50,901] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 15:51:50,901] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 15:51:51,773] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 15:51:51,840] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 15:51:51,841] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 15:51:51,841] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 16:13:12,496] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:13:12,648] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:13:15,375] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:13:15,522] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:13:18,300] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:13:18,446] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:13:21,278] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:13:21,428] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:13:24,024] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:13:24,179] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:13:27,955] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:13:28,057] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:13:33,299] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:13:33,404] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:13:41,738] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:13:41,856] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:13:56,591] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:13:56,721] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:14:24,084] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:14:24,203] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:14:46,000] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:14:46,166] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:14:48,581] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:14:48,707] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:14:51,107] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:14:51,254] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:14:54,141] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:14:54,288] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:14:56,779] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:14:56,887] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:15:00,024] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:15:00,131] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:15:04,816] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:15:04,921] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:15:12,926] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:15:13,043] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:15:27,498] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:15:27,605] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:15:55,054] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:15:55,216] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:16:08,583] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:16:08,704] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:16:10,750] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:16:10,873] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:16:12,791] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:16:12,904] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:16:14,876] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:16:14,986] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:16:17,364] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:16:17,470] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:16:20,657] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:16:20,768] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:16:25,523] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:16:25,631] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:16:33,526] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:16:33,639] ERROR apps.chat.apps: Error initializing chat app: type object 'User' has no attribute 'UserRole'
+[2025-07-29 16:16:48,091] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:16:48,212] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 16:16:48,214] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 16:16:48,214] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 16:16:49,430] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:16:49,648] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 16:16:49,651] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 16:16:49,651] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 16:16:50,914] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:16:51,001] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 16:16:51,003] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 16:16:51,003] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 16:19:38,509] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:19:38,626] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 16:19:38,628] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 16:19:38,628] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 16:19:39,647] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:19:39,749] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 16:19:39,750] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 16:19:39,750] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 16:19:40,626] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:19:40,700] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 16:19:40,701] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 16:19:40,701] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 16:19:46,878] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 16:19:46,878] WARNING django.request: Not Found: /api/v1/users/profiles/

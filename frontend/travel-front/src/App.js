@@ -6,13 +6,14 @@ import Footer from './components/common/Footer';
 import HomePage from './pages/HomePage';
 import Authentication from './auth/Authentication';
 import UserAccount from './account/UserAccount';
+import GuideAccount from './account/GuideAccount';
 import { getCurrentUser } from './api/api';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
 
-  // Sahifa yuklanganda autentifikatsiya holatini tekshirish
+  // Check authentication status on page load
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("access_token");
@@ -41,10 +42,15 @@ function App() {
     checkAuth();
   }, []);
 
-  // Account component
+  // Account component based on user role
   const AccountComponent = () => {
     if (!isAuthenticated || !user) return <HomePage />;
-    return <UserAccount user={user} setIsAuthenticated={setIsAuthenticated} setUser={setUser} />;
+    // Render GuideAccount for Customer role, UserAccount for Client role
+    return user.role === 'Customer' ? (
+      <GuideAccount user={user} setIsAuthenticated={setIsAuthenticated} setUser={setUser} />
+    ) : (
+      <UserAccount user={user} setIsAuthenticated={setIsAuthenticated} setUser={setUser} />
+    );
   };
 
   return (

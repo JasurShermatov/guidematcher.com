@@ -1,1005 +1,882 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { DateTime } from 'https://cdn.jsdelivr.net/npm/luxon@3.4.4/+esm';
-import { FiUser, FiMail, FiLogOut, FiSettings, FiMapPin, FiX, FiCheck, FiCalendar, FiStar, FiDollarSign, FiImage, FiCheckCircle, FiXCircle, FiEdit, FiCamera, FiUsers, FiMessageSquare } from 'react-icons/fi';
+import { FiUser, FiMail, FiLogOut, FiSettings, FiMapPin, FiX, FiCheck, FiCalendar, FiStar, FiDollarSign, FiImage, FiCheckCircle, FiUsers, FiClock, FiGlobe, FiAward, FiEdit, FiEye, FiMessageSquare, FiTrendingUp, FiHeart, FiPhone, FiDownload } from 'react-icons/fi';
 import './GuideAccount.css';
+import GuideChatWidget from './GuideChatWidget';
 
-// Mock timezone mapping based on city/country
-const getTimezone = (city, country) => {
-  const mappings = {
-    'Tashkent_Uzbekistan': 'Asia/Tashkent',
-    // Add more mappings as needed
-  };
-  return mappings[`${city}_${country}`] || 'UTC';
-};
+const GuideAccount = () => {
+  // Theme state
+  const [theme, setTheme] = useState('default');
+  // Chat open state
+  const [chatOpen, setChatOpen] = useState(false);
+  // Selected client for chat
+  const [selectedClient, setSelectedClient] = useState(null);
 
-const GuideAccount = ({ user, setUser, setIsAuthenticated }) => {
-  const navigate = useNavigate();
-  const localTimezone = useMemo(() => getTimezone(user?.city || 'Tashkent', user?.country || 'Uzbekistan'), [user?.city, user?.country]);
+  // Apply theme to document
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'auto') {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    } else {
+      root.setAttribute('data-theme', theme);
+    }
 
-  const [profileForm, setProfileForm] = useState({
-    bio: user?.bio || 'Experienced guide with a passion for sharing local culture and history.',
-    experience: user?.experience || '5 years guiding tours in Uzbekistan and Central Asia.',
-    services: user?.services || ['Historical', 'Cultural'],
-    pricePerHour: user?.pricePerHour || 20,
-    pricePerDay: user?.pricePerDay || 100,
-    workHours: user?.workHours || '9:00 AM - 5:00 PM, Monday to Saturday',
-    portfolio: user?.portfolio || [
-      'https://images.unsplash.com/photo-1602751584581-2e4f8243cc6d',
-      'https://images.unsplash.com/photo-1549972890-1e9d1e0e9e38'
-    ],
-    verificationStatus: user?.verificationStatus || 'Verified',
-    languages: user?.languages || [{ language: 'English', level: 'Advanced' }, { language: 'Uzbek', level: 'Native' }],
-    certificates: user?.certificates || ['English_C1_Certificate.pdf']
+    // Listen for system theme changes when in auto mode
+    const handleSystemThemeChange = (e) => {
+      if (theme === 'auto') {
+        root.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+      }
+    };
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+
+    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+  }, [theme]);
+
+  // Existing user state
+  const [user, setUser] = useState({
+    id: 'guide_001',
+    firstName: 'Ahmad',
+    lastName: 'Karimov',
+    email: 'ahmad.karimov@email.com',
+    phone: '+998901234567',
+    city: 'Tashkent',
+    country: 'Uzbekistan',
+    profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+    joinDate: '2023-01-15',
+    totalTours: 156,
+    rating: 4.8,
+    responseTime: '2 soat ichida',
+    isOnline: true,
+    lastSeen: new Date().toISOString()
   });
 
+  // Existing profile form state
+  const [profileForm, setProfileForm] = useState({
+    bio: 'O\'zbekistonning boy madaniyati va tarixini sevib, 7 yildan ortiq vaqt davomida xorijiy mehmonlarni qabul qilib kelaman. Samarqand, Buxoro va Xiva shaharlarining har bir burchagini bilaman.',
+    experience: '7 yil davomida 1000+ xorijiy turistlarga xizmat ko\'rsatganman. UNESCO merosi, madaniy turizm va mahalliy hunarmandchilik bo\'yicha mutaxassis.',
+    services: ['Tarixiy ekskursiyalar', 'Madaniy turizm', 'Hunarmandchilik turlari', 'Gastronomik turizm'],
+    languages: [
+      { language: 'O\'zbek', level: 'Ona tili' },
+      { language: 'Ingliz', level: 'C1' },
+      { language: 'Rus', level: 'B2' },
+      { language: 'Turk', level: 'A2' }
+    ],
+    pricePerHour: 25,
+    pricePerDay: 120,
+    workHours: '08:00 - 18:00, Dushanba-Shanba',
+    portfolio: [
+      'https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=300&h=200&fit=crop',
+      'https://images.unsplash.com/photo-1571841079840-1079c8b2e5b3?w=300&h=200&fit=crop',
+      'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=200&fit=crop',
+      'https://images.unsplash.com/photo-1542834281-0e6359ee7ba1?w=300&h=200&fit=crop'
+    ],
+    certificates: ['IELTS_Certificate.pdf', 'Tourism_License.pdf', 'First_Aid_Certificate.pdf'],
+    verificationStatus: 'Tasdiqlangan',
+    specializations: ['UNESCO merosi', 'Islom arxitekturasi', 'Mahalliy oshxona', 'Hunarmandchilik']
+  });
+
+  // Existing requests state
+  const [requests, setRequests] = useState([
+    {
+      id: 'REQ001',
+      clientName: 'John Smith',
+      clientId: 'client_001',
+      clientPhoto: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
+      date: '2024-08-15T09:00',
+      duration: '8 soat',
+      travelers: { adults: 2, children: 0 },
+      price: 120,
+      status: 'Kutilmoqda',
+      serviceType: 'Samarqand shahri bo\'ylab to\'liq tur',
+      notes: 'Registon va Gur-Emir maqbarasiga alohida e\'tibor bering',
+      priority: 'high',
+      isOnline: true,
+      lastSeen: new Date(Date.now() - 300000).toISOString()
+    },
+    {
+      id: 'REQ002', 
+      clientName: 'Maria Garcia',
+      clientId: 'client_002',
+      clientPhoto: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face',
+      date: '2024-08-18T10:30',
+      duration: '6 soat',
+      travelers: { adults: 4, children: 2 },
+      price: 200,
+      status: 'Tasdiqlangan',
+      serviceType: 'Buxoro madaniy turi',
+      notes: 'Bolalar bilan, qiziqarli hikoyalar kerak',
+      priority: 'medium',
+      isOnline: false,
+      lastSeen: new Date(Date.now() - 1800000).toISOString()
+    },
+    {
+      id: 'REQ003',
+      clientName: 'Zhang Wei',
+      clientId: 'client_003', 
+      clientPhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face',
+      date: '2024-08-12T14:00',
+      duration: '4 soat',
+      travelers: { adults: 1, children: 0 },
+      price: 80,
+      status: 'Yakunlangan',
+      serviceType: 'Toshkent shahar turi',
+      rating: 5,
+      priority: 'low',
+      isOnline: true,
+      lastSeen: new Date().toISOString()
+    },
+    {
+      id: 'REQ004',
+      clientName: 'Emma Wilson',
+      clientId: 'client_004',
+      clientPhoto: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop&crop=face',
+      date: '2024-08-20T14:00',
+      duration: '5 soat',
+      travelers: { adults: 3, children: 1 },
+      price: 150,
+      status: 'Kutilmoqda',
+      serviceType: 'Xiva tarixiy shahri turi',
+      notes: 'Fotosurat uchun yaxshi joylarni ko\'rsating',
+      priority: 'high',
+      isOnline: false,
+      lastSeen: new Date(Date.now() - 3600000).toISOString()
+    }
+  ]);
+
+  // Existing calendar state
   const [availability, setAvailability] = useState(
-    Array.from({ length: 7 }, (_, i) => {
-      const date = DateTime.now().setZone(localTimezone).plus({ days: i });
+    Array.from({ length: 14 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
       return {
-        date: date.toISODate(),
-        isBusy: false,
-        isVacation: false,
-        hours: Array.from({ length: 9 }, (_, h) => ({ time: `${9 + h}:00`, available: true }))
+        date: date.toISOString().split('T')[0],
+        isBusy: i === 3 || i === 7,
+        isVacation: i === 10,
+        hours: Array.from({ length: 10 }, (_, h) => ({
+          time: `${8 + h}:00`,
+          available: true
+        }))
       };
     })
   );
 
+  // Existing chat messages state
+  const [chatMessages, setChatMessages] = useState([
+    {
+      clientId: 'client_001',
+      unreadCount: 2,
+      lastMessage: 'Samarqand turi haqida batafsil ma\'lumot bering',
+      lastMessageTime: new Date(Date.now() - 300000).toISOString(),
+      messages: [
+        { 
+          id: 'msg_001',
+          sender: 'Client', 
+          text: 'Salom! Samarqand turi haqida ma\'lumot olsam bo\'ladimi?', 
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          status: 'read'
+        },
+        { 
+          id: 'msg_002',
+          sender: 'Guide', 
+          text: 'Assalomu alaykum! Albatta, men Samarqandning barcha diqqatga sazovor joylarini ko\'rsataman. Registon maydoni, Gur-Emir maqbarasi, Bibi-Xonim masjidi va boshqa ko\'plab ajoyib joylar.', 
+          timestamp: new Date(Date.now() - 3300000).toISOString(),
+          status: 'read'
+        },
+        { 
+          id: 'msg_003',
+          sender: 'Client', 
+          text: 'Ajoyib! Narxi qancha bo\'ladi?', 
+          timestamp: new Date(Date.now() - 1800000).toISOString(),
+          status: 'read'
+        },
+        { 
+          id: 'msg_004',
+          sender: 'Guide', 
+          text: '8 soatlik to\'liq tur uchun $120. Bu narxga transport, gid xizmati va barcha kirish chiptalari kiradi.', 
+          timestamp: new Date(Date.now() - 1500000).toISOString(),
+          status: 'read'
+        },
+        { 
+          id: 'msg_005',
+          sender: 'Client', 
+          text: 'Samarqand turi haqida batafsil ma\'lumot bering', 
+          timestamp: new Date(Date.now() - 300000).toISOString(),
+          status: 'delivered'
+        }
+      ]
+    },
+    {
+      clientId: 'client_002',
+      unreadCount: 0,
+      lastMessage: 'Rahmat, kutib qolamiz!',
+      lastMessageTime: new Date(Date.now() - 1800000).toISOString(),
+      messages: [
+        { 
+          id: 'msg_006',
+          sender: 'Client', 
+          text: 'Buxoro safari tayyormi?', 
+          timestamp: new Date(Date.now() - 7200000).toISOString(),
+          status: 'read'
+        },
+        { 
+          id: 'msg_007',
+          sender: 'Guide', 
+          text: 'Ha, hammasi tayyor! Ertaga 10:30 da uchrashamiz.', 
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          status: 'read'
+        },
+        { 
+          id: 'msg_008',
+          sender: 'Client', 
+          text: 'Rahmat, kutib qolamiz!', 
+          timestamp: new Date(Date.now() - 1800000).toISOString(),
+          status: 'read'
+        }
+      ]
+    },
+    {
+      clientId: 'client_004',
+      unreadCount: 1,
+      lastMessage: 'Xiva turiga qachon boramiz?',
+      lastMessageTime: new Date(Date.now() - 900000).toISOString(),
+      messages: [
+        { 
+          id: 'msg_009',
+          sender: 'Client', 
+          text: 'Salom! Xiva turi haqida gaplashish mumkinmi?', 
+          timestamp: new Date(Date.now() - 1800000).toISOString(),
+          status: 'read'
+        },
+        { 
+          id: 'msg_010',
+          sender: 'Guide', 
+          text: 'Assalomu alaykum! Albatta, Xiva - bu ajoyib tarixiy shahar. Qachon bormoqchisiz?', 
+          timestamp: new Date(Date.now() - 1500000).toISOString(),
+          status: 'read'
+        },
+        { 
+          id: 'msg_011',
+          sender: 'Client', 
+          text: 'Xiva turiga qachon boramiz?', 
+          timestamp: new Date(Date.now() - 900000).toISOString(),
+          status: 'delivered'
+        }
+      ]
+    }
+  ]);
+
+  // Existing other UI states
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [showHoursModal, setShowHoursModal] = useState(null);
-  const [requestsTab, setRequestsTab] = useState('pending');
-  const [counterOffer, setCounterOffer] = useState({ requestId: null, date: '', price: '' });
-  const [showCounterOfferModal, setShowCounterOfferModal] = useState(false);
-  const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [chatMessages, setChatMessages] = useState([]);
-  const [selectedChatClient, setSelectedChatClient] = useState(null);
-  const [showChatModal, setShowChatModal] = useState(false);
-  const [newMessage, setNewMessage] = useState('');
-  const [contracts, setContracts] = useState(user?.contracts || []);
-  const [error, setError] = useState('');
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [showPortfolioModal, setShowPortfolioModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [activeTab, setActiveTab] = useState('yangi');
+  const [showCounterOffer, setShowCounterOffer] = useState(false);
+  const [counterOfferData, setCounterOfferData] = useState({ requestId: null, date: '', price: '' });
+  const [notifications, setNotifications] = useState([]);
 
-  // Mock requests derived from contracts
-  const requests = useMemo(() =>
-    contracts.map(contract => ({
-      id: contract.id,
-      clientName: `Client ${contract.id}`,
-      clientId: `client_${contract.id}`,
-      date: contract.date,
-      duration: contract.duration,
-      travelers: contract.travelers,
-      price: contract.price,
-      status: contract.status
-    })), [contracts]);
+  // Existing statistics
+  const stats = useMemo(() => ({
+    totalTours: requests.filter(r => r.status === 'Yakunlangan').length,
+    pendingRequests: requests.filter(r => r.status === 'Kutilmoqda').length,
+    confirmedTours: requests.filter(r => r.status === 'Tasdiqlangan').length,
+    averageRating: requests.filter(r => r.rating).reduce((sum, r) => sum + r.rating, 0) / requests.filter(r => r.rating).length || 0,
+    thisMonthEarnings: requests.filter(r => r.status === 'Yakunlangan').reduce((sum, r) => sum + r.price, 0),
+    responseRate: 98,
+    totalUnreadMessages: chatMessages.reduce((sum, chat) => sum + chat.unreadCount, 0)
+  }), [requests, chatMessages]);
 
-  // Request notifications
-  useEffect(() => {
-    if (!('Notification' in window)) {
-      console.warn('Notifications not supported');
-      return;
-    }
-
-    Notification.requestPermission().then(permission => {
-      if (permission !== 'granted') {
-        console.warn('Notification permission denied');
-      }
-    });
-
-    const interval = setInterval(() => {
-      const now = DateTime.now().setZone(localTimezone);
-      requests.forEach(request => {
-        if (['Confirmed', 'Started'].includes(request.status)) {
-          const requestDateTime = DateTime.fromISO(request.date, { zone: localTimezone });
-          const minutesUntil = requestDateTime.diff(now, 'minutes').minutes;
-
-          if (minutesUntil <= 30 && minutesUntil > 29.5) {
-            new Notification(`Reminder: Tour #${request.id} in 30 minutes`, {
-              body: `Client: ${request.clientName}, Date: ${requestDateTime.toLocaleString(DateTime.DATETIME_MED)}`,
-              icon: 'https://via.placeholder.com/32'
-            });
-          } else if (minutesUntil <= 0 && minutesUntil > -0.5) {
-            new Notification(`Tour #${request.id} is starting now!`, {
-              body: `Client: ${request.clientName}, Date: ${requestDateTime.toLocaleString(DateTime.DATETIME_MED)}`,
-              icon: 'https://via.placeholder.com/32'
-            });
-          }
-        }
-      });
-    }, 60000); // Check every minute
-
-    return () => clearInterval(interval);
-  }, [requests, localTimezone]);
-
-  const handleProfileChange = (e) => {
-    const { name, value } = e.target;
-    if (!value.trim()) {
-      setError(`${name} cannot be empty`);
-      return;
-    }
-    if (name === 'services') {
-      setProfileForm({ ...profileForm, [name]: value.split(',').map(s => s.trim()).filter(s => s) });
-    } else if (name === 'languages' || name === 'languageLevels') {
-      const values = value.split(',').map(v => v.trim()).filter(v => v);
-      if (name === 'languages') {
-        const updatedLanguages = values.map((lang, i) => ({
-          language: lang,
-          level: profileForm.languages[i]?.level || 'Intermediate'
-        }));
-        setProfileForm({ ...profileForm, languages: updatedLanguages });
-      } else {
-        const updatedLanguages = profileForm.languages.map((lang, i) => ({
-          language: lang.language,
-          level: values[i] || lang.level
-        }));
-        setProfileForm({ ...profileForm, languages: updatedLanguages });
-      }
-    } else if (name === 'pricePerHour' || name === 'pricePerDay') {
-      if (value < 0) {
-        setError(`${name} cannot be negative`);
-        return;
-      }
-      setProfileForm({ ...profileForm, [name]: parseFloat(value) || 0 });
-    } else {
-      setProfileForm({ ...profileForm, [name]: value });
-    }
-    setError('');
-  };
-
-  const handlePortfolioAdd = (e) => {
-    const url = e.target.value;
-    if (url && /^https?:\/\/[^\s]+$/.test(url)) {
-      setProfileForm({ ...profileForm, portfolio: [...profileForm.portfolio, url] });
-      e.target.value = '';
-      setError('');
-    } else {
-      setError('Invalid URL');
-    }
-  };
-
-  const handlePortfolioRemove = (index) => {
-    setProfileForm({
-      ...profileForm,
-      portfolio: profileForm.portfolio.filter((_, i) => i !== index)
-    });
-  };
-
-  const handleCertificateAdd = (e) => {
-    const fileName = e.target.files[0]?.name;
-    if (fileName) {
-      setProfileForm({
-        ...profileForm,
-        certificates: [...profileForm.certificates, fileName]
-      });
-      alert(`Certificate ${fileName} uploaded (mock)`);
-      setError('');
-    } else {
-      setError('No file selected');
-    }
-  };
-
-  const handleCertificateRemove = (index) => {
-    setProfileForm({
-      ...profileForm,
-      certificates: profileForm.certificates.filter((_, i) => i !== index)
-    });
-  };
-
-  const handleProfileSubmit = (e) => {
-    e.preventDefault();
-    if (!profileForm.bio || !profileForm.experience || !profileForm.services.length ||
-        !profileForm.workHours || !profileForm.languages.length) {
-      setError('All fields are required');
-      return;
-    }
-    setUser({ ...user, ...profileForm, contracts });
-    setShowProfileModal(false);
-    alert('Profile updated successfully!');
-    setError('');
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUser(null);
-    navigate('/');
-  };
-
-  const toggleAvailability = (date) => {
-    setAvailability(
-      availability.map(day =>
-        day.date === date
-          ? { ...day, isBusy: !day.isBusy && !day.isVacation }
-          : day
-      )
-    );
-  };
-
-  const toggleVacation = (date) => {
-    setAvailability(
-      availability.map(day =>
-        day.date === date
-          ? { ...day, isVacation: !day.isVacation, isBusy: !day.isVacation ? false : day.isBusy }
-          : day
-      )
-    );
-  };
-
-  const setHourlySchedule = (date, updatedHours) => {
-    setAvailability(
-      availability.map(day =>
-        day.date === date ? { ...day, hours: updatedHours } : day
-      )
-    );
-  };
-
-  const handleRequestAction = (requestId, action, counterOfferData = null) => {
-    let updatedContracts = contracts;
-    let clientId = requests.find(r => r.id === requestId)?.clientId;
-    if (action === 'accept') {
-      updatedContracts = contracts.map(c =>
-        c.id === requestId ? { ...c, status: 'Confirmed' } : c
-      );
-      setChatMessages([
-        ...chatMessages.filter(c => c.clientId !== clientId),
-        {
-          clientId,
-          requestId,
-          messages: [
-            ...(chatMessages.find(c => c.clientId === clientId)?.messages || []),
-            {
-              sender: 'Guide',
-              text: `Request #${requestId} accepted.`,
-              timestamp: DateTime.now().setZone(localTimezone).toISO()
-            }
-          ]
-        }
-      ]);
-      alert('Request accepted');
-    } else if (action === 'reject') {
-      updatedContracts = contracts.map(c =>
-        c.id === requestId ? { ...c, status: 'Rejected' } : c
-      );
-      setChatMessages([
-        ...chatMessages.filter(c => c.clientId !== clientId),
-        {
-          clientId,
-          requestId,
-          messages: [
-            ...(chatMessages.find(c => c.clientId === clientId)?.messages || []),
-            {
-              sender: 'Guide',
-              text: `Request #${requestId} rejected.`,
-              timestamp: DateTime.now().setZone(localTimezone).toISO()
-            }
-          ]
-        }
-      ]);
-      alert('Request rejected');
-    } else if (action === 'counter-offer') {
-      if (!counterOfferData.date || !counterOfferData.price || counterOfferData.price < 0) {
-        setError('Invalid counter-offer date or price');
-        return;
-      }
-      updatedContracts = contracts.map(c =>
-        c.id === requestId
-          ? { ...c, date: counterOfferData.date, price: parseFloat(counterOfferData.price) }
-          : c
-      );
-      setChatMessages([
-        ...chatMessages.filter(c => c.clientId !== clientId),
-        {
-          clientId,
-          requestId,
-          messages: [
-            ...(chatMessages.find(c => c.clientId === clientId)?.messages || []),
-            {
-              sender: 'Guide',
-              text: `Counter-offer for Request #${requestId}: ${DateTime.fromISO(counterOfferData.date, { zone: localTimezone }).toLocaleString(DateTime.DATETIME_MED)}, $${counterOfferData.price}`,
-              timestamp: DateTime.now().setZone(localTimezone).toISO()
-            }
-          ]
-        }
-      ]);
-      alert(`Counter-offer sent: ${DateTime.fromISO(counterOfferData.date, { zone: localTimezone }).toLocaleString(DateTime.DATETIME_MED)}, $${counterOfferData.price}`);
-      setShowCounterOfferModal(false);
-      setError('');
-    }
-    setContracts(updatedContracts);
-    setUser({ ...user, contracts: updatedContracts });
-  };
-
-  const handleChatMessage = (e) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !selectedChatClient) {
-      setError('Message cannot be empty');
-      return;
-    }
-    const request = requests.find(r => r.clientId === selectedChatClient);
-    setChatMessages([
-      ...chatMessages.filter(c => c.clientId !== selectedChatClient),
-      {
-        clientId: selectedChatClient,
-        requestId: request?.id,
-        messages: [
-          ...(chatMessages.find(c => c.clientId === selectedChatClient)?.messages || []),
-          {
-            sender: 'Guide',
-            text: newMessage,
-            timestamp: DateTime.now().setZone(localTimezone).toISO()
-          }
-        ]
-      }
-    ]);
-    // Simulate client response
+  // Existing notification handler
+  const addNotification = (message, type) => {
+    const notification = {
+      id: Date.now(),
+      message,
+      type,
+      timestamp: new Date().toISOString()
+    };
+    setNotifications(prev => [notification, ...prev.slice(0, 4)]);
+    
     setTimeout(() => {
-      setChatMessages(prev => [
-        ...prev.filter(c => c.clientId !== selectedChatClient),
-        {
-          clientId: selectedChatClient,
-          requestId: request?.id,
-          messages: [
-            ...prev.find(c => c.clientId === selectedChatClient)?.messages || [],
-            {
-              sender: 'Client',
-              text: `Received: ${newMessage}`,
-              timestamp: DateTime.now().setZone(localTimezone).toISO()
-            }
-          ]
+      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+    }, 5000);
+  };
+
+  // Format time for last seen
+  const formatTime = (timestamp) => {
+    const date = new Date(timestamp);
+    const today = new Date();
+    const isToday = date.toDateString() === today.toDateString();
+    return isToday
+      ? date.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })
+      : date.toLocaleDateString('uz-UZ', {
+          day: 'numeric',
+          month: 'short',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+  };
+
+  // Handle opening chat
+  const openChat = (clientId) => {
+    setSelectedClient(clientId);
+    setChatOpen(true);
+  };
+
+  // Existing request actions
+  const handleRequestAction = (requestId, action, data = null) => {
+    setRequests(prev => prev.map(req => {
+      if (req.id === requestId) {
+        switch (action) {
+          case 'accept':
+            addNotification(`So'rov #${requestId} qabul qilindi`, 'success');
+            return { ...req, status: 'Tasdiqlangan' };
+          case 'reject':
+            addNotification(`So'rov #${requestId} rad etildi`, 'error');
+            return { ...req, status: 'Rad etilgan' };
+          case 'counter':
+            addNotification(`Counter taklif yuborildi #${requestId}`, 'info');
+            return { ...req, date: data.date, price: data.price, status: 'Counter taklif' };
+          default:
+            return req;
         }
-      ]);
-    }, 1000);
-    setNewMessage('');
-    setError('');
+      }
+      return req;
+    }));
   };
-
-  const openChatForClient = (clientId, clientName) => {
-    setSelectedChatClient(clientId);
-    setShowChatModal(true);
-  };
-
-  const financialStats = useMemo(() => ({
-    totalTours: contracts.length,
-    completedTours: contracts.filter(c => c.status === 'Completed').length,
-    averageRating:
-      contracts.reduce((sum, c) => sum + (c.clientRating || 0), 0) /
-      (contracts.filter(c => c.clientRating).length || 1),
-    uniqueClients: new Set(contracts.map(c => c.guideId)).size
-  }), [contracts]);
 
   return (
     <div className="guide-account">
-      <div className="homepage-container">
-        {error && <p className="guide-error" role="alert">{error}</p>}
-        {/* Profile and Calendar */}
-        <div className="guide-account-flex">
-          <section className="guide-account-section guide-profile">
-            <h2 className="homepage-section-title">Your Professional Profile</h2>
-            <p className="homepage-section-subtitle">Manage your guide information</p>
-            <div className="guide-profile-card card-gradient">
-              <img
-                src={user?.profilePicture || 'https://randomuser.me/api/portraits/men/75.jpg'}
-                alt="Profile"
-                className="guide-profile-image"
-              />
-              <div className="guide-profile-details">
-                <p><FiUser /> <strong>Name:</strong> {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'Not set'}</p>
-                <p><FiMail /> <strong>Email:</strong> {user?.email || 'No email'}</p>
-                <p><FiMapPin /> <strong>Location:</strong> {user?.city || 'Not set'}, {user?.country || 'Not set'} ({localTimezone})</p>
-                <p><FiStar /> <strong>Bio:</strong> {profileForm.bio || 'Not set'}</p>
-                <p><FiStar /> <strong>Experience:</strong> {profileForm.experience || 'Not set'}</p>
-                <p><FiMapPin /> <strong>Services:</strong> {profileForm.services.length ? profileForm.services.join(', ') : 'None'}</p>
-                <p><FiDollarSign /> <strong>Pricing:</strong> ${profileForm.pricePerHour}/hr, ${profileForm.pricePerDay}/day</p>
-                <p><FiCalendar /> <strong>Work Hours:</strong> {profileForm.workHours || 'Not set'}</p>
-                <p><FiCheckCircle /> <strong>Verification:</strong> {profileForm.verificationStatus || 'Not verified'}</p>
-                <p><FiStar /> <strong>Languages:</strong> {profileForm.languages.length ? profileForm.languages.map(l => `${l.language} (${l.level})`).join(', ') : 'None'}</p>
-                <p><FiCheckCircle /> <strong>Certificates:</strong> {profileForm.certificates.length ? profileForm.certificates.join(', ') : 'None'}</p>
-                <div className="portfolio-gallery">
-                  {profileForm.portfolio.map((img, index) => (
-                    <div key={index} className="portfolio-item">
-                      <img src={img} alt={`Portfolio ${index + 1}`} />
-                      <button
-                        className="portfolio-remove-btn"
-                        onClick={() => handlePortfolioRemove(index)}
-                        aria-label={`Remove portfolio image ${index + 1}`}
-                      >
-                        <FiX />
-                      </button>
-                    </div>
-                  ))}
+      {/* Notifications */}
+      <div className="guide-account-notifications">
+        {notifications.map(notification => (
+          <div key={notification.id} className={`guide-account-notification guide-account-notification-${notification.type}`}>
+            <span>{notification.message}</span>
+            <button onClick={() => setNotifications(prev => prev.filter(n => n.id !== notification.id))}>
+              <FiX />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Header */}
+      <div className="guide-account-header">
+        <div className="guide-account-header-content">
+          <div className="guide-account-user-info">
+            <div className="guide-account-avatar-container">
+              <img src={user.profilePicture} alt="Profile" className="guide-account-avatar" />
+              <div className={`guide-account-status-indicator ${user.isOnline ? 'online' : 'offline'}`}></div>
+            </div>
+            <div>
+              <h1>{user.firstName} {user.lastName}</h1>
+              <p className="guide-account-subtitle">Professional Guide • {user.city}, {user.country}</p>
+              <div className="guide-account-rating">
+                <FiStar className="guide-account-star" />
+                <span>{user.rating}</span>
+                <span>({user.totalTours} tur)</span>
+              </div>
+            </div>
+          </div>
+          <div className="guide-account-header-actions">
+            <div className="guide-account-quick-stats">
+              <div className="guide-account-stat-item">
+                <FiUsers />
+                <span>{stats.pendingRequests}</span>
+                <small>Yangi so'rov</small>
+              </div>
+              <div className="guide-account-stat-item">
+                <FiCheckCircle />
+                <span>{stats.confirmedTours}</span>
+                <small>Tasdiqlangan</small>
+              </div>
+              <div className="guide-account-stat-item">
+                <FiDollarSign />
+                <span>${stats.thisMonthEarnings}</span>
+                <small>Bu oy</small>
+              </div>
+              <div className="guide-account-stat-item" onClick={() => setChatOpen(true)}>
+                <FiMessageSquare />
+                <span>{stats.totalUnreadMessages}</span>
+                <small>Yangi xabar</small>
+                {stats.totalUnreadMessages > 0 && <div className="guide-account-notification-dot"></div>}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="guide-account-main">
+        {/* Left Sidebar */}
+        <div className="guide-account-sidebar">
+          <div className="guide-account-card">
+            <div className="guide-account-card-header">
+              <h3>Professional Profil</h3>
+              <button onClick={() => setShowProfileModal(true)} className="guide-account-edit-btn">
+                <FiEdit />
+              </button>
+            </div>
+            <div className="guide-account-profile-details">
+              <div className="guide-account-profile-item">
+                <FiUser />
+                <div>
+                  <strong>Bio</strong>
+                  <p>{profileForm.bio.substring(0, 100)}...</p>
                 </div>
-                <div className="guide-profile-actions">
-                  <button
-                    className="homepage-btn homepage-btn-primary"
-                    onClick={() => setShowProfileModal(true)}
-                    aria-label="Edit profile"
-                  >
-                    <FiSettings /> Edit Profile
-                  </button>
-                  <button
-                    className="homepage-btn homepage-btn-outline"
-                    onClick={() => setShowVerificationModal(true)}
-                    aria-label="Manage verification"
-                  >
-                    <FiCheckCircle /> Verification
-                  </button>
-                  <button
-                    className="homepage-btn homepage-btn-outline"
-                    onClick={handleLogout}
-                    aria-label="Log out"
-                  >
-                    <FiLogOut /> Log Out
-                  </button>
+              </div>
+              <div className="guide-account-profile-item">
+                <FiAward />
+                <div>
+                  <strong>Tajriba</strong>
+                  <p>{profileForm.experience.substring(0, 80)}...</p>
+                </div>
+              </div>
+              <div className="guide-account-profile-item">
+                <FiGlobe />
+                <div>
+                  <strong>Tillar</strong>
+                  <p>{profileForm.languages.map(l => l.language).join(', ')}</p>
+                </div>
+              </div>
+              <div className="guide-account-profile-item">
+                <FiDollarSign />
+                <div>
+                  <strong>Narxlar</strong>
+                  <p>${profileForm.pricePerHour}/soat • ${profileForm.pricePerDay}/kun</p>
+                </div>
+              </div>
+              <div className="guide-account-profile-portfolio">
+                <strong>Portfolio</strong>
+                <div className="guide-account-portfolio-preview">
+                  {profileForm.portfolio.slice(0, 3).map((img, index) => (
+                    <img key={index} src={img} alt={`Portfolio ${index + 1}`} onClick={() => setShowPortfolioModal(true)} />
+                  ))}
+                  {profileForm.portfolio.length > 3 && (
+                    <div className="guide-account-portfolio-more" onClick={() => setShowPortfolioModal(true)}>
+                      +{profileForm.portfolio.length - 3}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-          </section>
+          </div>
 
-          <section className="guide-account-section guide-calendar">
-            <h2 className="homepage-section-title">Availability Calendar</h2>
-            <p className="homepage-section-subtitle">Manage your availability (Times in {localTimezone})</p>
-            <div className="calendar-grid card-gradient">
-              {availability.map(day => {
-                const isBooked = requests.some(
-                  r => r.date === day.date && ['Pending', 'Confirmed', 'Started'].includes(r.status)
-                );
-                const localDate = DateTime.fromISO(day.date, { zone: localTimezone });
-                return (
-                  <div
-                    key={day.date}
-                    className={`calendar-day ${day.isBusy || isBooked ? 'busy' : ''} ${day.isVacation ? 'vacation' : ''}`}
-                  >
-                    <p>{localDate.toLocaleString({ weekday: 'short', day: 'numeric', month: 'short' })}</p>
-                    <button
-                      className="homepage-btn homepage-btn-outline"
-                      onClick={() => toggleAvailability(day.date)}
-                      aria-label={`Toggle availability for ${day.date}`}
-                      disabled={day.isVacation || isBooked}
-                    >
-                      {day.isBusy || isBooked ? 'Busy' : 'Free'}
-                    </button>
-                    <button
-                      className="homepage-btn homepage-btn-outline"
-                      onClick={() => toggleVacation(day.date)}
-                      aria-label={`Toggle vacation for ${day.date}`}
-                    >
-                      {day.isVacation ? 'Cancel Vacation' : 'Set Vacation'}
-                    </button>
-                    <button
-                      className="homepage-btn homepage-btn-primary"
-                      onClick={() => setShowHoursModal(day.date)}
-                      aria-label={`Edit hours for ${day.date}`}
-                      disabled={day.isVacation || isBooked}
-                    >
-                      <FiEdit /> Hours
-                    </button>
-                  </div>
-                );
-              })}
+          <div className="guide-account-card">
+            <div className="guide-account-card-header">
+              <h3>Statistika</h3>
             </div>
-          </section>
+            <div className="guide-account-stats-grid">
+              <div className="guide-account-stat">
+                <FiCheckCircle className="guide-account-stat-icon success" />
+                <div>
+                  <strong>{stats.totalTours}</strong>
+                  <span>Yakunlangan turlar</span>
+                </div>
+              </div>
+              <div className="guide-account-stat">
+                <FiStar className="guide-account-stat-icon warning" />
+                <div>
+                  <strong>{stats.averageRating.toFixed(1)}</strong>
+                  <span>O'rtacha reyting</span>
+                </div>
+              </div>
+              <div className="guide-account-stat">
+                <FiTrendingUp className="guide-account-stat-icon primary" />
+                <div>
+                  <strong>{stats.responseRate}%</strong>
+                  <span>Javob berish darajasi</span>
+                </div>
+              </div>
+              <div className="guide-account-stat">
+                <FiHeart className="guide-account-stat-icon danger" />
+                <div>
+                  <strong>156</strong>
+                  <span>Takroriy mijozlar</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="guide-account-card">
+            <div className="guide-account-card-header">
+              <h3>Tezkor Kalendar</h3>
+              <button onClick={() => setShowCalendarModal(true)} className="guide-account-edit-btn">
+                <FiCalendar />
+              </button>
+            </div>
+            <div className="guide-account-mini-calendar">
+              {availability.slice(0, 7).map(day => (
+                <div 
+                  key={day.date} 
+                  className={`guide-account-mini-day ${day.isBusy ? 'busy' : ''} ${day.isVacation ? 'vacation' : ''}`}
+                >
+                  <span>{new Date(day.date).getDate()}</span>
+                  <small>{new Date(day.date).toLocaleDateString('uz-UZ', { weekday: 'short' })}</small>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Requests and Financials/Chat */}
-        <div className="guide-account-flex">
-          <section className="guide-account-section guide-requests">
-            <h2 className="homepage-section-title">Request Management</h2>
-            <p className="homepage-section-subtitle">Manage client tour requests (Times in {localTimezone})</p>
-            <div className="requests-tabs">
-              <button
-                className={`homepage-btn ${requestsTab === 'pending' ? 'homepage-btn-primary' : 'homepage-btn-outline'}`}
-                onClick={() => setRequestsTab('pending')}
-                aria-label="View pending requests"
-              >
-                Pending
-              </button>
-              <button
-                className={`homepage-btn ${requestsTab === 'history' ? 'homepage-btn-primary' : 'homepage-btn-outline'}`}
-                onClick={() => setRequestsTab('history')}
-                aria-label="View request history"
-              >
-                History
-              </button>
+        {/* Main Content Area */}
+        <div className="guide-account-content">
+          <div className="guide-account-card">
+            <div className="guide-account-card-header">
+              <h3>So'rovlar Boshqaruvi</h3>
+              <div className="guide-account-tabs">
+                <button 
+                  className={`guide-account-tab ${activeTab === 'yangi' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('yangi')}
+                >
+                  Yangi ({requests.filter(r => r.status === 'Kutilmoqda').length})
+                </button>
+                <button 
+                  className={`guide-account-tab ${activeTab === 'tasdiqlangan' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('tasdiqlangan')}
+                >
+                  Tasdiqlangan ({requests.filter(r => r.status === 'Tasdiqlangan').length})
+                </button>
+                <button 
+                  className={`guide-account-tab ${activeTab === 'tarix' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('tarix')}
+                >
+                  Tarix ({requests.filter(r => r.status === 'Yakunlangan').length})
+                </button>
+              </div>
             </div>
-            <div className="homepage-destinations-grid">
+            
+            <div className="guide-account-requests-list">
               {requests
-                .filter(r => (requestsTab === 'pending' ? r.status === 'Pending' : r.status !== 'Pending'))
-                .map(request => {
-                  const requestDateTime = DateTime.fromISO(request.date, { zone: localTimezone });
-                  return (
-                    <div key={request.id} className="homepage-destination-card card-gradient">
-                      <div className="guide-request-content">
-                        <h3>Request #{request.id}</h3>
-                        <p><FiUser /> Client: {request.clientName}</p>
-                        <p><FiCalendar /> Date: {requestDateTime.toLocaleString(DateTime.DATETIME_MED)}</p>
-                        <p><FiCalendar /> Duration: {request.duration}</p>
-                        <p><FiUsers /> Travelers: {request.travelers.adults} Adults, {request.travelers.children} Children</p>
-                        <p><FiDollarSign /> Price: ${request.price}</p>
-                        <p><FiCheck /> Status: {request.status}</p>
-                        {request.status === 'Pending' && (
-                          <div className="guide-actions">
-                            <button
-                              className="homepage-btn homepage-btn-primary"
-                              onClick={() => handleRequestAction(request.id, 'accept')}
-                              aria-label={`Accept request ${request.id}`}
-                            >
-                              <FiCheckCircle /> Accept
-                            </button>
-                            <button
-                              className="homepage-btn cancel-btn"
-                              onClick={() => handleRequestAction(request.id, 'reject')}
-                              aria-label={`Reject request ${request.id}`}
-                            >
-                              <FiXCircle /> Reject
-                            </button>
-                            <button
-                              className="homepage-btn homepage-btn-outline"
-                              onClick={() => {
-                                setCounterOffer({ requestId: request.id, date: request.date, price: request.price });
-                                setShowCounterOfferModal(true);
-                              }}
-                              aria-label={`Counter-offer for request ${request.id}`}
-                            >
-                              <FiEdit /> Counter-Offer
-                            </button>
-                            <button
-                              className="homepage-btn homepage-btn-outline"
-                              onClick={() => openChatForClient(request.clientId, request.clientName)}
-                              aria-label={`Chat with ${request.clientName}`}
-                            >
-                              <FiMessageSquare /> Chat
-                            </button>
+                .filter(req => {
+                  if (activeTab === 'yangi') return req.status === 'Kutilmoqda';
+                  if (activeTab === 'tasdiqlangan') return req.status === 'Tasdiqlangan';
+                  if (activeTab === 'tarix') return req.status === 'Yakunlangan';
+                  return false;
+                })
+                .sort((a, b) => {
+                  if (activeTab === 'yangi') {
+                    const priorityOrder = { high: 3, medium: 2, low: 1 };
+                    return priorityOrder[b.priority] - priorityOrder[a.priority];
+                  }
+                  return new Date(b.date) - new Date(a.date);
+                })
+                .map(request => (
+                  <div key={request.id} className={`guide-account-request-item ${request.priority === 'high' ? 'high-priority' : ''}`}>
+                    <div className="guide-account-request-header">
+                      <div className="guide-account-client-info">
+                        <div className="guide-account-client-avatar-container">
+                          <img src={request.clientPhoto} alt={request.clientName} />
+                          <div className={`guide-account-client-status ${request.isOnline ? 'online' : 'offline'}`}></div>
+                        </div>
+                        <div>
+                          <h4>{request.clientName}</h4>
+                          <span className="guide-account-request-id">#{request.id}</span>
+                          {!request.isOnline && (
+                            <small className="guide-account-last-seen">
+                              Oxirgi faollik: {formatTime(request.lastSeen)}
+                            </small>
+                          )}
+                        </div>
+                      </div>
+                      <div className="guide-account-request-meta">
+                        <div className={`guide-account-status guide-account-status-${request.status.toLowerCase().replace(' ', '-')}`}>
+                          {request.status}
+                        </div>
+                        {request.priority && (
+                          <div className={`guide-account-priority guide-account-priority-${request.priority}`}>
+                            {request.priority === 'high' ? 'Yuqori' : request.priority === 'medium' ? 'O\'rta' : 'Past'}
                           </div>
                         )}
                       </div>
                     </div>
-                  );
-                })}
-              {requests.filter(r => (requestsTab === 'pending' ? r.status === 'Pending' : r.status !== 'Pending')).length === 0 && (
-                <p className="guide-account-empty">No {requestsTab === 'pending' ? 'pending requests' : 'request history'}.</p>
-              )}
-            </div>
-          </section>
+                    
+                    <div className="guide-account-request-details">
+                      <div className="guide-account-request-info">
+                        <div className="guide-account-info-item">
+                          <FiCalendar />
+                          <span>{new Date(request.date).toLocaleDateString('uz-UZ', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}</span>
+                        </div>
+                        <div className="guide-account-info-item">
+                          <FiClock />
+                          <span>{request.duration}</span>
+                        </div>
+                        <div className="guide-account-info-item">
+                          <FiUsers />
+                          <span>{request.travelers.adults} katta, {request.travelers.children} bola</span>
+                        </div>
+                        <div className="guide-account-info-item">
+                          <FiDollarSign />
+                          <span>${request.price}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="guide-account-service-type">
+                        <strong>{request.serviceType}</strong>
+                        {request.notes && <p>{request.notes}</p>}
+                        {request.rating && (
+                          <div className="guide-account-rating">
+                            <FiStar />
+                            <span>{request.rating}/5</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {request.status === 'Kutilmoqda' && (
+                      <div className="guide-account-request-actions">
+                        <button 
+                          className="guide-account-btn guide-account-btn-success"
+                          onClick={() => handleRequestAction(request.id, 'accept')}
+                        >
+                          <FiCheck /> Qabul qilish
+                        </button>
+                        <button 
+                          className="guide-account-btn guide-account-btn-danger"
+                          onClick={() => handleRequestAction(request.id, 'reject')}
+                        >
+                          <FiX /> Rad etish
+                        </button>
+                        <button 
+                          className="guide-account-btn guide-account-btn-outline"
+                          onClick={() => {
+                            setCounterOfferData({ requestId: request.id, date: request.date.split('T')[0], price: request.price });
+                            setShowCounterOffer(true);
+                          }}
+                        >
+                          <FiEdit /> Counter taklif
+                        </button>
+                        <button 
+                          className="guide-account-btn guide-account-btn-outline"
+                          onClick={() => openChat(request.clientId)}
+                        >
+                          <FiMessageSquare /> Chat
+                        </button>
+                      </div>
+                    )}
+                    
+                    {request.status === 'Tasdiqlangan' && (
+                      <div className="guide-account-request-actions">
+                        <button 
+                          className="guide-account-btn guide-account-btn-outline"
+                          onClick={() => openChat(request.clientId)}
+                        >
+                          <FiMessageSquare /> Mijoz bilan chat
+                        </button>
+                        <button className="guide-account-btn guide-account-btn-primary">
+                          <FiMapPin /> Yo'nalishni ko'rish
+                        </button>
+                        <button className="guide-account-btn guide-account-btn-outline">
+                          <FiPhone /> Qo'ng'iroq qilish
+                        </button>
+                      </div>
+                    )}
 
-          <section className="guide-account-section guide-financials">
-            <h2 className="homepage-section-title">Financial Report</h2>
-            <p className="homepage-section-subtitle">View your performance stats</p>
-            <div className="guide-financials-card card-gradient">
-              <p><FiCalendar /> <strong>Total Tours:</strong> {financialStats.totalTours}</p>
-              <p><FiCheck /> <strong>Completed Tours:</strong> {financialStats.completedTours}</p>
-              <p><FiStar /> <strong>Average Rating:</strong> {financialStats.averageRating.toFixed(1)}</p>
-              <p><FiUsers /> <strong>Unique Clients:</strong> {financialStats.uniqueClients}</p>
-            </div>
-          </section>
-
-          <section className="guide-account-section guide-chat">
-            <h2 className="homepage-section-title">Client Chat</h2>
-            <p className="homepage-section-subtitle">Communicate with clients</p>
-            <div className="guide-chat-card card-gradient">
-              <select
-                className="auth-input"
-                value={selectedChatClient || ''}
-                onChange={(e) => setSelectedChatClient(e.target.value)}
-                aria-label="Select client to chat with"
-              >
-                <option value="" disabled>Select a client</option>
-                {requests.map(request => (
-                  <option key={request.clientId} value={request.clientId}>
-                    {request.clientName} (Request #{request.id})
-                  </option>
+                    {request.status === 'Yakunlangan' && (
+                      <div className="guide-account-request-actions">
+                        <button 
+                          className="guide-account-btn guide-account-btn-outline"
+                          onClick={() => openChat(request.clientId)}
+                        >
+                          <FiMessageSquare /> Xabar yuborish
+                        </button>
+                        <button className="guide-account-btn guide-account-btn-outline">
+                          <FiDownload /> Hisobotni yuklab olish
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 ))}
-              </select>
-              <div className="chat-messages">
-                {chatMessages.find(c => c.clientId === selectedChatClient)?.messages.map((msg, index) => (
-                  <div
-                    key={index}
-                    className={`chat-bubble ${msg.sender === 'Guide' ? 'guide-message' : 'client-message'}`}
-                  >
-                    <div className="chat-sender">
-                      <span className="chat-sender-initials">
-                        {msg.sender === 'Guide' ? user?.firstName?.[0] || 'G' : 'C'}
-                      </span>
-                      <strong>{msg.sender}:</strong>
-                    </div>
-                    <p>{msg.text}</p>
-                    <span>{DateTime.fromISO(msg.timestamp, { zone: localTimezone }).toLocaleString(DateTime.DATETIME_SHORT)}</span>
-                  </div>
-                )) || <p className="guide-account-empty">No messages yet.</p>}
-              </div>
-              {selectedChatClient && (
-                <form className="chat-input-form" onSubmit={handleChatMessage}>
-                  <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Type a message..."
-                    className="auth-input chat-input"
-                    aria-label="Type a message"
-                  />
-                  <button type="submit" className="auth-submit-btn" aria-label="Send message">
-                    <FiCheck /> Send
-                  </button>
-                </form>
-              )}
             </div>
-          </section>
+          </div>
+
+          {/* Chat Widget */}
+          <GuideChatWidget
+            chatMessages={chatMessages}
+            setChatMessages={setChatMessages}
+            requests={requests}
+            openChat={openChat}
+            stats={stats}
+            chatOpen={chatOpen}
+            setChatOpen={setChatOpen}
+            selectedClient={selectedClient}
+          />
         </div>
+      </div>
 
-        {/* Profile Edit Modal */}
-        {showProfileModal && (
-          <div
-            className="homepage-learn-more-overlay"
-            onClick={() => setShowProfileModal(false)}
-            role="dialog"
-            aria-labelledby="profile-modal-title"
-            aria-modal="true"
-          >
-            <div className="homepage-learn-more-modal" onClick={(e) => e.stopPropagation()}>
-              <button
-                className="homepage-learn-more-close-btn"
-                onClick={() => setShowProfileModal(false)}
-                aria-label="Close profile modal"
-              >
+      {/* Modals */}
+      {showProfileModal && (
+        <div className="guide-account-modal-overlay" onClick={() => setShowProfileModal(false)}>
+          <div className="guide-account-modal guide-account-modal-large" onClick={e => e.stopPropagation()}>
+            <div className="guide-account-modal-header">
+              <h3>Profilni tahrirlash</h3>
+              <button onClick={() => setShowProfileModal(false)}>
                 <FiX />
               </button>
-              <div className="homepage-learn-more-content">
-                <h2 id="profile-modal-title">Edit Profile</h2>
-                {error && <p className="guide-error" role="alert">{error}</p>}
-                <form className="auth-form" onSubmit={handleProfileSubmit}>
-                  <div className="auth-form-group">
-                    <label htmlFor="bio"><FiStar /> Bio</label>
-                    <textarea
-                      id="bio"
-                      name="bio"
-                      value={profileForm.bio}
-                      onChange={handleProfileChange}
-                      placeholder="Enter your bio"
-                      className="auth-input"
-                      rows="4"
-                      aria-required="true"
-                    />
-                  </div>
-                  <div className="auth-form-group">
-                    <label htmlFor="experience"><FiStar /> Experience</label>
-                    <textarea
-                      id="experience"
-                      name="experience"
-                      value={profileForm.experience}
-                      onChange={handleProfileChange}
-                      placeholder="Enter your experience"
-                      className="auth-input"
-                      rows="4"
-                      aria-required="true"
-                    />
-                  </div>
-                  <div className="auth-form-group">
-                    <label htmlFor="services"><FiMapPin /> Services (comma-separated)</label>
-                    <input
-                      id="services"
-                      type="text"
-                      name="services"
-                      value={profileForm.services.join(', ')}
-                      onChange={handleProfileChange}
-                      placeholder="e.g., Historical, Cultural, Food"
-                      className="auth-input"
-                      aria-required="true"
-                    />
-                  </div>
-                  <div className="auth-name-grid">
-                    <div className="auth-form-group">
-                      <label htmlFor="pricePerHour"><FiDollarSign /> Price per Hour</label>
-                      <input
-                        id="pricePerHour"
-                        type="number"
-                        name="pricePerHour"
-                        value={profileForm.pricePerHour}
-                        onChange={handleProfileChange}
-                        min="0"
-                        step="0.01"
-                        className="auth-input"
-                        aria-required="true"
-                      />
-                    </div>
-                    <div className="auth-form-group">
-                      <label htmlFor="pricePerDay"><FiDollarSign /> Price per Day</label>
-                      <input
-                        id="pricePerDay"
-                        type="number"
-                        name="pricePerDay"
-                        value={profileForm.pricePerDay}
-                        onChange={handleProfileChange}
-                        min="0"
-                        step="0.01"
-                        className="auth-input"
-                        aria-required="true"
-                      />
-                    </div>
-                  </div>
-                  <div className="auth-form-group">
-                    <label htmlFor="workHours"><FiCalendar /> Work Hours</label>
-                    <input
-                      id="workHours"
-                      type="text"
-                      name="workHours"
-                      value={profileForm.workHours}
-                      onChange={handleProfileChange}
-                      placeholder="e.g., 9:00 AM - 5:00 PM, Monday to Saturday"
-                      className="auth-input"
-                      aria-required="true"
-                    />
-                  </div>
-                  <div className="auth-form-group">
-                    <label htmlFor="languages"><FiStar /> Languages (comma-separated)</label>
-                    <input
-                      id="languages"
-                      type="text"
-                      name="languages"
-                      value={profileForm.languages.map(l => l.language).join(', ')}
-                      onChange={handleProfileChange}
-                      placeholder="e.g., English, Uzbek, Russian"
-                      className="auth-input"
-                      aria-required="true"
-                    />
-                  </div>
-                  <div className="auth-form-group">
-                    <label htmlFor="languageLevels"><FiStar /> Language Levels (comma-separated)</label>
-                    <input
-                      id="languageLevels"
-                      type="text"
-                      name="languageLevels"
-                      value={profileForm.languages.map(l => l.level).join(', ')}
-                      onChange={handleProfileChange}
-                      placeholder="e.g., Advanced, Native, Intermediate"
-                      className="auth-input"
-                      aria-required="true"
-                    />
-                  </div>
-                  <div className="auth-form-group">
-                    <label htmlFor="portfolio"><FiImage /> Add Portfolio Image URL</label>
-                    <input
-                      id="portfolio"
-                      type="url"
-                      onBlur={handlePortfolioAdd}
-                      placeholder="Enter image URL"
-                      className="auth-input"
-                    />
-                  </div>
-                  <button type="submit" className="auth-submit-btn">
-                    <FiCheck /> Save Changes
-                  </button>
-                </form>
-              </div>
             </div>
-          </div>
-        )}
-
-        {/* Hourly Schedule Modal */}
-        {showHoursModal && (
-          <div
-            className="homepage-learn-more-overlay"
-            onClick={() => setShowHoursModal(null)}
-            role="dialog"
-            aria-labelledby="hours-modal-title"
-            aria-modal="true"
-          >
-            <div className="modal-hours" onClick={(e) => e.stopPropagation()}>
-              <button
-                className="homepage-learn-more-close-btn"
-                onClick={() => setShowHoursModal(null)}
-                aria-label="Close hours modal"
-              >
-                <FiX />
-              </button>
-              <div className="homepage-learn-more-content">
-                <h2 id="hours-modal-title">Set Hours for {DateTime.fromISO(showHoursModal, { zone: localTimezone }).toLocaleString(DateTime.DATE_MED)}</h2>
-                <div className="hours-grid">
-                  {availability.find(day => day.date === showHoursModal)?.hours.map((hour, index) => (
-                    <label key={index} className="hour-checkbox">
-                      <input
-                        type="checkbox"
-                        checked={hour.available}
-                        onChange={() => {
-                          const day = availability.find(d => d.date === showHoursModal);
-                          const updatedHours = [...day.hours];
-                          updatedHours[index] = { ...hour, available: !hour.available };
-                          setHourlySchedule(showHoursModal, updatedHours);
-                        }}
-                        aria-label={`Toggle availability for ${hour.time}`}
-                      />
-                      {hour.time}
-                    </label>
-                  ))}
-                </div>
-                <button
-                  className="auth-submit-btn"
-                  onClick={() => setShowHoursModal(null)}
-                  aria-label="Save hours"
-                >
-                  <FiCheck /> Save
-                </button>
+            <div className="guide-account-modal-content">
+              <div className="guide-account-form-group">
+                <label>Bio</label>
+                <textarea 
+                  value={profileForm.bio}
+                  onChange={(e) => setProfileForm({...profileForm, bio: e.target.value})}
+                  rows={4}
+                  placeholder="O'zingiz haqingizda qisqacha ma'lumot..."
+                />
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Counter-Offer Modal */}
-        {showCounterOfferModal && (
-          <div
-            className="homepage-learn-more-overlay"
-            onClick={() => setShowCounterOfferModal(false)}
-            role="dialog"
-            aria-labelledby="counter-offer-modal-title"
-            aria-modal="true"
-          >
-            <div className="modal-counter-offer" onClick={(e) => e.stopPropagation()}>
-              <button
-                className="homepage-learn-more-close-btn"
-                onClick={() => setShowCounterOfferModal(false)}
-                aria-label="Close counter-offer modal"
-              >
-                <FiX />
-              </button>
-              <div className="homepage-learn-more-content">
-                <h2 id="counter-offer-modal-title">Send Counter-Offer</h2>
-                {error && <p className="guide-error" role="alert">{error}</p>}
-                <div className="auth-form-group">
-                  <label htmlFor="counter-date"><FiCalendar /> New Date</label>
-                  <input
-                    id="counter-date"
-                    type="date"
-                    value={counterOffer.date}
-                    onChange={(e) => setCounterOffer({ ...counterOffer, date: e.target.value })}
-                    className="auth-input"
-                    aria-required="true"
-                    min={DateTime.now().setZone(localTimezone).toISODate()}
-                  />
-                </div>
-                <div className="auth-form-group">
-                  <label htmlFor="counter-price"><FiDollarSign /> New Price</label>
-                  <input
-                    id="counter-price"
+              <div className="guide-account-form-group">
+                <label>Tajriba</label>
+                <textarea 
+                  value={profileForm.experience}
+                  onChange={(e) => setProfileForm({...profileForm, experience: e.target.value})}
+                  rows={3}
+                  placeholder="Professional tajribangizni tasvirlab bering..."
+                />
+              </div>
+              <div className="guide-account-form-row">
+                <div className="guide-account-form-group">
+                  <label>Soatlik narx ($)</label>
+                  <input 
                     type="number"
-                    value={counterOffer.price}
-                    onChange={(e) => setCounterOffer({ ...counterOffer, price: e.target.value })}
+                    value={profileForm.pricePerHour}
+                    onChange={(e) => setProfileForm({...profileForm, pricePerHour: Number(e.target.value)})}
                     min="0"
-                    step="0.01"
-                    className="auth-input"
-                    aria-required="true"
+                    step="5"
                   />
                 </div>
-                <button
-                  className="auth-submit-btn"
-                  onClick={() => handleRequestAction(counterOffer.requestId, 'counter-offer', counterOffer)}
-                  aria-label="Send counter-offer"
+                <div className="guide-account-form-group">
+                  <label>Kunlik narx ($)</label>
+                  <input 
+                    type="number"
+                    value={profileForm.pricePerDay}
+                    onChange={(e) => setProfileForm({...profileForm, pricePerDay: Number(e.target.value)})}
+                    min="0"
+                    step="10"
+                  />
+                </div>
+              </div>
+              <div className="guide-account-form-group">
+                <label>Ish vaqti</label>
+                <input 
+                  type="text"
+                  value={profileForm.workHours}
+                  onChange={(e) => setProfileForm({...profileForm, workHours: e.target.value})}
+                  placeholder="Masalan: 08:00 - 18:00, Dushanba-Shanba"
+                />
+              </div>
+              <div className="guide-account-form-actions">
+                <button 
+                  className="guide-account-btn guide-account-btn-outline"
+                  onClick={() => setShowProfileModal(false)}
                 >
-                  <FiCheck /> Send
+                  Bekor qilish
+                </button>
+                <button 
+                  className="guide-account-btn guide-account-btn-primary" 
+                  onClick={() => {
+                    addNotification('Profil muvaffaqiyatli yangilandi', 'success');
+                    setShowProfileModal(false);
+                  }}
+                >
+                  <FiCheck /> Saqlash
                 </button>
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Verification Modal */}
-        {showVerificationModal && (
-          <div
-            className="homepage-learn-more-overlay"
-            onClick={() => setShowVerificationModal(false)}
-            role="dialog"
-            aria-labelledby="verification-modal-title"
-            aria-modal="true"
-          >
-            <div className="modal-verification" onClick={(e) => e.stopPropagation()}>
-              <button
-                className="homepage-learn-more-close-btn"
-                onClick={() => setShowVerificationModal(false)}
-                aria-label="Close verification modal"
-              >
+      {showCounterOffer && (
+        <div className="guide-account-modal-overlay" onClick={() => setShowCounterOffer(false)}>
+          <div className="guide-account-modal" onClick={e => e.stopPropagation()}>
+            <div className="guide-account-modal-header">
+              <h3>Counter Taklif</h3>
+              <button onClick={() => setShowCounterOffer(false)}>
                 <FiX />
               </button>
-              <div className="homepage-learn-more-content">
-                <h2 id="verification-modal-title">Verification Documents</h2>
-                <p>Current Status: <strong>{profileForm.verificationStatus}</strong></p>
-                <div className="auth-form-group">
-                  <label htmlFor="verification-file"><FiCamera /> Upload Verification Document</label>
-                  <input
-                    id="verification-file"
-                    type="file"
-                    accept="image/*,application/pdf"
-                    onChange={() => alert('Verification document uploaded (mock)')}
-                    className="auth-input"
-                  />
-                </div>
-                <div className="auth-form-group">
-                  <label htmlFor="certificate-file"><FiCamera /> Upload Language Certificate</label>
-                  <input
-                    id="certificate-file"
-                    type="file"
-                    accept="image/*,application/pdf"
-                    onChange={handleCertificateAdd}
-                    className="auth-input"
-                  />
-                </div>
-                <div className="certificate-list">
-                  {profileForm.certificates.map((cert, index) => (
-                    <div key={index} className="certificate-item">
-                      <p>{cert}</p>
-                      <button
-                        className="portfolio-remove-btn"
-                        onClick={() => handleCertificateRemove(index)}
-                        aria-label={`Remove certificate ${cert}`}
-                      >
+            </div>
+            <div className="guide-account-modal-content">
+              <div className="guide-account-form-group">
+                <label>Yangi sana</label>
+                <input 
+                  type="date"
+                  value={counterOfferData.date}
+                  onChange={(e) => setCounterOfferData({...counterOfferData, date: e.target.value})}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+              <div className="guide-account-form-group">
+                <label>Yangi narx ($)</label>
+                <input 
+                  type="number"
+                  value={counterOfferData.price}
+                  onChange={(e) => setCounterOfferData({...counterOfferData, price: Number(e.target.value)})}
+                  min="0"
+                  step="5"
+                />
+              </div>
+              <div className="guide-account-form-actions">
+                <button 
+                  className="guide-account-btn guide-account-btn-outline"
+                  onClick={() => setShowCounterOffer(false)}
+                >
+                  Bekor qilish
+                </button>
+                <button 
+                  className="guide-account-btn guide-account-btn-primary"
+                  onClick={() => {
+                    handleRequestAction(counterOfferData.requestId, 'counter', counterOfferData);
+                    setShowCounterOffer(false);
+                  }}
+                >
+                  <FiCheck /> Yuborish
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPortfolioModal && (
+        <div className="guide-account-modal-overlay" onClick={() => setShowPortfolioModal(false)}>
+          <div className="guide-account-modal guide-account-modal-large" onClick={e => e.stopPropagation()}>
+            <div className="guide-account-modal-header">
+              <h3>Portfolio</h3>
+              <button onClick={() => setShowPortfolioModal(false)}>
+                <FiX />
+              </button>
+            </div>
+            <div className="guide-account-modal-content">
+              <div className="guide-account-portfolio-grid">
+                {profileForm.portfolio.map((img, index) => (
+                  <div key={index} className="guide-account-portfolio-item">
+                    <img src={img} alt={`Portfolio ${index + 1}`} />
+                    <div className="guide-account-portfolio-overlay">
+                      <button className="guide-account-portfolio-view">
+                        <FiEye />
+                      </button>
+                      <button className="guide-account-portfolio-delete">
                         <FiX />
                       </button>
                     </div>
-                  ))}
+                  </div>
+                ))}
+                <div className="guide-account-portfolio-add">
+                  <FiImage />
+                  <span>Yangi rasm qo'shish</span>
                 </div>
-                <button
-                  className="auth-submit-btn"
-                  onClick={() => {
-                    setProfileForm({ ...profileForm, verificationStatus: 'Pending Review' });
-                    setShowVerificationModal(false);
-                    alert('Verification document submitted (mock)');
-                  }}
-                  aria-label="Submit verification"
-                >
-                  <FiCheck /> Submit
-                </button>
               </div>
             </div>
           </div>
-        )}
-
-        {/* Chat Modal */}
-        {showChatModal && (
-          <div
-            className="homepage-learn-more-overlay"
-            onClick={() => setShowChatModal(false)}
-            role="dialog"
-            aria-labelledby="chat-modal-title"
-            aria-modal="true"
-          >
-            <div className="modal-chat" onClick={(e) => e.stopPropagation()}>
-              <button
-                className="homepage-learn-more-close-btn"
-                onClick={() => setShowChatModal(false)}
-                aria-label="Close chat modal"
-              >
-                <FiX />
-              </button>
-              <div className="homepage-learn-more-content">
-                <h2 id="chat-modal-title">Chat with {requests.find(r => r.clientId === selectedChatClient)?.clientName} (Request #{requests.find(r => r.clientId === selectedChatClient)?.id})</h2>
-                <div className="chat-messages">
-                  {chatMessages.find(c => c.clientId === selectedChatClient)?.messages.map((msg, index) => (
-                    <div
-                      key={index}
-                      className={`chat-bubble ${msg.sender === 'Guide' ? 'guide-message' : 'client-message'}`}
-                    >
-                      <div className="chat-sender">
-                        <span className="chat-sender-initials">
-                          {msg.sender === 'Guide' ? user?.firstName?.[0] || 'G' : 'C'}
-                        </span>
-                        <strong>{msg.sender}:</strong>
-                      </div>
-                      <p>{msg.text}</p>
-                      <span>{DateTime.fromISO(msg.timestamp, { zone: localTimezone }).toLocaleString(DateTime.DATETIME_SHORT)}</span>
-                    </div>
-                  )) || <p className="guide-account-empty">No messages yet.</p>}
-                </div>
-                <form className="chat-input-form" onSubmit={handleChatMessage}>
-                  <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Type a message..."
-                    className="auth-input chat-input"
-                    aria-label="Type a message"
-                  />
-                  <button type="submit" className="auth-submit-btn" aria-label="Send message">
-                    <FiCheck /> Send
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

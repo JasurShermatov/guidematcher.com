@@ -2691,3 +2691,337 @@ DETAIL:  Key (email)=(feruzbekhamrayev2002@gmail.com) already exists.
 [2025-07-29 16:19:40,701] INFO apps.chat.apps: Chat app initialized successfully
 [2025-07-29 16:19:46,878] WARNING django.request: Not Found: /api/v1/users/profiles/
 [2025-07-29 16:19:46,878] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 16:52:22,506] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:52:22,612] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 16:52:22,613] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 16:52:22,613] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 16:52:23,646] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:52:23,759] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 16:52:23,760] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 16:52:23,760] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 16:52:24,729] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 16:52:24,807] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 16:52:24,809] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 16:52:24,809] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 20:13:58,871] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 20:13:58,974] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 20:13:58,975] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 20:13:58,975] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 20:13:59,898] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 20:13:59,991] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 20:13:59,993] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 20:13:59,993] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 20:14:00,789] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 20:14:00,853] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 20:14:00,854] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 20:14:00,854] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 20:14:22,520] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 20:14:22,520] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 20:29:24,477] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 20:29:24,477] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 20:29:45,225] WARNING django.request: Unauthorized: /api/v1/accounts/login/
+[2025-07-29 20:29:45,225] WARNING django.request: Unauthorized: /api/v1/accounts/login/
+[2025-07-29 20:29:45,242] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-29 20:29:45,242] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-07-29 20:52:03,011] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 20:52:03,111] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 20:52:03,112] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 20:52:03,112] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 20:52:04,043] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 20:52:04,139] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 20:52:04,140] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 20:52:04,140] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 20:52:04,976] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 20:52:05,044] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 20:52:05,045] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 20:52:05,045] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 21:06:05,132] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 21:06:05,132] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 21:07:03,497] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 21:07:03,497] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 21:08:19,210] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 21:08:19,314] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 21:08:19,316] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 21:08:19,316] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 21:08:20,247] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 21:08:20,342] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 21:08:20,343] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 21:08:20,343] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 21:08:21,126] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-29 21:08:21,191] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-29 21:08:21,192] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-29 21:08:21,192] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-29 21:08:25,834] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-29 21:08:25,834] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 10:22:38,617] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 10:22:38,724] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 10:22:38,725] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 10:22:38,725] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 10:22:39,724] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 10:22:39,826] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 10:22:39,827] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 10:22:39,827] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 10:22:40,703] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 10:22:40,777] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 10:22:40,778] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 10:22:40,778] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 10:30:41,212] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 10:30:41,212] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 10:41:50,807] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 10:41:50,940] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 10:41:50,941] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 10:41:50,941] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 10:41:52,345] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 10:41:52,478] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 10:41:52,480] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 10:41:52,480] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 10:41:53,682] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 10:41:53,777] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 10:41:53,778] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 10:41:53,778] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 10:42:22,933] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 10:42:22,933] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 10:55:20,043] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 10:55:20,186] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 10:55:20,188] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 10:55:20,188] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 10:55:21,416] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 10:55:21,532] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 10:55:21,533] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 10:55:21,533] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 10:55:22,614] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 10:55:22,696] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 10:55:22,697] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 10:55:22,698] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 10:55:34,066] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 10:55:34,066] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 10:59:28,935] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 10:59:28,935] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 12:00:07,230] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 12:00:07,351] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 12:00:07,352] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 12:00:07,352] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 12:00:08,464] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 12:00:08,579] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 12:00:08,580] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 12:00:08,580] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 12:00:09,781] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 12:00:09,872] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 12:00:09,874] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 12:00:09,874] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 12:00:44,510] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 12:00:44,510] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 12:47:41,077] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 12:47:41,231] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 12:47:41,232] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 12:47:41,233] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 12:47:42,643] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 12:47:42,772] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 12:47:42,773] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 12:47:42,773] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 12:47:43,890] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 12:47:43,975] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 12:47:43,976] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 12:47:43,976] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 12:47:52,204] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 12:47:52,204] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 13:23:47,168] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 13:23:47,309] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 13:23:47,311] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 13:23:47,311] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 13:23:48,672] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 13:23:48,790] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 13:23:48,791] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 13:23:48,792] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 13:23:49,793] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 13:23:49,871] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 13:23:49,872] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 13:23:49,873] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 13:49:56,728] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 13:49:56,839] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 13:49:56,840] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 13:49:56,840] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 13:49:57,837] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 13:49:57,942] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 13:49:57,943] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 13:49:57,943] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 13:49:58,958] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 13:49:59,044] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 13:49:59,044] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 13:49:59,045] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 13:54:19,194] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 13:54:19,321] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 13:54:19,322] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 13:54:19,322] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 13:54:20,519] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 13:54:20,639] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 13:54:20,640] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 13:54:20,641] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 13:54:21,848] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 13:54:21,935] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 13:54:21,936] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 13:54:21,936] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 13:54:43,256] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 13:54:43,256] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 14:00:06,291] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 14:00:06,425] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 14:00:06,426] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 14:00:06,426] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 14:00:07,722] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 14:00:07,847] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 14:00:07,849] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 14:00:07,849] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 14:00:08,998] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-30 14:00:09,086] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-30 14:00:09,087] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-30 14:00:09,087] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-30 14:01:00,744] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-30 14:01:00,744] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 16:50:13,060] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 16:50:13,197] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 16:50:13,198] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 16:50:13,198] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 16:50:14,415] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 16:50:14,511] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 16:50:14,512] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 16:50:14,513] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 16:50:15,324] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 16:50:15,384] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 16:50:15,385] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 16:50:15,385] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 19:23:10,833] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 19:23:10,952] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 19:23:10,953] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 19:23:10,954] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 19:23:11,939] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 19:23:12,030] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 19:23:12,031] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 19:23:12,031] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 19:23:12,796] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 19:23:12,855] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 19:23:12,856] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 19:23:12,856] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 19:25:45,991] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 19:25:46,093] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 19:25:46,094] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 19:25:46,095] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 19:25:46,988] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 19:25:47,083] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 19:25:47,084] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 19:25:47,084] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 19:25:47,881] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 19:25:47,947] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 19:25:47,948] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 19:25:47,948] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 19:26:08,478] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 19:26:08,478] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 19:26:10,530] WARNING django.request: Not Found: /favicon.ico
+[2025-07-31 19:26:10,530] WARNING django.request: Not Found: /favicon.ico
+[2025-07-31 19:52:13,125] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 19:52:13,229] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 19:52:13,230] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 19:52:13,230] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 19:52:14,188] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 19:52:14,287] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 19:52:14,288] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 19:52:14,288] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 19:52:15,143] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 19:52:15,211] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 19:52:15,212] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 19:52:15,212] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 20:11:03,347] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 20:11:03,482] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 20:11:03,484] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 20:11:03,484] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 20:11:04,949] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 20:11:05,112] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 20:11:05,114] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 20:11:05,114] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 20:11:06,523] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 20:11:06,617] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 20:11:06,619] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 20:11:06,619] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 20:11:16,985] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 20:11:16,985] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 20:19:38,401] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 20:19:38,517] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 20:19:38,518] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 20:19:38,518] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 20:19:39,603] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 20:19:39,711] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 20:19:39,712] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 20:19:39,712] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 20:19:40,632] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 20:19:40,707] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 20:19:40,708] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 20:19:40,708] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 20:19:49,364] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 20:19:49,364] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 20:24:47,644] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 20:24:47,763] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 20:24:47,764] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 20:24:47,764] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 20:24:48,850] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 20:24:48,960] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 20:24:48,961] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 20:24:48,961] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 20:24:49,915] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 20:24:49,990] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 20:24:49,991] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 20:24:49,991] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 20:24:57,433] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 20:24:57,433] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 20:35:53,102] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 20:35:53,218] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 20:35:53,219] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 20:35:53,219] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 20:35:54,289] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 20:35:54,398] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 20:35:54,399] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 20:35:54,399] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 20:35:55,372] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 20:35:55,448] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 20:35:55,449] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 20:35:55,449] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 21:11:45,473] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 21:11:45,473] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 21:30:27,748] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 21:30:27,869] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 21:30:27,871] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 21:30:27,871] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 21:30:28,948] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 21:30:29,059] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 21:30:29,060] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 21:30:29,060] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 21:30:30,007] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 21:30:30,084] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 21:30:30,086] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 21:30:30,086] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 21:31:02,059] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 21:31:02,059] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 21:53:24,568] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 21:53:24,689] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 21:53:24,691] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 21:53:24,691] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 21:53:25,805] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 21:53:25,918] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 21:53:25,920] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 21:53:25,920] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 21:53:26,870] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 21:53:26,949] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 21:53:26,951] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 21:53:26,951] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 21:53:43,447] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 21:53:43,447] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-07-31 22:43:14,967] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 22:43:15,087] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 22:43:15,088] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 22:43:15,088] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 22:43:16,229] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 22:43:16,344] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 22:43:16,345] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 22:43:16,345] INFO apps.chat.apps: Chat app initialized successfully
+[2025-07-31 22:43:17,323] INFO apps.chat.apps: Chat signals registered successfully
+[2025-07-31 22:43:17,403] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-07-31 22:43:17,404] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-07-31 22:43:17,404] INFO apps.chat.apps: Chat app initialized successfully

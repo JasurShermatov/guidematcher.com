@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage';
 import Authentication from './auth/Authentication';
 import UserAccount from './account/UserAccount';
 import GuideAccount from './account/GuideAccount';
+import FindGuide from './menues/FindGuide'; // Yangi FindGuide komponenti import qilindi
 import { getCurrentUser } from './api/api';
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<Authentication setIsAuthenticated={setIsAuthenticated} setUser={setUser} />} />
             <Route path="/account" element={<AccountComponent />} />
+            <Route path="/find-guides" element={<FindGuide user={user} />} /> {/* Yangi marshrut */}
           </Routes>
         </main>
         <Footer />

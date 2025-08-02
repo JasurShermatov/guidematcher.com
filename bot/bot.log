@@ -30,3 +30,1009 @@
 2025-07-21 14:33:10,464 - aiogram.dispatcher - INFO - Polling stopped for bot @uzguidecombot id=7857439280 - 'Uzguide'
 2025-07-21 14:33:10,464 - aiogram.dispatcher - INFO - Polling stopped
 2025-07-21 14:33:10,717 - __main__ - INFO - Bot va barcha resurslar to'xtatildi
+2025-08-02 07:59:17,568 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-02 07:59:17,569 - __main__ - INFO - Bot ishga tushdi
+2025-08-02 07:59:17,569 - aiogram.dispatcher - INFO - Start polling
+2025-08-02 07:59:17,942 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - 'UzGuide'
+2025-08-02 07:59:18,074 - utils.database.db - ERROR - Error connecting to database: could not translate host name "postgres" to address: Name or service not known
+
+2025-08-02 07:59:18,074 - aiogram.event - INFO - Update id=943253387 is not handled. Duration 6 ms by bot id=7857439280
+2025-08-02 07:59:18,074 - aiogram.event - ERROR - Cause exception while process update id=943253387 by bot id=7857439280
+OperationalError: could not translate host name "postgres" to address: Name or service not known
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/app/handlers/users/main/start.py", line 25, in start_handler
+    await db.add_user(
+  File "/app/utils/database/db.py", line 172, in add_user
+    conn = await self.get_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/utils/database/db.py", line 20, in get_connection
+    conn = psycopg2.connect(
+           ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.OperationalError: could not translate host name "postgres" to address: Name or service not known
+
+2025-08-02 07:59:18,076 - aiogram.event - INFO - Update id=943253386 is not handled. Duration 8 ms by bot id=7857439280
+2025-08-02 08:04:21,760 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-02 08:04:21,760 - __main__ - INFO - Bot ishga tushdi
+2025-08-02 08:04:21,760 - aiogram.dispatcher - INFO - Start polling
+2025-08-02 08:04:22,191 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - 'UzGuide'
+2025-08-02 08:04:39,189 - utils.database.db - ERROR - Error connecting to database: could not translate host name "postgres" to address: Name or service not known
+
+2025-08-02 08:04:39,190 - aiogram.event - INFO - Update id=943253388 is not handled. Duration 9 ms by bot id=7857439280
+2025-08-02 08:04:39,190 - aiogram.event - ERROR - Cause exception while process update id=943253388 by bot id=7857439280
+OperationalError: could not translate host name "postgres" to address: Name or service not known
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/app/handlers/users/main/start.py", line 25, in start_handler
+    await db.add_user(
+  File "/app/utils/database/db.py", line 172, in add_user
+    conn = await self.get_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/utils/database/db.py", line 20, in get_connection
+    conn = psycopg2.connect(
+           ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.OperationalError: could not translate host name "postgres" to address: Name or service not known
+
+2025-08-02 08:04:40,679 - utils.database.db - ERROR - Error connecting to database: could not translate host name "postgres" to address: Name or service not known
+
+2025-08-02 08:04:40,679 - aiogram.event - INFO - Update id=943253389 is not handled. Duration 8 ms by bot id=7857439280
+2025-08-02 08:04:40,680 - aiogram.event - ERROR - Cause exception while process update id=943253389 by bot id=7857439280
+OperationalError: could not translate host name "postgres" to address: Name or service not known
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/app/handlers/users/main/start.py", line 25, in start_handler
+    await db.add_user(
+  File "/app/utils/database/db.py", line 172, in add_user
+    conn = await self.get_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/utils/database/db.py", line 20, in get_connection
+    conn = psycopg2.connect(
+           ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.OperationalError: could not translate host name "postgres" to address: Name or service not known
+
+2025-08-02 08:04:41,374 - utils.database.db - ERROR - Error connecting to database: could not translate host name "postgres" to address: Name or service not known
+
+2025-08-02 08:04:41,375 - aiogram.event - INFO - Update id=943253390 is not handled. Duration 8 ms by bot id=7857439280
+2025-08-02 08:04:41,375 - aiogram.event - ERROR - Cause exception while process update id=943253390 by bot id=7857439280
+OperationalError: could not translate host name "postgres" to address: Name or service not known
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/app/handlers/users/main/start.py", line 25, in start_handler
+    await db.add_user(
+  File "/app/utils/database/db.py", line 172, in add_user
+    conn = await self.get_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/utils/database/db.py", line 20, in get_connection
+    conn = psycopg2.connect(
+           ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.OperationalError: could not translate host name "postgres" to address: Name or service not known
+
+2025-08-02 08:04:41,969 - utils.database.db - ERROR - Error connecting to database: could not translate host name "postgres" to address: Name or service not known
+
+2025-08-02 08:04:41,970 - aiogram.event - INFO - Update id=943253391 is not handled. Duration 8 ms by bot id=7857439280
+2025-08-02 08:04:41,970 - aiogram.event - ERROR - Cause exception while process update id=943253391 by bot id=7857439280
+OperationalError: could not translate host name "postgres" to address: Name or service not known
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/app/handlers/users/main/start.py", line 25, in start_handler
+    await db.add_user(
+  File "/app/utils/database/db.py", line 172, in add_user
+    conn = await self.get_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/utils/database/db.py", line 20, in get_connection
+    conn = psycopg2.connect(
+           ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.OperationalError: could not translate host name "postgres" to address: Name or service not known
+
+2025-08-02 08:04:42,449 - utils.database.db - ERROR - Error connecting to database: could not translate host name "postgres" to address: Name or service not known
+
+2025-08-02 08:04:42,449 - aiogram.event - INFO - Update id=943253392 is not handled. Duration 11 ms by bot id=7857439280
+2025-08-02 08:04:42,450 - aiogram.event - ERROR - Cause exception while process update id=943253392 by bot id=7857439280
+OperationalError: could not translate host name "postgres" to address: Name or service not known
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/app/handlers/users/main/start.py", line 25, in start_handler
+    await db.add_user(
+  File "/app/utils/database/db.py", line 172, in add_user
+    conn = await self.get_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/utils/database/db.py", line 20, in get_connection
+    conn = psycopg2.connect(
+           ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.OperationalError: could not translate host name "postgres" to address: Name or service not known
+
+2025-08-02 08:04:43,180 - utils.database.db - ERROR - Error connecting to database: could not translate host name "postgres" to address: Name or service not known
+
+2025-08-02 08:04:43,180 - aiogram.event - INFO - Update id=943253393 is not handled. Duration 11 ms by bot id=7857439280
+2025-08-02 08:04:43,181 - aiogram.event - ERROR - Cause exception while process update id=943253393 by bot id=7857439280
+OperationalError: could not translate host name "postgres" to address: Name or service not known
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/app/handlers/users/main/start.py", line 25, in start_handler
+    await db.add_user(
+  File "/app/utils/database/db.py", line 172, in add_user
+    conn = await self.get_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/utils/database/db.py", line 20, in get_connection
+    conn = psycopg2.connect(
+           ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.OperationalError: could not translate host name "postgres" to address: Name or service not known
+
+2025-08-02 08:12:03,087 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-02 08:12:03,087 - __main__ - INFO - Bot ishga tushdi
+2025-08-02 08:12:03,087 - aiogram.dispatcher - INFO - Start polling
+2025-08-02 08:12:03,412 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - 'UzGuide'
+2025-08-02 08:12:27,635 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:12:27,636 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 08:12:27,638 - utils.database.db - ERROR - Error adding user 5006482590: relation "users" does not exist
+LINE 2:                 INSERT INTO users (
+                                    ^
+
+2025-08-02 08:12:27,639 - aiogram.event - INFO - Update id=943253394 is not handled. Duration 22 ms by bot id=7857439280
+2025-08-02 08:12:27,640 - aiogram.event - ERROR - Cause exception while process update id=943253394 by bot id=7857439280
+UndefinedTable: relation "users" does not exist
+LINE 2:                 INSERT INTO users (
+                                    ^
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/app/handlers/users/main/start.py", line 25, in start_handler
+    await db.add_user(
+  File "/app/utils/database/db.py", line 203, in add_user
+    cur.execute(
+psycopg2.errors.UndefinedTable: relation "users" does not exist
+LINE 2:                 INSERT INTO users (
+                                    ^
+
+2025-08-02 08:12:29,753 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:12:29,754 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 08:12:29,755 - utils.database.db - ERROR - Error adding user 5006482590: relation "users" does not exist
+LINE 2:                 INSERT INTO users (
+                                    ^
+
+2025-08-02 08:12:29,756 - aiogram.event - INFO - Update id=943253395 is not handled. Duration 17 ms by bot id=7857439280
+2025-08-02 08:12:29,757 - aiogram.event - ERROR - Cause exception while process update id=943253395 by bot id=7857439280
+UndefinedTable: relation "users" does not exist
+LINE 2:                 INSERT INTO users (
+                                    ^
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/app/handlers/users/main/start.py", line 25, in start_handler
+    await db.add_user(
+  File "/app/utils/database/db.py", line 203, in add_user
+    cur.execute(
+psycopg2.errors.UndefinedTable: relation "users" does not exist
+LINE 2:                 INSERT INTO users (
+                                    ^
+
+2025-08-02 08:12:30,249 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:12:30,249 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 08:12:30,251 - utils.database.db - ERROR - Error adding user 5006482590: relation "users" does not exist
+LINE 2:                 INSERT INTO users (
+                                    ^
+
+2025-08-02 08:12:30,252 - aiogram.event - INFO - Update id=943253396 is not handled. Duration 17 ms by bot id=7857439280
+2025-08-02 08:12:30,252 - aiogram.event - ERROR - Cause exception while process update id=943253396 by bot id=7857439280
+UndefinedTable: relation "users" does not exist
+LINE 2:                 INSERT INTO users (
+                                    ^
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/app/handlers/users/main/start.py", line 25, in start_handler
+    await db.add_user(
+  File "/app/utils/database/db.py", line 203, in add_user
+    cur.execute(
+psycopg2.errors.UndefinedTable: relation "users" does not exist
+LINE 2:                 INSERT INTO users (
+                                    ^
+
+2025-08-02 08:12:32,658 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:12:32,658 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 08:12:32,659 - utils.database.db - ERROR - Error adding user 5006482590: relation "users" does not exist
+LINE 2:                 INSERT INTO users (
+                                    ^
+
+2025-08-02 08:12:32,660 - aiogram.event - INFO - Update id=943253397 is not handled. Duration 15 ms by bot id=7857439280
+2025-08-02 08:12:32,660 - aiogram.event - ERROR - Cause exception while process update id=943253397 by bot id=7857439280
+UndefinedTable: relation "users" does not exist
+LINE 2:                 INSERT INTO users (
+                                    ^
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/middlewares/user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/fsm/middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/aiogram/dispatcher/event/handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "/app/handlers/users/main/start.py", line 25, in start_handler
+    await db.add_user(
+  File "/app/utils/database/db.py", line 203, in add_user
+    cur.execute(
+psycopg2.errors.UndefinedTable: relation "users" does not exist
+LINE 2:                 INSERT INTO users (
+                                    ^
+
+2025-08-02 08:39:30,199 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-02 08:39:30,199 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-02 08:39:30,209 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-02 08:39:30,213 - utils.database.db_init - INFO - Creating 'users' table...
+2025-08-02 08:39:30,221 - utils.database.db_init - INFO - 'users' table created successfully!
+2025-08-02 08:39:30,221 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-02 08:39:30,223 - utils.database.db_init - INFO - Creating 'subscription' table...
+2025-08-02 08:39:30,227 - utils.database.db_init - INFO - 'subscription' table created successfully!
+2025-08-02 08:39:30,228 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-02 08:39:30,228 - utils.database.db_init - INFO - Database connection closed
+2025-08-02 08:39:30,244 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-02 08:39:30,244 - __main__ - INFO - Bot ishga tushdi
+2025-08-02 08:39:30,245 - aiogram.dispatcher - INFO - Start polling
+2025-08-02 08:39:30,579 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - 'UzGuide'
+2025-08-02 08:39:45,827 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:39:45,827 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 08:39:45,834 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 1
+2025-08-02 08:39:46,232 - aiogram.event - INFO - Update id=943253398 is handled. Duration 424 ms by bot id=7857439280
+2025-08-02 08:39:49,334 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:39:49,334 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 08:39:49,337 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 1
+2025-08-02 08:39:49,511 - aiogram.event - INFO - Update id=943253399 is handled. Duration 191 ms by bot id=7857439280
+2025-08-02 08:39:51,154 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:39:51,154 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 08:39:51,157 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 1
+2025-08-02 08:39:51,305 - aiogram.event - INFO - Update id=943253400 is handled. Duration 165 ms by bot id=7857439280
+2025-08-02 08:40:45,188 - aiogram.event - INFO - Update id=943253401 is handled. Duration 198 ms by bot id=7857439280
+2025-08-02 08:40:46,933 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:40:46,936 - utils.database.db - DEBUG - Total active users count: 1
+2025-08-02 08:40:46,944 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:40:46,946 - utils.database.db - DEBUG - Users count for date 2025-08-02: 1
+2025-08-02 08:40:46,953 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:40:46,955 - utils.database.db - DEBUG - Users count for date 2025-08-02: 1
+2025-08-02 08:40:46,962 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:40:46,964 - utils.database.db - DEBUG - Users count for date 2025-08-01: 0
+2025-08-02 08:40:46,971 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:40:46,973 - utils.database.db - DEBUG - Users count for date 2025-07-31: 0
+2025-08-02 08:40:46,979 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:40:46,981 - utils.database.db - DEBUG - Users count for date 2025-07-30: 0
+2025-08-02 08:40:46,986 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:40:46,988 - utils.database.db - DEBUG - Users count for date 2025-07-29: 0
+2025-08-02 08:40:46,993 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:40:46,995 - utils.database.db - DEBUG - Users count for date 2025-07-28: 0
+2025-08-02 08:40:47,000 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:40:47,001 - utils.database.db - DEBUG - Users count for date 2025-07-27: 0
+2025-08-02 08:40:47,146 - aiogram.event - INFO - Update id=943253402 is handled. Duration 232 ms by bot id=7857439280
+2025-08-02 08:40:49,346 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:40:49,347 - utils.database.db - DEBUG - Executing query: 
+                SELECT * FROM users 
+                WHERE is_active = TRUE 
+                ORDER BY created_at DESC
+            
+2025-08-02 08:40:49,350 - utils.database.db - DEBUG - Found 1 active users
+2025-08-02 08:40:49,351 - utils.database.db - DEBUG - Sample user data - ID: 5006482590, Username: shermatov_jasur, Active: True
+2025-08-02 08:40:49,489 - aiogram.event - INFO - Update id=943253403 is handled. Duration 406 ms by bot id=7857439280
+2025-08-02 08:40:54,521 - aiogram.event - INFO - Update id=943253404 is handled. Duration 134 ms by bot id=7857439280
+2025-08-02 08:40:57,899 - aiogram.event - INFO - Update id=943253405 is handled. Duration 158 ms by bot id=7857439280
+2025-08-02 08:41:00,347 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:41:00,608 - aiogram.event - INFO - Update id=943253406 is handled. Duration 273 ms by bot id=7857439280
+2025-08-02 08:41:03,648 - aiogram.event - INFO - Update id=943253407 is handled. Duration 123 ms by bot id=7857439280
+2025-08-02 08:41:06,308 - aiogram.event - INFO - Update id=943253408 is handled. Duration 174 ms by bot id=7857439280
+2025-08-02 08:50:18,588 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-02 08:50:18,588 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-02 08:50:18,601 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-02 08:50:18,607 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-02 08:50:18,607 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-02 08:50:18,608 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-02 08:50:18,609 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-02 08:50:18,609 - utils.database.db_init - INFO - Database connection closed
+2025-08-02 08:50:18,625 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-02 08:50:18,625 - __main__ - INFO - Bot ishga tushdi
+2025-08-02 08:50:18,626 - aiogram.dispatcher - INFO - Start polling
+2025-08-02 08:50:19,132 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - 'UzGuide'
+2025-08-02 08:50:19,258 - aiogram.event - INFO - Update id=943253409 is not handled. Duration 0 ms by bot id=7857439280
+2025-08-02 08:51:24,336 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:51:24,338 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 08:51:24,344 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 1
+2025-08-02 08:51:24,757 - aiogram.event - INFO - Update id=943253410 is handled. Duration 439 ms by bot id=7857439280
+2025-08-02 08:56:34,566 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-02 08:56:34,566 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-02 08:56:34,574 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-02 08:56:34,580 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-02 08:56:34,580 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-02 08:56:34,581 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-02 08:56:34,582 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-02 08:56:34,582 - utils.database.db_init - INFO - Database connection closed
+2025-08-02 08:56:34,599 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-02 08:56:34,599 - __main__ - INFO - Bot ishga tushdi
+2025-08-02 08:56:34,599 - aiogram.dispatcher - INFO - Start polling
+2025-08-02 08:56:34,937 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - 'UzGuide'
+2025-08-02 08:56:35,071 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:56:35,085 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:56:35,087 - utils.database.db - DEBUG - Total active users count: 1
+2025-08-02 08:56:35,094 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:56:35,097 - utils.database.db - DEBUG - Users count for date 2025-08-02: 1
+2025-08-02 08:56:35,103 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:56:35,104 - utils.database.db - DEBUG - Users count for date 2025-08-02: 1
+2025-08-02 08:56:35,110 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:56:35,112 - utils.database.db - DEBUG - Users count for date 2025-08-01: 0
+2025-08-02 08:56:35,117 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:56:35,118 - utils.database.db - DEBUG - Users count for date 2025-07-31: 0
+2025-08-02 08:56:35,124 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:56:35,125 - utils.database.db - DEBUG - Users count for date 2025-07-30: 0
+2025-08-02 08:56:35,131 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:56:35,133 - utils.database.db - DEBUG - Users count for date 2025-07-29: 0
+2025-08-02 08:56:35,138 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:56:35,140 - utils.database.db - DEBUG - Users count for date 2025-07-28: 0
+2025-08-02 08:56:35,146 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 08:56:35,148 - utils.database.db - DEBUG - Users count for date 2025-07-27: 0
+2025-08-02 08:56:35,429 - aiogram.event - INFO - Update id=943253412 is handled. Duration 373 ms by bot id=7857439280
+2025-08-02 08:56:35,448 - aiogram.event - INFO - Update id=943253411 is handled. Duration 392 ms by bot id=7857439280
+2025-08-02 08:56:35,467 - aiogram.event - INFO - Update id=943253413 is handled. Duration 409 ms by bot id=7857439280
+2025-08-02 08:56:35,503 - aiogram.event - INFO - Update id=943253414 is handled. Duration 446 ms by bot id=7857439280
+2025-08-02 08:56:40,346 - aiogram.event - INFO - Update id=943253415 is handled. Duration 173 ms by bot id=7857439280
+2025-08-02 09:03:52,845 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:03:53,013 - aiogram.event - INFO - Update id=943253416 is handled. Duration 186 ms by bot id=7857439280
+2025-08-02 09:05:15,092 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:05:15,353 - aiogram.event - INFO - Update id=943253417 is handled. Duration 274 ms by bot id=7857439280
+2025-08-02 09:05:20,284 - aiogram.event - INFO - Update id=943253418 is handled. Duration 151 ms by bot id=7857439280
+2025-08-02 09:05:33,632 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:05:33,931 - aiogram.event - INFO - Update id=943253419 is handled. Duration 312 ms by bot id=7857439280
+2025-08-02 09:05:47,815 - aiogram.event - INFO - Update id=943253420 is not handled. Duration 3 ms by bot id=7857439280
+2025-08-02 09:05:53,752 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:05:53,887 - aiogram.event - INFO - Update id=943253421 is handled. Duration 149 ms by bot id=7857439280
+2025-08-02 09:05:58,979 - aiogram.event - INFO - Update id=943253422 is handled. Duration 135 ms by bot id=7857439280
+2025-08-02 09:06:06,939 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:06:07,099 - aiogram.event - INFO - Update id=943253423 is handled. Duration 171 ms by bot id=7857439280
+2025-08-02 09:06:11,569 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:06:11,721 - aiogram.event - INFO - Update id=943253424 is handled. Duration 165 ms by bot id=7857439280
+2025-08-02 09:06:12,747 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:06:12,890 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:06:13,036 - aiogram.event - INFO - Update id=943253425 is handled. Duration 306 ms by bot id=7857439280
+2025-08-02 09:06:15,854 - aiogram.event - INFO - Update id=943253426 is handled. Duration 153 ms by bot id=7857439280
+2025-08-02 09:06:21,740 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:06:21,868 - aiogram.event - INFO - Update id=943253427 is handled. Duration 142 ms by bot id=7857439280
+2025-08-02 09:06:23,299 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:06:23,554 - aiogram.event - INFO - Update id=943253428 is handled. Duration 268 ms by bot id=7857439280
+2025-08-02 09:08:01,134 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:08:01,140 - utils.database.db - DEBUG - Total active users count: 1
+2025-08-02 09:08:01,150 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:08:01,153 - utils.database.db - DEBUG - Users count for date 2025-08-02: 1
+2025-08-02 09:08:01,161 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:08:01,163 - utils.database.db - DEBUG - Users count for date 2025-08-02: 1
+2025-08-02 09:08:01,171 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:08:01,173 - utils.database.db - DEBUG - Users count for date 2025-08-01: 0
+2025-08-02 09:08:01,184 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:08:01,186 - utils.database.db - DEBUG - Users count for date 2025-07-31: 0
+2025-08-02 09:08:01,196 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:08:01,199 - utils.database.db - DEBUG - Users count for date 2025-07-30: 0
+2025-08-02 09:08:01,206 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:08:01,209 - utils.database.db - DEBUG - Users count for date 2025-07-29: 0
+2025-08-02 09:08:01,215 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:08:01,217 - utils.database.db - DEBUG - Users count for date 2025-07-28: 0
+2025-08-02 09:08:01,223 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:08:01,225 - utils.database.db - DEBUG - Users count for date 2025-07-27: 0
+2025-08-02 09:08:01,361 - aiogram.event - INFO - Update id=943253429 is handled. Duration 246 ms by bot id=7857439280
+2025-08-02 09:08:13,669 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:08:13,669 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:08:13,674 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:08:13,993 - aiogram.event - INFO - Update id=943253430 is handled. Duration 338 ms by bot id=7857439280
+2025-08-02 09:08:24,333 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:08:24,333 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:08:24,336 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:08:24,626 - aiogram.event - INFO - Update id=943253431 is handled. Duration 304 ms by bot id=7857439280
+2025-08-02 09:10:17,645 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-02 09:10:17,645 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-02 09:10:17,675 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-02 09:10:17,680 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-02 09:10:17,680 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-02 09:10:17,681 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-02 09:10:17,682 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-02 09:10:17,682 - utils.database.db_init - INFO - Database connection closed
+2025-08-02 09:10:17,699 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-02 09:10:17,699 - __main__ - INFO - Bot ishga tushdi
+2025-08-02 09:10:17,700 - aiogram.dispatcher - INFO - Start polling
+2025-08-02 09:10:18,023 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - 'UzGuide'
+2025-08-02 09:10:18,169 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:10:18,170 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:10:18,175 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:10:18,677 - aiogram.event - INFO - Update id=943253432 is handled. Duration 520 ms by bot id=7857439280
+2025-08-02 09:10:21,206 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:10:21,206 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:10:21,210 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:10:21,455 - aiogram.event - INFO - Update id=943253433 is handled. Duration 260 ms by bot id=7857439280
+2025-08-02 09:10:32,049 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:10:32,049 - utils.database.db - DEBUG - Adding/Updating user - ID: 6091398928, Username: sarvarshermatov09
+2025-08-02 09:10:32,052 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 9
+2025-08-02 09:10:32,526 - aiogram.event - INFO - Update id=943253434 is handled. Duration 490 ms by bot id=7857439280
+2025-08-02 09:11:28,631 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:11:28,635 - utils.database.db - DEBUG - Total active users count: 3
+2025-08-02 09:11:28,644 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:11:28,647 - utils.database.db - DEBUG - Users count for date 2025-08-02: 3
+2025-08-02 09:11:28,661 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:11:28,664 - utils.database.db - DEBUG - Users count for date 2025-08-02: 3
+2025-08-02 09:11:28,671 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:11:28,673 - utils.database.db - DEBUG - Users count for date 2025-08-01: 0
+2025-08-02 09:11:28,680 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:11:28,682 - utils.database.db - DEBUG - Users count for date 2025-07-31: 0
+2025-08-02 09:11:28,689 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:11:28,691 - utils.database.db - DEBUG - Users count for date 2025-07-30: 0
+2025-08-02 09:11:28,696 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:11:28,698 - utils.database.db - DEBUG - Users count for date 2025-07-29: 0
+2025-08-02 09:11:28,703 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:11:28,704 - utils.database.db - DEBUG - Users count for date 2025-07-28: 0
+2025-08-02 09:11:28,710 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:11:28,711 - utils.database.db - DEBUG - Users count for date 2025-07-27: 0
+2025-08-02 09:11:28,840 - aiogram.event - INFO - Update id=943253435 is handled. Duration 409 ms by bot id=7857439280
+2025-08-02 09:11:31,712 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:11:31,713 - utils.database.db - DEBUG - Executing query: 
+                SELECT * FROM users 
+                WHERE is_active = TRUE 
+                ORDER BY created_at DESC
+            
+2025-08-02 09:11:31,717 - utils.database.db - DEBUG - Found 3 active users
+2025-08-02 09:11:31,717 - utils.database.db - DEBUG - Sample user data - ID: 6091398928, Username: sarvarshermatov09, Active: True
+2025-08-02 09:11:31,718 - utils.database.db - DEBUG - Sample user data - ID: 7963011841, Username: None, Active: True
+2025-08-02 09:11:31,718 - utils.database.db - DEBUG - Sample user data - ID: 5006482590, Username: shermatov_jasur, Active: True
+2025-08-02 09:11:31,900 - aiogram.event - INFO - Update id=943253436 is handled. Duration 454 ms by bot id=7857439280
+2025-08-02 09:11:50,511 - aiogram.event - INFO - Update id=943253437 is handled. Duration 301 ms by bot id=7857439280
+2025-08-02 09:11:58,615 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:11:58,616 - utils.database.db - DEBUG - Executing query: 
+                SELECT * FROM users 
+                WHERE is_active = TRUE 
+                ORDER BY created_at DESC
+            
+2025-08-02 09:11:58,619 - utils.database.db - DEBUG - Found 3 active users
+2025-08-02 09:11:58,619 - utils.database.db - DEBUG - Sample user data - ID: 6091398928, Username: sarvarshermatov09, Active: True
+2025-08-02 09:11:58,619 - utils.database.db - DEBUG - Sample user data - ID: 7963011841, Username: None, Active: True
+2025-08-02 09:11:58,620 - utils.database.db - DEBUG - Sample user data - ID: 5006482590, Username: shermatov_jasur, Active: True
+2025-08-02 09:11:59,453 - aiogram.event - INFO - Update id=943253438 is handled. Duration 969 ms by bot id=7857439280
+2025-08-02 09:19:07,219 - aiogram.event - INFO - Update id=943253439 is handled. Duration 436 ms by bot id=7857439280
+2025-08-02 09:19:24,841 - aiogram.event - INFO - Update id=943253440 is handled. Duration 234 ms by bot id=7857439280
+2025-08-02 09:19:27,949 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:19:28,121 - aiogram.event - INFO - Update id=943253441 is handled. Duration 303 ms by bot id=7857439280
+2025-08-02 09:19:29,598 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:19:29,794 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:19:30,008 - aiogram.event - INFO - Update id=943253442 is handled. Duration 558 ms by bot id=7857439280
+2025-08-02 09:19:32,040 - aiogram.event - INFO - Update id=943253443 is handled. Duration 139 ms by bot id=7857439280
+2025-08-02 09:19:34,434 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:19:34,571 - aiogram.event - INFO - Update id=943253444 is handled. Duration 151 ms by bot id=7857439280
+2025-08-02 09:19:50,200 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:19:50,201 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 09:19:50,203 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 1
+2025-08-02 09:19:50,437 - aiogram.event - INFO - Update id=943253445 is handled. Duration 246 ms by bot id=7857439280
+2025-08-02 09:19:57,464 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:19:57,464 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:19:57,468 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:19:57,732 - aiogram.event - INFO - Update id=943253446 is handled. Duration 284 ms by bot id=7857439280
+2025-08-02 09:19:59,151 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:19:59,151 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:19:59,155 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:19:59,556 - aiogram.event - INFO - Update id=943253447 is handled. Duration 424 ms by bot id=7857439280

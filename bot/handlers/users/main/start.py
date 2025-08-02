@@ -3,6 +3,7 @@ from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 
+from handlers.users.admin.admin import get_main_keyboard
 from utils.database.db import DataBase
 from keyboards.inline.user import get_channel_keyboard
 from data.config import load_config
@@ -70,4 +71,11 @@ async def check_subscription_handler(callback: CallbackQuery):
 
 
 async def show_main_menu(message: Message):
-    await message.answer("assalomu alaykum hush kelipsiz")
+    await message.answer(
+        "Assalomu alaykum!\n\n"
+        "Siz *UzGuide* platformasining rasmiy Telegram botiga xush kelibsiz.\n"
+        "Bu yerda siz o‘zingizga mos xizmat ko‘rsatuvchilarni topishingiz, ularni baholashingiz va aloqaga chiqishingiz mumkin.\n\n"
+        "Pastdagi tugmani bosing:",
+        reply_markup=get_main_keyboard(),
+        parse_mode="Markdown",
+    )

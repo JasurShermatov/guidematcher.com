@@ -7,6 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+# Zaruriy tizim paketlarini o'rnatish
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       gcc \
@@ -16,15 +17,15 @@ RUN apt-get update \
       curl \
  && rm -rf /var/lib/apt/lists/*
 
+# Python kutubxonalarini o'rnatish
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
+# Loyihani konteynerga nusxalash
 COPY . .
 
-COPY runner.sh .
-
+# Shell faylni ishga tushirish uchun ruxsat berish
 RUN chmod +x runner.sh
 
-
-
+# Botni ishga tushirish
 CMD ["./runner.sh"]

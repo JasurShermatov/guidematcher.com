@@ -34,24 +34,24 @@ logging.basicConfig(
 def setup_handlers(dp: Dispatcher):
     """Barcha handlerlarni ulash va middleware'ni qo'shish"""
     # Middleware'ni barcha routerlarga qo'shish
-    # middleware = CheckSubscriptionMiddleware()
-    #
-    # # Admin router uchun middleware
-    # admin_router.message.middleware(middleware)
-    # admin_router.callback_query.middleware(middleware)
-    #
-    # # Start router uchun middleware
-    # start_router.message.middleware(middleware)
-    # start_router.callback_query.middleware(middleware)
-    #
-    # # Admin spams router uchun middleware
-    # admin_spams_router.message.middleware(middleware)
-    # admin_spams_router.callback_query.middleware(middleware)
+    middleware = CheckSubscriptionMiddleware()
+
+    # Admin router uchun middleware
+    admin_router.message.middleware(middleware)
+    admin_router.callback_query.middleware(middleware)
+
+    # Start router uchun middleware
+    start_router.message.middleware(middleware)
+    start_router.callback_query.middleware(middleware)
+
+    # Admin spams router uchun middleware
+    admin_spams_router.message.middleware(middleware)
+    admin_spams_router.callback_query.middleware(middleware)
 
     # Routerlarni Dispatcher'ga ulash
     dp.include_router(admin_router)
-    # dp.include_router(start_router)
-    # dp.include_router(admin_spams_router)
+    dp.include_router(start_router)
+    dp.include_router(admin_spams_router)
 
     logger.info("Barcha handlerlar va middleware'lar ulandi")
 
@@ -59,7 +59,9 @@ def setup_handlers(dp: Dispatcher):
 async def main():
     # Configni yuklash
     config = load_config()
-    # await init_db()
+
+    # 🔧 Jadvalni yaratish yoki mavjudligini tekshirish
+    await init_db()
 
     # Bot va Dispatcher yaratish
     bot = Bot(
@@ -77,7 +79,6 @@ async def main():
     except Exception as e:
         logger.error(f"Bot ishga tushishida xatolik: {e}")
     finally:
-        # Bot to'xtaganda barcha resurslarni yopish
         await bot.session.close()
         logger.info("Bot va barcha resurslar to'xtatildi")
 

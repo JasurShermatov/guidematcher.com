@@ -13,9 +13,10 @@ from data.config import load_config
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from filters.admin import AdminFilter
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from keyboards.inline.channel_actions import get_delete_channel_keyboard
-from aiogram.types import WebAppInfo
+
+
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
 
 def get_main_keyboard():
@@ -23,10 +24,10 @@ def get_main_keyboard():
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="🌐 UzGuide",
-                    web_app=WebAppInfo(url="https://translate.google.com"),
+                    text="🌐 Web App ni ochish",
+                    web_app=WebAppInfo(url="https://google.com"),
                 )
-            ],
+            ]
         ]
     )
     return keyboard
@@ -46,7 +47,12 @@ class ChannelStates(StatesGroup):
 
 @router.message(F.text == "webapp")
 async def webapp_handler(message: Message):
-    await message.answer("Kiring", reply_markup=get_main_keyboard())
+    await message.answer(
+        "🔗 Sizni UzGuide veb-ilovasiga yo‘naltiramiz.\n"
+        "U yerda siz batafsil xizmatlar, foydalanuvchi profillari va boshqa imkoniyatlardan foydalanishingiz mumkin.\n\n"
+        "Iltimos, quyidagi tugma orqali veb platformamizga o‘ting.",
+        reply_markup=get_main_keyboard(),
+    )
 
 
 # 📌 Admin panel

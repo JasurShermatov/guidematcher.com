@@ -45,8 +45,29 @@ class ChannelStates(StatesGroup):
     delete_channel = State()
 
 
+def get_subscription_keyboard():
+    pass
+
+
 @router.message(F.text == "webapp")
 async def webapp_handler(message: Message):
+    # Kanal a'zoliklarini tekshir
+    unsubscribed = await check_user_subscription(message.from_user.id)
+
+    if unsubscribed:
+        text = "ℹ️ Iltimos, quyidagi kanallarga obuna bo‘ling:\n"
+        for channel in unsubscribed:
+            text += f"👉 <a href='{channel['link']}'>{channel['title']}</a>\n"
+        text += "\n✅ Obuna bo‘lganingizdan so‘ng, '✅ Obuna bo‘ldim' tugmasini bosing."
+        await message.answer(
+            text,
+            reply_markup=get_subscription_keyboard(),
+            parse_mode="HTML",
+            disable_web_page_preview=True,
+        )
+        return
+
+    # Agar foydalanuvchi hamma kanalga a’zo bo‘lsa
     await message.answer(
         "🔗 Sizni UzGuide veb-ilovasiga yo‘naltiramiz.\n"
         "U yerda siz batafsil xizmatlar, foydalanuvchi profillari va boshqa imkoniyatlardan foydalanishingiz mumkin.\n\n"

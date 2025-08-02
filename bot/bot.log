@@ -1036,3 +1036,137 @@ LINE 2:                 INSERT INTO users (
 2025-08-02 09:19:59,151 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
 2025-08-02 09:19:59,155 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
 2025-08-02 09:19:59,556 - aiogram.event - INFO - Update id=943253447 is handled. Duration 424 ms by bot id=7857439280
+2025-08-02 09:25:31,399 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-02 09:25:31,400 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-02 09:25:31,414 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-02 09:25:31,422 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-02 09:25:31,423 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-02 09:25:31,424 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-02 09:25:31,425 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-02 09:25:31,425 - utils.database.db_init - INFO - Database connection closed
+2025-08-02 09:25:31,442 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-02 09:25:31,442 - __main__ - INFO - Bot ishga tushdi
+2025-08-02 09:25:31,443 - aiogram.dispatcher - INFO - Start polling
+2025-08-02 09:25:31,761 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - 'UzGuide'
+2025-08-02 09:25:38,200 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:25:38,201 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 09:25:38,214 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 1
+2025-08-02 09:25:38,718 - aiogram.event - INFO - Update id=943253448 is handled. Duration 532 ms by bot id=7857439280
+2025-08-02 09:25:52,323 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:25:52,327 - utils.database.db - DEBUG - Total active users count: 3
+2025-08-02 09:25:52,334 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:25:52,337 - utils.database.db - DEBUG - Users count for date 2025-08-02: 3
+2025-08-02 09:25:52,344 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:25:52,347 - utils.database.db - DEBUG - Users count for date 2025-08-02: 3
+2025-08-02 09:25:52,354 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:25:52,355 - utils.database.db - DEBUG - Users count for date 2025-08-01: 0
+2025-08-02 09:25:52,362 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:25:52,364 - utils.database.db - DEBUG - Users count for date 2025-07-31: 0
+2025-08-02 09:25:52,370 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:25:52,372 - utils.database.db - DEBUG - Users count for date 2025-07-30: 0
+2025-08-02 09:25:52,377 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:25:52,380 - utils.database.db - DEBUG - Users count for date 2025-07-29: 0
+2025-08-02 09:25:52,385 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:25:52,387 - utils.database.db - DEBUG - Users count for date 2025-07-28: 0
+2025-08-02 09:25:52,395 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:25:52,397 - utils.database.db - DEBUG - Users count for date 2025-07-27: 0
+2025-08-02 09:25:52,618 - aiogram.event - INFO - Update id=943253449 is handled. Duration 442 ms by bot id=7857439280
+2025-08-02 09:33:59,399 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:33:59,401 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:33:59,406 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:33:59,748 - aiogram.event - INFO - Update id=943253450 is handled. Duration 371 ms by bot id=7857439280
+2025-08-02 09:34:06,970 - aiogram.event - INFO - Update id=943253451 is handled. Duration 571 ms by bot id=7857439280
+2025-08-02 09:34:55,695 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:34:55,854 - aiogram.event - INFO - Update id=943253452 is handled. Duration 304 ms by bot id=7857439280
+2025-08-02 09:34:57,131 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:34:57,276 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:34:57,407 - aiogram.event - INFO - Update id=943253453 is handled. Duration 398 ms by bot id=7857439280
+2025-08-02 09:35:03,266 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:35:03,393 - aiogram.event - INFO - Update id=943253454 is handled. Duration 141 ms by bot id=7857439280
+2025-08-02 09:35:07,775 - aiogram.event - INFO - Update id=943253455 is not handled. Duration 2 ms by bot id=7857439280
+2025-08-02 09:35:39,038 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:35:39,039 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 09:35:39,042 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 1
+2025-08-02 09:35:39,193 - aiogram.event - INFO - Update id=943253456 is handled. Duration 166 ms by bot id=7857439280
+2025-08-02 09:35:57,848 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:35:57,849 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:35:57,852 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:35:57,998 - aiogram.event - INFO - Update id=943253457 is handled. Duration 164 ms by bot id=7857439280
+2025-08-02 09:36:04,663 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:36:04,664 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:36:04,668 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:36:05,000 - aiogram.event - INFO - Update id=943253458 is handled. Duration 355 ms by bot id=7857439280
+2025-08-02 09:36:39,821 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:36:39,822 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:36:39,826 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:36:39,960 - aiogram.event - INFO - Update id=943253459 is handled. Duration 152 ms by bot id=7857439280
+2025-08-02 09:36:41,370 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:36:41,370 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:36:41,374 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:36:41,497 - aiogram.event - INFO - Update id=943253460 is handled. Duration 143 ms by bot id=7857439280
+2025-08-02 09:37:01,526 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:37:01,527 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:37:01,530 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:37:01,659 - aiogram.event - INFO - Update id=943253461 is handled. Duration 149 ms by bot id=7857439280
+2025-08-02 09:37:02,965 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:37:02,965 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:37:02,968 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:37:03,104 - aiogram.event - INFO - Update id=943253462 is handled. Duration 153 ms by bot id=7857439280
+2025-08-02 09:41:19,762 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:41:19,764 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 09:41:19,769 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 1
+2025-08-02 09:41:19,905 - aiogram.event - INFO - Update id=943253463 is handled. Duration 168 ms by bot id=7857439280
+2025-08-02 09:41:33,973 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:41:33,974 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 09:41:33,977 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 1
+2025-08-02 09:41:34,228 - aiogram.event - INFO - Update id=943253464 is handled. Duration 266 ms by bot id=7857439280
+2025-08-02 09:43:13,774 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:43:13,776 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 09:43:13,781 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 1
+2025-08-02 09:43:13,956 - aiogram.event - INFO - Update id=943253465 is handled. Duration 202 ms by bot id=7857439280
+2025-08-02 09:43:44,929 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:43:44,930 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 09:43:44,933 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 1
+2025-08-02 09:43:45,056 - aiogram.event - INFO - Update id=943253466 is handled. Duration 140 ms by bot id=7857439280
+2025-08-02 09:48:44,993 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:48:44,995 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:48:44,999 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:48:45,141 - aiogram.event - INFO - Update id=943253467 is handled. Duration 165 ms by bot id=7857439280
+2025-08-02 09:49:02,792 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:49:02,792 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:49:02,795 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:49:02,928 - aiogram.event - INFO - Update id=943253468 is handled. Duration 143 ms by bot id=7857439280
+2025-08-02 09:49:10,484 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:49:10,485 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:49:10,489 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:49:10,660 - aiogram.event - INFO - Update id=943253469 is handled. Duration 191 ms by bot id=7857439280
+2025-08-02 09:50:34,629 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-02 09:50:34,629 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-02 09:50:34,640 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-02 09:50:34,645 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-02 09:50:34,645 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-02 09:50:34,646 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-02 09:50:34,646 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-02 09:50:34,646 - utils.database.db_init - INFO - Database connection closed
+2025-08-02 09:50:34,664 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-02 09:50:34,664 - __main__ - INFO - Bot ishga tushdi
+2025-08-02 09:50:34,664 - aiogram.dispatcher - INFO - Start polling
+2025-08-02 09:50:34,994 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - 'UzGuide'
+2025-08-02 09:51:07,449 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:51:07,450 - utils.database.db - DEBUG - Adding/Updating user - ID: 5006482590, Username: shermatov_jasur
+2025-08-02 09:51:07,455 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 1
+2025-08-02 09:51:07,841 - aiogram.event - INFO - Update id=943253470 is handled. Duration 404 ms by bot id=7857439280
+2025-08-02 09:51:14,967 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:51:14,968 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:51:14,973 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:51:15,103 - aiogram.event - INFO - Update id=943253471 is handled. Duration 151 ms by bot id=7857439280
+2025-08-02 09:52:09,624 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:52:09,763 - aiogram.event - INFO - Update id=943253472 is handled. Duration 193 ms by bot id=7857439280
+2025-08-02 09:52:11,970 - aiogram.event - INFO - Update id=943253473 is handled. Duration 147 ms by bot id=7857439280
+2025-08-02 09:52:22,892 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:52:23,024 - aiogram.event - INFO - Update id=943253474 is handled. Duration 143 ms by bot id=7857439280
+2025-08-02 09:52:29,248 - utils.database.db - DEBUG - Database connection established successfully
+2025-08-02 09:52:29,249 - utils.database.db - DEBUG - Adding/Updating user - ID: 7963011841, Username: None
+2025-08-02 09:52:29,253 - utils.database.db - DEBUG - Successfully added/updated user with DB ID: 5
+2025-08-02 09:52:29,556 - aiogram.event - INFO - Update id=943253475 is handled. Duration 325 ms by bot id=7857439280
+2025-08-02 09:52:32,849 - aiogram.event - INFO - Update id=943253476 is handled. Duration 403 ms by bot id=7857439280

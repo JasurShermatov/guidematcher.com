@@ -69,7 +69,7 @@ services:
       - .env
     restart: always
     volumes:
-      - .:/bot
+      - ./bot:/app
     depends_on:
       backend:
         condition: service_healthy

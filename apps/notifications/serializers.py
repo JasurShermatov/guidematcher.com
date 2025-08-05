@@ -1,85 +1,110 @@
 from rest_framework import serializers
-from apps.notifications.models import (
-    NotificationType,
-    Notification,
-    UserNotificationSettings,
-    UserNotificationTypeSettings,
-    EmailLog,
-)
-from apps.users.serializers import UserShortSerializer
+from .models import Notification, NotificationPreference, EmailLog
+from apps.users.serializers import UserSerializer
 
 
-# ─────────── Type ───────────
-class NotificationTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = NotificationType
-        fields = "__all__"
-        read_only_fields = ["id", "created_at", "updated_at"]
-
-
-# ─────────── Notification ───────────
 class NotificationSerializer(serializers.ModelSerializer):
-    user = UserShortSerializer(read_only=True)
-    notification_type = NotificationTypeSerializer(read_only=True)
+    """
+    Serializer for Notification model
+    """
+
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Notification
-        fields = "__all__"
+        fields = [
+            "id",
+            "user",
+            "type",
+            "title",
+            "message",
+            "priority",
+            "is_read",
+            "read_at",
+            "action_url",
+            "action_text",
+            "booking_id",
+            "message_id",
+            "review_id",
+            "created_at",
+        ]
         read_only_fields = [
             "id",
             "user",
-            "notification_type",
-            "created_at",
-            "read_at",
             "is_read",
+            "read_at",
+            "created_at",
+            "updated_at",
         ]
 
+    def validate(self, data):
+        """
+        Validate notification data
+        """
+        if not data.get("title") or len(data.get("title").strip()) == 0:
+            raise serializers.ValidationError("Sarlavha bo'sh bo'lishi mumkin emas.")
+        if not data.get("message") or len(data.get("message").strip()) == 0:
+            raise serializers.ValidationError("Xabar bo'sh bo'lishi mumkin emas.")
+        return data
 
-# ─────────── User global settings ───────────
-class UserNotificationSettingsSerializer(serializers.ModelSerializer):
+
+class NotificationPreferenceSerializer(serializers.ModelSerializer):
+    """
+    Serializer for NotificationPreference model
+    """
+
+    user = UserSerializer(read_only=True)
+
     class Meta:
-        model = UserNotificationSettings
+        model = NotificationPreference
         fields = [
             "id",
-            "email_enabled",
-            "push_enabled",
-            "in_app_enabled",
-            "quiet_hours_enabled",
-            "quiet_hours_start",
-            "quiet_hours_end",
-            "chat_message_email",
-            "chat_message_push",
+            "user",
+            "email_booking_requests",
+            "email_booking_updates",
+            "email_messages",
+            "email_reviews",
+            "email_promotions",
+            "email_system_updates",
+            "push_booking_requests",
+            "push_booking_updates",
+            "push_messages",
+            "push_reviews",
+            "push_promotions",
+            "digest_frequency",
+            "created_at",
         ]
-
-
-# ─────────── Per-type settings ───────────
-class UserNotificationTypeSettingsSerializer(serializers.ModelSerializer):
-    notification_type = NotificationTypeSerializer(read_only=True)
-
-    class Meta:
-        model = UserNotificationTypeSettings
-        fields = [
-            "id",
-            "notification_type",
-            "email_enabled",
-            "push_enabled",
-            "in_app_enabled",
-        ]
-        read_only_fields = ["id", "notification_type"]
+        read_only_fields = ["id", "user", "created_at", "updated_at"]
 
 
 class EmailLogSerializer(serializers.ModelSerializer):
-    user = UserShortSerializer(read_only=True)
+    """
+    Serializer for EmailLog model
+    """
+
+    recipient_user = UserSerializer(read_only=True)
+    notification = NotificationSerializer(read_only=True)
 
     class Meta:
         model = EmailLog
-        fields = "__all__"
-        read_only_fields = (
+        fields = [
             "id",
-            "user",
+            "recipient_email",
+            "recipient_user",
             "subject",
-            "body",
+            "template_name",
             "status",
-            "response",
+            "sent_at",
+            "error_message",
+            "retry_count",
+            "notification",
             "created_at",
-        )
+        ]
+        read_only_fields = [
+            "id",
+            "recipient_user",
+            "notification",
+            "sent_at",
+            "created_at",
+            "updated_at",
+        ]

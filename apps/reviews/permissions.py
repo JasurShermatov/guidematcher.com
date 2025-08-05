@@ -1,21 +1,50 @@
-# apps/reviews/permissions.py
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework import permissions
+from django.contrib.auth import get_user_model
+from .models import Review, ReviewReport
+
+User = get_user_model()
 
 
-class IsClientOwner(BasePermission):
-    """PUT/PATCH/DELETE faqat review egasi (client) ga ruxsat."""
-
-    def has_object_permission(self, request, view, obj):
-        return request.method in SAFE_METHODS or obj.client == request.user
-
-
-class IsProviderOwner(BasePermission):
+class IsReviewOwnerOrStaff(permissions.BasePermission):
     """
-    ReviewResponse uchun:
-    faqat provider (customer.user) o‘z review’iga javob yozishi / tahrirlashi mumkin
+    Allows access to the review owner (reviewer) or staff
     """
 
     def has_object_permission(self, request, view, obj):
-        # obj bu ReviewResponse yoki Review bo‘lishi mumkin
-        review = obj.review if hasattr(obj, "review") else obj
-        return review.customer.user == request.user
+        return request.user.is_authenticated and (
+            request.user.is_staff
+            or (isinstance(obj, Review) and obj.reviewer == request.user)
+        )
+
+
+class IsReviewGuideOrStaff(permissions.BasePermission):
+    """
+    Allows access to the guide or staff for responding to reviews
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return request.user.is_authenticated and (
+            request.user.is_staff
+            or (isinstance(obj, Review) and obj.guide == request.user)
+        )
+
+
+class CanReportReview(permissions.BasePermission):
+    """
+    Allows authenticated users to report reviews
+    """
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated
+
+
+class IsReportOwnerOrStaff(permissions.BasePermission):
+    """
+    Allows access to the report owner (reporter) or staff
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return request.user.is_authenticated and (
+            request.user.is_staff
+            or (isinstance(obj, ReviewReport) and obj.reporter == request.user)
+        )

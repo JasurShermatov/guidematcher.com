@@ -1,12 +1,35 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework import permissions
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
-class IsOwnerOrReadOnly(BasePermission):
+class IsGuide(permissions.BasePermission):
     """
-    Faqat o‘z profilingizni o‘zgartirish (GET hammaga).
+    Allows access only to users with role 'Guide'
+    """
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role == "Guide"
+
+
+class IsProfileOwnerOrStaff(permissions.BasePermission):
+    """
+    Allows access to profile owners or staff members
     """
 
     def has_object_permission(self, request, view, obj):
-        if request.method in SAFE_METHODS:
-            return True
-        return hasattr(obj, "user") and obj.user == request.user
+        return request.user.is_authenticated and (
+            request.user.is_staff or obj.user == request.user
+        )
+
+
+class IsClientOrStaff(permissions.BasePermission):
+    """
+    Allows access to clients or staff members
+    """
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and (
+            request.user.role == "Client" or request.user.is_staff
+        )

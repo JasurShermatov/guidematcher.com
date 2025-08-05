@@ -1,19 +1,19 @@
-from rest_framework.routers import DefaultRouter
-from django.urls import path, include
+# apps/common/urls.py
 
-from apps.common.views import (
-    CountryViewSet,
-    CityViewSet,
-    LanguageViewSet,
-    ServiceTypeViewSet,
-)
+from django.urls import path
+from . import views
 
-router = DefaultRouter()
-router.register(r"countries", CountryViewSet, basename="country")
-router.register(r"cities", CityViewSet, basename="city")
-router.register(r"languages", LanguageViewSet, basename="language")
-router.register(r"service-types", ServiceTypeViewSet, basename="service-type")
+app_name = "common"
 
 urlpatterns = [
-    path("", include(router.urls)),
+    path("countries/", views.country_list, name="country_list"),
+    path("countries/<uuid:country_id>/", views.country_detail, name="country_detail"),
+    path("cities/", views.city_list, name="city_list"),
+    path("cities/<uuid:city_id>/", views.city_detail, name="city_detail"),
+    path("services/", views.service_list, name="service_list"),
+    path("services/<uuid:service_id>/", views.service_detail, name="service_detail"),
+    path("languages/", views.language_list, name="language_list"),
+    path(
+        "languages/<uuid:language_id>/", views.language_detail, name="language_detail"
+    ),
 ]

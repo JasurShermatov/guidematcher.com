@@ -33,6 +33,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
   const [countrySuggestions, setCountrySuggestions] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [codeTimer, setCodeTimer] = useState(0);
   const countryInputRef = useRef(null);
   const navigate = useNavigate();
 
@@ -60,6 +61,19 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City",
     "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
   ];
+
+  // Timer effect for resend code
+  useEffect(() => {
+    let interval = null;
+    if (codeTimer > 0) {
+      interval = setInterval(() => {
+        setCodeTimer(codeTimer - 1);
+      }, 1000);
+    } else if (codeTimer === 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [codeTimer]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -113,7 +127,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     if (name === "password" || name === "confirm_password") {
       if (value && !passwordRegex.test(value)) {
         setError(
-          "Parol kamida 8 belgidan iborat bo‘lishi, katta harf, kichik harf, raqam va maxsus belgi (@$!%*?&) o‘z ichiga olishi kerak."
+          "Parol kamida 8 belgidan iborat bo'lishi, katta harf, kichik harf, raqam va maxsus belgi (@$!%*?&) o'z ichiga olishi kerak."
         );
       } else if (registerForm.password && registerForm.confirm_password && registerForm.password !== registerForm.confirm_password) {
         setError("Parollar mos kelmadi.");
@@ -145,14 +159,14 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     setLoading(true);
 
     if (!loginForm.email || !loginForm.password) {
-      setError("Iltimos, barcha maydonlarni to‘ldiring.");
+      setError("Iltimos, barcha maydonlarni to'ldiring.");
       setLoading(false);
       return;
     }
 
     if (!passwordRegex.test(loginForm.password)) {
       setError(
-        "Parol kamida 8 belgidan iborat bo‘lishi, katta harf, kichik harf, raqam va maxsus belgi (@$!%*?&) o‘z ichiga olishi kerak."
+        "Parol kamida 8 belgidan iborat bo'lishi, katta harf, kichik harf, raqam va maxsus belgi (@$!%*?&) o'z ichiga olishi kerak."
       );
       setLoading(false);
       return;
@@ -172,51 +186,113 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     }
   };
 
+  const validateRegistrationForm = () => {
+    const { role, first_name, last_name, email, password, confirm_password, country } = registerForm;
+
+    if (!first_name?.trim()) {
+      setError("Ism kiritish majburiy.");
+      return false;
+    }
+
+    if (!last_name?.trim()) {
+      setError("Familiya kiritish majburiy.");
+      return false;
+    }
+
+    if (!email?.trim()) {
+      setError("Email kiritish majburiy.");
+      return false;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("To'g'ri email formatini kiriting.");
+      return false;
+    }
+
+    if (!password) {
+      setError("Parol kiritish majburiy.");
+      return false;
+    }
+
+    if (!confirm_password) {
+      setError("Parolni tasdiqlash majburiy.");
+      return false;
+    }
+
+    if (password !== confirm_password) {
+      setError("Parollar mos kelmadi.");
+      return false;
+    }
+
+    if (!passwordRegex.test(password)) {
+      setError(
+        "Parol kamida 8 belgidan iborat bo'lishi, katta harf, kichik harf, raqam va maxsus belgi (@$!%*?&) o'z ichiga olishi kerak."
+      );
+      return false;
+    }
+
+    if (!country?.trim()) {
+      setError("Mamlakat kiritish majburiy.");
+      return false;
+    }
+
+    if (!checkboxes.personalData) {
+      setError("Shaxsiy ma'lumotlarni qayta ishlashga rozilik berishingiz kerak.");
+      return false;
+    }
+
+    if (!checkboxes.terms) {
+      setError("Foydalanish shartlariga rozilik berishingiz kerak.");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccessMessage("");
     setLoading(true);
 
-    const { role, first_name, last_name, email, password, confirm_password, country } = registerForm;
-
-    if (!first_name || !last_name || !email || !password || !confirm_password || !country) {
-      setError("Iltimos, barcha majburiy maydonlarni to‘ldiring.");
-      setLoading(false);
-      return;
-    }
-
-    if (password !== confirm_password) {
-      setError("Parollar mos kelmadi.");
-      setLoading(false);
-      return;
-    }
-
-    if (!passwordRegex.test(password)) {
-      setError(
-        "Parol kamida 8 belgidan iborat bo‘lishi, katta harf, kichik harf, raqam va maxsus belgi (@$!%*?&) o‘z ichiga olishi kerak."
-      );
-      setLoading(false);
-      return;
-    }
-
-    if (!checkboxes.personalData || !checkboxes.terms) {
-      setError("Shaxsiy ma‘lumotlarni qayta ishlash va shartlarga rozilik berishingiz kerak.");
+    if (!validateRegistrationForm()) {
       setLoading(false);
       return;
     }
 
     try {
-      console.log("Sending requestCode with:", { email });
-      await requestCode({ email });
-      setSuccessMessage("Tasdiqlash kodi emailingizga yuborildi.");
+      console.log("Requesting verification code for:", registerForm.email);
+      
+      const requestData = {
+        email: registerForm.email.trim(),
+        code_type: "registration"
+      };
+
+      await requestCode(requestData);
+      
+      setSuccessMessage(`Tasdiqlash kodi ${registerForm.email} manziliga yuborildi. Iltimos, emailingizni tekshiring.`);
       setVerificationStep(true);
-      setLoading(false); // Loading holatini o'chirish
+      setCodeTimer(300); // 5 minutes timer for resend
+      
     } catch (error) {
-      const errorMsg = error.message.includes("already exists")
-        ? "Bu email allaqachon ro'yxatdan o'tgan. Iltimos, boshqa email ishlating yoki tizimga kiring."
-        : error.message || "Kod so‘rovida xatolik yuz berdi.";
+      console.error("Error requesting verification code:", error);
+      
+      let errorMsg = "Tasdiqlash kodi so'rovida xatolik yuz berdi.";
+      
+      if (error.message.includes("already")) {
+        errorMsg = "Bu email allaqachon ro'yxatdan o'tgan. Iltimos, boshqa email ishlating yoki tizimga kiring.";
+      } else if (error.message.includes("rate")) {
+        errorMsg = "Juda ko'p urinish. Iltimos, biroz kutib qaytadan urinib ko'ring.";
+      } else if (error.message.includes("invalid")) {
+        errorMsg = "Noto'g'ri email format.";
+      } else {
+        errorMsg = error.message || errorMsg;
+      }
+      
       setError(errorMsg);
+    } finally {
       setLoading(false);
     }
   };
@@ -227,40 +303,51 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     setSuccessMessage("");
     setLoading(true);
 
-    if (!verificationCode) {
+    // Validation
+    if (!verificationCode?.trim()) {
       setError("Iltimos, tasdiqlash kodini kiriting.");
       setLoading(false);
       return;
     }
 
-    if (!/^\d{6}$/.test(verificationCode)) {
-      setError("Tasdiqlash kodi 6 xonali raqam bo‘lishi kerak.");
-      setLoading(false);
-      return;
-    }
-
-    const { role, first_name, last_name, email, password, country } = registerForm;
-    if (!country || country.trim() === "") {
-      setError("Iltimos, mamlakatni tanlang.");
+    if (!/^\d{6}$/.test(verificationCode.trim())) {
+      setError("Tasdiqlash kodi 6 xonali raqam bo'lishi kerak.");
       setLoading(false);
       return;
     }
 
     try {
-      console.log("Verifying code with payload:", { role, first_name, last_name, email, password, country, code: verificationCode });
-      const response = await registerUser({
+      const { role, first_name, last_name, email, password, country } = registerForm;
+      
+      console.log("Attempting registration with data:", {
         role,
-        first_name,
-        last_name,
-        email,
-        password,
-        country,
-        code: verificationCode,
+        first_name: first_name.trim(),
+        last_name: last_name.trim(),
+        email: email.trim(),
+        country: country.trim(),
+        code: verificationCode.trim()
       });
+
+      const registrationData = {
+        role,
+        first_name: first_name.trim(),
+        last_name: last_name.trim(),
+        email: email.trim(),
+        password,
+        country: country.trim(),
+        code: verificationCode.trim(),
+      };
+
+      const response = await registerUser(registrationData);
+      
+      console.log("Registration successful:", response);
+
+      // Store tokens
       localStorage.setItem("access_token", response.access_token);
       localStorage.setItem("refresh_token", response.refresh_token);
-      setIsAuthenticated(true);
-      setUser({
+      
+      // Set user data
+      const userData = {
         id: response.user.id,
         role: response.user.role,
         username: response.user.full_name,
@@ -268,10 +355,14 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         first_name: response.user.first_name,
         last_name: response.user.last_name,
         country: response.user.country || "",
-        city: "",
-      });
-      setSuccessMessage("Ro‘yxatdan o‘tish muvaffaqiyatli!");
-      navigate("/account");
+        city: response.user.city || "",
+      };
+
+      setIsAuthenticated(true);
+      setUser(userData);
+      setSuccessMessage("Ro'yxatdan o'tish muvaffaqiyatli yakunlandi!");
+      
+      // Reset form
       setRegisterForm({
         role: "Client",
         first_name: "",
@@ -284,14 +375,32 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
       setVerificationCode("");
       setCheckboxes({ personalData: false, terms: false, travelTips: false });
       setVerificationStep(false);
+      
+      // Navigate to account page
+      setTimeout(() => {
+        navigate("/account");
+      }, 1000);
+      
     } catch (error) {
-      const errorMsg = error.message.includes("already exists")
-        ? "Bu email allaqachon ro'yxatdan o'tgan. Iltimos, tizimga kiring."
-        : error.message.includes("expired")
-        ? "Tasdiqlash kodi muddati tugagan. Iltimos, qaytadan kod so‘rang."
-        : error.message.includes("invalid")
-        ? "Noto‘g‘ri tasdiqlash kodi. Iltimos, tekshiring."
-        : error.message || "Ro‘yxatdan o‘tishda xatolik yuz berdi.";
+      console.error("Registration error:", error);
+      
+      let errorMsg = "Ro'yxatdan o'tishda xatolik yuz berdi.";
+      
+      if (error.message.includes("already exists") || error.message.includes("already")) {
+        errorMsg = "Bu email allaqachon ro'yxatdan o'tgan. Iltimos, tizimga kiring.";
+        setVerificationStep(false); // Go back to login
+      } else if (error.message.includes("expired") || error.message.includes("tugagan")) {
+        errorMsg = "Tasdiqlash kodi muddati tugagan. Iltimos, qaytadan kod so'rang.";
+      } else if (error.message.includes("invalid") || error.message.includes("noto'g'ri")) {
+        errorMsg = "Noto'g'ri tasdiqlash kodi. Iltimos, qaytadan kiriting.";
+      } else if (error.message.includes("used")) {
+        errorMsg = "Bu tasdiqlash kodi allaqachon ishlatilgan. Yangi kod so'rang.";
+      } else if (error.message.includes("attempts")) {
+        errorMsg = "Juda ko'p noto'g'ri urinish. Yangi kod so'rang.";
+      } else {
+        errorMsg = error.message || errorMsg;
+      }
+      
       setError(errorMsg);
     } finally {
       setLoading(false);
@@ -299,14 +408,30 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
   };
 
   const handleResendCode = async () => {
+    if (codeTimer > 0) {
+      setError(`Yana ${Math.floor(codeTimer / 60)}:${(codeTimer % 60).toString().padStart(2, '0')} kutib turing.`);
+      return;
+    }
+
     setError("");
     setSuccessMessage("");
     setLoading(true);
+    
     try {
-      await requestCode({ email: registerForm.email });
+      console.log("Resending verification code for:", registerForm.email);
+      
+      await requestCode({ 
+        email: registerForm.email.trim(),
+        code_type: "registration" 
+      });
+      
       setSuccessMessage("Yangi tasdiqlash kodi emailingizga yuborildi.");
+      setCodeTimer(300); // Reset timer to 5 minutes
+      setVerificationCode(""); // Clear previous code
+      
     } catch (error) {
-      setError("Kod qayta yuborishda xatolik yuz berdi.");
+      console.error("Error resending code:", error);
+      setError(error.message || "Kod qayta yuborishda xatolik yuz berdi.");
     } finally {
       setLoading(false);
     }
@@ -322,6 +447,16 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     setCountrySuggestions([]);
     setError("");
     setSuccessMessage("");
+    setVerificationCode("");
+    setCodeTimer(0);
+  };
+
+  const goBackToRegistration = () => {
+    setVerificationStep(false);
+    setVerificationCode("");
+    setError("");
+    setSuccessMessage("");
+    setCodeTimer(0);
   };
 
   useEffect(() => {
@@ -332,36 +467,112 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="auth-overlay" onClick={closeModal} role="dialog" aria-labelledby="auth-title" aria-modal="true">
       <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
         <button className="auth-close-btn" onClick={closeModal} aria-label="Close authentication modal">
           <FiX />
         </button>
-        <div className="auth-tabs">
-          <button
-            className={`auth-tab ${activeTab === "login" ? "auth-tab-active" : ""}`}
-            onClick={() => setActiveTab("login")}
-            aria-selected={activeTab === "login"}
-          >
-            Sign In
-          </button>
-          <button
-            className={`auth-tab ${activeTab === "register" ? "auth-tab-active" : ""}`}
-            onClick={() => setActiveTab("register")}
-            aria-selected={activeTab === "register"}
-          >
-            Register
-          </button>
-        </div>
+        
+        {!verificationStep && (
+          <div className="auth-tabs">
+            <button
+              className={`auth-tab ${activeTab === "login" ? "auth-tab-active" : ""}`}
+              onClick={() => setActiveTab("login")}
+              aria-selected={activeTab === "login"}
+            >
+              Sign In
+            </button>
+            <button
+              className={`auth-tab ${activeTab === "register" ? "auth-tab-active" : ""}`}
+              onClick={() => setActiveTab("register")}
+              aria-selected={activeTab === "register"}
+            >
+              Register
+            </button>
+          </div>
+        )}
+
         {error && <p className="auth-error" role="alert">{error}</p>}
         {successMessage && <p className="auth-success" role="alert">{successMessage}</p>}
+        
         {loading && (
           <div className="auth-loading">
             <div className="spinner"></div> Yuklanmoqda...
           </div>
         )}
-        {activeTab === "login" ? (
+
+        {verificationStep ? (
+          <div className="auth-content">
+            <h2 id="auth-title">Email Tasdiqlash</h2>
+            <div className="verification-info">
+              <p>
+                Tasdiqlash kodi <strong>{registerForm.email}</strong> manziliga yuborildi.
+              </p>
+              <p>6 xonali kodni quyidagi maydonga kiriting:</p>
+            </div>
+
+            <form className="auth-form" onSubmit={handleVerifyCode}>
+              <div className="auth-form-group">
+                <label htmlFor="verification-code">
+                  <FiCheck /> Tasdiqlash Kodi
+                </label>
+                <input
+                  id="verification-code"
+                  type="text"
+                  value={verificationCode}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+                    setVerificationCode(value);
+                  }}
+                  placeholder="000000"
+                  className="auth-input verification-input"
+                  aria-required="true"
+                  autoFocus
+                  maxLength="6"
+                  disabled={loading}
+                  style={{ textAlign: 'center', fontSize: '18px', letterSpacing: '4px' }}
+                />
+              </div>
+
+              <button type="submit" className="auth-submit-btn" disabled={loading || !verificationCode || verificationCode.length !== 6}>
+                <FiCheck /> Tasdiqlash
+              </button>
+
+              <div className="auth-verification-actions">
+                {codeTimer > 0 ? (
+                  <p className="resend-timer">
+                    Qayta yuborish uchun {formatTime(codeTimer)} kutib turing
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    className="auth-resend-btn"
+                    onClick={handleResendCode}
+                    disabled={loading}
+                  >
+                    Kodni Qayta Yuborish
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  className="auth-back-btn"
+                  onClick={goBackToRegistration}
+                  disabled={loading}
+                >
+                  ← Orqaga qaytish
+                </button>
+              </div>
+            </form>
+          </div>
+        ) : activeTab === "login" ? (
           <div className="auth-content">
             <h2 id="auth-title">Sign In to TravMatch</h2>
             <form className="auth-form" onSubmit={handleLoginSubmit}>
@@ -423,228 +634,193 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         ) : (
           <div className="auth-content">
             <h2 id="auth-title">Create Your TravMatch Account</h2>
-            {!verificationStep ? (
-              <form className="auth-form" onSubmit={handleRegisterSubmit}>
-                <div className="auth-form-group">
-                  <label htmlFor="register-role">
-                    <FiUser /> Role
-                  </label>
-                  <select
-                    id="register-role"
-                    name="role"
-                    value={registerForm.role}
-                    onChange={handleRegisterChange}
-                    className="auth-input"
-                    aria-required="true"
-                    disabled={loading}
-                  >
-                    <option value="Client">Client (Mijoz)</option>
-                    <option value="Customer">Customer (Xizmat ko‘rsatuvchi)</option>
-                  </select>
-                </div>
-                <div className="auth-name-grid">
-                  <div className="auth-form-group">
-                    <label htmlFor="register-first_name">
-                      <FiUser /> First Name
-                    </label>
-                    <input
-                      id="register-first_name"
-                      type="text"
-                      name="first_name"
-                      value={registerForm.first_name}
-                      onChange={handleRegisterChange}
-                      placeholder="Enter your first name"
-                      className="auth-input"
-                      aria-required="true"
-                      disabled={loading}
-                    />
-                  </div>
-                  <div className="auth-form-group">
-                    <label htmlFor="register-last_name">
-                      <FiUser /> Last Name
-                    </label>
-                    <input
-                      id="register-last_name"
-                      type="text"
-                      name="last_name"
-                      value={registerForm.last_name}
-                      onChange={handleRegisterChange}
-                      placeholder="Enter your last name"
-                      className="auth-input"
-                      aria-required="true"
-                      disabled={loading}
-                    />
-                  </div>
-                </div>
-                <div className="auth-form-group">
-                  <label htmlFor="register-email">
-                    <FiMail /> Email
-                  </label>
-                  <input
-                    id="register-email"
-                    type="email"
-                    name="email"
-                    value={registerForm.email}
-                    onChange={handleRegisterChange}
-                    placeholder="Enter your email"
-                    className="auth-input"
-                    aria-required="true"
-                    disabled={loading}
-                  />
-                </div>
-                <div className="auth-form-group">
-                  <label htmlFor="register-password">
-                    <FiLock /> Password
-                  </label>
-                  <div className="password-container">
-                    <input
-                      id="register-password"
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      value={registerForm.password}
-                      onChange={handleRegisterChange}
-                      placeholder="Enter your password"
-                      className="auth-input"
-                      aria-required="true"
-                      disabled={loading}
-                    />
-                    <button
-                      type="button"
-                      className="toggle-password"
-                      onClick={toggleShowPassword}
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                    >
-                      {showPassword ? <FiEyeOff /> : <FiEye />}
-                    </button>
-                  </div>
-                </div>
-                <div className="auth-form-group">
-                  <label htmlFor="register-confirm_password">
-                    <FiLock /> Confirm Password
-                  </label>
-                  <div className="password-container">
-                    <input
-                      id="register-confirm_password"
-                      type={showConfirmPassword ? "text" : "password"}
-                      name="confirm_password"
-                      value={registerForm.confirm_password}
-                      onChange={handleRegisterChange}
-                      placeholder="Confirm your password"
-                      className="auth-input"
-                      aria-required="true"
-                      disabled={loading}
-                    />
-                    <button
-                      type="button"
-                      className="toggle-password"
-                      onClick={toggleShowConfirmPassword}
-                      aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-                    >
-                      {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
-                    </button>
-                  </div>
-                </div>
-                <div className="auth-form-group">
-                  <label htmlFor="register-country">
-                    <FiGlobe /> Country
-                  </label>
-                  <input
-                    id="register-country"
-                    type="text"
-                    name="country"
-                    value={registerForm.country}
-                    onChange={handleRegisterChange}
-                    placeholder="Enter your country"
-                    className="auth-input"
-                    ref={countryInputRef}
-                    aria-required="true"
-                    disabled={loading}
-                  />
-                  {countrySuggestions.length > 0 && (
-                    <ul className="country-suggestions">
-                      {countrySuggestions.map((country, index) => (
-                        <li key={index} onClick={() => handleCountrySelect(country)} role="option" aria-selected="false">
-                          {country}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <div className="auth-checkbox-group">
-                  <label className="auth-checkbox-label">
-                    <input
-                      type="checkbox"
-                      name="personalData"
-                      checked={checkboxes.personalData}
-                      onChange={handleCheckboxChange}
-                      aria-required="true"
-                      disabled={loading}
-                    />
-                    {checkboxes.personalData ? <FiCheckSquare /> : <FiSquare />}
-                    Shaxsiy ma‘lumotlarni qayta ishlashga roziman.
-                  </label>
-                  <label className="auth-checkbox-label">
-                    <input
-                      type="checkbox"
-                      name="terms"
-                      checked={checkboxes.terms}
-                      onChange={handleCheckboxChange}
-                      aria-required="true"
-                      disabled={loading}
-                    />
-                    {checkboxes.terms ? <FiCheckSquare /> : <FiSquare />}
-                    TravMatch shartlariga roziman.
-                  </label>
-                  <label className="auth-checkbox-label">
-                    <input
-                      type="checkbox"
-                      name="travelTips"
-                      checked={checkboxes.travelTips}
-                      onChange={handleCheckboxChange}
-                      disabled={loading}
-                    />
-                    {checkboxes.travelTips ? <FiCheckSquare /> : <FiSquare />}
-                    Sayohat maslahatlari va aksiyalarni olishga roziman.
-                  </label>
-                </div>
-                <button type="submit" className="auth-submit-btn" disabled={loading}>
-                  <FiLogIn /> Register
-                </button>
-              </form>
-            ) : (
-              <form className="auth-form" onSubmit={handleVerifyCode}>
-                <h3>Email Tasdiqlash</h3>
-                <p>Iltimos, emailingizga ({registerForm.email}) yuborilgan 6 xonali tasdiqlash kodini kiriting.</p>
-                <div className="auth-form-group">
-                  <label htmlFor="verification-code">
-                    <FiCheck /> Tasdiqlash Kodi
-                  </label>
-                  <input
-                    id="verification-code"
-                    type="number"
-                    value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value.slice(0, 6))}
-                    placeholder="6 xonali kodni kiriting"
-                    className="auth-input"
-                    aria-required="true"
-                    autoFocus
-                    maxLength="6"
-                    disabled={loading}
-                  />
-                </div>
-                <button type="submit" className="auth-submit-btn" disabled={loading}>
-                  <FiCheck /> Tasdiqlash
-                </button>
-                <button
-                  type="button"
-                  className="auth-resend-btn"
-                  onClick={handleResendCode}
+            <form className="auth-form" onSubmit={handleRegisterSubmit}>
+              <div className="auth-form-group">
+                <label htmlFor="register-role">
+                  <FiUser /> Role
+                </label>
+                <select
+                  id="register-role"
+                  name="role"
+                  value={registerForm.role}
+                  onChange={handleRegisterChange}
+                  className="auth-input"
+                  aria-required="true"
                   disabled={loading}
                 >
-                  Kodi Qayta Yuborish
-                </button>
-              </form>
-            )}
+                  <option value="Client">Client (Mijoz)</option>
+                  <option value="Guide">Guide (Gid)</option>
+                </select>
+              </div>
+              <div className="auth-name-grid">
+                <div className="auth-form-group">
+                  <label htmlFor="register-first_name">
+                    <FiUser /> First Name *
+                  </label>
+                  <input
+                    id="register-first_name"
+                    type="text"
+                    name="first_name"
+                    value={registerForm.first_name}
+                    onChange={handleRegisterChange}
+                    placeholder="Enter your first name"
+                    className="auth-input"
+                    aria-required="true"
+                    disabled={loading}
+                  />
+                </div>
+                <div className="auth-form-group">
+                  <label htmlFor="register-last_name">
+                    <FiUser /> Last Name *
+                  </label>
+                  <input
+                    id="register-last_name"
+                    type="text"
+                    name="last_name"
+                    value={registerForm.last_name}
+                    onChange={handleRegisterChange}
+                    placeholder="Enter your last name"
+                    className="auth-input"
+                    aria-required="true"
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+              <div className="auth-form-group">
+                <label htmlFor="register-email">
+                  <FiMail /> Email *
+                </label>
+                <input
+                  id="register-email"
+                  type="email"
+                  name="email"
+                  value={registerForm.email}
+                  onChange={handleRegisterChange}
+                  placeholder="Enter your email"
+                  className="auth-input"
+                  aria-required="true"
+                  disabled={loading}
+                />
+              </div>
+              <div className="auth-form-group">
+                <label htmlFor="register-password">
+                  <FiLock /> Password *
+                </label>
+                <div className="password-container">
+                  <input
+                    id="register-password"
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={registerForm.password}
+                    onChange={handleRegisterChange}
+                    placeholder="Enter your password"
+                    className="auth-input"
+                    aria-required="true"
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password"
+                    onClick={toggleShowPassword}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <FiEyeOff /> : <FiEye />}
+                  </button>
+                </div>
+              </div>
+              <div className="auth-form-group">
+                <label htmlFor="register-confirm_password">
+                  <FiLock /> Confirm Password *
+                </label>
+                <div className="password-container">
+                  <input
+                    id="register-confirm_password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirm_password"
+                    value={registerForm.confirm_password}
+                    onChange={handleRegisterChange}
+                    placeholder="Confirm your password"
+                    className="auth-input"
+                    aria-required="true"
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password"
+                    onClick={toggleShowConfirmPassword}
+                    aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                  >
+                    {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                  </button>
+                </div>
+              </div>
+              <div className="auth-form-group">
+                <label htmlFor="register-country">
+                  <FiGlobe /> Country *
+                </label>
+                <input
+                  id="register-country"
+                  type="text"
+                  name="country"
+                  value={registerForm.country}
+                  onChange={handleRegisterChange}
+                  placeholder="Enter your country"
+                  className="auth-input"
+                  ref={countryInputRef}
+                  aria-required="true"
+                  disabled={loading}
+                />
+                {countrySuggestions.length > 0 && (
+                  <ul className="country-suggestions">
+                    {countrySuggestions.map((country, index) => (
+                      <li key={index} onClick={() => handleCountrySelect(country)} role="option" aria-selected="false">
+                        {country}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div className="auth-checkbox-group">
+                <label className="auth-checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="personalData"
+                    checked={checkboxes.personalData}
+                    onChange={handleCheckboxChange}
+                    aria-required="true"
+                    disabled={loading}
+                  />
+                  {checkboxes.personalData ? <FiCheckSquare /> : <FiSquare />}
+                  Shaxsiy ma'lumotlarni qayta ishlashga roziman. *
+                </label>
+                <label className="auth-checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="terms"
+                    checked={checkboxes.terms}
+                    onChange={handleCheckboxChange}
+                    aria-required="true"
+                    disabled={loading}
+                  />
+                  {checkboxes.terms ? <FiCheckSquare /> : <FiSquare />}
+                  TravMatch shartlariga roziman. *
+                </label>
+                <label className="auth-checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="travelTips"
+                    checked={checkboxes.travelTips}
+                    onChange={handleCheckboxChange}
+                    disabled={loading}
+                  />
+                  {checkboxes.travelTips ? <FiCheckSquare /> : <FiSquare />}
+                  Sayohat maslahatlari va aksiyalarni olishga roziman.
+                </label>
+              </div>
+              <button type="submit" className="auth-submit-btn" disabled={loading}>
+                <FiLogIn /> Register
+              </button>
+            </form>
           </div>
         )}
       </div>

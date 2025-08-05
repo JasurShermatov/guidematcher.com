@@ -1,119 +1,156 @@
-from rest_framework import viewsets, mixins, status
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.filters import SearchFilter, OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend
-from django.utils import timezone
-
-from apps.common.permissions import IsAdmin
-from apps.notifications.models import (
-    NotificationType,
-    Notification,
-    UserNotificationSettings,
-    UserNotificationTypeSettings,
-    EmailLog,
-)
-from apps.notifications.serializers import (
-    NotificationTypeSerializer,
+from django.shortcuts import get_object_or_404
+from .models import Notification, NotificationPreference, EmailLog
+from .serializers import (
     NotificationSerializer,
-    UserNotificationSettingsSerializer,
-    UserNotificationTypeSettingsSerializer,
+    NotificationPreferenceSerializer,
     EmailLogSerializer,
 )
+from apps.common.permissions import IsAuthenticated, IsStaff
+from apps.common.pagination import StandardResultsSetPagination
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-from drf_spectacular.utils import extend_schema
-
-
-@extend_schema(tags=["notifications"])
-class NotificationTypeViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
-):
-    queryset = NotificationType.objects.all().order_by("category", "name")
-    serializer_class = NotificationTypeSerializer
-    permission_classes = [IsAuthenticated]
-
-
-# ─────────── Notification ───────────
-class NotificationViewSet(viewsets.ModelViewSet):
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def notification_list(request):
     """
-    /notifications/       – list (faqat o‘z foydalanuvchisi)
-    /notifications/{id}/mark_read/
-    /notifications/mark_all_read/
-    /notifications/unread_count/
+    List notifications for the authenticated user
     """
-
-    serializer_class = NotificationSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ["is_read", "priority", "notification_type__category"]
-    search_fields = ["title", "message"]
-    ordering = ["-created_at"]
-
-    def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user).select_related(
-            "notification_type"
+    try:
+        queryset = Notification.objects.filter(user=request.user).order_by(
+            "-created_at"
         )
+        is_read = request.query_params.get("is_read")
+        notification_type = request.query_params.get("type")
 
-    # -------- extra actions --------
-    @action(detail=False, methods=["get"])
-    def unread_count(self, request):
-        cnt = self.get_queryset().filter(is_read=False).count()
-        return Response({"unread": cnt})
+        if is_read is not None:
+            queryset = queryset.filter(is_read=is_read.lower() == "true")
+        if notification_type:
+            queryset = queryset.filter(type=notification_type)
 
-    @action(detail=False, methods=["post"])
-    def mark_all_read(self, request):
-        qs = self.get_queryset().filter(is_read=False)
-        updated = qs.update(is_read=True, read_at=timezone.now())
-        return Response({"marked": updated})
-
-    @action(detail=True, methods=["post"])
-    def mark_read(self, request, pk=None):
-        obj = self.get_object()
-        if not obj.is_read:
-            obj.is_read = True
-            obj.read_at = timezone.now()
-            obj.save(update_fields=["is_read", "read_at"])
-        return Response(self.get_serializer(obj).data)
-
-
-# ─────────── Global setting (retrieve/update) ───────────
-class UserNotificationSettingsView(
-    mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet
-):
-    serializer_class = UserNotificationSettingsSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        # always return / create current user settings
-        obj, _ = UserNotificationSettings.objects.get_or_create(user=self.request.user)
-        return obj
-
-
-# ─────────── Per-type setting (list/update) ───────────
-class UserNotificationTypeSettingsViewSet(
-    mixins.ListModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet
-):
-    serializer_class = UserNotificationTypeSettingsSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return (
-            UserNotificationTypeSettings.objects.filter(user=self.request.user)
-            .select_related("notification_type")
-            .order_by("notification_type__category")
+        paginator = StandardResultsSetPagination()
+        page = paginator.paginate_queryset(queryset, request)
+        serializer = NotificationSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+    except Exception as e:
+        logger.error(
+            f"Error listing notifications for user {request.user.email}: {str(e)}"
+        )
+        return Response(
+            {"detail": "Xabarnomalarni ro'yxatlashda xatolik yuz berdi"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
-# ─────────── EmailLog (admin read-only) ───────────
-class EmailLogViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
-):
-    queryset = EmailLog.objects.select_related("user", "notification_type")
-    serializer_class = EmailLogSerializer
-    permission_classes = [IsAuthenticated & IsAdmin]
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ["status", "provider"]
-    search_fields = ["to_email", "subject"]
-    ordering = ["-created_at"]
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def notification_detail(request, notification_id):
+    """
+    Retrieve details of a specific notification
+    """
+    try:
+        notification = get_object_or_404(
+            Notification, id=notification_id, user=request.user
+        )
+        serializer = NotificationSerializer(notification)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f"Error retrieving notification {notification_id}: {str(e)}")
+        return Response(
+            {"detail": "Xabarnoma ma'lumotlarini olishda xatolik yuz berdi"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def mark_notification_read(request, notification_id):
+    """
+    Mark a notification as read
+    """
+    try:
+        notification = get_object_or_404(
+            Notification, id=notification_id, user=request.user
+        )
+        notification.mark_as_read()
+        logger.info(
+            f"Notification {notification_id} marked as read for user {request.user.email}"
+        )
+        return Response(
+            {"detail": "Xabarnoma o'qilgan deb belgilandi"}, status=status.HTTP_200_OK
+        )
+    except Exception as e:
+        logger.error(f"Error marking notification {notification_id} as read: {str(e)}")
+        return Response(
+            {"detail": "Xabarnomani o'qilgan deb belgilashda xatolik yuz berdi"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+@api_view(["GET", "PUT"])
+@permission_classes([IsAuthenticated])
+def notification_preferences(request):
+    """
+    Retrieve or update notification preferences for the authenticated user
+    """
+    try:
+        preferences, created = NotificationPreference.objects.get_or_create(
+            user=request.user
+        )
+
+        if request.method == "GET":
+            serializer = NotificationPreferenceSerializer(preferences)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        elif request.method == "PUT":
+            serializer = NotificationPreferenceSerializer(
+                preferences, data=request.data, partial=True
+            )
+            if serializer.is_valid():
+                serializer.save()
+                logger.info(
+                    f"Notification preferences updated for user {request.user.email}"
+                )
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        logger.error(
+            f"Error processing notification preferences for user {request.user.email}: {str(e)}"
+        )
+        return Response(
+            {"detail": "Xabarnoma sozlamalarini qayta ishlashda xatolik yuz berdi"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, IsStaff])
+def email_log_list(request):
+    """
+    List email logs (admin only)
+    """
+    try:
+        queryset = EmailLog.objects.all().order_by("-created_at")
+        email = request.query_params.get("recipient_email")
+        status = request.query_params.get("status")
+
+        if email:
+            queryset = queryset.filter(recipient_email=email)
+        if status:
+            queryset = queryset.filter(status=status)
+
+        paginator = StandardResultsSetPagination()
+        page = paginator.paginate_queryset(queryset, request)
+        serializer = EmailLogSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+    except Exception as e:
+        logger.error(f"Error listing email logs: {str(e)}")
+        return Response(
+            {"detail": "Email jurnallarini ro'yxatlashda xatolik yuz berdi"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

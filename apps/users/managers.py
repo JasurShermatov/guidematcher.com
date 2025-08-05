@@ -1,13 +1,20 @@
+# apps/users/managers.py
+
 from django.contrib.auth.models import BaseUserManager
-from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
-    """Custom user manager using email instead of username."""
+    """
+    Custom user manager for the User model
+    """
 
-    def _create_user(self, email, password, **extra_fields):
+    def create_user(self, email, password=None, **extra_fields):
+        """
+        Create and return a regular user with email and password
+        """
         if not email:
-            raise ValueError(_("Email field must be set."))
+            raise ValueError("The Email field must be set")
 
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
@@ -15,26 +22,52 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, password=None, **extra_fields):
-        """Create a standard user (not staff or superuser)."""
-        extra_fields.setdefault("is_staff", False)
-        extra_fields.setdefault("is_superuser", False)
-        return self._create_user(email, password, **extra_fields)
-
     def create_superuser(self, email, password=None, **extra_fields):
-        """Create a superuser (admin panel access)."""
+        """
+        Create and return a superuser with email and password
+        """
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
         extra_fields.setdefault("is_verified", True)
-        extra_fields.setdefault("role", "superadmin")
+        extra_fields.setdefault("role", "Admin")
 
-        if not extra_fields["is_staff"]:
-            raise ValueError(_("Superuser must have is_staff=True."))
-        if not extra_fields["is_superuser"]:
-            raise ValueError(_("Superuser must have is_superuser=True."))
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
 
-        return self._create_user(email, password, **extra_fields)
+        return self.create_user(email, password, **extra_fields)
 
-    def get_by_natural_key(self, email):
-        """Support email case-insensitive lookup (used for auth)."""
-        return self.get(email__iexact=email)
+    def get_by_email(self, email):
+        """
+        Get user by email address
+        """
+        try:
+            return self.get(email=email)
+        except self.model.DoesNotExist:
+            return None
+
+    def active_users(self):
+        """
+        Return only active users
+        """
+        return self.filter(is_active=True)
+
+    def verified_users(self):
+        """
+        Return only verified users
+        """
+        return self.filter(is_verified=True)
+
+    def clients(self):
+        """
+        Return only client users
+        """
+        return self.filter(role="Client")
+
+    def guides(self):
+        """
+        Return only guide users
+        """
+        return self.filter(role="Guide")

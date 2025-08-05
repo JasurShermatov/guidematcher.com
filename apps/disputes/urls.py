@@ -1,21 +1,10 @@
-from rest_framework.routers import DefaultRouter
-from rest_framework_nested.routers import NestedDefaultRouter
-from django.urls import path, include
+from django.urls import path
+from . import views
 
-from apps.disputes.views import (
-    DisputeViewSet,
-    EvidenceViewSet,
-    DisputeMessageViewSet,
-)
-
-router = DefaultRouter()
-router.register(r"disputes", DisputeViewSet, basename="dispute")
-
-nested = NestedDefaultRouter(router, r"disputes", lookup="dispute")
-nested.register(r"evidence", EvidenceViewSet, basename="dispute-evidence")
-nested.register(r"messages", DisputeMessageViewSet, basename="dispute-messages")
+app_name = "disputes"
 
 urlpatterns = [
-    path("", include(router.urls)),
-    path("", include(nested.urls)),
+    path("", views.dispute_list_create, name="dispute_list_create"),
+    path("<uuid:dispute_id>/", views.dispute_detail, name="dispute_detail"),
+    path("<uuid:dispute_id>/resolve/", views.dispute_resolve, name="dispute_resolve"),
 ]

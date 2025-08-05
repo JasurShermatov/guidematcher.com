@@ -1,17 +1,29 @@
-from rest_framework.routers import DefaultRouter
-from rest_framework_nested.routers import NestedDefaultRouter
-from django.urls import path, include
+# apps/bookings/urls.py
 
-from apps.bookings.views import BookingViewSet, BookingMessageViewSet
+from django.urls import path
+from . import views
 
-router = DefaultRouter()
-router.register(r"bookings", BookingViewSet, basename="booking")
-
-# nested router: /bookings/{booking_pk}/messages/
-nested_router = NestedDefaultRouter(router, r"bookings", lookup="booking")
-nested_router.register(r"messages", BookingMessageViewSet, basename="booking-messages")
+app_name = "bookings"
 
 urlpatterns = [
-    path("", include(router.urls)),
-    path("", include(nested_router.urls)),
+    # Booking management
+    path("", views.booking_list, name="booking_list"),
+    path("<uuid:booking_id>/", views.booking_detail, name="booking_detail"),
+    path("<uuid:booking_id>/history/", views.booking_history, name="booking_history"),
+    # Booking actions
+    path(
+        "<uuid:booking_id>/complete/", views.complete_booking, name="complete_booking"
+    ),
+    path("<uuid:booking_id>/start/", views.start_booking, name="start_booking"),
+    # Booking requests
+    path("requests/", views.booking_requests, name="booking_requests"),
+    path(
+        "requests/<uuid:request_id>/",
+        views.booking_request_detail,
+        name="booking_request_detail",
+    ),
+    # Utility endpoints
+    path("statistics/", views.booking_statistics, name="booking_statistics"),
+    path("available-guides/", views.available_guides, name="available_guides"),
+    path("calendar/", views.booking_calendar, name="booking_calendar"),
 ]

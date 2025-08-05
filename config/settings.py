@@ -200,7 +200,6 @@ SPECTACULAR_SETTINGS = {
 # ╭──────────────────────────────────────────────────────────────╮
 # | 11. E-mail (Gmail SMTP)                                     |
 # ╰──────────────────────────────────────────────────────────────╯
-# Development uchun console yoki real SMTP
 if DEBUG and env.bool("EMAIL_DEBUG_MODE", default=True):
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
@@ -217,7 +216,6 @@ EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
-# Gmail uchun maxsus sozlamalar
 if "gmail" in EMAIL_HOST:
     EMAIL_USE_TLS = True
     EMAIL_USE_SSL = False
@@ -245,7 +243,6 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 daqiqa
 
-# Development uchun
 CELERY_TASK_ALWAYS_EAGER = env.bool("CELERY_TASK_ALWAYS_EAGER", default=False)
 CELERY_TASK_EAGER_PROPAGATES = True
 
@@ -264,17 +261,13 @@ if SENTRY_DSN and not DEBUG:
         send_default_pii=False,
     )
 
-
 # ╭──────────────────────────────────────────────────────────────╮
 # | 3. URL / WSGI / ASGI                                        |
 # ╰──────────────────────────────────────────────────────────────╯
-# ↓ bor joyida
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
-ASGI_APPLICATION = "config.asgi.application"  # <-- uncomment / qo‘sh
+ASGI_APPLICATION = "config.asgi.application"
 
-# ... (pastroqda) ...
-# CHANNEL_LAYERS qo‘shamiz
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
@@ -284,14 +277,10 @@ CHANNEL_LAYERS = {
     },
 }
 
-
 FRONTEND_PASSWORD_RESET_URL = env.str(
     "FRONTEND_PASSWORD_RESET_URL",
     default="http://localhost:3003/reset-password",
 )
-
-CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
-
 
 LOGGING = {
     "version": 1,
@@ -333,7 +322,6 @@ LOGGING = {
     },
 }
 
-# settings.py
 ACCOUNTS_VERIFICATION_CODE_TTL_SECONDS = 300  # 5 minutes
 ACCOUNTS_VERIFICATION_CODE_LENGTH = 6
 DEFAULT_FROM_EMAIL = "feruzbekhamrayev2002@gmail.com"

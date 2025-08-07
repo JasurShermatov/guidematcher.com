@@ -1,11 +1,4 @@
 # apps/chat/signals.py
-"""
-Optimized signals for maintaining denormalized chat data consistency.
-
-These signals automatically update denormalized fields when related data changes,
-ensuring optimal performance while maintaining data accuracy.
-"""
-
 import logging
 from django.db import transaction
 from django.db.models.signals import post_save, post_delete, pre_delete, m2m_changed
@@ -17,21 +10,9 @@ from .models import ChatRoom, Message, MessageRead, UserTypingStatus
 logger = logging.getLogger(__name__)
 
 
-# ══════════════════════════════════════════════════════════════════════
-# MESSAGE SIGNALS (Core denormalization logic)
-# ══════════════════════════════════════════════════════════════════════
-
-
 @receiver(post_save, sender=Message)
 def update_room_on_message_create(sender, instance, created, **kwargs):
-    """
-    Update ChatRoom denormalized fields when a new message is created.
 
-    Updates:
-    - last_message_* fields
-    - total_messages count
-    - unread_counts for participants (except sender)
-    """
     if not created:
         return
 
@@ -39,15 +20,13 @@ def update_room_on_message_create(sender, instance, created, **kwargs):
         with transaction.atomic():
             room = instance.room
 
-            # Update last message fields
             room.update_last_message(instance, save=False)
 
-            # Update unread counts for all participants except sender
             if instance.sender:
                 for participant in room.participants.exclude(id=instance.sender.id):
                     room.increment_unread_count(participant, save=False)
 
-            # Save room with all updates
+
             room.save(
                 update_fields=[
                     "last_message_at",
@@ -67,10 +46,7 @@ def update_room_on_message_create(sender, instance, created, **kwargs):
 
 @receiver(pre_delete, sender=Message)
 def update_room_on_message_delete(sender, instance, **kwargs):
-    """
-    Update room stats when message is deleted (hard delete).
-    Note: Soft deletes are handled differently.
-    """
+
     try:
         room = instance.room
         if room.total_messages > 0:
@@ -85,9 +61,7 @@ def update_room_on_message_delete(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Message)
 def update_reply_count_on_message_save(sender, instance, created, **kwargs):
-    """
-    Update reply count on parent message when a reply is created.
-    """
+
     if not created or not instance.reply_to:
         return
 
@@ -99,16 +73,9 @@ def update_reply_count_on_message_save(sender, instance, created, **kwargs):
         logger.error("Error updating reply count: %s", e)
 
 
-# ══════════════════════════════════════════════════════════════════════
-# MESSAGE READ SIGNALS
-# ══════════════════════════════════════════════════════════════════════
-
-
 @receiver(post_save, sender=MessageRead)
 def update_read_count_on_read_receipt(sender, instance, created, **kwargs):
-    """
-    Update message read count and room unread count when read receipt is created.
-    """
+
     if not created:
         return
 
@@ -130,16 +97,9 @@ def update_read_count_on_read_receipt(sender, instance, created, **kwargs):
         logger.error("Error updating read counts: %s", e)
 
 
-# ══════════════════════════════════════════════════════════════════════
-# CHATROOM PARTICIPANT SIGNALS
-# ══════════════════════════════════════════════════════════════════════
-
-
 @receiver(m2m_changed, sender=ChatRoom.participants.through)
 def update_room_on_participants_change(sender, instance, action, pk_set, **kwargs):
-    """
-    Initialize/cleanup unread counts when participants are added/removed.
-    """
+
     if action not in ["post_add", "post_remove"]:
         return
 
@@ -163,17 +123,9 @@ def update_room_on_participants_change(sender, instance, action, pk_set, **kwarg
         logger.error("Error updating room participants: %s", e)
 
 
-# ══════════════════════════════════════════════════════════════════════
-# TYPING STATUS CLEANUP SIGNALS
-# ══════════════════════════════════════════════════════════════════════
-
-
 @receiver(post_save, sender=UserTypingStatus)
 def cleanup_old_typing_statuses(sender, instance, **kwargs):
-    """
-    Cleanup old typing statuses to prevent memory leaks.
-    This runs periodically, not on every save.
-    """
+
     # Only run cleanup occasionally to avoid performance impact
     if instance.id % 100 == 0:  # Every 100th save
         try:
@@ -189,19 +141,9 @@ def cleanup_old_typing_statuses(sender, instance, **kwargs):
             logger.error("Error cleaning up typing statuses: %s", e)
 
 
-# ══════════════════════════════════════════════════════════════════════
-# BULK OPERATIONS SIGNALS (Performance optimization)
-# ══════════════════════════════════════════════════════════════════════
 
 
 def bulk_update_room_unread_counts(room_id, user_message_counts):
-    """
-    Utility function for bulk updating unread counts.
-
-    Args:
-        room_id: ChatRoom ID
-        user_message_counts: Dict of {user_id: additional_unread_count}
-    """
     try:
         with transaction.atomic():
             room = ChatRoom.objects.select_for_update().get(id=room_id)
@@ -218,13 +160,6 @@ def bulk_update_room_unread_counts(room_id, user_message_counts):
 
 
 def recalculate_room_statistics(room_id):
-    """
-    Recalculate all denormalized statistics for a room.
-    Useful for data consistency checks.
-
-    Args:
-        room_id: ChatRoom ID
-    """
     try:
         with transaction.atomic():
             room = ChatRoom.objects.select_for_update().get(id=room_id)
@@ -257,10 +192,6 @@ def recalculate_room_statistics(room_id):
     except Exception as e:
         logger.error("Error recalculating room statistics: %s", e)
 
-
-# ══════════════════════════════════════════════════════════════════════
-# MESSAGE EDIT/DELETE SIGNALS
-# ══════════════════════════════════════════════════════════════════════
 
 
 @receiver(post_save, sender=Message)
@@ -331,16 +262,8 @@ def update_room_on_message_soft_delete(sender, instance, created, **kwargs):
         logger.error("Error updating room after message soft delete: %s", e)
 
 
-# ══════════════════════════════════════════════════════════════════════
-# SIGNAL MANAGEMENT UTILITIES
-# ══════════════════════════════════════════════════════════════════════
-
 
 class DisableSignals:
-    """
-    Context manager to temporarily disable signals.
-    Useful for bulk operations to avoid performance issues.
-    """
 
     def __init__(self, disabled_signals):
         self.disabled_signals = disabled_signals
@@ -357,20 +280,7 @@ class DisableSignals:
 
 
 def disable_chat_signals():
-    """
-    Disable all chat-related signals.
-    Use this context manager for bulk operations:
-
-    with disable_chat_signals():
-        # Bulk operations here
-        pass
-    """
     return DisableSignals([post_save, post_delete, pre_delete, m2m_changed])
-
-
-# ══════════════════════════════════════════════════════════════════════
-# INITIALIZATION
-# ══════════════════════════════════════════════════════════════════════
 
 
 def initialize_room_denormalized_fields(room_id):
@@ -395,21 +305,8 @@ def initialize_room_denormalized_fields(room_id):
         logger.error("Room %s not found for initialization", room_id)
 
 
-# ══════════════════════════════════════════════════════════════════════
-# HEALTH CHECK FUNCTIONS
-# ══════════════════════════════════════════════════════════════════════
-
 
 def validate_room_data_consistency(room_id=None):
-    """
-    Validate consistency between normalized and denormalized data.
-
-    Args:
-        room_id: Specific room to check, or None for all rooms
-
-    Returns:
-        Dict with validation results
-    """
     rooms = ChatRoom.objects.all()
     if room_id:
         rooms = rooms.filter(id=room_id)

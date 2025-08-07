@@ -7,7 +7,6 @@ from apps.users.models import User
 
 
 class ChatRoom(BaseModel):
-    """Chat rooms between users / system"""
 
     class RoomType(models.TextChoices):
         DIRECT = "direct", _("Direct message")
@@ -25,7 +24,6 @@ class ChatRoom(BaseModel):
     )
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
 
-    # for booking chats
     booking = models.ForeignKey(
         "bookings.Booking",
         on_delete=models.SET_NULL,
@@ -35,11 +33,7 @@ class ChatRoom(BaseModel):
         verbose_name=_("Related booking"),
     )
 
-    # ══════════════════════════════════════════════════════════════════
-    # DENORMALIZED FIELDS (Performance optimization)
-    # ══════════════════════════════════════════════════════════════════
 
-    # Last message info (for chat list optimization)
     last_message_at = models.DateTimeField(
         null=True, blank=True, verbose_name=_("Last message time")
     )
@@ -53,17 +47,14 @@ class ChatRoom(BaseModel):
         max_length=20, blank=True, verbose_name=_("Last message type")
     )
 
-    # Message statistics
     total_messages = models.PositiveIntegerField(
         default=0, verbose_name=_("Total messages count")
     )
 
-    # Unread counts per user (JSON format: {"user_id": count})
     unread_counts = models.JSONField(
         default=dict, blank=True, verbose_name=_("Unread counts per user")
     )
 
-    # Activity tracking
     last_activity_at = models.DateTimeField(
         auto_now=True, verbose_name=_("Last activity")
     )
@@ -78,7 +69,6 @@ class ChatRoom(BaseModel):
             models.Index(fields=["is_active", "last_message_at"]),  # Composite index
         ]
 
-    # ─────────────────────── helpers ─────────────────────────
     def __str__(self):
         if self.room_type == self.RoomType.DIRECT:
             users = list(self.participants.all()[:2])
@@ -87,24 +77,20 @@ class ChatRoom(BaseModel):
         return f"ChatRoom {self.pk}"
 
     def other_participant(self, user):
-        """Get other participant in direct chat"""
         if self.room_type == self.RoomType.DIRECT:
             return self.participants.exclude(id=user.id).first()
         return None
 
     def get_unread_count(self, user):
-        """Get unread message count for specific user"""
         return self.unread_counts.get(str(user.id), 0)
 
     def increment_unread_count(self, user, save=True):
-        """Increment unread count for specific user"""
         user_id = str(user.id)
         self.unread_counts[user_id] = self.unread_counts.get(user_id, 0) + 1
         if save:
             self.save(update_fields=["unread_counts"])
 
     def mark_as_read(self, user, save=True):
-        """Mark all messages as read for specific user"""
         user_id = str(user.id)
         if user_id in self.unread_counts:
             self.unread_counts[user_id] = 0
@@ -112,12 +98,10 @@ class ChatRoom(BaseModel):
                 self.save(update_fields=["unread_counts"])
 
     def update_last_message(self, message, save=True):
-        """Update last message denormalized fields"""
         self.last_message_at = message.created_at
         self.last_message_sender_id = message.sender_id
         self.last_message_type = message.message_type
 
-        # Create preview based on message type
         if message.message_type == Message.MessageType.TEXT:
             self.last_message_preview = (
                 message.text[:147] + "..." if len(message.text) > 150 else message.text
@@ -151,9 +135,7 @@ class ChatRoom(BaseModel):
             )
 
 
-# ══════════════════════════════════════════════════════════════════════
 class Message(BaseModel):
-    """Chat messages (text / media / system)"""
 
     class MessageType(models.TextChoices):
         TEXT = "text", _("Text")
@@ -184,21 +166,21 @@ class Message(BaseModel):
         verbose_name=_("Type"),
     )
 
-    # ───── raw content ─────
+
     text = models.TextField(blank=True, verbose_name=_("Text"))
     image = models.ImageField(
         upload_to="chat/images/%Y/%m/", blank=True, null=True, verbose_name=_("Image")
-    )  # max 10 MB
+    )
     file = models.FileField(
         upload_to="chat/files/%Y/%m/",
         blank=True,
         null=True,
         verbose_name=_("File / media"),
-    )  # max 25 MB
+    )
     file_name = models.CharField(max_length=255, blank=True)
     file_size = models.PositiveIntegerField(null=True, blank=True)
 
-    # location
+
     latitude = models.DecimalField(
         max_digits=9, decimal_places=6, null=True, blank=True
     )
@@ -207,13 +189,13 @@ class Message(BaseModel):
     )
     location_name = models.CharField(max_length=255, blank=True)
 
-    # flags
+
     is_edited = models.BooleanField(default=False)
     edited_at = models.DateTimeField(null=True, blank=True)
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
 
-    # reply-thread
+
     reply_to = models.ForeignKey(
         "self",
         on_delete=models.SET_NULL,
@@ -223,14 +205,9 @@ class Message(BaseModel):
         verbose_name=_("Reply to"),
     )
 
-    # ══════════════════════════════════════════════════════════════════
-    # DENORMALIZED FIELDS (Limited optimization)
-    # ══════════════════════════════════════════════════════════════════
 
-    # Read count optimization (only for performance critical cases)
     read_count = models.PositiveIntegerField(default=0, verbose_name=_("Read count"))
 
-    # Reply count for threaded messages
     replies_count = models.PositiveIntegerField(
         default=0, verbose_name=_("Replies count")
     )
@@ -250,22 +227,20 @@ class Message(BaseModel):
         return f"{self.get_message_type_display()} ({self.pk})"
 
     def increment_read_count(self, save=True):
-        """Increment read count"""
+
         self.read_count += 1
         if save:
             self.save(update_fields=["read_count"])
 
     def increment_replies_count(self, save=True):
-        """Increment replies count for parent message"""
+
         if self.reply_to:
             self.reply_to.replies_count += 1
             if save:
                 self.reply_to.save(update_fields=["replies_count"])
 
 
-# ══════════════════════════════════════════════════════════════════════
 class MessageRead(BaseModel):
-    """Read-receipt (Optimized)"""
 
     message = models.ForeignKey(
         Message,
@@ -295,9 +270,7 @@ class MessageRead(BaseModel):
         return f"{self.user} read message {self.message.pk}"
 
 
-# ══════════════════════════════════════════════════════════════════════
 class UserTypingStatus(models.Model):
-    """Realtime typing indicator (per-room) - Already optimal"""
 
     room = models.ForeignKey(
         ChatRoom, on_delete=models.CASCADE, related_name="typing_statuses"
@@ -320,33 +293,25 @@ class UserTypingStatus(models.Model):
 
     @classmethod
     def cleanup_old_typing_statuses(cls, minutes=5):
-        """Clean up old typing statuses (for periodic cleanup task)"""
         cutoff_time = timezone.now() - timezone.timedelta(minutes=minutes)
         cls.objects.filter(is_typing=True, last_typed_at__lt=cutoff_time).update(
             is_typing=False
         )
 
 
-# ══════════════════════════════════════════════════════════════════════
-# BULK OPERATIONS MANAGER (Performance optimization)
-# ══════════════════════════════════════════════════════════════════════
 
 
 class ChatRoomManager(models.Manager):
-    """Custom manager for optimized queries"""
 
     def with_last_message(self):
-        """Get chat rooms with last message info (already denormalized)"""
         return self.select_related().filter(is_active=True)
 
     def for_user(self, user):
-        """Get chat rooms for specific user with optimizations"""
         return self.filter(participants=user, is_active=True).prefetch_related(
             "participants"
         )
 
     def unread_for_user(self, user):
-        """Get rooms with unread messages for user"""
         user_id = str(user.id)
         return self.filter(participants=user, is_active=True).extra(
             where=["unread_counts->>%s::text::int > 0"], params=[user_id]

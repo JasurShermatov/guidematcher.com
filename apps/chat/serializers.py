@@ -9,15 +9,8 @@ from apps.common.validators import (
 )
 
 
-# ═══════════════════════════════════════════════════════════════════════
-# OPTIMIZED CHAT ROOM SERIALIZERS
-# ═══════════════════════════════════════════════════════════════════════
-
 
 class ChatRoomListSerializer(serializers.ModelSerializer):
-    """
-    Optimized serializer for chat room list (uses denormalized fields)
-    """
 
     participants = UserShortSerializer(many=True, read_only=True)
     other_participant = serializers.SerializerMethodField()
@@ -91,9 +84,7 @@ class ChatRoomListSerializer(serializers.ModelSerializer):
 
 
 class ChatRoomDetailSerializer(serializers.ModelSerializer):
-    """
-    Full serializer for chat room detail view
-    """
+
 
     participants = UserShortSerializer(many=True, read_only=True)
     other_participant = serializers.SerializerMethodField()
@@ -142,9 +133,7 @@ class ChatRoomDetailSerializer(serializers.ModelSerializer):
 
 
 class ChatRoomCreateSerializer(serializers.ModelSerializer):
-    """
-    Serializer for creating chat rooms
-    """
+
 
     participant_ids = serializers.ListField(
         child=serializers.UUIDField(),
@@ -180,15 +169,9 @@ class ChatRoomCreateSerializer(serializers.ModelSerializer):
         return room
 
 
-# ═══════════════════════════════════════════════════════════════════════
-# OPTIMIZED MESSAGE SERIALIZERS
-# ═══════════════════════════════════════════════════════════════════════
-
 
 class MessageListSerializer(serializers.ModelSerializer):
-    """
-    Optimized serializer for message list (includes denormalized counts)
-    """
+
 
     sender = UserShortSerializer(read_only=True)
     reply_to_message = serializers.SerializerMethodField()
@@ -271,9 +254,7 @@ class MessageListSerializer(serializers.ModelSerializer):
 
 
 class MessageCreateSerializer(serializers.ModelSerializer):
-    """
-    Serializer for creating messages
-    """
+
 
     class Meta:
         model = Message
@@ -325,31 +306,23 @@ class MessageCreateSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        """Create message and update denormalized fields"""
         message = super().create(validated_data)
 
-        # Update parent message reply count
         if message.reply_to:
             message.reply_to.increment_replies_count(save=True)
 
-        # Update chat room denormalized fields
         message.room.update_last_message(message, save=True)
 
-        # Update unread counts for other participants
         current_user = self.context.get("request").user
         for participant in message.room.participants.exclude(id=current_user.id):
             message.room.increment_unread_count(participant, save=False)
 
-        # Save room with updated unread counts
         message.room.save(update_fields=["unread_counts"])
 
         return message
 
 
 class MessageUpdateSerializer(serializers.ModelSerializer):
-    """
-    Serializer for updating messages (editing)
-    """
 
     class Meta:
         model = Message
@@ -363,10 +336,6 @@ class MessageUpdateSerializer(serializers.ModelSerializer):
         instance.save(update_fields=["text", "is_edited", "edited_at"])
         return instance
 
-
-# ═══════════════════════════════════════════════════════════════════════
-# OTHER SERIALIZERS
-# ═══════════════════════════════════════════════════════════════════════
 
 
 class MessageReadSerializer(serializers.ModelSerializer):
@@ -392,15 +361,9 @@ class TypingStatusSerializer(serializers.ModelSerializer):
         instance.last_typed_at = timezone.now()
         instance.save(update_fields=["is_typing", "last_typed_at"])
 
-        # Cleanup old typing statuses in background (optional)
-        # UserTypingStatus.cleanup_old_typing_statuses.delay()
 
         return instance
 
-
-# ═══════════════════════════════════════════════════════════════════════
-# BULK OPERATIONS SERIALIZERS (for performance)
-# ═══════════════════════════════════════════════════════════════════════
 
 
 class BulkMarkAsReadSerializer(serializers.Serializer):
@@ -454,9 +417,6 @@ class BulkMarkAsReadSerializer(serializers.Serializer):
 
 
 class ChatStatisticsSerializer(serializers.Serializer):
-    """
-    Serializer for chat room statistics
-    """
 
     total_rooms = serializers.IntegerField(read_only=True)
     unread_rooms_count = serializers.IntegerField(read_only=True)

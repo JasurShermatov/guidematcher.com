@@ -25,10 +25,6 @@ from apps.common.permissions import IsChatParticipant
 from apps.common.pagination import StandardResultsSetPagination
 
 
-# ═══════════════════════════════════════════════════════════════════════
-# OPTIMIZED CHAT ROOM VIEWS
-# ═══════════════════════════════════════════════════════════════════════
-
 
 @extend_schema_view(
     list=extend_schema(
@@ -45,9 +41,6 @@ from apps.common.pagination import StandardResultsSetPagination
 )
 @extend_schema(tags=["Chat Rooms"])
 class ChatRoomViewSet(viewsets.ModelViewSet):
-    """
-    Optimized ViewSet for chat rooms with performance optimizations
-    """
 
     permission_classes = [IsAuthenticated]
     filter_backends = [
@@ -62,7 +55,6 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
 
     def get_serializer_class(self):
-        """Dynamic serializer selection for optimal performance"""
         if self.action == "list":
             return ChatRoomListSerializer
         elif self.action == "create":
@@ -70,7 +62,6 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
         return ChatRoomDetailSerializer
 
     def get_queryset(self):
-        """Optimized queryset with minimal database hits"""
         user = self.request.user
         qs = ChatRoom.objects.for_user(user)
         if self.action == "list":
@@ -82,7 +73,6 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
         return qs
 
     def perform_create(self, serializer):
-        """Create chat room and set initial denormalized values"""
         with transaction.atomic():
             room = serializer.save()
             room.last_activity_at = timezone.now()
@@ -94,7 +84,6 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def mark_all_read(self, request, pk=None):
-        """Mark all messages in room as read for current user"""
         room = self.get_object()
         with transaction.atomic():
             room.mark_as_read(request.user, save=True)
@@ -118,7 +107,6 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def statistics(self, request):
-        """Get user's chat statistics"""
         user = request.user
         rooms = ChatRoom.objects.for_user(user)
         stats = {
@@ -138,15 +126,10 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def unread_rooms(self, request):
-        """Get rooms with unread messages"""
         rooms = ChatRoom.objects.unread_for_user(request.user)
         serializer = self.get_serializer(rooms, many=True)
         return Response(serializer.data)
 
-
-# ═══════════════════════════════════════════════════════════════════════
-# OPTIMIZED MESSAGE VIEWS (Nested under ChatRoom)
-# ═══════════════════════════════════════════════════════════════════════
 
 
 @extend_schema_view(
@@ -164,9 +147,6 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
 )
 @extend_schema(tags=["Chat Messages"])
 class MessageViewSet(viewsets.ModelViewSet):
-    """
-    Optimized ViewSet for messages with performance enhancements
-    """
 
     permission_classes = [IsChatParticipant]
     pagination_class = StandardResultsSetPagination
@@ -268,17 +248,9 @@ class MessageViewSet(viewsets.ModelViewSet):
             return Response({"unread_count": 0})
 
 
-# ═══════════════════════════════════════════════════════════════════════
-# OPTIMIZED TYPING STATUS VIEW
-# ═══════════════════════════════════════════════════════════════════════
-
 
 @extend_schema(tags=["Chat Typing"])
 class TypingStatusView(generics.RetrieveUpdateAPIView):
-    """
-    Optimized typing status management
-    """
-
     serializer_class = TypingStatusSerializer
     permission_classes = [IsChatParticipant]
 
@@ -296,16 +268,10 @@ class TypingStatusView(generics.RetrieveUpdateAPIView):
         return response
 
 
-# ═══════════════════════════════════════════════════════════════════════
-# ACTIVE TYPERS VIEW
-# ═══════════════════════════════════════════════════════════════════════
-
 
 @extend_schema(tags=["Chat Typing"])
 class ActiveTypersView(views.APIView):
-    """
-    View to get users currently typing in a room
-    """
+
 
     permission_classes = [IsChatParticipant]
 
@@ -323,16 +289,10 @@ class ActiveTypersView(views.APIView):
         return Response(serializer.data)
 
 
-# ═══════════════════════════════════════════════════════════════════════
-# READ RECEIPTS VIEW
-# ═══════════════════════════════════════════════════════════════════════
-
 
 @extend_schema(tags=["Message Read Receipts"])
 class MessageReadListView(generics.ListAPIView):
-    """
-    Get read receipts for specific message
-    """
+
 
     serializer_class = MessageReadSerializer
     permission_classes = [IsChatParticipant]
@@ -347,16 +307,9 @@ class MessageReadListView(generics.ListAPIView):
         )
 
 
-# ═══════════════════════════════════════════════════════════════════════
-# UTILITY VIEWS
-# ═══════════════════════════════════════════════════════════════════════
-
 
 @extend_schema(tags=["Chat Utilities"])
 class ChatCleanupView(generics.GenericAPIView):
-    """
-    Administrative view for cleaning up chat data
-    """
 
     permission_classes = [IsAuthenticated]
 

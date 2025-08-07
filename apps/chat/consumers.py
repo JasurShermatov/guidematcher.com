@@ -18,31 +18,6 @@ logger = logging.getLogger(__name__)
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
-    """
-    Production-ready real-time chat consumer with optimized denormalized field support.
-
-    Group name: chat_<room_uuid>
-    Auth: Query-string JWT middleware scope["user"]
-    Room UUID URLConf param: <room_id>
-
-    Client -> Server events:
-    - message.send: { "text": "...", "reply_to": "<uuid>?" }
-    - location.send: { "latitude": float, "longitude": float, "name": str? }
-    - file.broadcast: { "message_id": "<uuid>" }
-    - typing: { "is_typing": bool }
-    - read: { "message_ids": ["uuid", ...] }
-    - ping: {}
-    - room.stats: {}
-
-    Server -> Client events:
-    - message: { MessageListSerializer data + websocket fields }
-    - typing: { "user_id": str, "is_typing": bool, "user_info": {...} }
-    - read: { "user_id": str, "message_ids": [...], "user_info": {...} }
-    - room_updated: { "total_messages": int, "last_activity_at": str }
-    - system: { "text": str, "code": str }
-    - error: { "detail": str, "code": str }
-    - pong: { "room_stats": {...}, "timestamp": str }
-    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -50,12 +25,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         self.group_name: Optional[str] = None
         self.room_info: Optional[Dict[str, Any]] = None
 
-    # ══════════════════════════════════════════════════════════════════
-    # LIFECYCLE METHODS
-    # ══════════════════════════════════════════════════════════════════
 
     async def connect(self):
-        """Handle WebSocket connection."""
         try:
             # Extract room ID from URL
             self.room_id = self.scope["url_route"]["kwargs"]["room_id"]
@@ -305,9 +276,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         room_stats = await self._get_room_stats(self.room_id)
         await self.send_json({"type": "room_stats", "stats": room_stats})
 
-    # ══════════════════════════════════════════════════════════════════
-    # OUTBOUND GROUP EVENT HANDLERS
-    # ══════════════════════════════════════════════════════════════════
 
     async def chat_message(self, event):
         """Send message to client."""
@@ -327,9 +295,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         """Send room update to client."""
         await self.send_json({"type": "room_updated", **event})
 
-    # ══════════════════════════════════════════════════════════════════
-    # UTILITY METHODS
-    # ══════════════════════════════════════════════════════════════════
 
     def _is_user_authenticated(self, user) -> bool:
         """Check if user is authenticated."""
@@ -382,9 +347,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
-    # ══════════════════════════════════════════════════════════════════
-    # DATABASE OPERATIONS
-    # ══════════════════════════════════════════════════════════════════
+
 
     @database_sync_to_async
     def _get_room_info(
@@ -641,7 +604,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             return {}
 
     def _serialize_message_optimized(self, message: Message) -> Dict[str, Any]:
-        """Optimized message serialization."""
+
         try:
             data = MessageListSerializer(message, context={"request": None}).data
 
@@ -659,28 +622,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             return {}
 
 
-# ══════════════════════════════════════════════════════════════════════
-# NOTIFICATION CONSUMER
-# ══════════════════════════════════════════════════════════════════════
-
-
 class ChatNotificationConsumer(AsyncJsonWebsocketConsumer):
-    """
-    Global chat notifications consumer for user-specific notifications.
-    Group name: user_<user_id>
-
-    Handles:
-    - New message notifications from other rooms
-    - Chat invitations
-    - System notifications
-    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user_group: Optional[str] = None
 
     async def connect(self):
-        """Handle notification WebSocket connection."""
+
         try:
             user = self.scope.get("user")
             if not user or isinstance(user, AnonymousUser) or not user.is_authenticated:
@@ -693,7 +642,6 @@ class ChatNotificationConsumer(AsyncJsonWebsocketConsumer):
 
             logger.info("Notification WS connected: user=%s", user.id)
 
-            # Send connection confirmation
             await self.send_json(
                 {
                     "type": "system",
@@ -708,7 +656,6 @@ class ChatNotificationConsumer(AsyncJsonWebsocketConsumer):
             await self.close(code=4500)
 
     async def disconnect(self, close_code):
-        """Handle notification WebSocket disconnection."""
         try:
             if self.user_group:
                 await self.channel_layer.group_discard(
@@ -719,15 +666,12 @@ class ChatNotificationConsumer(AsyncJsonWebsocketConsumer):
             logger.error("Error disconnecting from notifications: %s", e)
 
     async def receive_json(self, content: Dict[str, Any], **kwargs):
-        """Handle notification WebSocket messages."""
-        # This consumer is mostly for receiving, but we can handle ping
         if content.get("type") == "ping":
             await self.send_json(
                 {"type": "pong", "timestamp": timezone.now().isoformat()}
             )
 
     async def chat_notification(self, event):
-        """Send chat notification to user."""
         await self.send_json(
             {"type": "notification", "timestamp": timezone.now().isoformat(), **event}
         )

@@ -9,7 +9,6 @@ from apps.common.validators import (
 )
 
 
-
 class ChatRoomListSerializer(serializers.ModelSerializer):
 
     participants = UserShortSerializer(many=True, read_only=True)
@@ -85,7 +84,6 @@ class ChatRoomListSerializer(serializers.ModelSerializer):
 
 class ChatRoomDetailSerializer(serializers.ModelSerializer):
 
-
     participants = UserShortSerializer(many=True, read_only=True)
     other_participant = serializers.SerializerMethodField()
     unread_count = serializers.SerializerMethodField()
@@ -134,7 +132,6 @@ class ChatRoomDetailSerializer(serializers.ModelSerializer):
 
 class ChatRoomCreateSerializer(serializers.ModelSerializer):
 
-
     participant_ids = serializers.ListField(
         child=serializers.UUIDField(),
         write_only=True,
@@ -169,9 +166,7 @@ class ChatRoomCreateSerializer(serializers.ModelSerializer):
         return room
 
 
-
 class MessageListSerializer(serializers.ModelSerializer):
-
 
     sender = UserShortSerializer(read_only=True)
     reply_to_message = serializers.SerializerMethodField()
@@ -255,7 +250,6 @@ class MessageListSerializer(serializers.ModelSerializer):
 
 class MessageCreateSerializer(serializers.ModelSerializer):
 
-
     class Meta:
         model = Message
         fields = (
@@ -337,7 +331,6 @@ class MessageUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
-
 class MessageReadSerializer(serializers.ModelSerializer):
     user = UserShortSerializer(read_only=True)
 
@@ -361,9 +354,7 @@ class TypingStatusSerializer(serializers.ModelSerializer):
         instance.last_typed_at = timezone.now()
         instance.save(update_fields=["is_typing", "last_typed_at"])
 
-
         return instance
-
 
 
 class BulkMarkAsReadSerializer(serializers.Serializer):

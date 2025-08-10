@@ -33,7 +33,6 @@ class ChatRoom(BaseModel):
         verbose_name=_("Related booking"),
     )
 
-
     last_message_at = models.DateTimeField(
         null=True, blank=True, verbose_name=_("Last message time")
     )
@@ -166,7 +165,6 @@ class Message(BaseModel):
         verbose_name=_("Type"),
     )
 
-
     text = models.TextField(blank=True, verbose_name=_("Text"))
     image = models.ImageField(
         upload_to="chat/images/%Y/%m/", blank=True, null=True, verbose_name=_("Image")
@@ -180,7 +178,6 @@ class Message(BaseModel):
     file_name = models.CharField(max_length=255, blank=True)
     file_size = models.PositiveIntegerField(null=True, blank=True)
 
-
     latitude = models.DecimalField(
         max_digits=9, decimal_places=6, null=True, blank=True
     )
@@ -189,12 +186,10 @@ class Message(BaseModel):
     )
     location_name = models.CharField(max_length=255, blank=True)
 
-
     is_edited = models.BooleanField(default=False)
     edited_at = models.DateTimeField(null=True, blank=True)
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
-
 
     reply_to = models.ForeignKey(
         "self",
@@ -204,7 +199,6 @@ class Message(BaseModel):
         related_name="replies",
         verbose_name=_("Reply to"),
     )
-
 
     read_count = models.PositiveIntegerField(default=0, verbose_name=_("Read count"))
 
@@ -297,8 +291,6 @@ class UserTypingStatus(models.Model):
         cls.objects.filter(is_typing=True, last_typed_at__lt=cutoff_time).update(
             is_typing=False
         )
-
-
 
 
 class ChatRoomManager(models.Manager):

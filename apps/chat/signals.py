@@ -26,7 +26,6 @@ def update_room_on_message_create(sender, instance, created, **kwargs):
                 for participant in room.participants.exclude(id=instance.sender.id):
                     room.increment_unread_count(participant, save=False)
 
-
             room.save(
                 update_fields=[
                     "last_message_at",
@@ -141,8 +140,6 @@ def cleanup_old_typing_statuses(sender, instance, **kwargs):
             logger.error("Error cleaning up typing statuses: %s", e)
 
 
-
-
 def bulk_update_room_unread_counts(room_id, user_message_counts):
     try:
         with transaction.atomic():
@@ -191,7 +188,6 @@ def recalculate_room_statistics(room_id):
         logger.warning("Room %s not found for recalculation", room_id)
     except Exception as e:
         logger.error("Error recalculating room statistics: %s", e)
-
 
 
 @receiver(post_save, sender=Message)
@@ -262,7 +258,6 @@ def update_room_on_message_soft_delete(sender, instance, created, **kwargs):
         logger.error("Error updating room after message soft delete: %s", e)
 
 
-
 class DisableSignals:
 
     def __init__(self, disabled_signals):
@@ -303,7 +298,6 @@ def initialize_room_denormalized_fields(room_id):
 
     except ChatRoom.DoesNotExist:
         logger.error("Room %s not found for initialization", room_id)
-
 
 
 def validate_room_data_consistency(room_id=None):

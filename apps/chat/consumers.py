@@ -25,7 +25,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         self.group_name: Optional[str] = None
         self.room_info: Optional[Dict[str, Any]] = None
 
-
     async def connect(self):
         try:
             # Extract room ID from URL
@@ -276,7 +275,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         room_stats = await self._get_room_stats(self.room_id)
         await self.send_json({"type": "room_stats", "stats": room_stats})
 
-
     async def chat_message(self, event):
         """Send message to client."""
         await self.send_json({"type": "message", **event["message"]})
@@ -294,7 +292,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def chat_room_updated(self, event):
         """Send room update to client."""
         await self.send_json({"type": "room_updated", **event})
-
 
     def _is_user_authenticated(self, user) -> bool:
         """Check if user is authenticated."""
@@ -346,8 +343,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "timestamp": timezone.now().isoformat(),
             }
         )
-
-
 
     @database_sync_to_async
     def _get_room_info(

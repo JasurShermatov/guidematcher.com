@@ -25,7 +25,6 @@ from apps.common.permissions import IsChatParticipant
 from apps.common.pagination import StandardResultsSetPagination
 
 
-
 @extend_schema_view(
     list=extend_schema(
         summary="Get user's chat rooms",
@@ -129,7 +128,6 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
         rooms = ChatRoom.objects.unread_for_user(request.user)
         serializer = self.get_serializer(rooms, many=True)
         return Response(serializer.data)
-
 
 
 @extend_schema_view(
@@ -248,7 +246,6 @@ class MessageViewSet(viewsets.ModelViewSet):
             return Response({"unread_count": 0})
 
 
-
 @extend_schema(tags=["Chat Typing"])
 class TypingStatusView(generics.RetrieveUpdateAPIView):
     serializer_class = TypingStatusSerializer
@@ -268,10 +265,8 @@ class TypingStatusView(generics.RetrieveUpdateAPIView):
         return response
 
 
-
 @extend_schema(tags=["Chat Typing"])
 class ActiveTypersView(views.APIView):
-
 
     permission_classes = [IsChatParticipant]
 
@@ -289,10 +284,8 @@ class ActiveTypersView(views.APIView):
         return Response(serializer.data)
 
 
-
 @extend_schema(tags=["Message Read Receipts"])
 class MessageReadListView(generics.ListAPIView):
-
 
     serializer_class = MessageReadSerializer
     permission_classes = [IsChatParticipant]
@@ -305,7 +298,6 @@ class MessageReadListView(generics.ListAPIView):
             .select_related("user")
             .order_by("-read_at")
         )
-
 
 
 @extend_schema(tags=["Chat Utilities"])

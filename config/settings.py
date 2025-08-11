@@ -44,6 +44,7 @@ AUTH_USER_MODEL = "users.User"
 # | 1. Installed apps                                           |
 # ╰──────────────────────────────────────────────────────────────╯
 DJANGO_APPS = [
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

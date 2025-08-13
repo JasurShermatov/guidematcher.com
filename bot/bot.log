@@ -1193,3 +1193,5 @@ LINE 2:                 INSERT INTO users (
 2025-08-13 07:41:14,587 - aiogram.dispatcher - WARNING - Sleep for 3.839909 seconds and try again... (tryings = 5, bot id = 7857439280)
 2025-08-13 07:41:23,651 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
 2025-08-13 07:41:23,651 - aiogram.dispatcher - WARNING - Sleep for 4.939278 seconds and try again... (tryings = 6, bot id = 7857439280)
+
+

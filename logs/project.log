@@ -2203,3 +2203,11 @@ KeyError: 'user'
 [2025-08-13 12:41:35,423] INFO apps.chat.apps: Chat WebSocket consumers loaded
 [2025-08-13 12:41:35,424] INFO apps.chat.apps: Chat periodic tasks registered
 [2025-08-13 12:41:35,424] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 12:41:36,393] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 12:41:36,462] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 12:41:36,463] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 12:41:36,463] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 12:41:37,086] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 12:41:37,136] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 12:41:37,137] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 12:41:37,137] INFO apps.chat.apps: Chat app initialized successfully

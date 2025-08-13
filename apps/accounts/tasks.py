@@ -90,3 +90,29 @@ def send_welcome_email(self, email: str, first_name: str):
             f"Failed to send welcome email to {email}: {str(e)}", exc_info=True
         )
         raise e
+
+
+@shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=True, max_retries=3)
+def send_password_reset_email(email: str, code: str):
+    logger.info(f"Sending password reset email to {email}")
+    try:
+        context = {"code": code}
+        html_content = render_to_string("emails/password_reset.html", context)
+        text_content = (
+            f"Your TravMatch password reset code: {code}\nIt expires in 5 minutes."
+        )
+
+        subject = "TravMatch Password Reset"
+        from_email = settings.DEFAULT_FROM_EMAIL
+
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [email])
+        msg.attach_alternative(html_content, "text/html")
+        sent = msg.send(fail_silently=False)
+
+        logger.info(f"Password reset email sent to {email}, result={sent}")
+        return sent
+    except Exception as e:
+        logger.error(
+            f"Failed to send password reset email to {email}: {str(e)}", exc_info=True
+        )
+        raise e

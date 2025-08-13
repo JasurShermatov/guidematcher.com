@@ -1,15 +1,15 @@
+bot/bot.log
+
 # Python cache
 __pycache__/
 *.py[cod]
 *.log
 logs
-
-
 # Media files
 media/     # media papka gitga tushmaydi (user upload'lar)
-
 # IDE (Pycharm, VSCode)
 .idea/
-
 # MacOS keraksiz fayllari
 .DS_Store
+
+

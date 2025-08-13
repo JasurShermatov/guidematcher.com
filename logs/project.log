@@ -2199,3 +2199,7 @@ KeyError: 'user'
 [2025-07-26 04:14:02,937] WARNING django.request: Bad Request: /api/v1/accounts/register/
 [2025-07-26 04:14:17,019] WARNING django.request: Bad Request: /api/v1/accounts/register/
 [2025-07-26 04:14:17,019] WARNING django.request: Bad Request: /api/v1/accounts/register/
+[2025-08-13 12:41:35,352] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 12:41:35,423] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 12:41:35,424] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 12:41:35,424] INFO apps.chat.apps: Chat app initialized successfully

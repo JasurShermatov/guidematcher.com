@@ -1195,3 +1195,325 @@ LINE 2:                 INSERT INTO users (
 2025-08-13 07:41:23,651 - aiogram.dispatcher - WARNING - Sleep for 4.939278 seconds and try again... (tryings = 6, bot id = 7857439280)
 
 
+2025-08-13 08:59:56,047 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-13 08:59:56,047 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-13 08:59:56,058 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-13 08:59:56,061 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-13 08:59:56,061 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-13 08:59:56,062 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-13 08:59:56,063 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-13 08:59:56,063 - utils.database.db_init - INFO - Database connection closed
+2025-08-13 08:59:56,079 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-13 08:59:56,079 - __main__ - INFO - Bot ishga tushdi
+2025-08-13 08:59:56,079 - aiogram.dispatcher - INFO - Start polling
+2025-08-13 08:59:56,665 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-13 09:02:46,520 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-13 09:02:46,521 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-13 09:02:46,531 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-13 09:02:46,535 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-13 09:02:46,535 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-13 09:02:46,536 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-13 09:02:46,536 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-13 09:02:46,537 - utils.database.db_init - INFO - Database connection closed
+2025-08-13 09:02:46,552 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-13 09:02:46,553 - __main__ - INFO - Bot ishga tushdi
+2025-08-13 09:02:46,553 - aiogram.dispatcher - INFO - Start polling
+2025-08-13 09:02:47,191 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-13 09:02:51,703 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:02:51,703 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7857439280)
+2025-08-13 09:10:08,633 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:10:08,633 - aiogram.dispatcher - WARNING - Sleep for 1.288329 seconds and try again... (tryings = 1, bot id = 7857439280)
+2025-08-13 09:10:15,084 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:10:15,085 - aiogram.dispatcher - WARNING - Sleep for 1.595597 seconds and try again... (tryings = 2, bot id = 7857439280)
+2025-08-13 09:10:22,661 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:10:22,662 - aiogram.dispatcher - WARNING - Sleep for 2.032789 seconds and try again... (tryings = 3, bot id = 7857439280)
+2025-08-13 09:10:28,396 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:10:28,397 - aiogram.dispatcher - WARNING - Sleep for 2.688698 seconds and try again... (tryings = 4, bot id = 7857439280)
+2025-08-13 09:10:39,046 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:10:39,051 - aiogram.dispatcher - WARNING - Sleep for 3.673607 seconds and try again... (tryings = 5, bot id = 7857439280)
+2025-08-13 09:10:48,380 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:10:48,381 - aiogram.dispatcher - WARNING - Sleep for 4.780322 seconds and try again... (tryings = 6, bot id = 7857439280)
+2025-08-13 09:10:58,503 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:10:58,504 - aiogram.dispatcher - WARNING - Sleep for 5.177938 seconds and try again... (tryings = 7, bot id = 7857439280)
+2025-08-13 09:11:09,256 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:11:09,257 - aiogram.dispatcher - WARNING - Sleep for 4.813496 seconds and try again... (tryings = 8, bot id = 7857439280)
+2025-08-13 09:11:19,903 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:11:19,904 - aiogram.dispatcher - WARNING - Sleep for 4.943283 seconds and try again... (tryings = 9, bot id = 7857439280)
+2025-08-13 09:11:35,873 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:11:35,874 - aiogram.dispatcher - WARNING - Sleep for 5.087259 seconds and try again... (tryings = 10, bot id = 7857439280)
+2025-08-13 09:11:41,609 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:11:41,610 - aiogram.dispatcher - WARNING - Sleep for 4.945836 seconds and try again... (tryings = 11, bot id = 7857439280)
+2025-08-13 09:11:51,047 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:11:51,048 - aiogram.dispatcher - WARNING - Sleep for 5.020374 seconds and try again... (tryings = 12, bot id = 7857439280)
+2025-08-13 09:12:01,088 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:12:01,089 - aiogram.dispatcher - WARNING - Sleep for 4.877162 seconds and try again... (tryings = 13, bot id = 7857439280)
+2025-08-13 09:12:11,103 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:12:11,105 - aiogram.dispatcher - WARNING - Sleep for 5.019071 seconds and try again... (tryings = 14, bot id = 7857439280)
+2025-08-13 09:12:21,591 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:12:21,592 - aiogram.dispatcher - WARNING - Sleep for 5.004391 seconds and try again... (tryings = 15, bot id = 7857439280)
+2025-08-13 09:12:32,664 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:12:32,666 - aiogram.dispatcher - WARNING - Sleep for 5.021330 seconds and try again... (tryings = 16, bot id = 7857439280)
+2025-08-13 09:12:42,221 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:12:42,221 - aiogram.dispatcher - WARNING - Sleep for 4.720921 seconds and try again... (tryings = 17, bot id = 7857439280)
+2025-08-13 09:12:52,067 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:12:52,069 - aiogram.dispatcher - WARNING - Sleep for 4.996733 seconds and try again... (tryings = 18, bot id = 7857439280)
+2025-08-13 09:13:02,509 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:13:02,511 - aiogram.dispatcher - WARNING - Sleep for 5.063670 seconds and try again... (tryings = 19, bot id = 7857439280)
+2025-08-13 09:13:13,164 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:13:13,165 - aiogram.dispatcher - WARNING - Sleep for 5.108659 seconds and try again... (tryings = 20, bot id = 7857439280)
+2025-08-13 09:13:25,031 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:13:25,032 - aiogram.dispatcher - WARNING - Sleep for 5.029256 seconds and try again... (tryings = 21, bot id = 7857439280)
+2025-08-13 09:13:35,378 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:13:35,380 - aiogram.dispatcher - WARNING - Sleep for 4.825395 seconds and try again... (tryings = 22, bot id = 7857439280)
+2025-08-13 09:13:45,516 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:13:45,516 - aiogram.dispatcher - WARNING - Sleep for 4.936299 seconds and try again... (tryings = 23, bot id = 7857439280)
+2025-08-13 09:13:55,804 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:13:55,805 - aiogram.dispatcher - WARNING - Sleep for 4.945333 seconds and try again... (tryings = 24, bot id = 7857439280)
+2025-08-13 09:14:06,303 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:14:06,304 - aiogram.dispatcher - WARNING - Sleep for 4.874685 seconds and try again... (tryings = 25, bot id = 7857439280)
+2025-08-13 09:14:17,571 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:14:17,572 - aiogram.dispatcher - WARNING - Sleep for 5.130848 seconds and try again... (tryings = 26, bot id = 7857439280)
+2025-08-13 09:14:30,527 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:14:30,528 - aiogram.dispatcher - WARNING - Sleep for 5.034238 seconds and try again... (tryings = 27, bot id = 7857439280)
+2025-08-13 09:14:41,105 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:14:41,107 - aiogram.dispatcher - WARNING - Sleep for 4.820364 seconds and try again... (tryings = 28, bot id = 7857439280)
+2025-08-13 09:14:51,171 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:14:51,172 - aiogram.dispatcher - WARNING - Sleep for 4.938787 seconds and try again... (tryings = 29, bot id = 7857439280)
+2025-08-13 09:15:01,547 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:15:01,549 - aiogram.dispatcher - WARNING - Sleep for 5.065806 seconds and try again... (tryings = 30, bot id = 7857439280)
+2025-08-13 09:15:11,926 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:15:11,927 - aiogram.dispatcher - WARNING - Sleep for 4.810405 seconds and try again... (tryings = 31, bot id = 7857439280)
+2025-08-13 09:15:23,010 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:15:23,012 - aiogram.dispatcher - WARNING - Sleep for 5.175278 seconds and try again... (tryings = 32, bot id = 7857439280)
+2025-08-13 09:15:33,656 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:15:33,658 - aiogram.dispatcher - WARNING - Sleep for 5.033740 seconds and try again... (tryings = 33, bot id = 7857439280)
+2025-08-13 09:15:44,150 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:15:44,151 - aiogram.dispatcher - WARNING - Sleep for 4.871561 seconds and try again... (tryings = 34, bot id = 7857439280)
+2025-08-13 09:15:54,497 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:15:54,498 - aiogram.dispatcher - WARNING - Sleep for 4.936207 seconds and try again... (tryings = 35, bot id = 7857439280)
+2025-08-13 09:16:04,989 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:16:04,991 - aiogram.dispatcher - WARNING - Sleep for 5.015616 seconds and try again... (tryings = 36, bot id = 7857439280)
+2025-08-13 09:16:15,148 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:16:15,149 - aiogram.dispatcher - WARNING - Sleep for 4.978179 seconds and try again... (tryings = 37, bot id = 7857439280)
+2025-08-13 09:16:25,462 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:16:25,463 - aiogram.dispatcher - WARNING - Sleep for 4.852477 seconds and try again... (tryings = 38, bot id = 7857439280)
+2025-08-13 09:16:36,789 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:16:36,791 - aiogram.dispatcher - WARNING - Sleep for 4.872033 seconds and try again... (tryings = 39, bot id = 7857439280)
+2025-08-13 09:16:47,105 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:16:47,107 - aiogram.dispatcher - WARNING - Sleep for 4.923069 seconds and try again... (tryings = 40, bot id = 7857439280)
+2025-08-13 09:16:57,270 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:16:57,271 - aiogram.dispatcher - WARNING - Sleep for 5.068551 seconds and try again... (tryings = 41, bot id = 7857439280)
+2025-08-13 09:17:07,643 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:17:07,644 - aiogram.dispatcher - WARNING - Sleep for 5.009976 seconds and try again... (tryings = 42, bot id = 7857439280)
+2025-08-13 09:17:18,156 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:17:18,158 - aiogram.dispatcher - WARNING - Sleep for 4.979102 seconds and try again... (tryings = 43, bot id = 7857439280)
+2025-08-13 09:17:28,812 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:17:28,814 - aiogram.dispatcher - WARNING - Sleep for 5.044263 seconds and try again... (tryings = 44, bot id = 7857439280)
+2025-08-13 09:17:39,350 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:17:39,352 - aiogram.dispatcher - WARNING - Sleep for 4.991832 seconds and try again... (tryings = 45, bot id = 7857439280)
+2025-08-13 09:17:49,897 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:17:49,899 - aiogram.dispatcher - WARNING - Sleep for 5.114266 seconds and try again... (tryings = 46, bot id = 7857439280)
+2025-08-13 09:18:00,545 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:18:00,547 - aiogram.dispatcher - WARNING - Sleep for 5.039010 seconds and try again... (tryings = 47, bot id = 7857439280)
+2025-08-13 09:18:11,097 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:18:11,097 - aiogram.dispatcher - WARNING - Sleep for 4.978410 seconds and try again... (tryings = 48, bot id = 7857439280)
+2025-08-13 09:18:21,357 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:18:21,358 - aiogram.dispatcher - WARNING - Sleep for 4.909354 seconds and try again... (tryings = 49, bot id = 7857439280)
+2025-08-13 09:18:31,779 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:18:31,780 - aiogram.dispatcher - WARNING - Sleep for 4.870788 seconds and try again... (tryings = 50, bot id = 7857439280)
+2025-08-13 09:18:42,050 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:18:42,051 - aiogram.dispatcher - WARNING - Sleep for 4.948429 seconds and try again... (tryings = 51, bot id = 7857439280)
+2025-08-13 09:18:52,366 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:18:52,368 - aiogram.dispatcher - WARNING - Sleep for 5.012847 seconds and try again... (tryings = 52, bot id = 7857439280)
+2025-08-13 09:19:02,806 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:19:02,808 - aiogram.dispatcher - WARNING - Sleep for 4.970960 seconds and try again... (tryings = 53, bot id = 7857439280)
+2025-08-13 09:19:13,259 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:19:13,261 - aiogram.dispatcher - WARNING - Sleep for 4.980540 seconds and try again... (tryings = 54, bot id = 7857439280)
+2025-08-13 09:19:23,600 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:19:23,601 - aiogram.dispatcher - WARNING - Sleep for 5.169392 seconds and try again... (tryings = 55, bot id = 7857439280)
+2025-08-13 09:19:34,254 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:19:34,256 - aiogram.dispatcher - WARNING - Sleep for 4.993614 seconds and try again... (tryings = 56, bot id = 7857439280)
+2025-08-13 09:19:44,715 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:19:44,716 - aiogram.dispatcher - WARNING - Sleep for 4.885099 seconds and try again... (tryings = 57, bot id = 7857439280)
+2025-08-13 09:19:55,065 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:19:55,066 - aiogram.dispatcher - WARNING - Sleep for 4.923530 seconds and try again... (tryings = 58, bot id = 7857439280)
+2025-08-13 09:20:05,780 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:20:05,781 - aiogram.dispatcher - WARNING - Sleep for 5.081171 seconds and try again... (tryings = 59, bot id = 7857439280)
+2025-08-13 09:20:16,280 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:20:16,281 - aiogram.dispatcher - WARNING - Sleep for 4.976804 seconds and try again... (tryings = 60, bot id = 7857439280)
+2025-08-13 09:20:26,578 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:20:26,579 - aiogram.dispatcher - WARNING - Sleep for 5.161827 seconds and try again... (tryings = 61, bot id = 7857439280)
+2025-08-13 09:20:37,132 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:20:37,133 - aiogram.dispatcher - WARNING - Sleep for 5.094343 seconds and try again... (tryings = 62, bot id = 7857439280)
+2025-08-13 09:20:48,214 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:20:48,215 - aiogram.dispatcher - WARNING - Sleep for 5.008430 seconds and try again... (tryings = 63, bot id = 7857439280)
+2025-08-13 09:20:58,311 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:20:58,313 - aiogram.dispatcher - WARNING - Sleep for 4.962391 seconds and try again... (tryings = 64, bot id = 7857439280)
+2025-08-13 09:21:10,199 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:21:10,201 - aiogram.dispatcher - WARNING - Sleep for 5.017277 seconds and try again... (tryings = 65, bot id = 7857439280)
+2025-08-13 09:21:20,532 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:21:20,533 - aiogram.dispatcher - WARNING - Sleep for 5.115580 seconds and try again... (tryings = 66, bot id = 7857439280)
+2025-08-13 09:21:31,096 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:21:31,098 - aiogram.dispatcher - WARNING - Sleep for 4.891756 seconds and try again... (tryings = 67, bot id = 7857439280)
+2025-08-13 09:21:41,422 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:21:41,424 - aiogram.dispatcher - WARNING - Sleep for 4.930262 seconds and try again... (tryings = 68, bot id = 7857439280)
+2025-08-13 09:21:51,732 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:21:51,733 - aiogram.dispatcher - WARNING - Sleep for 5.087514 seconds and try again... (tryings = 69, bot id = 7857439280)
+2025-08-13 09:22:02,209 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:22:02,210 - aiogram.dispatcher - WARNING - Sleep for 4.941198 seconds and try again... (tryings = 70, bot id = 7857439280)
+2025-08-13 09:22:12,427 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:22:12,428 - aiogram.dispatcher - WARNING - Sleep for 4.831146 seconds and try again... (tryings = 71, bot id = 7857439280)
+2025-08-13 09:22:22,893 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:22:22,894 - aiogram.dispatcher - WARNING - Sleep for 4.931647 seconds and try again... (tryings = 72, bot id = 7857439280)
+2025-08-13 09:22:33,296 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:22:33,298 - aiogram.dispatcher - WARNING - Sleep for 4.929864 seconds and try again... (tryings = 73, bot id = 7857439280)
+2025-08-13 09:22:43,579 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:22:43,580 - aiogram.dispatcher - WARNING - Sleep for 5.043557 seconds and try again... (tryings = 74, bot id = 7857439280)
+2025-08-13 09:22:54,487 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:22:54,488 - aiogram.dispatcher - WARNING - Sleep for 5.058222 seconds and try again... (tryings = 75, bot id = 7857439280)
+2025-08-13 09:23:04,886 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:23:04,887 - aiogram.dispatcher - WARNING - Sleep for 5.060053 seconds and try again... (tryings = 76, bot id = 7857439280)
+2025-08-13 09:23:15,734 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:23:15,736 - aiogram.dispatcher - WARNING - Sleep for 4.926792 seconds and try again... (tryings = 77, bot id = 7857439280)
+2025-08-13 09:23:26,077 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:23:26,078 - aiogram.dispatcher - WARNING - Sleep for 5.172473 seconds and try again... (tryings = 78, bot id = 7857439280)
+2025-08-13 09:23:37,171 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:23:37,173 - aiogram.dispatcher - WARNING - Sleep for 4.822050 seconds and try again... (tryings = 79, bot id = 7857439280)
+2025-08-13 09:23:47,576 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:23:47,577 - aiogram.dispatcher - WARNING - Sleep for 4.941603 seconds and try again... (tryings = 80, bot id = 7857439280)
+2025-08-13 09:23:57,921 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:23:57,923 - aiogram.dispatcher - WARNING - Sleep for 4.931073 seconds and try again... (tryings = 81, bot id = 7857439280)
+2025-08-13 09:24:08,031 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:24:08,033 - aiogram.dispatcher - WARNING - Sleep for 5.094161 seconds and try again... (tryings = 82, bot id = 7857439280)
+2025-08-13 09:24:18,506 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:24:18,507 - aiogram.dispatcher - WARNING - Sleep for 5.125451 seconds and try again... (tryings = 83, bot id = 7857439280)
+2025-08-13 09:24:28,927 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:24:28,929 - aiogram.dispatcher - WARNING - Sleep for 4.945705 seconds and try again... (tryings = 84, bot id = 7857439280)
+2025-08-13 09:24:39,289 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:24:39,289 - aiogram.dispatcher - WARNING - Sleep for 4.993907 seconds and try again... (tryings = 85, bot id = 7857439280)
+2025-08-13 09:24:49,599 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:24:49,601 - aiogram.dispatcher - WARNING - Sleep for 4.937756 seconds and try again... (tryings = 86, bot id = 7857439280)
+2025-08-13 09:24:59,802 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:24:59,804 - aiogram.dispatcher - WARNING - Sleep for 5.021561 seconds and try again... (tryings = 87, bot id = 7857439280)
+2025-08-13 09:25:10,798 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:25:10,799 - aiogram.dispatcher - WARNING - Sleep for 4.841606 seconds and try again... (tryings = 88, bot id = 7857439280)
+2025-08-13 09:25:21,381 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:25:21,383 - aiogram.dispatcher - WARNING - Sleep for 4.877250 seconds and try again... (tryings = 89, bot id = 7857439280)
+2025-08-13 09:25:31,645 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:25:31,645 - aiogram.dispatcher - WARNING - Sleep for 4.953553 seconds and try again... (tryings = 90, bot id = 7857439280)
+2025-08-13 09:25:41,780 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:25:41,780 - aiogram.dispatcher - WARNING - Sleep for 5.048379 seconds and try again... (tryings = 91, bot id = 7857439280)
+2025-08-13 09:25:52,278 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:25:52,280 - aiogram.dispatcher - WARNING - Sleep for 5.072543 seconds and try again... (tryings = 92, bot id = 7857439280)
+2025-08-13 09:26:02,776 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:26:02,778 - aiogram.dispatcher - WARNING - Sleep for 5.153773 seconds and try again... (tryings = 93, bot id = 7857439280)
+2025-08-13 09:26:13,419 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:26:13,419 - aiogram.dispatcher - WARNING - Sleep for 5.141153 seconds and try again... (tryings = 94, bot id = 7857439280)
+2025-08-13 09:26:23,814 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:26:23,816 - aiogram.dispatcher - WARNING - Sleep for 5.043508 seconds and try again... (tryings = 95, bot id = 7857439280)
+2025-08-13 09:26:33,940 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:26:33,941 - aiogram.dispatcher - WARNING - Sleep for 4.979000 seconds and try again... (tryings = 96, bot id = 7857439280)
+2025-08-13 09:26:44,773 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:26:44,774 - aiogram.dispatcher - WARNING - Sleep for 5.130416 seconds and try again... (tryings = 97, bot id = 7857439280)
+2025-08-13 09:26:55,322 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:26:55,323 - aiogram.dispatcher - WARNING - Sleep for 4.597813 seconds and try again... (tryings = 98, bot id = 7857439280)
+2025-08-13 09:27:05,444 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:27:05,445 - aiogram.dispatcher - WARNING - Sleep for 5.118680 seconds and try again... (tryings = 99, bot id = 7857439280)
+2025-08-13 09:27:16,800 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:27:16,800 - aiogram.dispatcher - WARNING - Sleep for 4.972766 seconds and try again... (tryings = 100, bot id = 7857439280)
+2025-08-13 09:27:27,012 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:27:27,013 - aiogram.dispatcher - WARNING - Sleep for 5.087332 seconds and try again... (tryings = 101, bot id = 7857439280)
+2025-08-13 09:27:37,327 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:27:37,328 - aiogram.dispatcher - WARNING - Sleep for 5.080635 seconds and try again... (tryings = 102, bot id = 7857439280)
+2025-08-13 09:27:48,097 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:27:48,099 - aiogram.dispatcher - WARNING - Sleep for 5.066537 seconds and try again... (tryings = 103, bot id = 7857439280)
+2025-08-13 09:28:01,180 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:28:01,181 - aiogram.dispatcher - WARNING - Sleep for 5.041345 seconds and try again... (tryings = 104, bot id = 7857439280)
+2025-08-13 09:28:12,617 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:28:12,617 - aiogram.dispatcher - WARNING - Sleep for 4.907212 seconds and try again... (tryings = 105, bot id = 7857439280)
+2025-08-13 09:28:23,473 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:28:23,474 - aiogram.dispatcher - WARNING - Sleep for 4.921493 seconds and try again... (tryings = 106, bot id = 7857439280)
+2025-08-13 09:28:33,913 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:28:33,916 - aiogram.dispatcher - WARNING - Sleep for 5.088852 seconds and try again... (tryings = 107, bot id = 7857439280)
+2025-08-13 09:28:44,538 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:28:44,539 - aiogram.dispatcher - WARNING - Sleep for 5.073553 seconds and try again... (tryings = 108, bot id = 7857439280)
+2025-08-13 09:28:55,109 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:28:55,110 - aiogram.dispatcher - WARNING - Sleep for 5.214703 seconds and try again... (tryings = 109, bot id = 7857439280)
+2025-08-13 09:29:05,636 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:29:05,637 - aiogram.dispatcher - WARNING - Sleep for 4.851849 seconds and try again... (tryings = 110, bot id = 7857439280)
+2025-08-13 09:29:15,723 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:29:15,724 - aiogram.dispatcher - WARNING - Sleep for 5.035228 seconds and try again... (tryings = 111, bot id = 7857439280)
+2025-08-13 09:29:25,963 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:29:25,965 - aiogram.dispatcher - WARNING - Sleep for 4.908587 seconds and try again... (tryings = 112, bot id = 7857439280)
+2025-08-13 09:31:00,614 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-13 09:31:00,615 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-13 09:31:00,625 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-13 09:31:00,629 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-13 09:31:00,629 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-13 09:31:00,630 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-13 09:31:00,630 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-13 09:31:00,630 - utils.database.db_init - INFO - Database connection closed
+2025-08-13 09:31:00,646 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-13 09:31:00,646 - __main__ - INFO - Bot ishga tushdi
+2025-08-13 09:31:00,647 - aiogram.dispatcher - INFO - Start polling
+2025-08-13 09:31:01,158 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-13 09:31:05,562 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:31:05,562 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7857439280)
+2025-08-13 09:31:11,217 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:31:11,217 - aiogram.dispatcher - WARNING - Sleep for 1.306844 seconds and try again... (tryings = 1, bot id = 7857439280)
+2025-08-13 09:31:17,601 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:31:17,602 - aiogram.dispatcher - WARNING - Sleep for 1.651024 seconds and try again... (tryings = 2, bot id = 7857439280)
+2025-08-13 09:31:24,868 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:31:24,868 - aiogram.dispatcher - WARNING - Sleep for 2.130012 seconds and try again... (tryings = 3, bot id = 7857439280)
+2025-08-13 09:31:30,220 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:31:30,221 - aiogram.dispatcher - WARNING - Sleep for 2.670232 seconds and try again... (tryings = 4, bot id = 7857439280)
+2025-08-13 09:31:40,027 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:31:40,028 - aiogram.dispatcher - WARNING - Sleep for 3.457172 seconds and try again... (tryings = 5, bot id = 7857439280)
+2025-08-13 09:31:48,695 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:31:48,695 - aiogram.dispatcher - WARNING - Sleep for 4.584284 seconds and try again... (tryings = 6, bot id = 7857439280)
+2025-08-13 09:31:58,728 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:31:58,728 - aiogram.dispatcher - WARNING - Sleep for 4.862423 seconds and try again... (tryings = 7, bot id = 7857439280)
+2025-08-13 09:32:08,876 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:32:08,877 - aiogram.dispatcher - WARNING - Sleep for 4.900139 seconds and try again... (tryings = 8, bot id = 7857439280)
+2025-08-13 09:32:18,900 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:32:18,901 - aiogram.dispatcher - WARNING - Sleep for 5.149180 seconds and try again... (tryings = 9, bot id = 7857439280)
+2025-08-13 09:32:29,616 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:32:29,617 - aiogram.dispatcher - WARNING - Sleep for 5.049044 seconds and try again... (tryings = 10, bot id = 7857439280)
+2025-08-13 09:32:39,951 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:32:39,952 - aiogram.dispatcher - WARNING - Sleep for 4.959806 seconds and try again... (tryings = 11, bot id = 7857439280)
+2025-08-13 09:32:50,147 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:32:50,148 - aiogram.dispatcher - WARNING - Sleep for 4.970547 seconds and try again... (tryings = 12, bot id = 7857439280)
+2025-08-13 09:33:00,569 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:33:00,570 - aiogram.dispatcher - WARNING - Sleep for 5.083777 seconds and try again... (tryings = 13, bot id = 7857439280)
+2025-08-13 09:33:10,934 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:33:10,936 - aiogram.dispatcher - WARNING - Sleep for 4.780608 seconds and try again... (tryings = 14, bot id = 7857439280)
+2025-08-13 09:33:21,178 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:33:21,179 - aiogram.dispatcher - WARNING - Sleep for 4.922140 seconds and try again... (tryings = 15, bot id = 7857439280)
+2025-08-13 09:33:31,458 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:33:31,459 - aiogram.dispatcher - WARNING - Sleep for 5.176297 seconds and try again... (tryings = 16, bot id = 7857439280)
+2025-08-13 09:33:41,876 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:33:41,876 - aiogram.dispatcher - WARNING - Sleep for 4.974758 seconds and try again... (tryings = 17, bot id = 7857439280)
+2025-08-13 09:33:52,049 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:33:52,050 - aiogram.dispatcher - WARNING - Sleep for 4.999561 seconds and try again... (tryings = 18, bot id = 7857439280)
+2025-08-13 09:34:02,291 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:34:02,293 - aiogram.dispatcher - WARNING - Sleep for 5.093774 seconds and try again... (tryings = 19, bot id = 7857439280)
+2025-08-13 09:34:12,778 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:34:12,779 - aiogram.dispatcher - WARNING - Sleep for 5.001550 seconds and try again... (tryings = 20, bot id = 7857439280)
+2025-08-13 09:34:23,505 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:34:23,506 - aiogram.dispatcher - WARNING - Sleep for 4.879895 seconds and try again... (tryings = 21, bot id = 7857439280)
+2025-08-13 09:34:33,595 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:34:33,596 - aiogram.dispatcher - WARNING - Sleep for 4.876812 seconds and try again... (tryings = 22, bot id = 7857439280)
+2025-08-13 09:34:43,806 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:34:43,808 - aiogram.dispatcher - WARNING - Sleep for 5.069942 seconds and try again... (tryings = 23, bot id = 7857439280)
+2025-08-13 09:34:54,092 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:34:54,092 - aiogram.dispatcher - WARNING - Sleep for 5.075423 seconds and try again... (tryings = 24, bot id = 7857439280)
+2025-08-13 09:35:04,549 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:35:04,550 - aiogram.dispatcher - WARNING - Sleep for 4.830384 seconds and try again... (tryings = 25, bot id = 7857439280)
+2025-08-13 09:35:14,823 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:35:14,824 - aiogram.dispatcher - WARNING - Sleep for 4.893422 seconds and try again... (tryings = 26, bot id = 7857439280)
+2025-08-13 09:35:25,563 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:35:25,564 - aiogram.dispatcher - WARNING - Sleep for 4.875950 seconds and try again... (tryings = 27, bot id = 7857439280)
+2025-08-13 09:35:35,731 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:35:35,732 - aiogram.dispatcher - WARNING - Sleep for 4.899074 seconds and try again... (tryings = 28, bot id = 7857439280)
+2025-08-13 09:35:46,105 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-08-13 09:35:46,106 - aiogram.dispatcher - WARNING - Sleep for 5.107777 seconds and try again... (tryings = 29, bot id = 7857439280)

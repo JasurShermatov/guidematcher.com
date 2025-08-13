@@ -1,9 +1,11 @@
-# apps/reviews/views.py
+#  apps/reviews/views.py
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
 
+from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 
@@ -15,26 +17,28 @@ from apps.reviews.serializers import (
     ReviewHelpfulSerializer,
 )
 from apps.reviews.permissions import IsClientOwner, IsProviderOwner
-from apps.common.permissions import IsVerifiedUser  # avval yaratilgan
+from apps.common.permissions import IsVerifiedUser
 from apps.reviews.filters import ReviewFilter
-
 
 from drf_spectacular.utils import extend_schema
 
 
 @extend_schema(tags=["reviews"])
 class ReviewViewSet(viewsets.ModelViewSet):
-    """
-    list   – hamma ko‘rishi mumkin (faqat published)
-    create – faqat verified CLIENT
-    update/delete – faqat review egasi
-    """
 
-    queryset = Review.objects.select_related("client", "customer", "booking")
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
     filterset_class = ReviewFilter
     ordering_fields = ["created_at", "overall_rating"]
     search_fields = ["title", "comment"]
+
+    def get_queryset(self):
+        qs = Review.objects.select_related(
+            "client", "customer", "customer__user", "booking"
+        ).annotate(helpful_count=Count("helpful_votes", distinct=True))
+
+        if self.action in ["list", "retrieve"]:
+            qs = qs.filter(is_published=True)
+        return qs
 
     def get_serializer_class(self):
         if self.action == "create":
@@ -50,18 +54,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
             perms = [IsAuthenticated()]
         return perms
 
-    def get_queryset(self):
-        qs = super().get_queryset()
-        if self.action in ["list", "retrieve"]:
-            return qs.filter(is_published=True)
-        return qs
-
-    # ---------- extra actions ----------
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def helpful(self, request, pk=None):
-        """/reviews/{id}/helpful/ – ‘foydali’ ovoz berish"""
         review = self.get_object()
-        _, created = ReviewHelpful.objects.get_or_create(
+        obj, created = ReviewHelpful.objects.get_or_create(
             review=review, user=request.user
         )
         if not created:
@@ -69,25 +65,20 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 {"detail": "Allaqachon ovoz berdingiz."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        review.helpful_count = review.helpful_votes.count()
+        review.save(update_fields=["helpful_count"])
         return Response(
             {"detail": "Rahmat! Fikr foydali deb belgilandi."},
             status=status.HTTP_201_CREATED,
         )
 
 
-# ───────────────────────────────────────── ReviewResponse
 class ReviewResponseViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
     viewsets.GenericViewSet,
 ):
-    """
-    Provider review’ga javob yozadi yoki tahrirlaydi.
-    – create: ReviewResponse yo‘q bo‘lsa
-    – update: faqat egasi
-    """
-
     queryset = ReviewResponse.objects.select_related("review", "review__customer__user")
     serializer_class = ReviewResponseSerializer
     permission_classes = [IsAuthenticated, IsProviderOwner]
@@ -101,11 +92,10 @@ class ReviewResponseViewSet(
         serializer.save()
 
 
-# ───────────────────────────────────────── Helpful (optional, agar alohida endpoint xohlasangiz)
 class ReviewHelpfulViewSet(
     mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet
 ):
-    queryset = ReviewHelpful.objects.all()
+    queryset = ReviewHelpful.objects.select_related("review").all()
     serializer_class = ReviewHelpfulSerializer
     permission_classes = [IsAuthenticated]
 

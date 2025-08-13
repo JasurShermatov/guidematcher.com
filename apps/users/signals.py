@@ -8,11 +8,7 @@ from apps.notifications.models import UserNotificationSettings
 
 @receiver(post_save, sender=User)
 def create_related_objects(sender, instance: User, created, **kwargs):
-    """
-    User yaratilganda avtomatik bog‘liq obyektlarni yaratadi:
-    - ClientProfile yoki CustomerProfile
-    - UserNotificationSettings
-    """
+
     if not created:
         return
 

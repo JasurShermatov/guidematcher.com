@@ -9,12 +9,7 @@ from google.auth.transport import requests as google_requests
 User = get_user_model()
 
 
-# ─────────────── JWT Token Serializer
 class AuthTokenSerializer(TokenObtainPairSerializer):
-    """
-    JWT access va refresh tokenlarni qaytaradi, foydalanuvchi haqidagi
-    muhim ma'lumotlarni token ichiga joylaydi.
-    """
 
     @classmethod
     def get_token(cls, user):
@@ -26,7 +21,6 @@ class AuthTokenSerializer(TokenObtainPairSerializer):
         return token
 
 
-# ─────────────── Developer/Test uchun Register
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
     role = serializers.ChoiceField(
@@ -58,7 +52,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-# ─────────────── Google Auth
 class GoogleAuthSerializer(serializers.Serializer):
     id_token = serializers.CharField(write_only=True)
 
@@ -93,7 +86,6 @@ class GoogleAuthSerializer(serializers.Serializer):
         return {"refresh": str(refresh), "access": str(refresh.access_token)}
 
 
-# ─────────────── Parolni tiklash (delegated)
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -137,7 +129,6 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         return self.user
 
 
-# ─────────────── Profile
 class ProfileSerializer(serializers.ModelSerializer):
     country_name = serializers.CharField(read_only=True)
 
@@ -168,7 +159,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         )
 
 
-# ─────────────── Mini user info
 class UserShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

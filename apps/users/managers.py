@@ -3,7 +3,6 @@ from django.utils.translation import gettext_lazy as _
 
 
 class UserManager(BaseUserManager):
-    """Custom user manager using email instead of username."""
 
     def _create_user(self, email, password, **extra_fields):
         if not email:
@@ -16,13 +15,11 @@ class UserManager(BaseUserManager):
         return user
 
     def create_user(self, email, password=None, **extra_fields):
-        """Create a standard user (not staff or superuser)."""
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password=None, **extra_fields):
-        """Create a superuser (admin panel access)."""
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_verified", True)
@@ -36,5 +33,4 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
     def get_by_natural_key(self, email):
-        """Support email case-insensitive lookup (used for auth)."""
         return self.get(email__iexact=email)

@@ -1,5 +1,4 @@
 # apps/reviews/models.py
-
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -10,9 +9,7 @@ from apps.bookings.models import Booking
 
 
 class Review(BaseModel):
-    """Reviews from clients about service providers"""
 
-    # Relations
     booking = models.OneToOneField(
         Booking,
         on_delete=models.CASCADE,
@@ -32,7 +29,6 @@ class Review(BaseModel):
         verbose_name=_("Service provider"),
     )
 
-    # Ratings (1-5 stars)
     overall_rating = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
         verbose_name=_("Overall rating"),
@@ -62,11 +58,9 @@ class Review(BaseModel):
         verbose_name=_("Value for money rating"),
     )
 
-    # Review content
     title = models.CharField(max_length=200, blank=True, verbose_name=_("Review title"))
     comment = models.TextField(verbose_name=_("Review comment"))
 
-    # Moderation
     is_published = models.BooleanField(default=True, verbose_name=_("Is published"))
     is_featured = models.BooleanField(default=False, verbose_name=_("Is featured"))
     moderated_by = models.ForeignKey(
@@ -82,7 +76,6 @@ class Review(BaseModel):
     )
     moderation_note = models.TextField(blank=True, verbose_name=_("Moderation note"))
 
-    # Interaction
     helpful_count = models.PositiveIntegerField(
         default=0, verbose_name=_("Helpful count")
     )
@@ -106,13 +99,11 @@ class Review(BaseModel):
         return f"Review by {self.client} - {self.overall_rating} stars"
 
     def save(self, *args, **kwargs):
-        """Update customer's average rating after saving"""
         super().save(*args, **kwargs)
         if self.is_published:
             self._update_customer_rating()
 
     def _update_customer_rating(self):
-        """Calculate and update customer's average rating"""
         from django.db.models import Avg
 
         avg_rating = (
@@ -130,7 +121,6 @@ class Review(BaseModel):
 
 
 class ReviewResponse(BaseModel):
-    """Service provider's response to a review"""
 
     review = models.OneToOneField(
         Review,
@@ -150,7 +140,6 @@ class ReviewResponse(BaseModel):
 
 
 class ReviewHelpful(BaseModel):
-    """Track users who found a review helpful"""
 
     review = models.ForeignKey(
         Review,
@@ -174,7 +163,6 @@ class ReviewHelpful(BaseModel):
         return f"{self.user} found {self.review} helpful"
 
     def save(self, *args, **kwargs):
-        """Update review's helpful count"""
         is_new = self.pk is None
         super().save(*args, **kwargs)
         if is_new:

@@ -2,24 +2,21 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-# Faqat built-in filterdan foydalanamiz (rangefilter yo'q)
 from django.contrib.admin import DateFieldListFilter
 
 from .models import Country, City, Language, ServiceType
 
 
-# ── umumiy admin actions ─────────────────────────────────────────────
 @admin.action(description=_("Mark selected items as active"))
-def make_active(modeladmin, request, queryset):
+def make_active(queryset):
     queryset.update(is_active=True)
 
 
 @admin.action(description=_("Mark selected items as inactive"))
-def make_inactive(modeladmin, request, queryset):
+def make_inactive(queryset):
     queryset.update(is_active=False)
 
 
-# ── Country ─────────────────────────────────────────────────────────
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
     list_display = (
@@ -58,7 +55,6 @@ class CountryAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-# ── City ────────────────────────────────────────────────────────────
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "country", "is_active", "created_at", "updated_at")
@@ -90,7 +86,6 @@ class CityAdmin(admin.ModelAdmin):
         return qs.select_related("country")
 
 
-# ── Language ───────────────────────────────────────────────────────
 @admin.register(Language)
 class LanguageAdmin(admin.ModelAdmin):
     list_display = (
@@ -129,7 +124,6 @@ class LanguageAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-# ── ServiceType ─────────────────────────────────────────────────────
 @admin.register(ServiceType)
 class ServiceTypeAdmin(admin.ModelAdmin):
     list_display = (

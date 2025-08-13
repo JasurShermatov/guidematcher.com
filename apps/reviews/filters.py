@@ -6,14 +6,6 @@ from apps.reviews.models import Review
 
 
 class ReviewFilter(df.FilterSet):
-    """
-    ?min_rating        – minimum umumiy baho (>=)
-    ?max_rating        – maksimum umumiy baho (<=)
-    ?customer=<uuid>   – xizmat ko‘rsatuvchi (CustomerProfile.id)
-    ?client=<uuid>     – buyurtmachi (User.id)
-    ?published=true    – faqat eʼlon qilingan / qilingan emas
-    ?created_between=2025-01-01,2025-01-31
-    """
 
     # ★ Baholar
     min_rating = df.NumberFilter(field_name="overall_rating", lookup_expr="gte")
@@ -31,7 +23,6 @@ class ReviewFilter(df.FilterSet):
 
     class Meta:
         model = Review
-        # Meta.fields DRF’ga kerak bo‘ladi, lekin custom maydonlar alohida metodda
         fields = ["customer", "client", "published"]
 
     # YYYY-MM-DD,YYYY-MM-DD  →  queryset

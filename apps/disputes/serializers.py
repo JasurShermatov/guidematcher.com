@@ -1,11 +1,10 @@
+#  apps/disputes/models.py
 from rest_framework import serializers
-
 from apps.disputes.models import Dispute, DisputeEvidence, DisputeMessage, DisputeAction
 from apps.users.serializers import UserShortSerializer
 from apps.bookings.serializers import BookingShortSerializer
 
 
-# ─────────── DisputeAction (read-only) ───────────
 class DisputeActionSerializer(serializers.ModelSerializer):
     performed_by = UserShortSerializer(read_only=True)
 
@@ -15,13 +14,12 @@ class DisputeActionSerializer(serializers.ModelSerializer):
         read_only_fields = (
             "id",
             "dispute",
-            "action",
+            "action_type",
             "performed_by",
             "created_at",
         )
 
 
-# ─────────── Evidence ───────────
 class EvidenceSerializer(serializers.ModelSerializer):
     submitted_by = UserShortSerializer(read_only=True)
 
@@ -51,22 +49,18 @@ class EvidenceSerializer(serializers.ModelSerializer):
             "created_at",
         )
 
-    # ≤ 25 MB tekshiruv
     def validate_file(self, file):
         if file.size > 25 * 1024 * 1024:
             raise serializers.ValidationError("Max 25 MB.")
         return file
 
     def create(self, validated):
-        user = self.context["request"].user
         validated.update(
-            submitted_by=user,
-            file_size=validated["file"].size,
+            submitted_by=self.context["request"].user, file_size=validated["file"].size
         )
         return super().create(validated)
 
 
-# ─────────── DisputeMessage ───────────
 class DisputeMessageSerializer(serializers.ModelSerializer):
     sender = UserShortSerializer(read_only=True)
     attachments = EvidenceSerializer(many=True, read_only=True)
@@ -89,7 +83,6 @@ class DisputeMessageSerializer(serializers.ModelSerializer):
         return super().create(validated)
 
 
-# ─────────── Dispute (asosiy) ───────────
 class DisputeSerializer(serializers.ModelSerializer):
     reporter = UserShortSerializer(read_only=True)
     respondent = UserShortSerializer(read_only=True)

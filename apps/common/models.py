@@ -5,7 +5,6 @@ from django.utils.translation import gettext_lazy as _
 
 
 class BaseModel(models.Model):
-    """Base abstract model with UUID PK + timestamps."""
 
     id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, verbose_name=_("ID")
@@ -19,7 +18,6 @@ class BaseModel(models.Model):
 
 
 class Country(BaseModel):
-    """Countries for user origin and service locations."""
 
     code = models.CharField(
         max_length=2,
@@ -51,7 +49,6 @@ class Country(BaseModel):
 
 
 class City(BaseModel):
-    """Cities/regions for more specific location."""
 
     country = models.ForeignKey(
         Country,
@@ -81,7 +78,6 @@ class City(BaseModel):
 
 
 class Language(BaseModel):
-    """Languages for communication."""
 
     code = models.CharField(
         max_length=5,
@@ -114,7 +110,6 @@ class Language(BaseModel):
 
 
 class ServiceType(BaseModel):
-    """Types of services offered (Guide, Translator, etc.)."""
 
     name = models.CharField(max_length=100, unique=True, verbose_name=_("Service type"))
     description = models.TextField(blank=True, verbose_name=_("Description"))

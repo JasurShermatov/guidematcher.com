@@ -13,3 +13,5 @@ media/     # media papka gitga tushmaydi (user upload'lar)
 .DS_Store
 
 
+bot.log
+bot_*.log

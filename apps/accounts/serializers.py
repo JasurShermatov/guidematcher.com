@@ -2,6 +2,7 @@
 import datetime
 import secrets
 import string
+import logging
 from django.conf import settings
 from django.utils import timezone
 from django.core.cache import cache
@@ -9,6 +10,12 @@ from rest_framework import serializers
 from apps.users.models import User, Country
 from apps.accounts.models import EmailVerification
 from apps.accounts.tasks import send_verification_email, send_welcome_email
+from .services import (
+    create_and_send_password_reset_code,
+    validate_password_reset_code,
+)
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_EXPIRE_SECONDS = getattr(
     settings, "ACCOUNTS_VERIFICATION_CODE_TTL_SECONDS", 300
@@ -24,9 +31,9 @@ class RequestVerificationCodeSerializer(serializers.Serializer):
 
     def validate_email(self, value):
         email = value.lower().strip()
-        # Rate limiting: max 3 requests per 15 minutes per email
         cache_key = f"verification_request:{email}"
         request_count = cache.get(cache_key, 0)
+
         if request_count >= 3:
             raise serializers.ValidationError(
                 "Too many verification code requests. Please wait 15 minutes and try again."
@@ -35,6 +42,7 @@ class RequestVerificationCodeSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         email = validated_data["email"]
+
         # Invalidate previous codes
         EmailVerification.objects.filter(email=email, is_used=False).update(
             is_used=True
@@ -104,7 +112,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
     def validate_country(self, value):
-        # Har qanday davlat nomini qabul qiladi
         return value.strip()
 
     def validate(self, attrs):
@@ -155,3 +162,104 @@ class RegisterSerializer(serializers.ModelSerializer):
         send_welcome_email.delay(user.email, user.first_name)
 
         return user
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        email = value.lower().strip()
+        cache_key = f"password_reset_request:{email}"
+        request_count = cache.get(cache_key, 0)
+
+        if request_count >= 3:
+            logger.warning(
+                f"Rate limit exceeded for password reset: {email} - {request_count} attempts"
+            )
+            raise serializers.ValidationError(
+                "Too many password reset requests. Please wait 30 minutes and try again."
+            )
+        return email
+
+    def create(self, validated_data):
+        email = validated_data["email"]
+
+        # ✅ Rate limiting counter oshirish
+        cache_key = f"password_reset_request:{email}"
+        request_count = cache.get(cache_key, 0) + 1
+        cache.set(cache_key, request_count, timeout=30 * 60)  # 30 minutes
+
+        # ✅ User.DoesNotExist handle qilish
+        try:
+            user = User.objects.get(email=email, is_active=True)
+            create_and_send_password_reset_code(user)
+            logger.info(f"Password reset code sent to {email}")
+        except User.DoesNotExist:
+            # Security: user mavjudligini oshkor qilmaymiz
+            logger.info(f"Password reset attempted for non-existent email: {email}")
+            pass  # Silent fail
+
+        # ✅ Har doim bir xil response (security best practice)
+        return {
+            "message": "If an account exists with this email, a password reset code has been sent.",
+            "detail": "Please check your email for the verification code.",
+        }
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField(max_length=6)
+    new_password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate_new_password(self, value):
+        if not (
+            any(c.islower() for c in value)
+            and any(c.isupper() for c in value)
+            and any(c.isdigit() for c in value)
+            and any(c in "@$!%*?&" for c in value)
+        ):
+            raise serializers.ValidationError(
+                "Password must contain at least one lowercase, one uppercase, one digit, and one special character (@$!%*?&)."
+            )
+        return value
+
+    def validate(self, attrs):
+        email = attrs["email"].lower().strip()
+        code = attrs["code"]
+
+        # ✅ Rate limiting for code verification
+        cache_key = f"password_reset_verify:{email}"
+        attempt_count = cache.get(cache_key, 0)
+
+        if attempt_count >= 5:
+            logger.warning(f"Too many verification attempts for {email}")
+            raise serializers.ValidationError(
+                {"code": "Too many failed attempts. Please request a new code."}
+            )
+
+        try:
+            user = validate_password_reset_code(email, code)
+            attrs["user"] = user
+            # Clear rate limit on success
+            cache.delete(cache_key)
+        except ValueError as e:
+            # Increment failed attempts
+            cache.set(cache_key, attempt_count + 1, timeout=15 * 60)
+            raise serializers.ValidationError({"code": str(e)})
+
+        return attrs
+
+    def save(self, **kwargs):
+        user = self.validated_data["user"]
+        new_password = self.validated_data["new_password"]
+        user.set_password(new_password)
+        user.save(update_fields=["password", "updated_at"])
+
+        logger.info(f"Password successfully reset for {user.email}")
+        return user
+
+
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField(
+        required=True, help_text="Refresh token obtained from login"
+    )

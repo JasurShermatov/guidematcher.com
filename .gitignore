@@ -1,25 +1,27 @@
-# Python cache
+# ─────────── Python cache ───────────
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
+
+# ─────────── Logs ───────────
 *.log
-logs
-
 logs/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-
 bot.log
 bot_*.log
 
-# Media files
-media/     # media papka gitga tushmaydi (user upload'lar)
+# ─────────── Media / user uploads ───────────
+media/
 
-# IDE (Pycharm, VSCode)
+# ─────────── IDE fayllari ───────────
 .idea/
+.vscode/
 
-# MacOS keraksiz fayllari
+# ─────────── MacOS / Windows keraksiz fayllari ───────────
 .DS_Store
+Thumbs.db
 
-
+# ─────────── Node / JS log fayllari ───────────
+npm-debug.log*
+yarn-debug.log*
+lerna-debug.log*

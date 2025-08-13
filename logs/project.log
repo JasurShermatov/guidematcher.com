@@ -1,0 +1,696 @@
+[2025-08-13 21:14:30,716] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:14:30,776] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:14:30,777] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:14:30,777] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:14:31,475] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:14:31,537] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:14:31,538] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:14:31,538] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:14:32,147] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:14:32,185] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:14:32,186] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:14:32,186] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:16:34,941] WARNING django.request: Not Found: /
+[2025-08-13 21:16:34,941] WARNING django.request: Not Found: /
+[2025-08-13 21:16:35,042] WARNING django.request: Not Found: /apple-touch-icon-precomposed.png
+[2025-08-13 21:16:35,043] WARNING django.request: Not Found: /favicon.ico
+[2025-08-13 21:16:35,042] WARNING django.request: Not Found: /apple-touch-icon-precomposed.png
+[2025-08-13 21:16:35,043] WARNING django.request: Not Found: /favicon.ico
+[2025-08-13 21:16:35,043] WARNING django.request: Not Found: /apple-touch-icon.png
+[2025-08-13 21:16:35,043] WARNING django.request: Not Found: /apple-touch-icon.png
+[2025-08-13 21:16:41,552] WARNING django.request: Not Found: /
+[2025-08-13 21:16:41,552] WARNING django.request: Not Found: /
+[2025-08-13 21:16:42,649] WARNING django.request: Not Found: /apple-touch-icon-precomposed.png
+[2025-08-13 21:16:42,649] WARNING django.request: Not Found: /apple-touch-icon-precomposed.png
+[2025-08-13 21:16:42,650] WARNING django.request: Not Found: /apple-touch-icon.png
+[2025-08-13 21:16:42,650] WARNING django.request: Not Found: /apple-touch-icon.png
+[2025-08-13 21:16:42,651] WARNING django.request: Not Found: /favicon.ico
+[2025-08-13 21:16:42,651] WARNING django.request: Not Found: /favicon.ico
+[2025-08-13 21:18:15,012] WARNING django.request: Not Found: /
+[2025-08-13 21:18:15,012] WARNING django.request: Not Found: /
+[2025-08-13 21:18:18,211] WARNING django.request: Not Found: /
+[2025-08-13 21:18:18,211] WARNING django.request: Not Found: /
+[2025-08-13 21:18:38,523] WARNING django.request: Unauthorized: /api/v1/accounts/login/
+[2025-08-13 21:18:38,523] WARNING django.request: Unauthorized: /api/v1/accounts/login/
+[2025-08-13 21:18:38,538] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-08-13 21:18:38,538] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-08-13 21:20:19,421] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-08-13 21:20:19,421] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-08-13 21:31:46,004] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:31:46,079] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:31:46,079] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:31:46,080] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:37:58,451] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-08-13 21:37:58,451] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-08-13 21:38:20,035] WARNING django.request: Unauthorized: /api/v1/accounts/login/
+[2025-08-13 21:38:20,035] WARNING django.request: Unauthorized: /api/v1/accounts/login/
+[2025-08-13 21:38:20,046] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-08-13 21:38:20,046] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-08-13 21:45:44,806] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:45:44,870] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:45:44,871] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:45:44,871] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:45:46,093] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:45:46,158] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:45:46,158] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:45:46,159] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:45:47,433] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:45:47,505] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:45:47,505] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:45:47,505] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:45:48,953] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:45:49,013] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:45:49,014] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:45:49,014] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:45:50,856] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:45:50,920] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:45:50,921] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:45:50,921] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:45:53,544] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:45:53,610] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:45:53,611] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:45:53,611] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:45:57,814] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:45:57,873] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:45:57,874] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:45:57,874] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:46:05,315] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:46:05,375] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:46:05,376] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:46:05,376] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:46:19,234] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:46:19,297] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:46:19,298] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:46:19,298] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:46:45,910] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:46:45,972] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:46:45,973] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:46:45,973] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:47:38,211] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:47:38,273] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:47:38,274] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:47:38,274] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:48:39,356] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:48:39,421] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:48:39,422] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:48:39,423] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:49:01,577] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:49:01,647] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:49:01,648] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:49:01,648] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:49:02,880] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:49:02,941] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:49:02,942] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:49:02,942] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:49:04,179] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:49:04,240] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:49:04,241] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:49:04,241] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:49:05,675] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:49:05,743] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:49:05,743] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:49:05,744] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:49:07,595] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:49:07,688] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:49:07,689] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:49:07,690] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:49:10,368] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:49:10,429] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:49:10,429] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:49:10,429] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:49:14,659] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:49:14,725] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:49:14,725] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:49:14,726] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:49:22,162] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:49:22,222] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:49:22,222] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:49:22,222] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:49:36,057] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:49:36,123] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:49:36,124] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:49:36,124] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:50:02,744] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:50:02,805] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:50:02,806] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:50:02,806] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:50:55,052] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:50:55,118] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:50:55,119] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:50:55,119] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:51:56,157] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:51:56,216] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:51:56,217] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:51:56,217] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:52:57,239] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:52:57,304] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:52:57,305] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:52:57,305] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 21:53:58,443] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 21:53:58,515] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 21:53:58,516] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 21:53:58,516] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 22:21:16,546] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 22:21:16,609] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 22:21:16,610] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 22:21:16,610] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 22:21:17,664] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 22:21:17,724] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 22:21:17,724] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 22:21:17,725] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 22:21:18,366] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 22:21:18,405] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 22:21:18,405] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 22:21:18,405] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 22:36:21,737] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 22:36:21,807] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 22:36:21,807] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 22:36:21,807] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 22:36:22,666] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 22:36:22,728] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 22:36:22,728] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 22:36:22,729] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 22:36:23,418] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 22:36:23,476] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 22:36:23,476] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 22:36:23,477] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 22:49:50,422] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 22:49:50,487] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 22:49:50,488] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 22:49:50,488] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 22:49:51,322] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 22:49:51,384] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 22:49:51,385] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 22:49:51,385] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 22:49:52,032] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 22:49:52,072] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 22:49:52,073] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 22:49:52,073] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 23:14:20,787] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 23:14:20,851] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 23:14:20,852] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 23:14:20,852] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 23:14:21,663] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 23:14:21,724] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 23:14:21,724] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 23:14:21,724] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 23:14:22,328] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-13 23:14:22,366] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-13 23:14:22,367] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-13 23:14:22,367] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-13 23:18:28,744] ERROR django.request: Internal Server Error: /admin/bookings/booking/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/contrib/admin/templatetags/base.py", line 45, in render
+    return super().render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/library.py", line 381, in render
+    return t.render(new_context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 56, in render
+    result = self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/defaulttags.py", line 327, in render
+    return nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/library.py", line 321, in render
+    output = self.func(*resolved_args, **resolved_kwargs)
+  File "/usr/local/lib/python3.10/site-packages/jazzmin/templatetags/jazzmin.py", line 276, in jazzmin_list_filter
+    tpl = get_template(spec.template)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: rangefilter/date_filter.html
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 284, in _get_response_async
+    response = await sync_to_async(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+  File "/usr/local/lib/python3.10/site-packages/django/template/response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+  File "/usr/local/lib/python3.10/site-packages/django/template/backends/django.py", line 109, in render
+    reraise(exc, self.backend)
+  File "/usr/local/lib/python3.10/site-packages/django/template/backends/django.py", line 130, in reraise
+    raise new from exc
+django.template.exceptions.TemplateDoesNotExist: rangefilter/date_filter.html
+[2025-08-13 23:18:28,744] ERROR django.request: Internal Server Error: /admin/bookings/booking/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/contrib/admin/templatetags/base.py", line 45, in render
+    return super().render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/library.py", line 381, in render
+    return t.render(new_context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 56, in render
+    result = self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/defaulttags.py", line 327, in render
+    return nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/library.py", line 321, in render
+    output = self.func(*resolved_args, **resolved_kwargs)
+  File "/usr/local/lib/python3.10/site-packages/jazzmin/templatetags/jazzmin.py", line 276, in jazzmin_list_filter
+    tpl = get_template(spec.template)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: rangefilter/date_filter.html
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 284, in _get_response_async
+    response = await sync_to_async(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+  File "/usr/local/lib/python3.10/site-packages/django/template/response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+  File "/usr/local/lib/python3.10/site-packages/django/template/backends/django.py", line 109, in render
+    reraise(exc, self.backend)
+  File "/usr/local/lib/python3.10/site-packages/django/template/backends/django.py", line 130, in reraise
+    raise new from exc
+django.template.exceptions.TemplateDoesNotExist: rangefilter/date_filter.html
+[2025-08-13 23:18:38,823] ERROR django.request: Internal Server Error: /admin/bookings/booking/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/contrib/admin/templatetags/base.py", line 45, in render
+    return super().render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/library.py", line 381, in render
+    return t.render(new_context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 56, in render
+    result = self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/defaulttags.py", line 327, in render
+    return nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/library.py", line 321, in render
+    output = self.func(*resolved_args, **resolved_kwargs)
+  File "/usr/local/lib/python3.10/site-packages/jazzmin/templatetags/jazzmin.py", line 276, in jazzmin_list_filter
+    tpl = get_template(spec.template)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: rangefilter/date_filter.html
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 284, in _get_response_async
+    response = await sync_to_async(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+  File "/usr/local/lib/python3.10/site-packages/django/template/response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+  File "/usr/local/lib/python3.10/site-packages/django/template/backends/django.py", line 109, in render
+    reraise(exc, self.backend)
+  File "/usr/local/lib/python3.10/site-packages/django/template/backends/django.py", line 130, in reraise
+    raise new from exc
+django.template.exceptions.TemplateDoesNotExist: rangefilter/date_filter.html
+[2025-08-13 23:18:38,823] ERROR django.request: Internal Server Error: /admin/bookings/booking/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/contrib/admin/templatetags/base.py", line 45, in render
+    return super().render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/library.py", line 381, in render
+    return t.render(new_context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader_tags.py", line 56, in render
+    result = self.nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/defaulttags.py", line 327, in render
+    return nodelist.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 1016, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "/usr/local/lib/python3.10/site-packages/django/template/base.py", line 977, in render_annotated
+    return self.render(context)
+  File "/usr/local/lib/python3.10/site-packages/django/template/library.py", line 321, in render
+    output = self.func(*resolved_args, **resolved_kwargs)
+  File "/usr/local/lib/python3.10/site-packages/jazzmin/templatetags/jazzmin.py", line 276, in jazzmin_list_filter
+    tpl = get_template(spec.template)
+  File "/usr/local/lib/python3.10/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: rangefilter/date_filter.html
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 489, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.10/site-packages/django/core/handlers/base.py", line 284, in _get_response_async
+    response = await sync_to_async(
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 439, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/current_thread_executor.py", line 40, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.10/site-packages/asgiref/sync.py", line 493, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+  File "/usr/local/lib/python3.10/site-packages/django/template/response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+  File "/usr/local/lib/python3.10/site-packages/django/template/backends/django.py", line 109, in render
+    reraise(exc, self.backend)
+  File "/usr/local/lib/python3.10/site-packages/django/template/backends/django.py", line 130, in reraise
+    raise new from exc
+django.template.exceptions.TemplateDoesNotExist: rangefilter/date_filter.html

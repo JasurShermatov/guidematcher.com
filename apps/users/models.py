@@ -9,7 +9,6 @@ from .managers import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin, BaseModel):
-    """Custom user model with e-mail login & role support."""
 
     class UserRole(models.TextChoices):
         CLIENT = "client", _("Client (Tourist)")
@@ -17,7 +16,6 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         ADMIN = "admin", _("Admin")
         SUPERADMIN = "superadmin", _("Superadmin")
 
-    # Identity
     email = models.EmailField(unique=True, verbose_name=_("Email address"))
     first_name = models.CharField(max_length=150, verbose_name=_("First name"))
     last_name = models.CharField(max_length=150, verbose_name=_("Last name"))
@@ -28,7 +26,6 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         verbose_name=_("User role"),
     )
 
-    # Denormalized fields
     full_name = models.CharField(
         max_length=301, blank=True, verbose_name=_("Full name")
     )
@@ -44,12 +41,10 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         max_length=128, blank=True, verbose_name=_("Country name")
     )
 
-    # Status flags
     is_active = models.BooleanField(default=True, verbose_name=_("Active status"))
     is_staff = models.BooleanField(default=False, verbose_name=_("Staff status"))
     is_verified = models.BooleanField(default=False, verbose_name=_("Email verified"))
 
-    # Metadata
     date_joined = models.DateTimeField(
         default=timezone.now, verbose_name=_("Date joined")
     )
@@ -57,7 +52,6 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         null=True, blank=True, verbose_name=_("Last login IP")
     )
 
-    # UI
     avatar = models.ImageField(
         upload_to="avatars/%Y/%m/",
         blank=True,

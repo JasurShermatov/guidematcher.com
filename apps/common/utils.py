@@ -1,8 +1,5 @@
 # apps/common/utils.py
-
-import random
 import string
-import hashlib
 from datetime import timedelta
 from django.utils import timezone
 from django.utils.text import slugify
@@ -10,18 +7,15 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-import requests
 
 
 def generate_random_code(length=6, digits_only=True):
-    """Generate random code for verification"""
     if digits_only:
         return "".join(random.choices(string.digits, k=length))
     return "".join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
 
 def generate_unique_slug(model_class, base_slug, instance=None):
-    """Generate unique slug for a model"""
     slug = slugify(base_slug)
     unique_slug = slug
     num = 1
@@ -38,7 +32,6 @@ def generate_unique_slug(model_class, base_slug, instance=None):
 
 
 def get_client_ip(request):
-    """Get client IP address from request"""
     x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
     if x_forwarded_for:
         ip = x_forwarded_for.split(",")[0]
@@ -48,12 +41,10 @@ def get_client_ip(request):
 
 
 def get_user_agent(request):
-    """Get user agent from request"""
     return request.META.get("HTTP_USER_AGENT", "")
 
 
 def mask_email(email):
-    """Mask email address for privacy"""
     username, domain = email.split("@")
     if len(username) <= 2:
         masked_username = username[0] + "*"
@@ -63,14 +54,12 @@ def mask_email(email):
 
 
 def mask_phone(phone):
-    """Mask phone number for privacy"""
     if len(phone) <= 6:
         return "*" * len(phone)
     return phone[:3] + "*" * (len(phone) - 6) + phone[-3:]
 
 
 def calculate_distance(lat1, lon1, lat2, lon2):
-    """Calculate distance between two coordinates in kilometers"""
     from math import radians, sin, cos, sqrt, atan2
 
     R = 6371  # Earth's radius in kilometers
@@ -92,15 +81,12 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 def send_email_notification(
     recipient_email, subject, template_name, context, from_email=None
 ):
-    """Send email notification using template"""
     if not from_email:
         from_email = settings.DEFAULT_FROM_EMAIL
 
-    # Render HTML and text content
     html_content = render_to_string(template_name, context)
     text_content = strip_tags(html_content)
 
-    # Send email
     send_mail(
         subject=subject,
         message=text_content,
@@ -112,28 +98,23 @@ def send_email_notification(
 
 
 def resize_image(image_field, max_width=1200, max_height=1200):
-    """Resize image to maximum dimensions while maintaining aspect ratio"""
     from PIL import Image
     from io import BytesIO
     from django.core.files.uploadedfile import InMemoryUploadedFile
 
     img = Image.open(image_field)
 
-    # Convert RGBA to RGB if necessary
     if img.mode == "RGBA":
         rgb_img = Image.new("RGB", img.size, (255, 255, 255))
         rgb_img.paste(img, mask=img.split()[3])
         img = rgb_img
 
-    # Calculate new dimensions
     img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
 
-    # Save to BytesIO
     output = BytesIO()
     img.save(output, format="JPEG", quality=85, optimize=True)
     output.seek(0)
 
-    # Create new InMemoryUploadedFile
     return InMemoryUploadedFile(
         output,
         "ImageField",
@@ -145,9 +126,6 @@ def resize_image(image_field, max_width=1200, max_height=1200):
 
 
 def get_currency_exchange_rate(from_currency, to_currency="USD"):
-    """Get currency exchange rate (placeholder - implement with real API)"""
-    # This is a placeholder. In production, use a real currency API
-    # like exchangerate-api.com, fixer.io, etc.
     exchange_rates = {
         "USD": 1.0,
         "EUR": 0.85,
@@ -159,7 +137,6 @@ def get_currency_exchange_rate(from_currency, to_currency="USD"):
     if from_currency == to_currency:
         return 1.0
 
-    # Convert to USD first, then to target currency
     from_rate = exchange_rates.get(from_currency, 1.0)
     to_rate = exchange_rates.get(to_currency, 1.0)
 
@@ -167,7 +144,6 @@ def get_currency_exchange_rate(from_currency, to_currency="USD"):
 
 
 def format_currency(amount, currency="USD"):
-    """Format currency for display"""
     currency_symbols = {
         "USD": "$",
         "EUR": "€",
@@ -185,7 +161,6 @@ def format_currency(amount, currency="USD"):
 
 
 def generate_verification_url(user, token):
-    """Generate email verification URL"""
     from django.urls import reverse
     from django.contrib.sites.models import Site
 
@@ -196,7 +171,6 @@ def generate_verification_url(user, token):
 
 
 def create_thumbnail(image_field, size=(300, 300)):
-    """Create thumbnail from image"""
     from PIL import Image
     from io import BytesIO
     from django.core.files.base import ContentFile
@@ -212,7 +186,6 @@ def create_thumbnail(image_field, size=(300, 300)):
 
 
 def get_date_range_filter(period):
-    """Get date range for filtering"""
     today = timezone.now().date()
 
     if period == "today":
@@ -246,19 +219,14 @@ def get_date_range_filter(period):
 
 
 def sanitize_filename(filename):
-    """Sanitize filename for safe storage"""
     import re
 
-    # Remove any path components
     filename = os.path.basename(filename)
 
-    # Replace spaces with underscores
     filename = filename.replace(" ", "_")
 
-    # Remove any non-alphanumeric characters except dots, hyphens, and underscores
     filename = re.sub(r"[^\w\.-]", "", filename)
 
-    # Ensure filename is not empty
     if not filename:
         filename = "unnamed_file"
 

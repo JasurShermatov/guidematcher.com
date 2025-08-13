@@ -12,9 +12,7 @@ router = DefaultRouter()
 router.register(r"profiles", ProfileViewSet, basename="profiles")
 
 urlpatterns = [
-    # OAuth Login
     path("auth/google/", GoogleLoginView.as_view(), name="auth-google-login"),
-    # Password Reset Flow
     path(
         "auth/password/reset/",
         PasswordResetRequestView.as_view(),
@@ -25,6 +23,5 @@ urlpatterns = [
         PasswordResetConfirmView.as_view(),
         name="auth-password-reset-confirm",
     ),
-    # API endpoints
     path("", include(router.urls)),
 ]

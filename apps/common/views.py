@@ -14,10 +14,6 @@ from apps.common.serializers import (
 
 
 class ReadOnlyOrAdmin(permissions.BasePermission):
-    """
-    GET/HEAD/OPTIONS -> everybody.
-    POST/PUT/PATCH/DELETE -> only staff/admin.
-    """
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:

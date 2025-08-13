@@ -7,5 +7,4 @@ class UsersConfig(AppConfig):
     name = "apps.users"
 
     def ready(self):
-        # Signalsni import qilsak, ular ro‘yxatdan o‘tadi
         from . import signals  # noqa

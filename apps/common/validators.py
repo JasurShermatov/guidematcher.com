@@ -1,5 +1,4 @@
 # apps/common/validators.py
-
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
@@ -7,9 +6,8 @@ import magic
 
 
 def validate_file_size(file, max_size_mb=5):
-    """Validate file size"""
     file_size = file.size
-    max_size = max_size_mb * 1024 * 1024  # Convert MB to bytes
+    max_size = max_size_mb * 1024 * 1024
 
     if file_size > max_size:
         raise ValidationError(
@@ -21,25 +19,21 @@ def validate_file_size(file, max_size_mb=5):
 
 
 def validate_image_file(file):
-    """Validate image file type and size"""
-    # Validate size (max 5MB for images)
+
     validate_file_size(file, max_size_mb=5)
 
-    # Validate file type
     allowed_types = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
     file_mime = magic.from_buffer(file.read(1024), mime=True)
-    file.seek(0)  # Reset file pointer
+    file.seek(0)
 
     if file_mime not in allowed_types:
         raise ValidationError(_("Invalid file type. Allowed types: JPEG, PNG, WebP"))
 
 
 def validate_document_file(file):
-    """Validate document file type and size"""
-    # Validate size (max 25MB for documents)
+
     validate_file_size(file, max_size_mb=25)
 
-    # Validate file type
     allowed_types = [
         "application/pdf",
         "application/msword",
@@ -50,7 +44,7 @@ def validate_document_file(file):
     ]
 
     file_mime = magic.from_buffer(file.read(1024), mime=True)
-    file.seek(0)  # Reset file pointer
+    file.seek(0)
 
     if file_mime not in allowed_types:
         raise ValidationError(
@@ -59,7 +53,6 @@ def validate_document_file(file):
 
 
 def validate_phone_number(value):
-    """Validate phone number format"""
     phone_regex = RegexValidator(
         regex=r"^\+?1?\d{9,15}$",
         message=_(
@@ -70,7 +63,6 @@ def validate_phone_number(value):
 
 
 def validate_username(value):
-    """Validate username format"""
     username_regex = RegexValidator(
         regex=r"^[\w.@+-]+$",
         message=_(
@@ -81,13 +73,11 @@ def validate_username(value):
 
 
 def validate_positive_decimal(value):
-    """Validate positive decimal value"""
     if value < 0:
         raise ValidationError(_("Value must be positive"), params={"value": value})
 
 
 def validate_rating(value):
-    """Validate rating value (1-5)"""
     if value < 1 or value > 5:
         raise ValidationError(
             _("Rating must be between 1 and 5"), params={"value": value}
@@ -95,7 +85,6 @@ def validate_rating(value):
 
 
 def validate_future_date(value):
-    """Validate that date is in the future"""
     from django.utils import timezone
 
     if value < timezone.now().date():
@@ -103,7 +92,6 @@ def validate_future_date(value):
 
 
 def validate_age(date_of_birth):
-    """Validate user is at least 18 years old"""
     from datetime import date
 
     today = date.today()
@@ -118,7 +106,6 @@ def validate_age(date_of_birth):
 
 
 def validate_password_strength(password):
-    """Validate password strength"""
     if len(password) < 8:
         raise ValidationError(_("Password must be at least 8 characters long"))
 
@@ -133,7 +120,6 @@ def validate_password_strength(password):
 
 
 def validate_coordinates(latitude, longitude):
-    """Validate GPS coordinates"""
     if latitude < -90 or latitude > 90:
         raise ValidationError(_("Latitude must be between -90 and 90 degrees"))
 

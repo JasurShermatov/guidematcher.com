@@ -1,3 +1,4 @@
+#  app/disputes/views.py
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -15,7 +16,6 @@ from apps.disputes.serializers import (
     DisputeActionSerializer,
 )
 from apps.common.permissions import IsDisputeParticipant, IsAdmin
-
 from drf_spectacular.utils import extend_schema
 
 
@@ -31,15 +31,15 @@ def _log_action(dispute, performed_by, action_type, desc, old=None, new=None):
     )
 
 
-# ─────────── DisputeViewSet ───────────
 class DisputeViewSet(viewsets.ModelViewSet):
-    """
-    Reporter/Respondent ko‘rishi va yangisini yaratishi mumkin.
-    Admin – to‘liq CRUD + assign, status change va h.k.
-    """
-
     queryset = Dispute.objects.select_related(
         "reporter", "respondent", "booking", "assigned_to"
+    ).prefetch_related(
+        "actions__performed_by",
+        "messages__sender",
+        "messages__attachments",
+        "evidence__submitted_by",
+        "evidence__verified_by",
     )
     serializer_class = DisputeSerializer
     permission_classes = [IsAuthenticated, IsDisputeParticipant | IsAdmin]
@@ -61,7 +61,6 @@ class DisputeViewSet(viewsets.ModelViewSet):
             obj, self.request.user, "STATUS_CHANGED", "Dispute created", new=obj.status
         )
 
-    # ---- custom actions ----
     @action(detail=True, methods=["post"], permission_classes=[IsAdmin])
     def assign(self, request, pk=None):
         dispute = self.get_object()
@@ -96,17 +95,11 @@ class DisputeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["get"])
     def actions(self, request, pk=None):
-        """
-        /disputes/{id}/actions/
-        """
-        actions = dispute_actions = self.get_object().actions.select_related(
-            "performed_by"
-        )
+        dispute_actions = self.get_object().actions.select_related("performed_by")
         serializer = DisputeActionSerializer(dispute_actions, many=True)
         return Response(serializer.data)
 
 
-# ─────────── EvidenceViewSet (nested) ───────────
 class EvidenceViewSet(viewsets.ModelViewSet):
     serializer_class = EvidenceSerializer
     permission_classes = [IsDisputeParticipant | IsAdmin]
@@ -121,7 +114,6 @@ class EvidenceViewSet(viewsets.ModelViewSet):
         _log_action(obj.dispute, self.request.user, "EVIDENCE_ADDED", obj.title)
 
 
-# ─────────── MessageViewSet (nested) ───────────
 class DisputeMessageViewSet(viewsets.ModelViewSet):
     serializer_class = DisputeMessageSerializer
     permission_classes = [IsDisputeParticipant | IsAdmin]

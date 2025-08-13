@@ -10,9 +10,6 @@ from apps.users.models import User, Country
 from apps.accounts.models import EmailVerification
 from apps.accounts.tasks import send_verification_email, send_welcome_email
 
-# Predefined country list (example, can be expanded or sourced from a library like pycountry)
-VALID_COUNTRIES = ["Uzbekistan", "United States", "United Kingdom", "Russia", "China"]
-
 DEFAULT_EXPIRE_SECONDS = getattr(
     settings, "ACCOUNTS_VERIFICATION_CODE_TTL_SECONDS", 300
 )
@@ -107,12 +104,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
     def validate_country(self, value):
-        country_name = value.strip()
-        if country_name not in VALID_COUNTRIES:
-            raise serializers.ValidationError(
-                f"Invalid country. Must be one of: {', '.join(VALID_COUNTRIES)}."
-            )
-        return country_name
+        # Har qanday davlat nomini qabul qiladi
+        return value.strip()
 
     def validate(self, attrs):
         email = attrs.get("email").lower().strip()

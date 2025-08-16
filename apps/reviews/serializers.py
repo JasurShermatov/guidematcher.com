@@ -4,12 +4,8 @@ from apps.reviews.models import Review, ReviewResponse, ReviewHelpful
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    client_full_name = serializers.CharField(
-        source="client.get_full_name", read_only=True
-    )
-    customer_full_name = serializers.CharField(
-        source="customer.user.get_full_name", read_only=True
-    )
+    client = serializers.SerializerMethodField()
+    customer = serializers.SerializerMethodField()
 
     class Meta:
         model = Review
@@ -17,9 +13,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             "id",
             "booking",
             "client",
-            "client_full_name",
             "customer",
-            "customer_full_name",
             "overall_rating",
             "communication_rating",
             "service_rating",
@@ -33,7 +27,24 @@ class ReviewSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ("id", "helpful_count", "created_at", "updated_at")
+        read_only_fields = (
+            "id",
+            "helpful_count",
+            "created_at",
+            "updated_at",
+        )
+
+    def get_client(self, obj):
+        return {
+            "id": obj.client.id,
+            "full_name": obj.client.get_full_name(),
+        }
+
+    def get_customer(self, obj):
+        return {
+            "id": obj.customer.id,
+            "full_name": obj.customer.user.get_full_name(),
+        }
 
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
@@ -67,11 +78,14 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
 
 
 class ReviewResponseSerializer(serializers.ModelSerializer):
+    customer = serializers.SerializerMethodField()
+
     class Meta:
         model = ReviewResponse
         fields = [
             "id",
             "review",
+            "customer",
             "response_text",
             "is_published",
             "created_at",
@@ -79,8 +93,16 @@ class ReviewResponseSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ("id", "created_at", "updated_at")
 
+    def get_customer(self, obj):
+        return {
+            "id": obj.review.customer.id,
+            "full_name": obj.review.customer.user.get_full_name(),
+        }
+
 
 class ReviewHelpfulSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
     class Meta:
         model = ReviewHelpful
         fields = ("id", "review", "user", "created_at")
@@ -89,3 +111,9 @@ class ReviewHelpfulSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data["user"] = self.context["request"].user
         return super().create(validated_data)
+
+    def get_user(self, obj):
+        return {
+            "id": obj.user.id,
+            "full_name": obj.user.get_full_name(),
+        }

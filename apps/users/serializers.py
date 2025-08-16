@@ -37,14 +37,15 @@ class RegisterSerializer(serializers.ModelSerializer):
         password = validated_data.pop("password")
         user = User.objects.create_user(password=password, **validated_data)
         user.is_active = True
-        user.save(update_fields=["is_active"])
+        user.save()
+
+        # cache update
+        from django.core.cache import cache
+        cache.set(f"user:{user.pk}", user, timeout=3600)
 
         if not user.is_verified:
             try:
-                from apps.accounts.services import (
-                    create_and_send_email_verification_code,
-                )
-
+                from apps.accounts.services import create_and_send_email_verification_code
                 create_and_send_email_verification_code(user)
             except Exception:
                 pass

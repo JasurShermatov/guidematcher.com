@@ -778,3 +778,169 @@ django.template.exceptions.TemplateDoesNotExist: rangefilter/date_filter.html
 [2025-08-16 09:40:59,021] WARNING django.request: Not Found: /api/v1/users/profiles/
 [2025-08-16 09:40:59,021] WARNING django.request: Not Found: /api/v1/users/profiles/
 
+[2025-08-16 09:45:56,785] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 09:45:56,857] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 09:45:56,858] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 09:45:56,859] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 09:45:57,668] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 09:45:57,732] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 09:45:57,733] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 09:45:57,733] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 09:45:58,351] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 09:45:58,391] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 09:45:58,391] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 09:45:58,392] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 09:47:02,655] WARNING django.request: Unauthorized: /api/v1/accounts/login/
+[2025-08-16 09:47:02,655] WARNING django.request: Unauthorized: /api/v1/accounts/login/
+[2025-08-16 09:47:02,670] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-08-16 09:47:02,670] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
+[2025-08-16 09:47:12,696] WARNING django.request: Not Found: /
+[2025-08-16 09:47:12,696] WARNING django.request: Not Found: /
+[2025-08-16 09:47:16,341] WARNING django.request: Not Found: /
+[2025-08-16 09:47:16,341] WARNING django.request: Not Found: /
+[2025-08-16 09:47:17,186] WARNING django.request: Not Found: /favicon.ico
+[2025-08-16 09:47:17,186] WARNING django.request: Not Found: /favicon.ico
+[2025-08-16 09:47:17,187] WARNING django.request: Not Found: /apple-touch-icon-precomposed.png
+[2025-08-16 09:47:17,187] WARNING django.request: Not Found: /apple-touch-icon-precomposed.png
+[2025-08-16 09:47:17,189] WARNING django.request: Not Found: /apple-touch-icon.png
+[2025-08-16 09:47:17,189] WARNING django.request: Not Found: /apple-touch-icon.png
+[2025-08-16 10:00:59,959] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 10:01:00,026] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 10:01:00,027] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 10:01:00,027] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 10:01:00,820] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 10:01:00,881] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 10:01:00,882] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 10:01:00,882] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 10:01:01,499] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 10:01:01,538] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 10:01:01,539] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 10:01:01,539] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 10:09:16,260] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 10:09:16,319] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 10:09:16,320] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 10:09:16,320] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 10:09:17,096] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 10:09:17,154] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 10:09:17,155] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 10:09:17,155] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 10:09:17,765] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 10:09:17,804] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 10:09:17,805] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 10:09:17,805] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 10:12:07,769] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 10:12:07,836] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 10:12:07,837] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 10:12:07,837] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 10:12:08,679] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 10:12:08,736] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 10:12:08,737] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 10:12:08,737] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 10:12:09,356] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 10:12:09,396] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 10:12:09,397] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 10:12:09,397] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:31:07,680] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:31:07,750] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:31:07,750] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:31:07,750] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:31:09,133] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:31:09,205] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:31:09,206] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:31:09,206] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:31:10,570] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:31:10,650] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:31:10,651] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:31:10,651] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:31:12,110] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:31:12,180] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:31:12,180] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:31:12,181] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:31:14,098] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:31:14,168] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:31:14,168] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:31:14,168] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:31:16,843] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:31:16,907] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:31:16,908] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:31:16,908] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:31:21,138] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:31:21,204] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:31:21,205] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:31:21,205] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:31:28,647] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:31:28,713] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:31:28,714] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:31:28,714] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:31:42,569] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:31:42,633] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:31:42,634] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:31:42,634] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:32:09,295] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:32:09,363] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:32:09,364] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:32:09,364] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:33:01,581] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:33:01,647] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:33:01,647] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:33:01,648] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:34:02,699] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:34:02,776] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:34:02,776] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:34:02,777] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:35:04,011] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:35:04,075] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:35:04,076] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:35:04,076] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:35:15,283] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:35:15,351] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:35:15,352] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:35:15,352] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:35:16,580] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:35:16,647] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:35:16,648] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:35:16,648] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:35:17,934] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:35:18,004] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:35:18,004] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:35:18,005] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:35:19,436] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:35:19,502] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:35:19,503] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:35:19,503] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:35:21,333] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:35:21,395] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:35:21,396] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:35:21,396] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:35:23,993] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:35:24,055] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:35:24,056] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:35:24,056] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:35:28,259] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:35:28,320] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:35:28,321] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:35:28,321] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:35:35,761] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:35:35,828] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:35:35,829] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:35:35,829] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:35:49,649] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:35:49,710] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:35:49,711] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:35:49,711] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:36:16,358] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:36:16,422] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:36:16,422] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:36:16,423] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:36:59,145] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:36:59,210] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:36:59,210] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:36:59,211] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:37:00,066] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:37:00,126] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:37:00,127] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:37:00,127] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 11:37:00,739] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 11:37:00,782] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 11:37:00,782] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 11:37:00,782] INFO apps.chat.apps: Chat app initialized successfully

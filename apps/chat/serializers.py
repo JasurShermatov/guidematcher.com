@@ -413,3 +413,33 @@ class ChatStatisticsSerializer(serializers.Serializer):
     unread_rooms_count = serializers.IntegerField(read_only=True)
     total_unread_messages = serializers.IntegerField(read_only=True)
     active_rooms_count = serializers.IntegerField(read_only=True)
+
+
+class MessageFileUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = (
+            "id",
+            "file",
+            "file_name",
+            "file_size",
+            "message_type",
+            "created_at",
+        )
+        read_only_fields = ("id", "created_at", "message_type")
+
+    def validate_file(self, file):
+        """Fayl hajmi tekshirish"""
+        max_size = 10 * 1024 * 1024  # 10 MB
+        if file.size > max_size:
+            raise serializers.ValidationError("Fayl hajmi 10 MB dan oshmasligi kerak.")
+        return file
+
+    def create(self, validated_data):
+        """Fayl nomi va hajmini avtomatik to‘ldirish"""
+        file = validated_data.get("file")
+        if file:
+            validated_data["file_name"] = file.name
+            validated_data["file_size"] = file.size
+            validated_data["message_type"] = Message.MessageType.FILE
+        return super().create(validated_data)

@@ -677,3 +677,63 @@
 2025-08-13 18:16:36,182 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
 2025-08-13 18:16:36,183 - aiogram.dispatcher - WARNING - Sleep for 5.010770 seconds and try again... (tryings = 12, bot id = 7857439280)
 2025-08-13 18:16:51,339 - aiogram.dispatcher - INFO - Connection established (tryings = 13, bot id = 7857439280)
+2025-08-16 04:46:27,585 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-16 04:46:27,585 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-16 04:46:27,592 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-16 04:46:27,595 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-16 04:46:27,595 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-16 04:46:27,596 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-16 04:46:27,597 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-16 04:46:27,597 - utils.database.db_init - INFO - Database connection closed
+2025-08-16 04:46:27,603 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-16 04:46:27,603 - __main__ - INFO - Bot ishga tushdi
+2025-08-16 04:46:27,604 - aiogram.dispatcher - INFO - Start polling
+2025-08-16 04:46:28,454 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-16 05:01:30,883 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-16 05:01:30,883 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-16 05:01:30,890 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-16 05:01:30,893 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-16 05:01:30,894 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-16 05:01:30,894 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-16 05:01:30,895 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-16 05:01:30,895 - utils.database.db_init - INFO - Database connection closed
+2025-08-16 05:01:30,902 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-16 05:01:30,902 - __main__ - INFO - Bot ishga tushdi
+2025-08-16 05:01:30,902 - aiogram.dispatcher - INFO - Start polling
+2025-08-16 05:01:31,248 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-16 05:09:46,969 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-16 05:09:46,970 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-16 05:09:46,976 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-16 05:09:46,978 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-16 05:09:46,979 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-16 05:09:46,979 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-16 05:09:46,980 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-16 05:09:46,980 - utils.database.db_init - INFO - Database connection closed
+2025-08-16 05:09:46,987 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-16 05:09:46,987 - __main__ - INFO - Bot ishga tushdi
+2025-08-16 05:09:46,987 - aiogram.dispatcher - INFO - Start polling
+2025-08-16 05:09:47,371 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-16 05:12:38,522 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-16 05:12:38,522 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-16 05:12:38,538 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-16 05:12:38,540 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-16 05:12:38,541 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-16 05:12:38,542 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-16 05:12:38,543 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-16 05:12:38,543 - utils.database.db_init - INFO - Database connection closed
+2025-08-16 05:12:38,549 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-16 05:12:38,550 - __main__ - INFO - Bot ishga tushdi
+2025-08-16 05:12:38,550 - aiogram.dispatcher - INFO - Start polling
+2025-08-16 05:12:38,905 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-16 06:37:29,874 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-16 06:37:29,874 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-16 06:37:29,883 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-16 06:37:29,887 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-16 06:37:29,887 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-16 06:37:29,888 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-16 06:37:29,889 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-16 06:37:29,889 - utils.database.db_init - INFO - Database connection closed
+2025-08-16 06:37:29,896 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-16 06:37:29,896 - __main__ - INFO - Bot ishga tushdi
+2025-08-16 06:37:29,896 - aiogram.dispatcher - INFO - Start polling
+2025-08-16 06:37:30,233 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'

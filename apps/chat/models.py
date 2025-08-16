@@ -304,9 +304,18 @@ class ChatRoomManager(models.Manager):
         )
 
     def unread_for_user(self, user):
+        """O'qilmagan xabarlari bor xonalarni topish"""
         user_id = str(user.id)
-        return self.filter(participants=user, is_active=True).extra(
-            where=["unread_counts->>%s::text::int > 0"], params=[user_id]
+
+        # Xavfsiz PostgreSQL JSON query
+        return (
+            self.filter(participants=user, is_active=True)
+            .annotate(
+                user_unread=Cast(
+                    KeyTextTransform(user_id, "unread_counts"), IntegerField()
+                )
+            )
+            .filter(user_unread__gt=0)
         )
 
 

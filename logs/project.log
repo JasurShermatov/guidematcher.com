@@ -1498,17 +1498,3 @@ Traceback (most recent call last):
 django.db.utils.IntegrityError: duplicate key value violates unique constraint "accounts_emailverification_email_key"
 DETAIL:  Key (email)=(pythondev2005@gmail.com) already exists.
 
-[2025-08-17 03:47:29,702] INFO apps.chat.apps: Chat signals registered successfully
-[2025-08-17 03:47:29,761] INFO apps.chat.apps: Chat WebSocket consumers loaded
-[2025-08-17 03:47:29,762] INFO apps.chat.apps: Chat periodic tasks registered
-[2025-08-17 03:47:29,762] INFO apps.chat.apps: Chat app initialized successfully
-[2025-08-17 03:47:30,597] INFO apps.chat.apps: Chat signals registered successfully
-[2025-08-17 03:47:30,660] INFO apps.chat.apps: Chat WebSocket consumers loaded
-[2025-08-17 03:47:30,661] INFO apps.chat.apps: Chat periodic tasks registered
-[2025-08-17 03:47:30,661] INFO apps.chat.apps: Chat app initialized successfully
-[2025-08-17 03:47:31,276] INFO apps.chat.apps: Chat signals registered successfully
-[2025-08-17 03:47:31,317] INFO apps.chat.apps: Chat WebSocket consumers loaded
-[2025-08-17 03:47:31,318] INFO apps.chat.apps: Chat periodic tasks registered
-[2025-08-17 03:47:31,318] INFO apps.chat.apps: Chat app initialized successfully
-[2025-08-17 03:49:48,806] WARNING django.request: Bad Request: /api/v1/accounts/register/
-[2025-08-17 03:49:48,806] WARNING django.request: Bad Request: /api/v1/accounts/register/

@@ -694,34 +694,7 @@ Traceback (most recent call last):
   File "/usr/local/lib/python3.10/site-packages/django/template/backends/django.py", line 130, in reraise
     raise new from exc
 django.template.exceptions.TemplateDoesNotExist: rangefilter/date_filter.html
-[2025-08-13 23:23:02,478] INFO apps.chat.apps: Chat signals registered successfully
-[2025-08-13 23:23:02,538] INFO apps.chat.apps: Chat WebSocket consumers loaded
-[2025-08-13 23:23:02,539] INFO apps.chat.apps: Chat periodic tasks registered
-[2025-08-13 23:23:02,539] INFO apps.chat.apps: Chat app initialized successfully
-[2025-08-13 23:23:03,314] INFO apps.chat.apps: Chat signals registered successfully
-[2025-08-13 23:23:03,373] INFO apps.chat.apps: Chat WebSocket consumers loaded
-[2025-08-13 23:23:03,373] INFO apps.chat.apps: Chat periodic tasks registered
-[2025-08-13 23:23:03,374] INFO apps.chat.apps: Chat app initialized successfully
-[2025-08-13 23:23:03,987] INFO apps.chat.apps: Chat signals registered successfully
-[2025-08-13 23:23:04,025] INFO apps.chat.apps: Chat WebSocket consumers loaded
-[2025-08-13 23:23:04,025] INFO apps.chat.apps: Chat periodic tasks registered
-[2025-08-13 23:23:04,026] INFO apps.chat.apps: Chat app initialized successfully
-[2025-08-13 23:24:38,532] WARNING django.request: Not Found: /api/v1/users/profiles/
-[2025-08-13 23:24:38,532] WARNING django.request: Not Found: /api/v1/users/profiles/
-[2025-08-13 23:25:02,619] WARNING django.request: Unauthorized: /api/v1/accounts/login/
-[2025-08-13 23:25:02,619] WARNING django.request: Unauthorized: /api/v1/accounts/login/
-[2025-08-13 23:25:02,635] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
-[2025-08-13 23:25:02,635] WARNING django.request: Bad Request: /api/v1/accounts/refresh/
-[2025-08-14 10:44:26,706] INFO apps.chat.apps: Chat signals registered successfully
-[2025-08-14 10:44:26,786] INFO apps.chat.apps: Chat WebSocket consumers loaded
-[2025-08-14 10:44:26,787] INFO apps.chat.apps: Chat periodic tasks registered
-[2025-08-14 10:44:26,787] INFO apps.chat.apps: Chat app initialized successfully
-[2025-08-14 10:44:27,650] INFO apps.chat.apps: Chat signals registered successfully
-[2025-08-14 10:44:27,716] INFO apps.chat.apps: Chat WebSocket consumers loaded
-[2025-08-14 10:44:27,717] INFO apps.chat.apps: Chat periodic tasks registered
-[2025-08-14 10:44:27,717] INFO apps.chat.apps: Chat app initialized successfully
-[2025-08-14 10:44:28,410] INFO apps.chat.apps: Chat signals registered successfully
-[2025-08-14 10:44:28,449] INFO apps.chat.apps: Chat WebSocket consumers loaded
+
 [2025-08-14 10:44:28,449] INFO apps.chat.apps: Chat periodic tasks registered
 [2025-08-14 10:44:28,450] INFO apps.chat.apps: Chat app initialized successfully
 [2025-08-14 10:54:11,060] WARNING django.request: Not Found: /
@@ -804,3 +777,4 @@ django.template.exceptions.TemplateDoesNotExist: rangefilter/date_filter.html
 [2025-08-16 09:40:57,176] WARNING django.request: Not Found: /
 [2025-08-16 09:40:59,021] WARNING django.request: Not Found: /api/v1/users/profiles/
 [2025-08-16 09:40:59,021] WARNING django.request: Not Found: /api/v1/users/profiles/
+

@@ -694,3 +694,87 @@ Traceback (most recent call last):
   File "/usr/local/lib/python3.10/site-packages/django/template/backends/django.py", line 130, in reraise
     raise new from exc
 django.template.exceptions.TemplateDoesNotExist: rangefilter/date_filter.html
+
+[2025-08-14 10:44:28,449] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-14 10:44:28,450] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-14 10:54:11,060] WARNING django.request: Not Found: /
+[2025-08-14 10:54:11,060] WARNING django.request: Not Found: /
+[2025-08-14 10:54:11,104] WARNING django.request: Not Found: /apple-touch-icon-precomposed.png
+[2025-08-14 10:54:11,105] WARNING django.request: Not Found: /apple-touch-icon-precomposed.png
+[2025-08-14 10:54:11,104] WARNING django.request: Not Found: /apple-touch-icon-precomposed.png
+[2025-08-14 10:54:11,105] WARNING django.request: Not Found: /favicon.ico
+[2025-08-14 10:54:11,105] WARNING django.request: Not Found: /apple-touch-icon-precomposed.png
+[2025-08-14 10:54:11,105] WARNING django.request: Not Found: /favicon.ico
+[2025-08-14 10:54:11,106] WARNING django.request: Not Found: /apple-touch-icon.png
+[2025-08-14 10:54:11,106] WARNING django.request: Not Found: /apple-touch-icon.png
+[2025-08-14 10:54:11,160] WARNING django.request: Not Found: /apple-touch-icon.png
+[2025-08-14 10:54:11,160] WARNING django.request: Not Found: /apple-touch-icon.png
+[2025-08-14 10:54:16,522] WARNING django.request: Not Found: /
+[2025-08-14 10:54:16,522] WARNING django.request: Not Found: /
+[2025-08-14 10:54:23,235] WARNING django.request: Not Found: /
+[2025-08-14 10:54:23,235] WARNING django.request: Not Found: /
+[2025-08-14 10:55:54,203] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-14 10:55:54,276] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-14 10:55:54,277] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-14 10:55:54,277] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-14 10:55:55,178] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-14 10:55:55,245] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-14 10:55:55,245] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-14 10:55:55,246] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-14 10:55:55,923] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-14 10:55:55,967] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-14 10:55:55,968] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-14 10:55:55,968] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-14 10:57:55,125] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-14 10:57:55,185] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-14 10:57:55,186] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-14 10:57:55,186] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-14 10:57:55,971] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-14 10:57:56,030] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-14 10:57:56,031] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-14 10:57:56,031] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-14 10:57:56,674] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-14 10:57:56,716] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-14 10:57:56,717] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-14 10:57:56,717] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 09:37:35,045] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 09:37:35,171] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 09:37:35,172] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 09:37:35,172] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 09:37:36,114] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 09:37:36,175] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 09:37:36,175] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 09:37:36,176] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 09:37:36,874] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 09:37:36,914] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 09:37:36,915] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 09:37:36,915] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 09:38:24,120] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 09:38:24,184] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 09:38:24,185] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 09:38:24,185] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 09:38:25,000] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 09:38:25,063] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 09:38:25,063] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 09:38:25,064] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 09:38:25,696] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-16 09:38:25,737] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-16 09:38:25,737] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-16 09:38:25,738] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-16 09:40:21,206] WARNING django.request: Not Found: /
+[2025-08-16 09:40:21,206] WARNING django.request: Not Found: /
+[2025-08-16 09:40:21,267] WARNING django.request: Not Found: /favicon.ico
+[2025-08-16 09:40:21,267] WARNING django.request: Not Found: /favicon.ico
+[2025-08-16 09:40:21,268] WARNING django.request: Not Found: /apple-touch-icon-precomposed.png
+[2025-08-16 09:40:21,268] WARNING django.request: Not Found: /apple-touch-icon.png
+[2025-08-16 09:40:21,268] WARNING django.request: Not Found: /apple-touch-icon-precomposed.png
+[2025-08-16 09:40:21,268] WARNING django.request: Not Found: /apple-touch-icon.png
+[2025-08-16 09:40:26,051] WARNING django.request: Not Found: /
+[2025-08-16 09:40:26,051] WARNING django.request: Not Found: /
+[2025-08-16 09:40:54,506] WARNING django.request: Not Found: /
+[2025-08-16 09:40:54,506] WARNING django.request: Not Found: /
+[2025-08-16 09:40:57,176] WARNING django.request: Not Found: /
+[2025-08-16 09:40:57,176] WARNING django.request: Not Found: /
+[2025-08-16 09:40:59,021] WARNING django.request: Not Found: /api/v1/users/profiles/
+[2025-08-16 09:40:59,021] WARNING django.request: Not Found: /api/v1/users/profiles/
+

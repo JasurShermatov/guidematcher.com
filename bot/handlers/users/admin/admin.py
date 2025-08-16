@@ -25,7 +25,7 @@ def get_main_keyboard():
             [
                 InlineKeyboardButton(
                     text="🌐 Web App ni ochish",
-                    web_app=WebAppInfo(url="https://google.com"),
+                    web_app=WebAppInfo(url="https://uzguide.com"),
                 )
             ]
         ]

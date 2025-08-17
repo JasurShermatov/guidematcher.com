@@ -1,10 +1,11 @@
-# apps/bookings/views.py
 from django.utils import timezone
 from django.db import transaction
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from apps.bookings.models import Booking, BookingMessage
 from apps.bookings.serializers import (
@@ -18,18 +19,37 @@ from apps.common.permissions import (
     IsBookingParticipant,
     IsOwnerOrReadOnly,
 )
-from rest_framework.permissions import IsAuthenticated
-from drf_spectacular.utils import extend_schema
 
 
+
+@extend_schema_view(
+    list=extend_schema(
+        summary="List Bookings",
+        description="Retrieve a list of bookings. Clients see only their own bookings."
+    ),
+    create=extend_schema(
+        summary="Create Booking",
+        description="Client creates a new booking."
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve Booking",
+        description="Get details of a specific booking by ID."
+    ),
+    update=extend_schema(
+        summary="Update Booking",
+        description="Update all fields of a booking (owner or admin only)."
+    ),
+    partial_update=extend_schema(
+        summary="Partial Update Booking",
+        description="Update some fields of a booking (owner or admin only)."
+    ),
+    destroy=extend_schema(
+        summary="Delete Booking",
+        description="Delete a booking (owner or admin only)."
+    ),
+)
 @extend_schema(tags=["booking"])
 class BookingViewSet(viewsets.ModelViewSet):
-    """
-    Booking CRUD + custom actions (respond, accept, reject, cancel, complete).
-    Business logic is role-based:
-      - Client: create, accept counter-offer, cancel, complete
-      - Customer: respond, accept, reject, cancel, complete
-    """
 
     queryset = Booking.objects.select_related(
         "client", "customer__user", "service_type"
@@ -72,6 +92,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         return BookingSerializer
 
     def get_permissions(self):
+        """Return appropriate permissions depending on action"""
         if self.action == "create":
             return [IsClient()]
         elif self.action in [
@@ -88,15 +109,17 @@ class BookingViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def perform_create(self, serializer):
+        """Automatically assign client as request user on creation"""
         serializer.save(client=self.request.user)
 
     # ──────────────────────────── Custom Actions ──────────────────────────── #
 
     @action(detail=True, methods=["post"])
+    @extend_schema(
+        summary="Respond to Booking",
+        description="Customer responds to a booking with optional counter-offer."
+    )
     def respond(self, request, pk=None):
-        """
-        Customer responds to booking with optional counter-offer.
-        """
         booking = self.get_object()
 
         if not request.user.is_customer:
@@ -120,10 +143,11 @@ class BookingViewSet(viewsets.ModelViewSet):
         return Response(BookingSerializer(booking).data)
 
     @action(detail=True, methods=["post"])
+    @extend_schema(
+        summary="Accept Counter-offer",
+        description="Client accepts a provider's counter-offer."
+    )
     def accept_counter(self, request, pk=None):
-        """
-        Client accepts counter-offer from provider.
-        """
         booking = self.get_object()
 
         if request.user != booking.client:
@@ -153,10 +177,11 @@ class BookingViewSet(viewsets.ModelViewSet):
         return Response(BookingSerializer(booking).data)
 
     @action(detail=True, methods=["post"])
+    @extend_schema(
+        summary="Accept Booking",
+        description="Provider accepts a pending booking request."
+    )
     def accept(self, request, pk=None):
-        """
-        Provider accepts booking request.
-        """
         booking = self.get_object()
 
         if not request.user.is_customer:
@@ -177,10 +202,11 @@ class BookingViewSet(viewsets.ModelViewSet):
         return Response(BookingSerializer(booking).data)
 
     @action(detail=True, methods=["post"])
+    @extend_schema(
+        summary="Reject Booking",
+        description="Provider rejects a pending booking request."
+    )
     def reject(self, request, pk=None):
-        """
-        Provider rejects booking request.
-        """
         booking = self.get_object()
 
         if not request.user.is_customer:
@@ -200,10 +226,11 @@ class BookingViewSet(viewsets.ModelViewSet):
         return Response(BookingSerializer(booking).data)
 
     @action(detail=True, methods=["post"])
+    @extend_schema(
+        summary="Cancel Booking",
+        description="Client or provider can cancel booking if not completed/cancelled."
+    )
     def cancel(self, request, pk=None):
-        """
-        Both client and provider can cancel booking if not already completed/cancelled.
-        """
         booking = self.get_object()
 
         if booking.status not in [
@@ -230,10 +257,11 @@ class BookingViewSet(viewsets.ModelViewSet):
         return Response(BookingSerializer(booking).data)
 
     @action(detail=True, methods=["post"])
+    @extend_schema(
+        summary="Complete Booking",
+        description="Mark booking as completed by client or provider if accepted."
+    )
     def complete(self, request, pk=None):
-        """
-        Either participant (client or provider) can mark booking as completed if accepted.
-        """
         booking = self.get_object()
 
         if request.user not in [booking.client, booking.customer.user]:
@@ -254,16 +282,46 @@ class BookingViewSet(viewsets.ModelViewSet):
         return Response(BookingSerializer(booking).data)
 
 
+# ──────────────────────────── BookingMessageViewSet ──────────────────────────── #
+
+@extend_schema_view(
+    list=extend_schema(
+        summary="List Booking Messages",
+        description="Retrieve all messages for a booking."
+    ),
+    create=extend_schema(
+        summary="Create Booking Message",
+        description="Create a new message in the booking chat."
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve Message",
+        description="Retrieve details of a specific booking message."
+    ),
+    update=extend_schema(
+        summary="Update Message",
+        description="Update all fields of a booking message."
+    ),
+    partial_update=extend_schema(
+        summary="Partial Update Message",
+        description="Update some fields of a booking message."
+    ),
+    destroy=extend_schema(
+        summary="Delete Message",
+        description="Delete a booking message (only sender)."
+    ),
+)
 @extend_schema(tags=["booking"])
 class BookingMessageViewSet(viewsets.ModelViewSet):
     """
-    Chat/messages between participants inside a booking.
+    Chat/messages inside a booking.
+    Allows participants to list and create messages.
     """
 
     serializer_class = BookingMessageSerializer
     permission_classes = [IsBookingParticipant]
 
     def get_queryset(self):
+        """Return all messages for the given booking_id"""
         return (
             BookingMessage.objects.filter(booking_id=self.kwargs["booking_pk"])
             .select_related("sender")
@@ -278,4 +336,5 @@ class BookingMessageViewSet(viewsets.ModelViewSet):
         )
 
     def perform_create(self, serializer):
+        """Automatically assign sender and booking_id on message creation"""
         serializer.save(sender=self.request.user, booking_id=self.kwargs["booking_pk"])

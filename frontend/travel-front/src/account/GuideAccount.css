@@ -1,1043 +1,1546 @@
-/* ===== GUIDE ACCOUNT SCOPED STYLES ===== */
-/* Faqat .guide-account component ichida ishlaydi */
+/* ===== GUIDE ACCOUNT OPTIMIZED STYLES ===== */
 
 /* Base CSS Variables */
 .guide-account {
-  --guide-primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --guide-secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  --guide-success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  --guide-warning-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-  --guide-danger-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-  
-  --guide-primary-color: #667eea;
-  --guide-secondary-color: #764ba2;
-  --guide-success-color: #10b981;
-  --guide-warning-color: #f59e0b;
-  --guide-danger-color: #ef4444;
-  
-  --guide-text-primary: #1a202c;
-  --guide-text-secondary: #4a5568;
-  --guide-text-muted: #718096;
-  
-  --guide-bg-primary: #ffffff;
-  --guide-bg-secondary: #f7fafc;
-  --guide-bg-accent: rgba(255, 255, 255, 0.8);
-  
-  --guide-border-light: rgba(255, 255, 255, 0.2);
-  --guide-border-medium: #e2e8f0;
-  
-  --guide-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-  --guide-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --guide-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --guide-shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
-  
-  --guide-radius-sm: 8px;
-  --guide-radius-md: 12px;
-  --guide-radius-lg: 16px;
-  --guide-radius-xl: 24px;
-  
-  --guide-transition-fast: 0.15s ease;
-  --guide-transition-normal: 0.3s ease;
-  --guide-transition-slow: 0.5s ease;
-}
+    --guide-primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --guide-secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --guide-success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --guide-warning-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    --guide-danger-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
 
-/* Theme-Specific Variables */
-[data-theme="light"] {
-  --guide-primary-gradient: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%);
-  --guide-secondary-gradient: linear-gradient(135deg, #f9a8d4 0%, #f472b6 100%);
-  --guide-success-gradient: linear-gradient(135deg, #34d399 0%, #6ee7b7 100%);
-  --guide-warning-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  --guide-danger-gradient: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
-  
-  --guide-primary-color: #60a5fa;
-  --guide-secondary-color: #818cf8;
-  --guide-success-color: #10b981;
-  --guide-warning-color: #f59e0b;
-  --guide-danger-color: #ef4444;
-  
-  --guide-text-primary: #1f2937;
-  --guide-text-secondary: #4b5563;
-  --guide-text-muted: #6b7280;
-  
-  --guide-bg-primary: #ffffff;
-  --guide-bg-secondary: #f9fafb;
-  --guide-bg-accent: rgba(255, 255, 255, 0.9);
-  
-  --guide-border-light: rgba(255, 255, 255, 0.3);
-  --guide-border-medium: #e5e7eb;
-}
-
-[data-theme="dark"] {
-  --guide-primary-gradient: linear-gradient(135deg, #3b82f6 0%, #5b21b6 100%);
-  --guide-secondary-gradient: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
-  --guide-success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --guide-warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  --guide-danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  
-  --guide-primary-color: #3b82f6;
-  --guide-secondary-color: #5b21b6;
-  --guide-success-color: #10b981;
-  --guide-warning-color: #f59e0b;
-  --guide-danger-color: #ef4444;
-  
-  --guide-text-primary: #f3f4f6;
-  --guide-text-secondary: #d1d5db;
-  --guide-text-muted: #9ca3af;
-  
-  --guide-bg-primary: #1e293b;
-  --guide-bg-secondary: #374151;
-  --guide-bg-accent: rgba(45, 55, 72, 0.9);
-  
-  --guide-border-light: rgba(255, 255, 255, 0.1);
-  --guide-border-medium: #4b5563;
-}
-
-[data-theme="default"] {
-  /* Default uses the same variables as the base .guide-account */
-}
-
-/* Auto mode handled via prefers-color-scheme */
-@media (prefers-color-scheme: dark) {
-  [data-theme="auto"] {
-    --guide-primary-gradient: linear-gradient(135deg, #3b82f6 0%, #5b21b6 100%);
-    --guide-secondary-gradient: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
-    --guide-success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    --guide-warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    --guide-danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    
-    --guide-primary-color: #3b82f6;
-    --guide-secondary-color: #5b21b6;
+    --guide-primary-color: #667eea;
+    --guide-secondary-color: #764ba2;
     --guide-success-color: #10b981;
     --guide-warning-color: #f59e0b;
     --guide-danger-color: #ef4444;
-    
+
+    --guide-text-primary: #1a202c;
+    --guide-text-secondary: #4a5568;
+    --guide-text-muted: #718096;
+
+    --guide-bg-primary: #ffffff;
+    --guide-bg-secondary: #f7fafc;
+    --guide-bg-accent: rgba(255, 255, 255, 0.8);
+
+    --guide-border-light: rgba(255, 255, 255, 0.2);
+    --guide-border-medium: #e2e8f0;
+
+    --guide-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --guide-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --guide-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --guide-shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+    --guide-radius-sm: 8px;
+    --guide-radius-md: 12px;
+    --guide-radius-lg: 16px;
+    --guide-radius-xl: 24px;
+
+    --guide-transition-fast: 0.15s ease;
+    --guide-transition-normal: 0.3s ease;
+    --guide-transition-slow: 0.5s ease;
+}
+
+/* Theme Support */
+[data-theme="dark"] {
     --guide-text-primary: #f3f4f6;
     --guide-text-secondary: #d1d5db;
     --guide-text-muted: #9ca3af;
-    
     --guide-bg-primary: #1e293b;
     --guide-bg-secondary: #374151;
     --guide-bg-accent: rgba(45, 55, 72, 0.9);
-    
     --guide-border-light: rgba(255, 255, 255, 0.1);
     --guide-border-medium: #4b5563;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  [data-theme="auto"] {
-    --guide-primary-gradient: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%);
-    --guide-secondary-gradient: linear-gradient(135deg, #f9a8d4 0%, #f472b6 100%);
-    --guide-success-gradient: linear-gradient(135deg, #34d399 0%, #6ee7b7 100%);
-    --guide-warning-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    --guide-danger-gradient: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
-    
-    --guide-primary-color: #60a5fa;
-    --guide-secondary-color: #818cf8;
-    --guide-success-color: #10b981;
-    --guide-warning-color: #f59e0b;
-    --guide-danger-color: #ef4444;
-    
-    --guide-text-primary: #1f2937;
-    --guide-text-secondary: #4b5563;
-    --guide-text-muted: #6b7280;
-    
-    --guide-bg-primary: #ffffff;
-    --guide-bg-secondary: #f9fafb;
-    --guide-bg-accent: rgba(255, 255, 255, 0.9);
-    
-    --guide-border-light: rgba(255, 255, 255, 0.3);
-    --guide-border-medium: #e5e7eb;
-  }
 }
 
 /* Base Component Styles */
 .guide-account {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background: var(--guide-bg-primary);
-  min-height: 100vh;
-  color: var(--guide-text-primary);
-  position: relative;
-  overflow-x: hidden;
-  box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    background: var(--guide-bg-primary);
+    min-height: 100vh;
+    color: var(--guide-text-primary);
+    position: relative;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .guide-account *,
 .guide-account *::before,
 .guide-account *::after {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 .guide-account::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(240, 147, 251, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 60%, rgba(118, 75, 162, 0.05) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: -1;
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(240, 147, 251, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
 }
 
-/* Theme Switcher Styling */
-.guide-account .guide-account-theme-switcher {
-  position: relative;
+/* Loading State */
+.guide-account-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 1rem;
 }
 
-.guide-account .guide-account-theme-select {
-  appearance: none;
-  background: var(--guide-bg-accent);
-  border: 2px solid var(--guide-border-medium);
-  border-radius: var(--guide-radius-lg);
-  padding: 0.75rem 2.5rem 0.75rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--guide-text-primary);
-  cursor: pointer;
-  transition: var(--guide-transition-fast);
-  box-shadow: var(--guide-shadow-sm);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+.guide-account-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--guide-border-medium);
+    border-top: 4px solid var(--guide-primary-color);
+    border-radius: 50%;
+    animation: guideSpinner 1s linear infinite;
 }
 
-.guide-account .guide-account-theme-select:hover {
-  border-color: var(--guide-primary-color);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  transform: translateY(-1px);
-}
-
-.guide-account .guide-account-theme-select:focus {
-  outline: none;
-  border-color: var(--guide-primary-color);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-}
-
-.guide-account .guide-account-theme-select::after {
-  content: '▼';
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--guide-text-muted);
-  pointer-events: none;
-}
-
-.guide-account .guide-account-theme-select option {
-  background: var(--guide-bg-primary);
-  color: var(--guide-text-primary);
+@keyframes guideSpinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* Notifications */
-.guide-account .guide-account-notifications {
-  position: fixed;
-  top: 2rem;
-  right: 2rem;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  max-width: 400px;
+.guide-account-notifications {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 400px;
 }
 
-.guide-account .guide-account-notification {
-  background: var(--guide-bg-accent);
-  border-radius: var(--guide-radius-md);
-  padding: 1rem 1.5rem;
-  box-shadow: var(--guide-shadow-lg);
-  border-left: 4px solid;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  animation: guideSlideInRight 0.3s ease, guideFadeOut 0.3s ease 4.7s forwards;
-  backdrop-filter: blur(10px);
+.guide-account-notification {
+    background: var(--guide-bg-accent);
+    border-radius: var(--guide-radius-md);
+    padding: 1rem 1.5rem;
+    box-shadow: var(--guide-shadow-lg);
+    border-left: 4px solid;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: guideSlideInRight 0.3s ease, guideFadeOut 0.3s ease 4.7s forwards;
+    backdrop-filter: blur(10px);
 }
 
-.guide-account .guide-account-notification.guide-account-notification-success {
-  border-left-color: var(--guide-success-color);
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, var(--guide-bg-accent) 100%);
+.guide-account-notification.guide-account-notification-success {
+    border-left-color: var(--guide-success-color);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, var(--guide-bg-accent) 100%);
 }
 
-.guide-account .guide-account-notification.guide-account-notification-error {
-  border-left-color: var(--guide-danger-color);
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--guide-bg-accent) 100%);
+.guide-account-notification.guide-account-notification-error {
+    border-left-color: var(--guide-danger-color);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--guide-bg-accent) 100%);
 }
 
-.guide-account .guide-account-notification.guide-account-notification-info {
-  border-left-color: var(--guide-primary-color);
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, var(--guide-bg-accent) 100%);
+.guide-account-notification.guide-account-notification-info {
+    border-left-color: var(--guide-primary-color);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, var(--guide-bg-accent) 100%);
 }
 
-.guide-account .guide-account-notification button {
-  background: none;
-  border: none;
-  color: var(--guide-text-muted);
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: var(--guide-radius-sm);
-  transition: var(--guide-transition-fast);
+.guide-account-notification button {
+    background: none;
+    border: none;
+    color: var(--guide-text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: var(--guide-radius-sm);
+    transition: var(--guide-transition-fast);
 }
 
-.guide-account .guide-account-notification button:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--guide-text-primary);
+.guide-account-notification button:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--guide-text-primary);
 }
 
 @keyframes guideSlideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 @keyframes guideFadeOut {
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(100%);
-  }
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
 }
 
 /* Header */
-.guide-account .guide-account-header {
-  background: var(--guide-bg-accent);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--guide-border-light);
-  padding: 1.5rem 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: var(--guide-shadow-md);
+.guide-account-header {
+    background: var(--guide-bg-accent);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--guide-border-light);
+    padding: 1.5rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--guide-shadow-md);
 }
 
-.guide-account .guide-account-header-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.guide-account-header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.guide-account .guide-account-user-info {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
+.guide-account-user-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
 }
 
-.guide-account .guide-account-avatar-container {
-  position: relative;
+.guide-account-avatar-container {
+    position: relative;
 }
 
-.guide-account .guide-account-avatar {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid transparent;
-  background: var(--guide-primary-gradient);
-  padding: 2px;
-  box-shadow: var(--guide-shadow-md);
-  transition: var(--guide-transition-normal);
+.guide-account-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid transparent;
+    background: var(--guide-primary-gradient);
+    padding: 2px;
+    box-shadow: var(--guide-shadow-md);
+    transition: var(--guide-transition-normal);
 }
 
-.guide-account .guide-account-avatar:hover {
-  transform: scale(1.05);
-  box-shadow: var(--guide-shadow-lg);
+.guide-account-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: var(--guide-shadow-lg);
 }
 
-.guide-account .guide-account-status-indicator {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 3px solid var(--guide-bg-primary);
-  background: #ef4444;
-  animation: guidePulse 2s infinite;
+.guide-account-status-indicator {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 3px solid var(--guide-bg-primary);
+    background: #ef4444;
+    animation: guidePulse 2s infinite;
 }
 
-.guide-account .guide-account-status-indicator.online {
-  background: var(--guide-success-color);
+.guide-account-status-indicator.online {
+    background: var(--guide-success-color);
 }
 
 @keyframes guidePulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
 
-.guide-account .guide-account-user-info h1 {
-  margin: 0;
-  font-size: 1.75rem;
-  font-weight: 800;
-  background: var(--guide-primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.guide-account-user-info h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+    background: var(--guide-primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
-.guide-account .guide-account-subtitle {
-  margin: 0.5rem 0 0 0;
-  color: var(--guide-text-secondary);
-  font-size: 1rem;
-  font-weight: 500;
+.guide-account-subtitle {
+    margin: 0.5rem 0 0 0;
+    color: var(--guide-text-secondary);
+    font-size: 1rem;
+    font-weight: 500;
 }
 
-.guide-account .guide-account-rating {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-  padding: 0.5rem 1rem;
-  background: rgba(245, 158, 11, 0.1);
-  border-radius: var(--guide-radius-lg);
-  backdrop-filter: blur(5px);
+.guide-account-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: rgba(245, 158, 11, 0.1);
+    border-radius: var(--guide-radius-lg);
+    backdrop-filter: blur(5px);
 }
 
-.guide-account .guide-account-star {
-  color: var(--guide-warning-color);
-  font-size: 1.25rem;
-  animation: guideSparkle 3s ease-in-out infinite;
+.guide-account-star {
+    color: var(--guide-warning-color);
+    font-size: 1.25rem;
 }
 
-@keyframes guideSparkle {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1) rotate(5deg); }
+.guide-account-rating span {
+    font-weight: 700;
+    color: var(--guide-text-primary);
 }
 
-.guide-account .guide-account-rating span {
-  font-weight: 700;
-  color: var(--guide-text-primary);
+.guide-account-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
 }
 
-.guide-account .guide-account-quick-stats {
-  display: flex;
-  gap: 1.5rem;
+.guide-account-quick-stats {
+    display: flex;
+    gap: 1.5rem;
 }
 
-.guide-account .guide-account-stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 1.5rem;
-  background: var(--guide-bg-accent);
-  backdrop-filter: blur(10px);
-  border-radius: var(--guide-radius-lg);
-  min-width: 100px;
-  cursor: pointer;
-  transition: var(--guide-transition-normal);
-  position: relative;
-  overflow: hidden;
+.guide-account-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: var(--guide-bg-accent);
+    backdrop-filter: blur(10px);
+    border-radius: var(--guide-radius-lg);
+    min-width: 100px;
+    cursor: pointer;
+    transition: var(--guide-transition-normal);
+    position: relative;
+    overflow: hidden;
 }
 
-.guide-account .guide-account-stat-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: left 0.5s ease;
+.guide-account-stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--guide-shadow-lg);
+    background: rgba(255, 255, 255, 0.9);
 }
 
-.guide-account .guide-account-stat-item:hover::before {
-  left: 100%;
+.guide-account-stat-item svg {
+    font-size: 1.75rem;
+    color: var(--guide-primary-color);
 }
 
-.guide-account .guide-account-stat-item:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--guide-shadow-lg);
-  background: rgba(255, 255, 255, 0.9);
+.guide-account-stat-item span {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--guide-text-primary);
 }
 
-.guide-account .guide-account-stat-item svg {
-  font-size: 1.75rem;
-  color: var(--guide-primary-color);
+.guide-account-stat-item small {
+    font-size: 0.8rem;
+    color: var(--guide-text-muted);
+    text-align: center;
+    font-weight: 500;
 }
 
-.guide-account .guide-account-stat-item span {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--guide-text-primary);
-}
-
-.guide-account .guide-account-stat-item small {
-  font-size: 0.8rem;
-  color: var(--guide-text-muted);
-  text-align: center;
-  font-weight: 500;
-}
-
-.guide-account .guide-account-notification-dot {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 12px;
-  height: 12px;
-  background: var(--guide-danger-color);
-  border-radius: 50%;
-  border: 2px solid var(--guide-bg-primary);
-  animation: guideBounce 2s infinite;
+.guide-account-notification-dot {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    background: var(--guide-danger-color);
+    border-radius: 50%;
+    border: 2px solid var(--guide-bg-primary);
+    animation: guideBounce 2s infinite;
 }
 
 @keyframes guideBounce {
-  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-3px); }
-  60% { transform: translateY(-1px); }
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-3px); }
+    60% { transform: translateY(-1px); }
 }
 
-.guide-account .guide-account-logout-btn {
-  background: var(--guide-danger-gradient);
-  color: white;
-  border: none;
-  padding: 1rem 1.5rem;
-  border-radius: var(--guide-radius-lg);
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: var(--guide-transition-normal);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  box-shadow: var(--guide-shadow-md);
+.guide-account-settings-btn {
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--guide-primary-color);
+    border: none;
+    padding: 1rem;
+    border-radius: var(--guide-radius-lg);
+    cursor: pointer;
+    transition: var(--guide-transition-normal);
+    font-size: 1.5rem;
 }
 
-.guide-account .guide-account-logout-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--guide-shadow-lg);
-  filter: brightness(1.1);
+.guide-account-settings-btn:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: scale(1.05);
 }
 
 /* Main Layout */
-.guide-account .guide-account-main {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 2rem;
+.guide-account-main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 2rem;
 }
 
 /* Sidebar */
-.guide-account .guide-account-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.guide-account-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 /* Cards */
-.guide-account .guide-account-card {
-  background: var(--guide-bg-accent);
-  backdrop-filter: blur(20px);
-  border-radius: var(--guide-radius-xl);
-  border: 1px solid var(--guide-border-light);
-  box-shadow: var(--guide-shadow-lg);
-  overflow: hidden;
-  transition: var(--guide-transition-normal);
-  position: relative;
+.guide-account-card {
+    background: var(--guide-bg-accent);
+    backdrop-filter: blur(20px);
+    border-radius: var(--guide-radius-xl);
+    border: 1px solid var(--guide-border-light);
+    box-shadow: var(--guide-shadow-lg);
+    overflow: hidden;
+    transition: var(--guide-transition-normal);
+    position: relative;
 }
 
-.guide-account .guide-account-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--guide-primary-gradient);
+.guide-account-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--guide-primary-gradient);
 }
 
-.guide-account .guide-account-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--guide-shadow-xl);
+.guide-account-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--guide-shadow-xl);
 }
 
-.guide-account .guide-account-card-header {
-  padding: 2rem 2rem 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+.guide-account-card-header {
+    padding: 2rem 2rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.guide-account .guide-account-card-header h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--guide-text-primary);
+.guide-account-card-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--guide-text-primary);
 }
 
-.guide-account .guide-account-edit-btn {
-  background: rgba(102, 126, 234, 0.1);
-  color: var(--guide-primary-color);
-  border: none;
-  padding: 0.75rem;
-  border-radius: var(--guide-radius-md);
-  cursor: pointer;
-  transition: var(--guide-transition-fast);
-  font-size: 1.1rem;
+.guide-account-edit-btn {
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--guide-primary-color);
+    border: none;
+    padding: 0.75rem;
+    border-radius: var(--guide-radius-md);
+    cursor: pointer;
+    transition: var(--guide-transition-fast);
+    font-size: 1.1rem;
 }
 
-.guide-account .guide-account-edit-btn:hover {
-  background: rgba(102, 126, 234, 0.2);
-  transform: scale(1.05);
+.guide-account-edit-btn:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: scale(1.05);
 }
 
 /* Profile Details */
-.guide-account .guide-account-profile-details {
-  padding: 1rem 2rem 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.guide-account-profile-details {
+    padding: 1rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.guide-account .guide-account-profile-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: var(--guide-radius-md);
-  transition: var(--guide-transition-fast);
+.guide-account-profile-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: var(--guide-radius-md);
+    transition: var(--guide-transition-fast);
 }
 
-.guide-account .guide-account-profile-item:hover {
-  background: rgba(102, 126, 234, 0.05);
-  transform: translateX(5px);
+.guide-account-profile-item:hover {
+    background: rgba(102, 126, 234, 0.05);
+    transform: translateX(5px);
 }
 
-.guide-account .guide-account-profile-item svg {
-  color: var(--guide-primary-color);
-  font-size: 1.25rem;
-  margin-top: 0.25rem;
-  flex-shrink: 0;
+.guide-account-profile-item svg {
+    color: var(--guide-primary-color);
+    font-size: 1.25rem;
+    margin-top: 0.25rem;
+    flex-shrink: 0;
 }
 
-.guide-account .guide-account-profile-item strong {
-  display: block;
-  color: var(--guide-text-primary);
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
+.guide-account-profile-item strong {
+    display: block;
+    color: var(--guide-text-primary);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
 }
 
-.guide-account .guide-account-profile-item p {
-  margin: 0;
-  color: var(--guide-text-secondary);
-  font-size: 0.9rem;
-  line-height: 1.5;
+.guide-account-profile-item p {
+    margin: 0;
+    color: var(--guide-text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
 }
 
-.guide-account .guide-account-profile-portfolio {
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: var(--guide-radius-md);
+.guide-account-profile-portfolio {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: var(--guide-radius-md);
 }
 
-.guide-account .guide-account-profile-portfolio strong {
-  display: block;
-  color: var(--guide-text-primary);
-  font-weight: 700;
-  margin-bottom: 1rem;
-  font-size: 1rem;
+.guide-account-profile-portfolio strong {
+    display: block;
+    color: var(--guide-text-primary);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 1rem;
 }
 
-.guide-account .guide-account-portfolio-preview {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
+.guide-account-portfolio-preview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
 }
 
-.guide-account .guide-account-portfolio-preview img {
-  width: 100%;
-  height: 60px;
-  object-fit: cover;
-  border-radius: var(--guide-radius-sm);
-  cursor: pointer;
-  transition: var(--guide-transition-normal);
+.guide-account-portfolio-preview img {
+    width: 100%;
+    height: 60px;
+    object-fit: cover;
+    border-radius: var(--guide-radius-sm);
+    cursor: pointer;
+    transition: var(--guide-transition-normal);
 }
 
-.guide-account .guide-account-portfolio-preview img:hover {
-  transform: scale(1.05);
-  box-shadow: var(--guide-shadow-md);
+.guide-account-portfolio-preview img:hover {
+    transform: scale(1.05);
+    box-shadow: var(--guide-shadow-md);
 }
 
-.guide-account .guide-account-portfolio-more {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 60px;
-  background: var(--guide-primary-gradient);
-  color: white;
-  border-radius: var(--guide-radius-sm);
-  cursor: pointer;
-  font-weight: 700;
-  transition: var(--guide-transition-normal);
+.guide-account-portfolio-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    background: var(--guide-primary-gradient);
+    color: white;
+    border-radius: var(--guide-radius-sm);
+    cursor: pointer;
+    font-weight: 700;
+    transition: var(--guide-transition-normal);
 }
 
-.guide-account .guide-account-portfolio-more:hover {
-  transform: scale(1.05);
-  filter: brightness(1.1);
+.guide-account-portfolio-more:hover {
+    transform: scale(1.05);
+    filter: brightness(1.1);
 }
 
 /* Statistics Grid */
-.guide-account .guide-account-stats-grid {
-  padding: 1rem 2rem 2rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+.guide-account-stats-grid {
+    padding: 1rem 2rem 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
 }
 
-.guide-account .guide-account-stat {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: var(--guide-radius-md);
-  transition: var(--guide-transition-normal);
-  cursor: pointer;
+.guide-account-stat {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: var(--guide-radius-md);
+    transition: var(--guide-transition-normal);
+    cursor: pointer;
 }
 
-.guide-account .guide-account-stat:hover {
-  background: rgba(0, 0, 0, 0.05);
-  transform: translateY(-2px);
+.guide-account-stat:hover {
+    background: rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
 }
 
-.guide-account .guide-account-stat-icon {
-  font-size: 1.75rem;
-  padding: 0.75rem;
-  border-radius: var(--guide-radius-md);
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: var(--guide-shadow-sm);
+.guide-account-stat-icon {
+    font-size: 1.75rem;
+    padding: 0.75rem;
+    border-radius: var(--guide-radius-md);
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: var(--guide-shadow-sm);
 }
 
-.guide-account .guide-account-stat-icon.success { 
-  color: var(--guide-success-color); 
-  background: rgba(16, 185, 129, 0.1);
-}
-.guide-account .guide-account-stat-icon.warning { 
-  color: var(--guide-warning-color); 
-  background: rgba(245, 158, 11, 0.1);
-}
-.guide-account .guide-account-stat-icon.primary { 
-  color: var(--guide-primary-color); 
-  background: rgba(102, 126, 234, 0.1);
-}
-.guide-account .guide-account-stat-icon.danger { 
-  color: var(--guide-danger-color); 
-  background: rgba(239, 68, 68, 0.1);
+.guide-account-stat-icon.success {
+    color: var(--guide-success-color);
+    background: rgba(16, 185, 129, 0.1);
 }
 
-.guide-account .guide-account-stat div strong {
-  display: block;
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--guide-text-primary);
+.guide-account-stat-icon.warning {
+    color: var(--guide-warning-color);
+    background: rgba(245, 158, 11, 0.1);
 }
 
-.guide-account .guide-account-stat div span {
-  font-size: 0.85rem;
-  color: var(--guide-text-muted);
-  font-weight: 500;
+.guide-account-stat-icon.primary {
+    color: var(--guide-primary-color);
+    background: rgba(102, 126, 234, 0.1);
 }
 
-/* Mini Calendar */
-.guide-account .guide-account-mini-calendar {
-  padding: 1rem 2rem 2rem;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0.5rem;
+.guide-account-stat-icon.danger {
+    color: var(--guide-danger-color);
+    background: rgba(239, 68, 68, 0.1);
 }
 
-.guide-account .guide-account-mini-day {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0.75rem 0.25rem;
-  border-radius: var(--guide-radius-md);
-  background: rgba(0, 0, 0, 0.02);
-  transition: var(--guide-transition-normal);
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
+.guide-account-stat div strong {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--guide-text-primary);
 }
 
-.guide-account .guide-account-mini-day::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--guide-primary-gradient);
-  opacity: 0;
-  transition: var(--guide-transition-normal);
-}
-
-.guide-account .guide-account-mini-day:hover::before {
-  opacity: 0.1;
-}
-
-.guide-account .guide-account-mini-day span {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--guide-text-primary);
-  position: relative;
-  z-index: 1;
-}
-
-.guide-account .guide-account-mini-day small {
-  font-size: 0.7rem;
-  color: var(--guide-text-muted);
-  margin-top: 0.25rem;
-  position: relative;
-  z-index: 1;
-  font-weight: 500;
-}
-
-.guide-account .guide-account-mini-day.busy {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(254, 202, 202, 0.2) 100%);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-.guide-account .guide-account-mini-day.vacation {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.2) 100%);
-  border: 1px solid rgba(59, 130, 246, 0.2);
+.guide-account-stat div span {
+    font-size: 0.85rem;
+    color: var(--guide-text-muted);
+    font-weight: 500;
 }
 
 /* Content Area */
-.guide-account .guide-account-content {
-  display: flex;
-  flex-direction: column;
+.guide-account-content {
+    display: flex;
+    flex-direction: column;
 }
 
 /* Tabs */
-.guide-account .guide-account-tabs {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+.guide-account-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
 }
 
-.guide-account .guide-account-tab {
-  background: transparent;
-  border: 2px solid transparent;
-  color: var(--guide-text-muted);
-  padding: 1rem 1.5rem;
-  border-radius: var(--guide-radius-lg);
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 600;
-  transition: var(--guide-transition-normal);
-  position: relative;
-  overflow: hidden;
+.guide-account-tab {
+    background: transparent;
+    border: 2px solid transparent;
+    color: var(--guide-text-muted);
+    padding: 1rem 1.5rem;
+    border-radius: var(--guide-radius-lg);
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: var(--guide-transition-normal);
+    position: relative;
+    overflow: hidden;
 }
 
-.guide-account .guide-account-tab::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: var(--guide-primary-gradient);
-  transition: left 0.5s ease;
-  opacity: 0.1;
+.guide-account-tab:hover {
+    background: rgba(102, 126, 234, 0.05);
+    color: var(--guide-primary-color);
+    transform: translateY(-1px);
 }
 
-.guide-account .guide-account-tab:hover::before {
-  left: 100%;
-}
-
-.guide-account .guide-account-tab:hover {
-  background: rgba(102, 126, 234, 0.05);
-  color: var(--guide-primary-color);
-  transform: translateY(-1px);
-}
-
-.guide-account .guide-account-tab.active {
-  background: var(--guide-primary-gradient);
-  color: white;
-  border-color: var(--guide-primary-color);
-  box-shadow: var(--guide-shadow-md);
+.guide-account-tab.active {
+    background: var(--guide-primary-gradient);
+    color: white;
+    border-color: var(--guide-primary-color);
+    box-shadow: var(--guide-shadow-md);
 }
 
 /* Requests List */
-.guide-account .guide-account-requests-list {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.guide-account-requests-list {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.guide-account .guide-account-request-item {
-  background: var(--guide-bg-accent);
-  border: 1px solid var(--guide-border-light);
-  border-radius: var(--guide-radius-lg);
-  padding: 2rem;
-  transition: var(--guide-transition-normal);
-  position: relative;
-  overflow: hidden;
+.guide-account-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    color: var(--guide-text-muted);
 }
 
-.guide-account .guide-account-request-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--guide-primary-gradient);
-  opacity: 0;
-  transition: var(--guide-transition-normal);
+.guide-account-empty-state h3 {
+    margin: 1rem 0 0.5rem 0;
+    color: var(--guide-text-secondary);
 }
 
-.guide-account .guide-account-request-item:hover::before {
-  opacity: 1;
+.guide-account-empty-state p {
+    margin: 0;
+    font-size: 0.9rem;
 }
 
-.guide-account .guide-account-request-item.high-priority {
-  border-left: 4px solid var(--guide-danger-color);
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.02) 0%, var(--guide-bg-accent) 100%);
+.guide-account-request-item {
+    background: var(--guide-bg-accent);
+    border: 1px solid var(--guide-border-light);
+    border-radius: var(--guide-radius-lg);
+    padding: 2rem;
+    transition: var(--guide-transition-normal);
+    position: relative;
+    overflow: hidden;
 }
 
-.guide-account .guide-account-request-item:hover {
-  background: rgba(255, 255, 255, 0.95);
-  transform: translateY(-2px);
-  box-shadow: var(--guide-shadow-lg);
+.guide-account-request-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--guide-primary-gradient);
+    opacity: 0;
+    transition: var(--guide-transition-normal);
 }
 
-.guide-account .guide-account-request-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1.5rem;
+.guide-account-request-item:hover::before {
+    opacity: 1;
 }
 
-.guide-account .guide-account-client-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.guide-account-request-item:hover {
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-2px);
+    box-shadow: var(--guide-shadow-lg);
 }
 
-.guide-account .guide-account-client-avatar-container {
-  position: relative;
+.guide-account-request-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
 }
 
-.guide-account .guide-account-client-avatar-container img {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid transparent;
-  background: var(--guide-primary-gradient);
-  padding: 1px;
+.guide-account-client-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
-.guide-account .guide-account-client-status {
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid var(--guide-bg-primary);
-  background: #ef4444;
+.guide-account-client-avatar-container {
+    position: relative;
 }
 
-.guide-account .guide-account-client-status.online {
-  background: var(--guide-success-color);
-  animation: guidePulse 2s infinite;
+.guide-account-client-avatar-container img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid transparent;
+    background: var(--guide-primary-gradient);
+    padding: 1px;
 }
 
-.guide-account .guide-account-client-info h4 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--guide-text-primary);
+.guide-account-client-status {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--guide-bg-primary);
+    background: #ef4444;
 }
 
-.guide-account .guide-account-request-id {
-  font-size: 0.85rem;
-  color: var(--guide-text-muted);
-  font-weight: 500;
+.guide-account-client-status.online {
+    background: var(--guide-success-color);
+    animation: guidePulse 2s infinite;
 }
 
-.guide-account .guide-account-last-seen {
-  font-size: 0.8rem;
-  color: var(--guide-text-muted);
-  display: block;
-  margin-top: 0.25rem;
+.guide-account-client-info h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--guide-text-primary);
 }
 
-.guide-account .guide-account-request-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
+.guide-account-request-id {
+    font-size: 0.85rem;
+    color: var(--guide-text-muted);
+    font-weight: 500;
 }
 
-.guide-account .guide-account-status {
-  padding: 0.5rem 1rem;
-  border-radius: var(--guide-radius-lg);
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: var(--guide-shadow-sm);
+.guide-account-request-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
 }
 
-.guide-account .guide-account-status-kutilmoqda {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  color: #d97706;
-  border: 1px solid #f6e05e;
+.guide-account-status {
+    padding: 0.5rem 1rem;
+    border-radius: var(--guide-radius-lg);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--guide-shadow-sm);
 }
 
-.guide-account .guide-account-status-tasdiqlangan {
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-  color: #059669;
-  border: 1px solid #9ae6b4;
+.guide-account-status-pending {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #d97706;
+    border: 1px solid #f6e05e;
 }
 
-.guide-account .guide-account-status-yakunlangan {
-  background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
-  color: #1d4ed8;
-  border: 1px solid #90cdf4;
+.guide-account-status-confirmed {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #059669;
+    border: 1px solid #9ae6b4;
 }
 
-.guide-account .guide-account-status-rad-etilgan {
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-  color: #dc2626;
-  border: 1px solid #feb2b2;
+.guide-account-status-completed {
+    background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
+    color: #1d4ed8;
+    border: 1px solid #90cdf4;
 }
 
-.guide-account .guide-account-priority {
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--guide-radius-lg);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.guide-account-status-rejected {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #dc2626;
+    border: 1px solid #feb2b2;
 }
 
-.guide-account .guide-account-priority-high {
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-  color: #dc2626;
+.guide-account-request-details {
+    margin-bottom: 1.5rem;
 }
 
-.guide-account .guide-account-priority-medium {
-  background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%);
-  color: #b45309;
+.guide-account-request-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.guide-account-info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: var(--guide-radius-sm);
+}
+
+.guide-account-info-item svg {
+    color: var(--guide-primary-color);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.guide-account-info-item span {
+    font-size: 0.9rem;
+    color: var(--guide-text-secondary);
+    font-weight: 500;
+}
+
+.guide-account-service-type {
+    padding: 1rem;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: var(--guide-radius-md);
+    border-left: 4px solid var(--guide-primary-color);
+}
+
+.guide-account-service-type strong {
+    display: block;
+    color: var(--guide-text-primary);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.guide-account-service-type p {
+    margin: 0;
+    color: var(--guide-text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.guide-account-service-type .guide-account-rating {
+    margin-top: 0.75rem;
+    display: inline-flex;
+}
+
+/* Request Actions */
+.guide-account-request-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.guide-account-btn {
+    background: var(--guide-bg-primary);
+    color: var(--guide-text-primary);
+    border: 2px solid var(--guide-border-medium);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--guide-radius-lg);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: var(--guide-transition-normal);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.guide-account-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--guide-shadow-md);
+}
+
+.guide-account-btn-primary {
+    background: var(--guide-primary-gradient);
+    color: white;
+    border-color: var(--guide-primary-color);
+}
+
+.guide-account-btn-success {
+    background: var(--guide-success-gradient);
+    color: white;
+    border-color: var(--guide-success-color);
+}
+
+.guide-account-btn-danger {
+    background: var(--guide-danger-gradient);
+    color: white;
+    border-color: var(--guide-danger-color);
+}
+
+.guide-account-btn-outline {
+    background: transparent;
+    color: var(--guide-primary-color);
+    border-color: var(--guide-primary-color);
+}
+
+.guide-account-btn-outline:hover {
+    background: var(--guide-primary-color);
+    color: white;
+}
+
+.guide-account-btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+}
+
+/* Modals */
+.guide-account-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.guide-account-modal {
+    background: var(--guide-bg-primary);
+    border-radius: var(--guide-radius-xl);
+    box-shadow: var(--guide-shadow-xl);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid var(--guide-border-light);
+}
+
+.guide-account-modal-large {
+    max-width: 800px;
+}
+
+.guide-account-modal-header {
+    padding: 2rem 2rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--guide-border-medium);
+}
+
+.guide-account-modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--guide-text-primary);
+}
+
+.guide-account-modal-header button {
+    background: none;
+    border: none;
+    color: var(--guide-text-muted);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: var(--guide-radius-sm);
+    transition: var(--guide-transition-fast);
+    font-size: 1.25rem;
+}
+
+.guide-account-modal-header button:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--guide-text-primary);
+}
+
+.guide-account-modal-content {
+    padding: 2rem;
+}
+
+/* Form Styles */
+.guide-account-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.guide-account-form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--guide-text-primary);
+}
+
+.guide-account-form-group input,
+.guide-account-form-group textarea,
+.guide-account-form-group select {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid var(--guide-border-medium);
+    border-radius: var(--guide-radius-md);
+    font-size: 1rem;
+    background: var(--guide-bg-primary);
+    color: var(--guide-text-primary);
+    transition: var(--guide-transition-fast);
+}
+
+.guide-account-form-group input:focus,
+.guide-account-form-group textarea:focus,
+.guide-account-form-group select:focus {
+    outline: none;
+    border-color: var(--guide-primary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.guide-account-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.guide-account-form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--guide-border-medium);
+}
+
+.guide-account-error-message {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(254, 202, 202, 0.2) 100%);
+    color: var(--guide-danger-color);
+    padding: 1rem;
+    border-radius: var(--guide-radius-md);
+    margin-bottom: 1rem;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    font-weight: 500;
+}
+
+/* Avatar Upload */
+.guide-account-avatar-upload {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.guide-account-avatar-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--guide-border-medium);
+}
+
+.guide-account-upload-btn {
+    background: var(--guide-primary-gradient);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--guide-radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--guide-transition-normal);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    font-size: 0.9rem;
+}
+
+.guide-account-upload-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--guide-shadow-md);
+    filter: brightness(1.1);
+}
+
+/* Languages Section */
+.guide-account-languages-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.guide-account-add-language {
+    display: flex;
+    gap: 0.5rem;
+    align-items: end;
+}
+
+.guide-account-add-language input {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.guide-account-add-language select {
+    width: 120px;
+    margin-bottom: 0;
+}
+
+.guide-account-languages-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.guide-account-language-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--guide-primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: var(--guide-radius-lg);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.guide-account-remove-btn {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    transition: var(--guide-transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.guide-account-remove-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* Specializations */
+.guide-account-specializations-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.guide-account-specializations-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.guide-account-specialization-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--guide-success-color);
+    padding: 0.5rem 1rem;
+    border-radius: var(--guide-radius-lg);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Certificates */
+.guide-account-certificates-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.guide-account-certificates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.guide-account-certificate-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.02);
+    padding: 1rem;
+    border-radius: var(--guide-radius-md);
+    border: 1px solid var(--guide-border-medium);
+}
+
+.guide-account-certificate-item span {
+    font-size: 0.9rem;
+    color: var(--guide-text-secondary);
+    font-weight: 500;
+}
+
+/* Settings */
+.guide-account-settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.guide-account-settings-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: var(--guide-radius-md);
+    border: 1px solid var(--guide-border-medium);
+    cursor: pointer;
+    transition: var(--guide-transition-normal);
+    text-align: left;
+    width: 100%;
+}
+
+.guide-account-settings-item:hover {
+    background: rgba(102, 126, 234, 0.05);
+    transform: translateX(5px);
+}
+
+.guide-account-settings-item svg {
+    color: var(--guide-primary-color);
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.guide-account-settings-item strong {
+    display: block;
+    color: var(--guide-text-primary);
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.guide-account-settings-item p {
+    margin: 0;
+    color: var(--guide-text-secondary);
+    font-size: 0.9rem;
+}
+
+.guide-account-theme-select {
+    appearance: none;
+    background: var(--guide-bg-primary);
+    border: 2px solid var(--guide-border-medium);
+    border-radius: var(--guide-radius-md);
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--guide-text-primary);
+    cursor: pointer;
+    transition: var(--guide-transition-fast);
+    margin-top: 0.5rem;
+}
+
+.guide-account-theme-select:hover {
+    border-color: var(--guide-primary-color);
+}
+
+.guide-account-theme-select:focus {
+    outline: none;
+    border-color: var(--guide-primary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Portfolio Grid */
+.guide-account-portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.guide-account-portfolio-item {
+    position: relative;
+    border-radius: var(--guide-radius-md);
+    overflow: hidden;
+    aspect-ratio: 4/3;
+}
+
+.guide-account-portfolio-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.guide-account-portfolio-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    opacity: 0;
+    transition: var(--guide-transition-normal);
+}
+
+.guide-account-portfolio-item:hover .guide-account-portfolio-overlay {
+    opacity: 1;
+}
+
+.guide-account-portfolio-view,
+.guide-account-portfolio-delete {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: var(--guide-transition-fast);
+    backdrop-filter: blur(10px);
+}
+
+.guide-account-portfolio-view:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.guide-account-portfolio-delete:hover {
+    background: rgba(239, 68, 68, 0.8);
+}
+
+.guide-account-portfolio-add {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--guide-border-medium);
+    color: var(--guide-text-muted);
+    border-radius: var(--guide-radius-md);
+    cursor: pointer;
+    transition: var(--guide-transition-normal);
+    aspect-ratio: 4/3;
+    border: 2px dashed var(--guide-border-medium);
+}
+
+.guide-account-portfolio-add:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--guide-primary-color);
+    border-color: var(--guide-primary-color);
+}
+
+.guide-account-portfolio-add svg {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Error States */
+.guide-account-error-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--guide-danger-color);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    cursor: help;
+    animation: guidePulse 2s infinite;
+}
+
+.guide-account-error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    color: var(--guide-text-muted);
+}
+
+.guide-account-error-state h3 {
+    margin: 1rem 0 0.5rem 0;
+    color: var(--guide-danger-color);
+    font-weight: 700;
+}
+
+.guide-account-error-state p {
+    margin: 0 0 2rem 0;
+    font-size: 0.9rem;
+    max-width: 400px;
+    line-height: 1.5;
+}
+
+.guide-account-error-message-card {
+    padding: 0.75rem 2rem 1.5rem;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(254, 202, 202, 0.1) 100%);
+    border-top: 1px solid rgba(239, 68, 68, 0.1);
+    text-align: center;
+}
+
+.guide-account-error-message-card small {
+    color: var(--guide-danger-color);
+    font-weight: 500;
+    font-size: 0.8rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .guide-account-main {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .guide-account-sidebar {
+        grid-row: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .guide-account-header-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .guide-account-quick-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .guide-account-main {
+        padding: 1rem;
+    }
+
+    .guide-account-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .guide-account-request-info {
+        grid-template-columns: 1fr;
+    }
+
+    .guide-account-request-actions {
+        flex-direction: column;
+    }
+
+    .guide-account-form-actions {
+        flex-direction: column;
+    }
+
+    .guide-account-modal {
+        width: 95%;
+        max-height: 95vh;
+    }
+
+    .guide-account-modal-header {
+        padding: 1.5rem 1.5rem 1rem;
+    }
+
+    .guide-account-modal-content {
+        padding: 1.5rem;
+    }
+
+    .guide-account-portfolio-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+
+    .guide-account-notifications {
+        top: 1rem;
+        right: 1rem;
+        max-width: calc(100vw - 2rem);
+    }
+}
+
+@media (max-width: 480px) {
+    .guide-account-header-content {
+        padding: 0 1rem;
+    }
+
+    .guide-account-user-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .guide-account-quick-stats {
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+
+    .guide-account-stat-item {
+        min-width: auto;
+        padding: 0.75rem 1rem;
+    }
+
+    .guide-account-main {
+        padding: 0.5rem;
+    }
+
+    .guide-account-card-header {
+        padding: 1.5rem 1.5rem 1rem;
+    }
+
+    .guide-account-profile-details,
+    .guide-account-stats-grid,
+    .guide-account-requests-list {
+        padding: 1rem 1.5rem 1.5rem;
+    }
+
+    .guide-account-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .guide-account-request-item {
+        padding: 1.5rem;
+    }
+
+    .guide-account-request-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .guide-account-request-meta {
+        align-items: flex-start;
+    }
+
+    .guide-account-tabs {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .guide-account-tab {
+        text-align: center;
+    }
+
+    .guide-account-add-language {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .guide-account-add-language select {
+        width: 100%;
+    }
 }

@@ -1,3 +1,4 @@
+```
 import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://backend:8000/api/v1/";
@@ -121,3 +122,18 @@ export const confirmPasswordReset = (payload) =>
   api.post("accounts/reset-password/", payload).then((r) => r.data);
 
 export default api;
+```
+
+----
+mana shu qismida dasturni kichraytiramiz bunda dasturni funksionalligi quyidagilar bo'lishi kerak
+
+1. dasturda foydalauvchining isimi familyasi ko'rinishi kerak (api orqali olinadi bazadan)
+2. Uni roli ko'rinib turishi kerak (Bazadan oladi)
+3. Profuil qismi bo'ladi unda o'zining profilini shakllantirib chiqish qimsi buladi bunda (ish tajribasi, biladigan tili (bir nechta), o'zi haqida qisqacha, avatar rasmi, ma'lumotlarini yuklash qismi (fayl bilan), narx belgilash maxsus qulayliklar bilan tariflar orqali)
+4. Buyurtmalarini ko'rib turishi, ularni qabul qilish, rad qilish.
+5. chat qismi hozirgi holatda joylashib tursin
+6. Sozlamalar qimsi bo'lishi (o'zini berilgan ma'lumotlarini tahrirlay olishi kerak,
+7. Sozlamalarda o'zini parolini almashtira olishi kerak!)
+8. o'zini umumiy bahosini ko'rib turishi kerak
+
+hozircha mana shu qismini shakllantirib ber bunda berilgan api qismida aytilgan qismi bor va api berilmagan qismlari ma'lumotlari uchun api shakllanirib ket men o'sh qismini back endda shakllantirib qo'shib qo'yaman. menga frontda namuna berib qo'yma, shunchaki ma'lumotni olish darajasida turishi kerak ma'lumot yo'q qismlari shunchaki chiqb turishi kerak, back endni shakllantirganimda o'zi avtomatik olvoladi

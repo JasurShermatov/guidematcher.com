@@ -1,0 +1,719 @@
+{
+  "header": {
+    "logo_text": "TravMatch",
+    "tagline": "Mahalliy aholi bilan kashf qiling",
+    "find_guides": "Yo'lboshchilarni toping",
+    "blog": "Blog",
+    "select_language": "Tilni tanlang",
+    "choose_appearance": "Ko'rinishni tanlang",
+    "sign_in": "Kirish",
+    "logout": "Chiqish",
+    "account": "Hisob"
+  },
+  "theme": {
+    "light": "Yorug' rejim",
+    "dark": "Qorong'i rejim",
+    "default": "Tizim",
+    "auto": "Avto vaqt",
+    "light_desc": "Yorqin va toza",
+    "dark_desc": "Zamonaviy va jozibali",
+    "default_desc": "Qurilmangizga mos keladi",
+    "auto_desc": "Vaqtga asoslangan mavzu"
+  },
+  "language": {
+    "en": "Inglizcha",
+    "ru": "Ruscha",
+    "uz": "O'zbekcha",
+    "es": "Ispancha",
+    "ar": "Arabcha",
+    "en_native": "English",
+    "ru_native": "Русский",
+    "uz_native": "O'zbek",
+    "es_native": "Español",
+    "ar_native": "العربية"
+  },
+  "guide": {
+    "loading": {
+      "data": "Ma'lumotlar yuklanmoqda..."
+    },
+    "header": {
+      "tours": "sayohatlar"
+    },
+    "stats": {
+      "new_requests": "Yangi so'rovlar",
+      "confirmed": "Tasdiqlangan",
+      "earnings": "Daromadlar",
+      "new_messages": "Yangi xabarlar"
+    },
+    "profile": {
+      "professional_profile": "Professional profil",
+      "bio": "Biografiya",
+      "no_bio": "Biografiya qo'shilmagan",
+      "experience": "Tajriba",
+      "no_experience": "Tajriba qo'shilmagan",
+      "languages": "Tillar",
+      "no_languages": "Tillar qo'shilmagan",
+      "pricing": "Narxlar",
+      "hourly_rate": "${{rate}}/soat",
+      "daily_rate": "${{rate}}/kun",
+      "no_hourly_rate": "Soatlik narx belgilanmagan",
+      "no_daily_rate": "Kunlik narx belgilanmagan",
+      "portfolio": "Portfolio",
+      "portfolio_item": "Portfolio {{number}}",
+      "profile_picture_alt": "Profil rasmi",
+      "avatar_alt": "Avatar",
+      "form": {
+        "avatar": "Avatar rasmi",
+        "upload_image": "Rasm yuklash",
+        "first_name": "Ism",
+        "first_name_placeholder": "Ismingizni kiriting",
+        "last_name": "Familiya",
+        "last_name_placeholder": "Familiyangizni kiriting",
+        "email": "Elektron pochta",
+        "email_placeholder": "Elektron pochtangizni kiriting",
+        "phone": "Telefon",
+        "phone_placeholder": "+998901234567",
+        "bio": "O'zingiz haqida",
+        "bio_placeholder": "O'zingiz haqida qisqacha ma'lumot...",
+        "experience": "Ish tajribasi",
+        "experience_placeholder": "Professional tajribangizni tasvirlang...",
+        "languages": "Tillar",
+        "language_placeholder": "Til nomi",
+        "native_language": "Ona tili",
+        "specializations": "Ixtisoslashuv sohalari",
+        "specializations_placeholder": "Ixtisoslashuvingizni kiriting va Enter tugmasini bosing",
+        "hourly_rate": "Soatlik narx ($)",
+        "daily_rate": "Kunlik narx ($)",
+        "work_hours": "Ish soatlari",
+        "work_hours_placeholder": "Masalan: 08:00 - 18:00, Dushanba-Shanba",
+        "certificates": "Sertifikatlar",
+        "upload_certificate": "Sertifikat yuklash"
+      },
+      "validation": {
+        "required_fields": "Iltimos, barcha majburiy maydonlarni to'ldiring"
+      },
+      "success": {
+        "updated": "Profil muvaffaqiyatli yangilandi"
+      },
+      "errors": {
+        "update_failed": "Profilni yangilash amalga oshmadi"
+      }
+    },
+    "statistics": {
+      "title": "Statistika",
+      "completed_tours": "Tugallangan sayohatlar",
+      "average_rating": "O'rtacha reyting",
+      "response_rate": "Javob berish darajasi",
+      "total_earnings": "Umumiy daromad"
+    },
+    "requests": {
+      "title": "So'rovlar boshqaruvi",
+      "new": "Yangi",
+      "confirmed": "Tasdiqlangan",
+      "history": "Tarix",
+      "no_requests_title": "Hozircha so'rovlar yo'q",
+      "no_requests_desc": "Yangi so'rovlar kelganda ular bu yerda ko'rinadi",
+      "anonymous_client": "Anonim mijoz",
+      "no_date": "Sana ko'rsatilmagan",
+      "no_duration": "Davomiylik ko'rsatilmagan",
+      "no_travelers": "Sayohatchilar soni ko'rsatilmagan",
+      "no_service_type": "Xizmat turi ko'rsatilmagan"
+    },
+    "status": {
+      "pending": "Kutilmoqda",
+      "confirmed": "Tasdiqlangan",
+      "completed": "Tugallangan",
+      "rejected": "Rad etilgan"
+    },
+    "actions": {
+      "accept": "Qabul qilish",
+      "reject": "Rad etish",
+      "chat": "Suhbat",
+      "chat_with_client": "Mijoz bilan suhbat",
+      "view_route": "Yo'nalishni ko'rish",
+      "send_message": "Xabar yuborish",
+      "retry": "Qayta urinish",
+      "cancel": "Bekor qilish",
+      "save": "Saqlash",
+      "change": "O'zgartirish"
+    },
+    "modals": {
+      "edit_profile": "Profilni tahrirlash",
+      "settings": "Sozlamalar",
+      "change_password": "Parolni o'zgartirish",
+      "portfolio": "Portfolio"
+    },
+    "settings": {
+      "profile_data": "Profil ma'lumotlari",
+      "profile_data_desc": "Shaxsiy ma'lumotlaringizni tahrirlang",
+      "change_password": "Parolni o'zgartirish",
+      "change_password_desc": "Hisobingiz xavfsizligini ta'minlang",
+      "theme": "Mavzu"
+    },
+    "password": {
+      "form": {
+        "current_password": "Joriy parol",
+        "current_password_placeholder": "Joriy parolingizni kiriting",
+        "new_password": "Yangi parol",
+        "new_password_placeholder": "Yangi parolingizni kiriting",
+        "confirm_password": "Yangi parolni tasdiqlang",
+        "confirm_password_placeholder": "Yangi parolni qayta kiriting"
+      },
+      "validation": {
+        "all_fields_required": "Barcha maydonlarni to'ldiring",
+        "passwords_not_match": "Yangi parollar mos kelmaydi",
+        "min_length": "Yangi parol kamida 8 belgi bo'lishi kerak"
+      },
+      "success": {
+        "changed": "Parol muvaffaqiyatli o'zgartirildi"
+      },
+      "errors": {
+        "change_failed": "Parolni o'zgartirish amalga oshmadi"
+      }
+    },
+    "portfolio": {
+      "add_new_image": "Yangi rasm qo'shish"
+    },
+    "errors": {
+      "stats_api_unavailable": "Yo'lboshchi statistikasi API hozirda mavjud emas",
+      "requests_api_unavailable": "Yo'lboshchi so'rovlari API hozirda mavjud emas",
+      "chat_api_unavailable": "Suhbat API hozirda mavjud emas",
+      "password_api_unavailable": "Parol o'zgartirish API hozirda mavjud emas",
+      "request_action_unavailable": "So'rov harakati API hozirda mavjud emas",
+      "request_service_unavailable": "So'rov xizmati hozirda mavjud emas",
+      "general_error": "Xato yuz berdi",
+      "data_fetch_error": "Ma'lumotlarni yuklashda xato",
+      "data_loading_error": "Ma'lumotlarni yuklashda xato",
+      "requests_loading_error": "So'rovlarni yuklashda xato",
+      "requests_loading_error_title": "So'rovlarni yuklashda xato",
+      "requests_loading_error_desc": "So'rov xizmati hozirda mavjud emas yoki xato yuz berdi",
+      "statistics_loading_error": "Statistika ma'lumotlarini yuklashda xato"
+    }
+  },
+  "user": {
+    "loading": {
+      "data": "Hisoblar API dan ma'lumotlar yuklanmoqda..."
+    },
+    "profile": {
+      "title": "Mening profilim (Hisoblar API)",
+      "subtitle": "Hisoblar API dan shaxsiy ma'lumotlar",
+      "user": "Foydalanuvchi",
+      "client": "Mijoz",
+      "email": "Elektron pochta",
+      "no_email": "Elektron pochta ko'rsatilmagan",
+      "first_name": "Ism",
+      "no_first_name": "Ism ko'rsatilmagan",
+      "last_name": "Familiya",
+      "no_last_name": "Familiya ko'rsatilmagan",
+      "role": "Rol",
+      "country": "Davlat",
+      "no_country": "Davlat ko'rsatilmagan"
+    },
+    "stats": {
+      "total_bookings": "Jami buyurtmalar",
+      "active_chats": "Faol suhbatlar",
+      "accounts_api": "Hisoblar API"
+    },
+    "bookings": {
+      "title": "Mening buyurtmalarim",
+      "subtitle": "Barcha sayohat buyurtmalarim"
+    },
+    "guides": {
+      "title": "Yo'lboshchilar",
+      "subtitle": "Siz uchun mukammal yo'lboshchini toping",
+      "travel_date": "Sayohat sanasi",
+      "travelers_count": "Sayohatchilar soni",
+      "adults": "Kattalar",
+      "children": "Bolalar"
+    },
+    "tabs": {
+      "profile": "Profil",
+      "bookings": "Buyurtmalar",
+      "guides": "Yo'lboshchilar"
+    },
+    "form": {
+      "first_name": "Ism",
+      "first_name_placeholder": "Ismingizni kiriting",
+      "last_name": "Familiya",
+      "last_name_placeholder": "Familiyangizni kiriting",
+      "email": "Elektron pochta",
+      "email_placeholder": "Elektron pochtangizni kiriting",
+      "role": "Rol",
+      "client": "Mijoz",
+      "customer": "Xaridor",
+      "country": "Davlat",
+      "country_placeholder": "Davlatingizni kiriting"
+    },
+    "validation": {
+      "required_fields": "Ism, familiya va elektron pochta majburiy maydonlardir",
+      "invalid_email": "Noto'g'ri elektron pochta formati"
+    },
+    "success": {
+      "profile_updated": "Profil muvaffaqiyatli yangilandi! (localStorage da saqlandi)"
+    },
+    "errors": {
+      "no_access_token": "Kirish tokeni topilmadi",
+      "user_data_not_found": "localStorage da foydalanuvchi ma'lumotlari topilmadi",
+      "backend_not_connected_fallback": "Backend ulanmagan. Joriy sessiya ma'lumotlari ko'rsatilmoqda.",
+      "backend_and_user_data_missing": "Backend ga ulanishda muammo va foydalanuvchi ma'lumotlari topilmadi.",
+      "no_profile_update_endpoint": "Hisoblar API da profil yangilash nuqtasi mavjud emas",
+      "profile_update_failed": "Profilni yangilash amalga oshmadi"
+    },
+    "alerts": {
+      "warning": "Ogohlantirish",
+      "info": "Ma'lumot",
+      "localstorage_notice": "Hisoblar API da profil yangilash nuqtasi yo'q. Ma'lumotlar localStorage da saqlanadi.",
+      "booking_api_unavailable": "⚠️ Buyurtma API hali ulanmagan. Tez orada mavjud bo'ladi!",
+      "cancel_booking_api_unavailable": "⚠️ Buyurtmani bekor qilish API hali ulanmagan. Tez orada mavjud bo'ladi!",
+      "chat_api_unavailable": "⚠️ Suhbat API hali ulanmagan. Tez orada mavjud bo'ladi!"
+    },
+    "api_not_connected": {
+      "title": "API ulanmagan",
+      "soon_available": "Tez orada mavjud bo'ladi",
+      "badge": "API yo'q",
+      "bookings": "Buyurtma API hali ulanmagan. Barcha buyurtma tafsilotlari, buyurtma va boshqaruv funksiyalari tez orada qo'shiladi.",
+      "guides": "Yo'lboshchilar API hali ulanmagan. Yo'lboshchilarni ko'rish, qidirish va buyurtma qilish tez orada qo'shiladi."
+    },
+    "backend_status": {
+      "connected": "Hisoblar API ulangan",
+      "disconnected": "Hisoblar API uzilgan"
+    },
+    "actions": {
+      "menu": "Menyu",
+      "edit_profile": "Profilni tahrirlash",
+      "settings": "Sozlamalar",
+      "logout": "Chiqish (Hisoblar API)",
+      "retry_connection": "Ulanishni qayta urinish",
+      "close": "Yopish",
+      "cancel": "Bekor qilish",
+      "save_localstorage": "Saqlash (localStorage)",
+      "saving": "Saqlanmoqda...",
+      "filters": "Filtrlar (API yo'q)"
+    },
+    "confirm_logout": "Haqiqatan chiqmoqchimisiz?",
+    "console": {
+      "fetching_user_data": "Hisoblar API dan foydalanuvchi ma'lumotlarini olish...",
+      "accounts_api_response": "Hisoblar API javobi:",
+      "retrieved_user_data": "localStorage dan foydalanuvchi ma'lumotlari olindi:",
+      "attempting_fetch_user_data": "Hisoblar API dan foydalanuvchi ma'lumotlarini olishga urinish...",
+      "using_saved_user_data": "Saqlangan foydalanuvchi ma'lumotlari ishlatilmoqda:",
+      "user_data_loaded": "Foydalanuvchi ma'lumotlari muvaffaqiyatli yuklandi:",
+      "failed_fetch_user_data": "Foydalanuvchi ma'lumotlarini olish amalga oshmadi:",
+      "using_fallback_user_data": "Joriy foydalanuvchi holati zaxira sifatida ishlatilmoqda:",
+      "attempting_update_profile": "Hisoblar API orqali profilni yangilashga urinish...",
+      "profile_updated_localstorage": "Profil localStorage da yangilandi:",
+      "error_fetching_user": "Hisoblardan foydalanuvchi olishda xato:",
+      "error_updating_profile": "Profilni yangilashda xato:",
+      "updating_profile_payload": "Profilni yangilash uchun yuklama:",
+      "profile_update_response": "Profil yangilash javobi:",
+      "profile_update_error": "Profil yangilash xatosi:",
+      "logout_success": "Hisoblar API orqali chiqish muvaffaqiyatli",
+      "logout_error": "Chiqish xatosi:"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Dunyoni kashf eting",
+      "title_highlight": "Ishonchli yo'lboshchilar bilan",
+      "description": "150 dan ortiq mamlakatlarda tasdiqlangan mahalliy yo'lboshchilar bilan haqiqiy sayohat tajribalarini ulashing.",
+      "guide_name": "Ahmad K.",
+      "guide_expert": "Istanbul mutaxassisi",
+      "guide_rating": "4.9 (127)",
+      "guide_alt": "Yo'lboshchi",
+      "tour_name": "Istanbul sayohati",
+      "tour_date": "Ertaga, 10:00",
+      "tour_duration": "4 soat",
+      "tour_status": "Tasdiqlangan"
+    },
+    "search": {
+      "location_placeholder": "Qayerga sayohat qilyapsiz?",
+      "service_placeholder": "Qanday xizmat kerak?",
+      "location_aria": "Shahar yoki davlat bo'yicha qidirish",
+      "service_aria": "Xizmat turi bo'yicha qidirish",
+      "results_aria": "Xizmat turi bo'yicha takliflar",
+      "button": "Yo'lboshchingizni toping",
+      "button_aria": "Joriy qidiruv bilan yo'lboshchingizni toping"
+    },
+    "stats": {
+      "verified_guides": "Tasdiqlangan yo'lboshchilar",
+      "countries": "Davlatlar",
+      "happy_travelers": "Baxtli sayohatchilar",
+      "average_rating": "O'rtacha reyting"
+    },
+    "destinations": {
+      "title": "Mashhur yo'nalishlar",
+      "subtitle": "Mutaxassis yo'lboshchilar bilan eng yaxshi yo'nalishlarni kashf eting",
+      "view_all": "Barcha yo'nalishlarni ko'rish",
+      "view_all_aria": "Barcha mashhur yo'nalishlarni ko'rish",
+      "guides_count": "{{count}} yo'lboshchi",
+      "explore_aria": "{{name}} uchun tafsilotlarni ko'rish",
+      "modal": {
+        "highlights": "Diqqatga sazovor joylar",
+        "find_guides": "Yo'lboshchilarni toping",
+        "find_guides_aria": "{{name}} uchun yo'lboshchilarni toping",
+        "close_aria": "Yo'nalish tafsilotlari modalini yopish"
+      },
+      "istanbul": {
+        "name": "Istanbul, Turkiya",
+        "price": "Kuni $25 dan",
+        "highlights": [
+          "Tarixiy sayohatlar",
+          "Mahalliy taomlar",
+          "Xarid qilish bo'yicha yo'lboshchi"
+        ]
+      },
+      "barcelona": {
+        "name": "Barselona, Ispaniya",
+        "price": "Kuni $35 dan",
+        "highlights": [
+          "Arxitektura",
+          "Plyaj sayohatlari",
+          "San'at va madaniyat"
+        ]
+      },
+      "tokyo": {
+        "name": "Tokio, Yaponiya",
+        "price": "Kuni $45 dan",
+        "highlights": [
+          "Zamonaviy madaniyat",
+          "An'anaviy joylar",
+          "Taom sayohatlari"
+        ]
+      },
+      "paris": {
+        "name": "Parij, Fransiya",
+        "price": "Kuni $40 dan",
+        "highlights": [
+          "Muzeylar",
+          "Romantik sayohatlar",
+          "Moda tumanlari"
+        ]
+      },
+      "dubai": {
+        "name": "Dubay, BAA",
+        "price": "Kuni $50 dan",
+        "highlights": [
+          "Hashamatli sayohatlar",
+          "Cho'l safari",
+          "Zamonaviy mo'jizalar"
+        ]
+      },
+      "rome": {
+        "name": "Rim, Italiya",
+        "price": "Kuni $30 dan",
+        "highlights": [
+          "Qadimiy tarix",
+          "Vatikan sayohatlari",
+          "Taom sayohatlari"
+        ]
+      }
+    },
+    "services": {
+      "city_tours": {
+        "name": "Shahar sayohatlari",
+        "description": "Mutaxassis yo'lboshchilar bilan shahar kashfiyoti",
+        "count": "2.5k+ yo'lboshchi"
+      },
+      "language_support": {
+        "name": "Til yordami",
+        "description": "Real vaqtda tarjima xizmatlari",
+        "count": "150+ til"
+      },
+      "photography": {
+        "name": "Fotografiya",
+        "description": "Professional sayohat fotografiyasi",
+        "count": "800+ fotograf"
+      },
+      "cultural_experiences": {
+        "name": "Madaniy tajribalar",
+        "description": "Haqiqiy mahalliy tadbirlar",
+        "count": "1.2k+ tajriba"
+      }
+    },
+    "features": {
+      "title": "Nega TravMatch?",
+      "subtitle": "Biz bilan sayohat qilishning afzalliklarini kashf eting",
+      "verified_guides": {
+        "title": "Tasdiqlangan yo'lboshchilar",
+        "description": "Barcha yo'lboshchilar xavfsizlik uchun sinchkovlik bilan tekshiriladi.",
+        "stats": "99.8% Xavfsizlik"
+      },
+      "top_quality": {
+        "title": "Yuqori sifat",
+        "description": "Tasdiqlangan sharhlar bilan yuqori baholangan tajribalar.",
+        "stats": "4.8★ Reyting"
+      },
+      "global_reach": {
+        "title": "Global qamrov",
+        "description": "150 dan ortiq mamlakatlarda yo'lboshchilar bilan ulaning.",
+        "stats": "150+ Davlat"
+      },
+      "instant_booking": {
+        "title": "Tezkor buyurtma",
+        "description": "Real vaqtda mavjudlik bilan darhol buyurtma qiling.",
+        "stats": "24/7 Yordam"
+      }
+    },
+    "steps": {
+      "title": "Qanday ishlaydi",
+      "subtitle": "3 oddiy qadamda boshlang",
+      "search_browse": {
+        "title": "Qidirish va ko'rish",
+        "description": "Tasdiqlangan mahalliy yo'lboshchilarni toping."
+      },
+      "connect_plan": {
+        "title": "Ulanish va rejalashtirish",
+        "description": "Sayohatingizni rejalashtirish uchun yo'lboshchilar bilan suhbatlashing."
+      },
+      "experience": {
+        "title": "Tajriba",
+        "description": "Haqiqiy mahalliy tajribalardan bahramand bo'ling."
+      }
+    },
+    "testimonials": {
+      "title": "Sayohatchilar nima deydi",
+      "subtitle": "Baxtli sayohatchilarimizdan eshiting",
+      "dot_aria": "{{index}}-sharhni tanlang",
+      "sarah": {
+        "name": "Sarah Jonson",
+        "location": "Nyu-York, AQSh",
+        "text": "Istanbulda ajoyib tajriba! Yo'lboshchi menga yashirin joylarni ko'rsatdi.",
+        "tour": "Istanbul tarixiy sayohati"
+      },
+      "marco": {
+        "name": "Marko Rodrigues",
+        "location": "Madrid, Ispaniya",
+        "text": "Tokio fotografiya sayohati mukammal edi! Ajoyib suratlar va madaniy tushunchalar.",
+        "tour": "Tokio fotografiya sayohati"
+      },
+      "emma": {
+        "name": "Emma Uilson",
+        "location": "London, Buyuk Britaniya",
+        "text": "Barselonaga yakkaxon sayohat TravMatch tufayli ajoyib bo'ldi!",
+        "tour": "Barselona madaniy tajribasi"
+      }
+    },
+    "cta": {
+      "title": "Sarguzashtingizni boshlang",
+      "description": "Dunyo bo'ylab haqiqiy tajribalar uchun minglab sayohatchilarga qo'shiling.",
+      "find_guide": "Yo'lboshchingizni toping",
+      "learn_more": "Ko'proq bilib oling"
+    },
+    "learn_more": {
+      "title": "TravMatch haqida",
+      "description": "TravMatch sayohatchilarni 150 dan ortiq mamlakatlarda tasdiqlangan mahalliy yo'lboshchilar bilan bog'laydi, haqiqiy va unutilmas tajribalar yaratadi. Bizning vazifamiz sayohatni xavfsiz, qulay va immersiv qilishdir.",
+      "why_title": "Nega TravMatchni tanlash kerak?",
+      "vision_title": "Bizning vizyonimiz",
+      "vision_description": "Biz sayohat ulanish, kashfiyot va hikoyalar haqida deb hisoblaymiz. TravMatch bilan siz nafaqat joyga tashrif buyurasiz, balki uni mahalliy aholi ko'zi bilan yashaysiz.",
+      "find_guide": "Yo'lboshchingizni hozir toping",
+      "close": "Yopish",
+      "features": {
+        "verified_guides": {
+          "title": "Tasdiqlangan yo'lboshchilar:",
+          "description": "Barcha yo'lboshchilar xavfsizlik va tajriba uchun tekshiriladi."
+        },
+        "global_reach": {
+          "title": "Global qamrov:",
+          "description": "150 dan ortiq mamlakatlarda mahalliy mutaxassislar bilan kashf eting."
+        },
+        "custom_experiences": {
+          "title": "Maxsus tajribalar:",
+          "description": "Sayohatingizni shaxsiy sayohatlar bilan moslashtiring."
+        },
+        "support": {
+          "title": "24/7 Yordam:",
+          "description": "Tezkor buyurtma va doimiy yordam."
+        }
+      }
+    }
+  },
+  "auth": {
+    "title": "TravMatch",
+    "subtitle": "Sayohat hamrohingizni toping",
+    "tabs": {
+      "login": "Kirish",
+      "register": "Ro'yxatdan o'tish",
+      "forgot": "Parolni tiklash"
+    },
+    "close_aria": "Autentifikatsiya modalini yopish",
+    "login": {
+      "title": "TravMatch'ga kirish",
+      "subtitle": "Hisobingizga kiring va sayohatingizni davom ettiring",
+      "email_label": "Elektron pochta manzili",
+      "email_placeholder": "Elektron pochtangizni kiriting",
+      "password_label": "Parol",
+      "password_placeholder": "Parolingizni kiriting",
+      "submit_button": "Kirish",
+      "show_password_aria": "Parolni ko'rsatish",
+      "hide_password_aria": "Parolni yashirish",
+      "or": "yoki",
+      "social": {
+        "google": "Google bilan davom eting",
+        "facebook": "Facebook bilan davom eting"
+      }
+    },
+    "register": {
+      "title": "TravMatch'ga ro'yxatdan o'ting",
+      "subtitle": "Yangi hisob yarating va sayohat hamrohlarini toping",
+      "role_label": "Rol",
+      "role_client": "Mijoz",
+      "role_customer": "Xaridor",
+      "first_name_label": "Ism",
+      "first_name_placeholder": "Ismingizni kiriting",
+      "last_name_label": "Familiya",
+      "last_name_placeholder": "Familiyangizni kiriting",
+      "email_label": "Elektron pochta manzili",
+      "email_placeholder": "Elektron pochtangizni kiriting",
+      "password_label": "Parol",
+      "password_placeholder": "Parolingizni kiriting",
+      "confirm_password_label": "Parolni tasdiqlang",
+      "confirm_password_placeholder": "Parolni qayta kiriting",
+      "country_label": "Davlat",
+      "country_placeholder": "Davlatingizni kiriting",
+      "country_option_aria": "{country} davlatini tanlang",
+      "checkboxes": {
+        "personal_data": "Shaxsiy ma'lumotlarni qayta ishlashga roziman",
+        "terms": "TravMatch shartlariga roziman",
+        "travel_tips": "Sayohat bo'yicha maslahatlar va aktsiyalar olishga roziman"
+      },
+      "submit_button": "Ro'yxatdan o'tish",
+      "verification": {
+        "title": "Elektron pochta tasdiqlash",
+        "subtitle": "<strong>{email}</strong> ga yuborilgan 6 raqamli tasdiqlash kodini kiriting",
+        "code_label": "Tasdiqlash kodi",
+        "code_placeholder": "000000",
+        "submit_button": "Tasdiqlash",
+        "resend_button": "Kodni qayta yuborish"
+      }
+    },
+    "forgot": {
+      "title": "Parolni tiklash",
+      "subtitle": "Elektron pochta orqali parolingizni tiklang",
+      "email_label": "Elektron pochta manzili",
+      "email_placeholder": "Elektron pochtangizni kiriting",
+      "submit_button": "Tasdiqlash kodini yuborish",
+      "reset": {
+        "title": "Parolni yangilash",
+        "subtitle": "<strong>{email}</strong> ga yuborilgan tasdiqlash kodi va yangi parolni kiriting",
+        "code_label": "Tasdiqlash kodi",
+        "code_placeholder": "000000",
+        "new_password_label": "Yangi parol",
+        "new_password_placeholder": "Yangi parolingizni kiriting",
+        "confirm_password_label": "Parolni tasdiqlang",
+        "confirm_password_placeholder": "Yangi parolni qayta kiriting",
+        "submit_button": "Parolni yangilash",
+        "resend_button": "Kodni qayta yuborish",
+        "show_password_aria": "Yangi parolni ko'rsatish",
+        "hide_password_aria": "Yangi parolni yashirish"
+      }
+    },
+    "validation": {
+      "required_fields": "Iltimos, barcha majburiy maydonlarni to'ldiring",
+      "required_checkboxes": "Shaxsiy ma'lumotlarni qayta ishlash va shartlarga rozi bo'lishingiz kerak",
+      "required_code": "Iltimos, tasdiqlash kodini kiriting",
+      "invalid_email": "Noto'g'ri elektron pochta formati",
+      "passwords_not_match": "Parollar mos kelmaydi",
+      "password_requirements": "Parol kamida 8 belgi, katta harf, kichik harf, raqam va maxsus belgi (@$!%*?&) bo'lishi kerak",
+      "invalid_code": "Tasdiqlash kodi 6 raqamli son bo'lishi kerak"
+    },
+    "success": {
+      "verification_sent": "Tasdiqlash kodi elektron pochtangizga yuborildi",
+      "register_success": "Ro'yxatdan o'tish muvaffaqiyatli!",
+      "password_reset_sent": "Tasdiqlash kodi elektron pochtangizga yuborildi",
+      "password_reset_success": "Parol muvaffaqiyatli yangilandi!"
+    },
+    "errors": {
+      "login_failed": "Kirish amalga oshmadi. Iltimos, elektron pochta yoki parolingizni tekshiring",
+      "email_exists": "Bu elektron pochta allaqachon ro'yxatdan o'tgan. Iltimos, kiring yoki boshqa elektron pochta ishlating",
+      "code_request_failed": "Tasdiqlash kodini so'rash amalga oshmadi",
+      "invalid_code": "Noto'g'ri tasdiqlash kodi. Iltimos, tekshirib qayta urining",
+      "expired_code": "Tasdiqlash kodi muddati tugagan. Iltimos, yangi kod so'rang",
+      "register_failed": "Ro'yxatdan o'tish amalga oshmadi",
+      "password_reset_failed": "Parolni tiklash amalga oshmadi",
+      "resend_code_failed": "Tasdiqlash kodini qayta yuborish amalga oshmadi"
+    },
+    "loading": "Yuklanmoqda...",
+    "social_login_dev": "{provider} kirish hozirda ishlab chiqilmoqda"
+  },
+  "footer": {
+    "newsletter": {
+      "title": "Aloqada bo'ling",
+      "subtitle": "Sayohat bo'yicha maslahatlar, eksklyuziv takliflar va yangiliklar uchun yangiliklar xabarlariga obuna bo'ling",
+      "email_placeholder": "Elektron pochtangizni kiriting",
+      "email_aria": "Yangiliklar xabari uchun elektron pochta",
+      "subscribe_button": "Obuna bo'lish",
+      "privacy": "Biz sizning maxfiyligingizni hurmat qilamiz"
+    },
+    "company": {
+      "logo": "TravMatch",
+      "description": "Sayohatchilarni dunyo bo'ylab tasdiqlangan mahalliy yo'lboshchilar bilan bog'laydi. 150 dan ortiq mamlakatlarda tasdiqlangan mutaxassislar bilan haqiqiy sayohat tajribasini boshdan kechiring.",
+      "contact": {
+        "address": "Toshkent, O'zbekiston",
+        "email": "salom@travmatch.com",
+        "phone": "+998 (90) 123-45-67"
+      }
+    },
+    "social": {
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "youtube": "YouTube"
+    },
+    "links": {
+      "platform": {
+        "title": "Platforma",
+        "how_it_works": "Qanday ishlaydi",
+        "find_guide": "Yo'lboshchi topish",
+        "become_guide": "Yo'lboshchi bo'lish",
+        "safety_trust": "Xavfsizlik va ishonch",
+        "pricing": "Narxlar"
+      },
+      "support": {
+        "title": "Yordam",
+        "help_center": "Yordam markazi",
+        "contact_us": "Biz bilan bog'lanish",
+        "faqs": "Ko'p so'raladigan savollar",
+        "dispute_center": "Nizo markazi",
+        "report_issue": "Muammoni xabar qilish"
+      },
+      "legal": {
+        "title": "Huquqiy",
+        "terms_of_service": "Xizmat shartlari",
+        "privacy_policy": "Maxfiylik siyosati",
+        "cookie_policy": "Cookie siyosati",
+        "community_guidelines": "Jamoa qoidalari",
+        "gdpr_compliance": "GDPR muvofiqligi"
+      },
+      "company": {
+        "title": "Kompaniya",
+        "about_us": "Biz haqimizda",
+        "careers": "Karyera",
+        "press_kit": "Matbuot to'plami",
+        "blog": "Blog",
+        "investors": "Investorlar"
+      }
+    },
+    "app": {
+      "title": "Ilovani yuklab oling",
+      "description": "Yaxshiroq tajriba uchun mobil ilovamizni yuklab oling",
+      "ios_label": "Yuklab olish",
+      "ios_store": "App Store",
+      "android_label": "Oling",
+      "android_store": "Google Play",
+      "trust": {
+        "ssl": "SSL bilan himoyalangan",
+        "gdpr": "GDPR ga mos"
+      }
+    },
+    "bottom": {
+      "copyright": "© {year} TravMatch. Barcha huquqlar himoyalangan.",
+      "links": {
+        "terms": "Shartlar",
+        "privacy": "Maxfiylik",
+        "cookies": "Cookie'lar",
+        "accessibility": "Qulaylik"
+      }
+    }
+  }
+}

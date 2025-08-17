@@ -5,11 +5,11 @@ from apps.users.views import (
     GoogleLoginView,
     PasswordResetRequestView,
     PasswordResetConfirmView,
-    ProfileViewSet,
+    UserViewSet,
 )
 
 router = DefaultRouter()
-router.register(r"profiles", ProfileViewSet, basename="profiles")
+router.register(r"users", UserViewSet, basename="users")
 
 urlpatterns = [
     path("auth/google/", GoogleLoginView.as_view(), name="auth-google-login"),

@@ -1,10 +1,10 @@
-# apps/users/views.py
-from rest_framework import generics, permissions, status, viewsets, mixins
+from rest_framework import generics, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema
 from django.core.cache import cache
 
+from apps.users.models import User
 from apps.users.serializers import (
     GoogleAuthSerializer,
     PasswordResetRequestSerializer,
@@ -12,10 +12,13 @@ from apps.users.serializers import (
     ProfileSerializer,
     UserShortSerializer,
 )
+from apps.users.permissions import IsOwnerOrAdmin
 
 
 @extend_schema(tags=["users"])
 class GoogleLoginView(generics.GenericAPIView):
+    """Google orqali login"""
+
     serializer_class = GoogleAuthSerializer
     permission_classes = [permissions.AllowAny]
 
@@ -28,6 +31,8 @@ class GoogleLoginView(generics.GenericAPIView):
 
 @extend_schema(tags=["users"])
 class PasswordResetRequestView(generics.GenericAPIView):
+    """Parolni tiklash uchun email yuborish"""
+
     serializer_class = PasswordResetRequestSerializer
     permission_classes = [permissions.AllowAny]
 
@@ -38,6 +43,8 @@ class PasswordResetRequestView(generics.GenericAPIView):
 
 @extend_schema(tags=["users"])
 class PasswordResetConfirmView(generics.GenericAPIView):
+    """Parolni yangilash"""
+
     serializer_class = PasswordResetConfirmSerializer
     permission_classes = [permissions.AllowAny]
 
@@ -47,8 +54,17 @@ class PasswordResetConfirmView(generics.GenericAPIView):
 
 
 @extend_schema(tags=["users"])
-class ProfileViewSet(viewsets.ViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    User management:
+    - Oddiy user → faqat o‘z profilini ko‘rishi va yangilashi mumkin.
+    - Admin → barcha userlarni boshqarishi mumkin.
+    - GET /users/short/ → login bo‘lgan user qisqa ma’lumotlari.
+    """
+
+    queryset = User.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
 
     def get_serializer_class(self):
         if self.action == "short":
@@ -56,30 +72,21 @@ class ProfileViewSet(viewsets.ViewSet):
         return ProfileSerializer
 
     def get_object(self):
-        user = cache.get(f"user:{self.request.user.pk}")
+        """Cache orqali yoki DB dan userni olish"""
+        pk = self.kwargs.get("pk") or self.request.user.pk
+        user = cache.get(f"user:{pk}")
         if not user:
-            user = self.request.user
-            cache.set(f"user:{user.pk}", user, timeout=3600)
+            user = self.get_queryset().get(pk=pk)
+            cache.set(f"user:{pk}", user, timeout=3600)
         return user
 
-    @extend_schema(responses=ProfileSerializer)
-    def retrieve(self, request):
-        serializer = self.get_serializer(self.get_object())
-        return Response(serializer.data)
-
-    @extend_schema(request=ProfileSerializer, responses=ProfileSerializer)
-    def update(self, request):
-        user = self.get_object()
-        serializer = self.get_serializer(user, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        cache.set(f"user:{user.pk}", user, timeout=3600)
-        return Response(serializer.data)
-
     @action(
-        detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated]
+        detail=False,
+        methods=["get"],
+        permission_classes=[permissions.IsAuthenticated],
     )
     @extend_schema(responses=UserShortSerializer)
     def short(self, request):
-        serializer = self.get_serializer(self.get_object())
+        """GET /users/short/ → login bo‘lgan user qisqa ma’lumotlari"""
+        serializer = self.get_serializer(request.user)
         return Response(serializer.data)

@@ -1,140 +1,170 @@
 # apps/reviews/models.py
-
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.contrib.auth import get_user_model
-from apps.common.models import TimeStampedModel
+from apps.common.models import BaseModel
+from apps.users.models import User
+from apps.profiles.models import CustomerProfile
+from apps.bookings.models import Booking
 
-User = get_user_model()
 
+class Review(BaseModel):
 
-class Review(TimeStampedModel):
-    """
-    Reviews and ratings for completed tours
-    """
-
-    # Parties
-    reviewer = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="reviews_given"
-    )
-    guide = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="reviews_received"
-    )
-
-    # Related booking
     booking = models.OneToOneField(
-        "bookings.Booking", on_delete=models.CASCADE, related_name="review"
+        Booking,
+        on_delete=models.CASCADE,
+        related_name="review",
+        verbose_name=_("Booking"),
+    )
+    client = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="given_reviews",
+        verbose_name=_("Client"),
+    )
+    customer = models.ForeignKey(
+        CustomerProfile,
+        on_delete=models.CASCADE,
+        related_name="received_reviews",
+        verbose_name=_("Service provider"),
     )
 
-    # Review content
-    rating = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    overall_rating = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        verbose_name=_("Overall rating"),
     )
-    title = models.CharField(max_length=200, blank=True)
-    comment = models.TextField()
-
-    # Detailed ratings
     communication_rating = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        null=True,
+        blank=True,
+        verbose_name=_("Communication rating"),
     )
-    professionalism_rating = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True
+    service_rating = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        null=True,
+        blank=True,
+        verbose_name=_("Service quality rating"),
     )
-    knowledge_rating = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True
+    punctuality_rating = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        null=True,
+        blank=True,
+        verbose_name=_("Punctuality rating"),
     )
     value_rating = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        null=True,
+        blank=True,
+        verbose_name=_("Value for money rating"),
     )
 
-    # Review status
-    is_verified = models.BooleanField(default=False)
-    is_featured = models.BooleanField(default=False)
+    title = models.CharField(max_length=200, blank=True, verbose_name=_("Review title"))
+    comment = models.TextField(verbose_name=_("Review comment"))
 
-    # Response from guide
-    guide_response = models.TextField(blank=True)
-    guide_responded_at = models.DateTimeField(null=True, blank=True)
-
-    class Meta:
-        db_table = "reviews"
-        verbose_name = "Review"
-        verbose_name_plural = "Reviews"
-        indexes = [
-            models.Index(fields=["guide", "rating"]),
-            models.Index(fields=["reviewer"]),
-            models.Index(fields=["is_verified"]),
-            models.Index(fields=["is_featured"]),
-        ]
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return f"Review by {self.reviewer.full_name} for {self.guide.full_name} - {self.rating}★"
-
-    def save(self, *args, **kwargs):
-        """Update guide's average rating when review is saved"""
-        super().save(*args, **kwargs)
-        # Update guide's profile rating
-        if hasattr(self.guide, "guide_profile"):
-            self.guide.guide_profile.update_rating()
-
-
-class ReviewHelpful(TimeStampedModel):
-    """
-    Track helpful votes for reviews
-    """
-
-    review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name="helpful_votes"
-    )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    is_helpful = models.BooleanField()  # True for helpful, False for not helpful
-
-    class Meta:
-        db_table = "review_helpful"
-        verbose_name = "Review Helpful Vote"
-        verbose_name_plural = "Review Helpful Votes"
-        unique_together = ["review", "user"]
-
-    def __str__(self):
-        vote = "helpful" if self.is_helpful else "not helpful"
-        return f"{self.user.full_name} found review {vote}"
-
-
-class ReviewReport(TimeStampedModel):
-    """
-    Reports for inappropriate reviews
-    """
-
-    REASON_CHOICES = [
-        ("spam", "Spam"),
-        ("fake", "Fake Review"),
-        ("inappropriate", "Inappropriate Content"),
-        ("harassment", "Harassment"),
-        ("off_topic", "Off Topic"),
-        ("other", "Other"),
-    ]
-
-    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name="reports")
-    reporter = models.ForeignKey(User, on_delete=models.CASCADE)
-    reason = models.CharField(max_length=20, choices=REASON_CHOICES)
-    details = models.TextField(blank=True)
-
-    # Report status
-    is_resolved = models.BooleanField(default=False)
-    resolved_at = models.DateTimeField(null=True, blank=True)
-    resolved_by = models.ForeignKey(
+    is_published = models.BooleanField(default=True, verbose_name=_("Is published"))
+    is_featured = models.BooleanField(default=False, verbose_name=_("Is featured"))
+    moderated_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="resolved_reports",
+        related_name="moderated_reviews",
+        verbose_name=_("Moderated by"),
+    )
+    moderated_at = models.DateTimeField(
+        null=True, blank=True, verbose_name=_("Moderated at")
+    )
+    moderation_note = models.TextField(blank=True, verbose_name=_("Moderation note"))
+
+    helpful_count = models.PositiveIntegerField(
+        default=0, verbose_name=_("Helpful count")
     )
 
     class Meta:
-        db_table = "review_reports"
-        verbose_name = "Review Report"
-        verbose_name_plural = "Review Reports"
-        unique_together = ["review", "reporter"]
+        verbose_name = _("Review")
+        verbose_name_plural = _("Reviews")
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["customer", "is_published", "-created_at"]),
+            models.Index(fields=["client", "-created_at"]),
+            models.Index(fields=["overall_rating"]),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["booking"], name="unique_review_per_booking"
+            )
+        ]
 
     def __str__(self):
-        return f"Report by {self.reporter.full_name} for review #{self.review.id}"
+        return f"Review by {self.client} - {self.overall_rating} stars"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.is_published:
+            self._update_customer_rating()
+
+    def _update_customer_rating(self):
+        from django.db.models import Avg
+
+        avg_rating = (
+            self.customer.received_reviews.filter(is_published=True).aggregate(
+                avg=Avg("overall_rating")
+            )["avg"]
+            or 0
+        )
+
+        self.customer.average_rating = round(avg_rating, 2)
+        self.customer.total_reviews = self.customer.received_reviews.filter(
+            is_published=True
+        ).count()
+        self.customer.save(update_fields=["average_rating", "total_reviews"])
+
+
+class ReviewResponse(BaseModel):
+
+    review = models.OneToOneField(
+        Review,
+        on_delete=models.CASCADE,
+        related_name="response",
+        verbose_name=_("Review"),
+    )
+    response_text = models.TextField(verbose_name=_("Response text"))
+    is_published = models.BooleanField(default=True, verbose_name=_("Is published"))
+
+    class Meta:
+        verbose_name = _("Review response")
+        verbose_name_plural = _("Review responses")
+
+    def __str__(self):
+        return f"Response to {self.review}"
+
+
+class ReviewHelpful(BaseModel):
+
+    review = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        related_name="helpful_votes",
+        verbose_name=_("Review"),
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="helpful_reviews",
+        verbose_name=_("User"),
+    )
+
+    class Meta:
+        verbose_name = _("Review helpful vote")
+        verbose_name_plural = _("Review helpful votes")
+        unique_together = [["review", "user"]]
+
+    def __str__(self):
+        return f"{self.user} found {self.review} helpful"
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        if is_new:
+            self.review.helpful_count = self.review.helpful_votes.count()
+            self.review.save(update_fields=["helpful_count"])

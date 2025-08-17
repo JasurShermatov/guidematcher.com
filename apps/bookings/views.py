@@ -1,355 +1,340 @@
-# apps/bookings/views.py
-
-from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from .models import Booking, BookingRequest, BookingUpdate
-from .serializers import (
+from django.db import transaction
+from rest_framework import viewsets, filters, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema, extend_schema_view
+
+from apps.bookings.models import Booking, BookingMessage
+from apps.bookings.serializers import (
     BookingSerializer,
     BookingCreateSerializer,
-    BookingUpdateSerializer,
-    BookingRequestSerializer,
-    BookingRequestCreateSerializer,
-    BookingRequestResponseSerializer,
-    BookingUpdateHistorySerializer,
+    BookingMessageSerializer,
 )
-from .services import BookingService, BookingRequestService, NotificationService
-from apps.common.permissions import IsAuthenticated, IsGuideOrClient
-import logging
-
-User = get_user_model()
-logger = logging.getLogger(__name__)
-
-
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def booking_list(request):
-    """
-    List bookings for the authenticated user (client or guide).
-    """
-    try:
-        if request.user.role == "Guide":
-            bookings = Booking.objects.filter(guide=request.user)
-        else:
-            bookings = Booking.objects.filter(client=request.user)
-
-        serializer = BookingSerializer(bookings, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except Exception as e:
-        logger.error(f"Error listing bookings for user {request.user.id}: {str(e)}")
-        return Response(
-            {"detail": "Bronlarni ro'yxatlashda xatolik yuz berdi"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+from apps.common.permissions import (
+    IsClient,
+    IsCustomer,
+    IsBookingParticipant,
+    IsOwnerOrReadOnly,
+)
 
 
-@api_view(["GET"])
-@permission_classes([IsAuthenticated, IsGuideOrClient])
-def booking_detail(request, booking_id):
-    """
-    Retrieve details of a specific booking.
-    """
-    try:
-        booking = get_object_or_404(Booking, id=booking_id)
-        if not BookingService.can_access_booking(request.user, booking):
+
+@extend_schema_view(
+    list=extend_schema(
+        summary="List Bookings",
+        description="Retrieve a list of bookings. Clients see only their own bookings."
+    ),
+    create=extend_schema(
+        summary="Create Booking",
+        description="Client creates a new booking."
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve Booking",
+        description="Get details of a specific booking by ID."
+    ),
+    update=extend_schema(
+        summary="Update Booking",
+        description="Update all fields of a booking (owner or admin only)."
+    ),
+    partial_update=extend_schema(
+        summary="Partial Update Booking",
+        description="Update some fields of a booking (owner or admin only)."
+    ),
+    destroy=extend_schema(
+        summary="Delete Booking",
+        description="Delete a booking (owner or admin only)."
+    ),
+)
+@extend_schema(tags=["booking"])
+class BookingViewSet(viewsets.ModelViewSet):
+
+    queryset = Booking.objects.select_related(
+        "client", "customer__user", "service_type"
+    ).only(
+        "id",
+        "client",
+        "customer",
+        "service_type",
+        "title",
+        "status",
+        "start_date",
+        "end_date",
+        "proposed_rate",
+        "counter_offer_rate",
+        "provider_response",
+        "responded_at",
+        "accepted_at",
+        "completed_at",
+        "cancelled_at",
+        "cancelled_by",
+        "cancellation_reason",
+        "created_at",
+        "updated_at",
+    )
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+    filterset_fields = ["status", "service_type", "start_date", "end_date", "currency"]
+    search_fields = ["title", "description", "location", "location_details"]
+    ordering_fields = ["created_at", "start_date", "proposed_rate"]
+    ordering = ["-created_at"]
+
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action in ["create", "update", "partial_update"]:
+            return BookingCreateSerializer
+        return BookingSerializer
+
+    def get_permissions(self):
+        """Return appropriate permissions depending on action"""
+        if self.action == "create":
+            return [IsClient()]
+        elif self.action in [
+            "accept",
+            "reject",
+            "respond",
+            "cancel",
+            "complete",
+            "accept_counter",
+        ]:
+            return [IsBookingParticipant()]
+        elif self.action in ["update", "partial_update", "destroy"]:
+            return [IsOwnerOrReadOnly()]
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        """Automatically assign client as request user on creation"""
+        serializer.save(client=self.request.user)
+
+    # ──────────────────────────── Custom Actions ──────────────────────────── #
+
+    @action(detail=True, methods=["post"])
+    @extend_schema(
+        summary="Respond to Booking",
+        description="Customer responds to a booking with optional counter-offer."
+    )
+    def respond(self, request, pk=None):
+        booking = self.get_object()
+
+        if not request.user.is_customer:
             return Response(
-                {"detail": "Bu bronga kirish huquqingiz yo'q"},
+                {"detail": "Only providers can respond."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        serializer = BookingSerializer(booking)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except Exception as e:
-        logger.error(f"Error retrieving booking {booking_id}: {str(e)}")
-        return Response(
-            {"detail": "Bron ma'lumotlarini olishda xatolik yuz berdi"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-
-@api_view(["GET"])
-@permission_classes([IsAuthenticated, IsGuideOrClient])
-def booking_history(request, booking_id):
-    """
-    Retrieve status update history for a specific booking.
-    """
-    try:
-        booking = get_object_or_404(Booking, id=booking_id)
-        if not BookingService.can_access_booking(request.user, booking):
+        if booking.status != Booking.BookingStatus.PENDING:
             return Response(
-                {"detail": "Bu bronga kirish huquqingiz yo'q"},
+                {"detail": "Cannot respond to non-pending booking."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        booking.provider_response = request.data.get("response", "")
+        booking.counter_offer_rate = request.data.get("counter_offer_rate")
+        booking.responded_at = timezone.now()
+        booking.save(
+            update_fields=["provider_response", "counter_offer_rate", "responded_at"]
+        )
+        return Response(BookingSerializer(booking).data)
+
+    @action(detail=True, methods=["post"])
+    @extend_schema(
+        summary="Accept Counter-offer",
+        description="Client accepts a provider's counter-offer."
+    )
+    def accept_counter(self, request, pk=None):
+        booking = self.get_object()
+
+        if request.user != booking.client:
+            return Response(
+                {"detail": "Only client can accept counter-offer."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        updates = BookingUpdate.objects.filter(booking=booking)
-        serializer = BookingUpdateHistorySerializer(updates, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except Exception as e:
-        logger.error(f"Error retrieving booking history for {booking_id}: {str(e)}")
-        return Response(
-            {"detail": "Bron tarixini olishda xatolik yuz berdi"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-
-@api_view(["POST"])
-@permission_classes([IsAuthenticated, IsGuideOrClient])
-def complete_booking(request, booking_id):
-    """
-    Mark a booking as completed (only by guide).
-    """
-    try:
-        booking = get_object_or_404(Booking, id=booking_id)
-        if request.user != booking.guide:
+        if not booking.counter_offer_rate:
             return Response(
-                {"detail": "Faqat gid bu bronni yakunlashi mumkin"},
+                {"detail": "No counter-offer to accept."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if booking.status != Booking.BookingStatus.PENDING:
+            return Response(
+                {"detail": "Only pending bookings can accept counter-offer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        with transaction.atomic():
+            booking.proposed_rate = booking.counter_offer_rate
+            booking.status = Booking.BookingStatus.ACCEPTED
+            booking.accepted_at = timezone.now()
+            booking.save(update_fields=["proposed_rate", "status", "accepted_at"])
+
+        return Response(BookingSerializer(booking).data)
+
+    @action(detail=True, methods=["post"])
+    @extend_schema(
+        summary="Accept Booking",
+        description="Provider accepts a pending booking request."
+    )
+    def accept(self, request, pk=None):
+        booking = self.get_object()
+
+        if not request.user.is_customer:
+            return Response(
+                {"detail": "Only providers can accept."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        booking = BookingService.complete_booking(booking, request.user)
-        NotificationService.send_booking_notification(booking, "booking_completed")
-        serializer = BookingSerializer(booking)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except ValueError as e:
-        return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        logger.error(f"Error completing booking {booking_id}: {str(e)}")
-        return Response(
-            {"detail": "Bronni yakunlashda xatolik yuz berdi"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-
-@api_view(["POST"])
-@permission_classes([IsAuthenticated, IsGuideOrClient])
-def start_booking(request, booking_id):
-    """
-    Mark a booking as in progress (only by guide).
-    """
-    try:
-        booking = get_object_or_404(Booking, id=booking_id)
-        if request.user != booking.guide:
+        if booking.status != Booking.BookingStatus.PENDING:
             return Response(
-                {"detail": "Faqat gid bu bronni boshlashi mumkin"},
+                {"detail": "Only pending bookings can be accepted."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        booking.status = Booking.BookingStatus.ACCEPTED
+        booking.accepted_at = timezone.now()
+        booking.save(update_fields=["status", "accepted_at"])
+        return Response(BookingSerializer(booking).data)
+
+    @action(detail=True, methods=["post"])
+    @extend_schema(
+        summary="Reject Booking",
+        description="Provider rejects a pending booking request."
+    )
+    def reject(self, request, pk=None):
+        booking = self.get_object()
+
+        if not request.user.is_customer:
+            return Response(
+                {"detail": "Only providers can reject."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        booking = BookingService.start_booking(booking, request.user)
-        NotificationService.send_booking_notification(booking, "booking_started")
-        serializer = BookingSerializer(booking)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except ValueError as e:
-        return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        logger.error(f"Error starting booking {booking_id}: {str(e)}")
-        return Response(
-            {"detail": "Bronni boshlashda xatolik yuz berdi"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        if booking.status != Booking.BookingStatus.PENDING:
+            return Response(
+                {"detail": "Only pending bookings can be rejected."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        booking.status = Booking.BookingStatus.REJECTED
+        booking.save(update_fields=["status"])
+        return Response(BookingSerializer(booking).data)
+
+    @action(detail=True, methods=["post"])
+    @extend_schema(
+        summary="Cancel Booking",
+        description="Client or provider can cancel booking if not completed/cancelled."
+    )
+    def cancel(self, request, pk=None):
+        booking = self.get_object()
+
+        if booking.status not in [
+            Booking.BookingStatus.PENDING,
+            Booking.BookingStatus.ACCEPTED,
+        ]:
+            return Response(
+                {"detail": "Cannot cancel at this stage."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        booking.status = Booking.BookingStatus.CANCELLED
+        booking.cancelled_at = timezone.now()
+        booking.cancelled_by = request.user
+        booking.cancellation_reason = request.data.get("reason", "")
+        booking.save(
+            update_fields=[
+                "status",
+                "cancelled_at",
+                "cancelled_by",
+                "cancellation_reason",
+            ]
         )
+        return Response(BookingSerializer(booking).data)
 
+    @action(detail=True, methods=["post"])
+    @extend_schema(
+        summary="Complete Booking",
+        description="Mark booking as completed by client or provider if accepted."
+    )
+    def complete(self, request, pk=None):
+        booking = self.get_object()
 
-@api_view(["GET", "POST"])
-@permission_classes([IsAuthenticated])
-def booking_requests(request):
-    """
-    List all booking requests or create a new one.
-    """
-    if request.method == "GET":
-        try:
-            if request.user.role == "Guide":
-                requests = BookingRequest.objects.filter(guide=request.user)
-            else:
-                requests = BookingRequest.objects.filter(client=request.user)
-
-            serializer = BookingRequestSerializer(requests, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            logger.error(
-                f"Error listing booking requests for user {request.user.id}: {str(e)}"
-            )
+        if request.user not in [booking.client, booking.customer.user]:
             return Response(
-                {"detail": "So'rovlarni ro'yxatlashda xatolik yuz berdi"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-
-    elif request.method == "POST":
-        try:
-            serializer = BookingRequestCreateSerializer(
-                data=request.data, context={"request": request}
-            )
-            if serializer.is_valid():
-                booking_request = BookingRequestService.create_request(
-                    client=request.user,
-                    guide=User.objects.get(id=request.data["guide"]),
-                    **serializer.validated_data,
-                )
-                NotificationService.send_booking_request_notification(
-                    booking_request, "new_request"
-                )
-                return Response(
-                    BookingRequestSerializer(booking_request).data,
-                    status=status.HTTP_201_CREATED,
-                )
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except User.DoesNotExist:
-            return Response(
-                {"detail": "Gid topilmadi"}, status=status.HTTP_404_NOT_FOUND
-            )
-        except ValueError as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            logger.error(f"Error creating booking request: {str(e)}")
-            return Response(
-                {"detail": "So'rov yaratishda xatolik yuz berdi"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-
-
-@api_view(["GET", "POST"])
-@permission_classes([IsAuthenticated, IsGuideOrClient])
-def booking_request_detail(request, request_id):
-    """
-    Retrieve or respond to a booking request.
-    """
-    try:
-        booking_request = get_object_or_404(BookingRequest, id=request_id)
-        if not BookingRequestService.can_access_request(request.user, booking_request):
-            return Response(
-                {"detail": "Bu so'rovga kirish huquqingiz yo'q"},
+                {"detail": "Only participants can complete."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        if request.method == "GET":
-            serializer = BookingRequestSerializer(booking_request)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        elif request.method == "POST":
-            if request.user != booking_request.guide:
-                return Response(
-                    {"detail": "Faqat gid so'rovga javob bera oladi"},
-                    status=status.HTTP_403_FORBIDDEN,
-                )
-
-            serializer = BookingRequestResponseSerializer(data=request.data)
-            if serializer.is_valid():
-                action = serializer.validated_data["action"]
-                if action == "accept":
-                    booking_request = BookingRequestService.accept_request(
-                        booking_request, request.user
-                    )
-                    NotificationService.send_booking_request_notification(
-                        booking_request, "request_accept"
-                    )
-                elif action == "reject":
-                    booking_request = BookingRequestService.reject_request(
-                        booking_request, request.user
-                    )
-                    NotificationService.send_booking_request_notification(
-                        booking_request, "request_reject"
-                    )
-                elif action == "counter":
-                    booking_request = BookingRequestService.counter_offer(
-                        booking_request,
-                        request.user,
-                        counter_date=serializer.validated_data.get("counter_date"),
-                        counter_end_date=serializer.validated_data.get(
-                            "counter_end_date"
-                        ),
-                        counter_price=serializer.validated_data.get("counter_price"),
-                        counter_notes=serializer.validated_data.get(
-                            "counter_notes", ""
-                        ),
-                    )
-                    NotificationService.send_booking_request_notification(
-                        booking_request, "request_counter"
-                    )
-
-                return Response(
-                    BookingRequestSerializer(booking_request).data,
-                    status=status.HTTP_200_OK,
-                )
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        logger.error(f"Error processing booking request {request_id}: {str(e)}")
-        return Response(
-            {"detail": "So'rovni qayta ishlashda xatolik yuz berdi"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def booking_statistics(request):
-    """
-    Retrieve booking statistics for the authenticated user.
-    """
-    try:
-        stats = BookingService.get_booking_statistics(request.user)
-        return Response(stats, status=status.HTTP_200_OK)
-    except Exception as e:
-        logger.error(
-            f"Error retrieving booking statistics for user {request.user.id}: {str(e)}"
-        )
-        return Response(
-            {"detail": "Statistikani olishda xatolik yuz berdi"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def available_guides(request):
-    """
-    Retrieve available guides based on filters (date, service, location).
-    """
-    try:
-        date = request.query_params.get("date")
-        service_id = request.query_params.get("service_id")
-        location = request.query_params.get("location")
-
-        guides = BookingService.get_available_guides(date, service_id, location)
-        from apps.accounts.serializers import UserSerializer
-
-        serializer = UserSerializer(guides, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except Exception as e:
-        logger.error(f"Error retrieving available guides: {str(e)}")
-        return Response(
-            {"detail": "Mavjud gidlarni olishda xatolik yuz berdi"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def booking_calendar(request):
-    """
-    Retrieve booking calendar data for the authenticated user.
-    """
-    try:
-        start_date = request.query_params.get("start_date")
-        end_date = request.query_params.get("end_date")
-
-        try:
-            start_date = timezone.datetime.strptime(start_date, "%Y-%m-%d").date()
-            end_date = timezone.datetime.strptime(end_date, "%Y-%m-%d").date()
-        except (ValueError, TypeError):
+        if booking.status != Booking.BookingStatus.ACCEPTED:
             return Response(
-                {"detail": "Yaroqsiz sana formati"}, status=status.HTTP_400_BAD_REQUEST
+                {"detail": "Only accepted bookings can be completed."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        calendar_data = BookingService.get_booking_calendar(
-            request.user, start_date, end_date
+        booking.status = Booking.BookingStatus.COMPLETED
+        booking.completed_at = timezone.now()
+        booking.save(update_fields=["status", "completed_at"])
+        return Response(BookingSerializer(booking).data)
+
+
+# ──────────────────────────── BookingMessageViewSet ──────────────────────────── #
+
+@extend_schema_view(
+    list=extend_schema(
+        summary="List Booking Messages",
+        description="Retrieve all messages for a booking."
+    ),
+    create=extend_schema(
+        summary="Create Booking Message",
+        description="Create a new message in the booking chat."
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve Message",
+        description="Retrieve details of a specific booking message."
+    ),
+    update=extend_schema(
+        summary="Update Message",
+        description="Update all fields of a booking message."
+    ),
+    partial_update=extend_schema(
+        summary="Partial Update Message",
+        description="Update some fields of a booking message."
+    ),
+    destroy=extend_schema(
+        summary="Delete Message",
+        description="Delete a booking message (only sender)."
+    ),
+)
+@extend_schema(tags=["booking"])
+class BookingMessageViewSet(viewsets.ModelViewSet):
+    """
+    Chat/messages inside a booking.
+    Allows participants to list and create messages.
+    """
+
+    serializer_class = BookingMessageSerializer
+    permission_classes = [IsBookingParticipant]
+
+    def get_queryset(self):
+        """Return all messages for the given booking_id"""
+        return (
+            BookingMessage.objects.filter(booking_id=self.kwargs["booking_pk"])
+            .select_related("sender")
+            .only(
+                "id",
+                "booking_id",
+                "sender",
+                "message",
+                "is_system_message",
+                "created_at",
+            )
         )
-        return Response(calendar_data, status=status.HTTP_200_OK)
-    except Exception as e:
-        logger.error(
-            f"Error retrieving booking calendar for user {request.user.id}: {str(e)}"
-        )
-        return Response(
-            {"detail": "Kalendar ma'lumotlarini olishda xatolik yuz berdi"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+
+    def perform_create(self, serializer):
+        """Automatically assign sender and booking_id on message creation"""
+        serializer.save(sender=self.request.user, booking_id=self.kwargs["booking_pk"])

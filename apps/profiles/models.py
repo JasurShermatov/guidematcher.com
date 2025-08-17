@@ -1,201 +1,190 @@
-# apps/profiles/models.py
-
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.contrib.auth import get_user_model
-from apps.common.models import TimeStampedModel, Country, City, Service, Language
-
-User = get_user_model()
+from apps.common.models import BaseModel
+from apps.users.models import User
 
 
-class ClientProfile(TimeStampedModel):
-    """
-    Extended profile for client users
-    """
-
+class AbstractProfile(BaseModel):
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="client_profile"
+        User,
+        on_delete=models.CASCADE,
+        verbose_name=_("User"),
     )
-    birth_date = models.DateField(null=True, blank=True)
-    gender = models.CharField(
-        max_length=10,
-        choices=[("Male", "Male"), ("Female", "Female"), ("Other", "Other")],
+    languages = models.ManyToManyField(
+        "common.Language",
         blank=True,
+        verbose_name=_("Languages spoken"),
     )
-    emergency_contact = models.CharField(max_length=100, blank=True)
-    emergency_phone = models.CharField(max_length=20, blank=True)
-    travel_preferences = models.TextField(blank=True)
-    dietary_restrictions = models.TextField(blank=True)
 
     class Meta:
-        db_table = "client_profiles"
-        verbose_name = "Client Profile"
-        verbose_name_plural = "Client Profiles"
+        abstract = True
 
     def __str__(self):
-        return f"Client Profile: {self.user.full_name}"
+        return f"{self.__class__.__name__}: {self.user.full_name}"
 
 
-class GuideProfile(TimeStampedModel):
-    """
-    Extended profile for guide users
-    """
-
-    EXPERIENCE_CHOICES = [
-        ("0-1", "0-1 years"),
-        ("1-3", "1-3 years"),
-        ("3-5", "3-5 years"),
-        ("5+", "5+ years"),
-    ]
-
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="guide_profile"
+class ClientProfile(AbstractProfile):
+    date_of_birth = models.DateField(
+        null=True, blank=True, verbose_name=_("Date of birth")
+    )
+    preferred_contact = models.CharField(
+        max_length=20,
+        choices=[
+            ("email", _("Email")),
+            ("phone", _("Phone")),
+            ("chat", _("In-app chat")),
+        ],
+        default="chat",
+        verbose_name=_("Preferred contact method"),
     )
 
-    # Professional details
-    experience_years = models.CharField(
-        max_length=10, choices=EXPERIENCE_CHOICES, blank=True
+    class Meta:
+        verbose_name = _("Client profile")
+        verbose_name_plural = _("Client profiles")
+
+
+class CustomerProfile(AbstractProfile):
+    class VerificationStatus(models.TextChoices):
+        PENDING = "pending", _("Pending")
+        VERIFIED = "verified", _("Verified")
+        REJECTED = "rejected", _("Rejected")
+
+    professional_bio = models.TextField(verbose_name=_("Professional biography"))
+    years_of_experience = models.PositiveIntegerField(
+        default=0, verbose_name=_("Years of experience")
     )
+    service_types = models.ManyToManyField(
+        "common.ServiceType", verbose_name=_("Service types offered")
+    )
+
+    city = models.ForeignKey(
+        "common.City", on_delete=models.PROTECT, verbose_name=_("Service city")
+    )
+    service_areas = models.TextField(blank=True, verbose_name=_("Service areas"))
+
     hourly_rate = models.DecimalField(
-        max_digits=8,
+        max_digits=10,
         decimal_places=2,
-        validators=[MinValueValidator(0)],
         null=True,
         blank=True,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Hourly rate (USD)"),
     )
     daily_rate = models.DecimalField(
-        max_digits=8,
+        max_digits=10,
         decimal_places=2,
-        validators=[MinValueValidator(0)],
         null=True,
         blank=True,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Daily rate (USD)"),
+    )
+    currency = models.CharField(max_length=3, default="USD", verbose_name=_("Currency"))
+
+    verification_status = models.CharField(
+        max_length=20,
+        choices=VerificationStatus.choices,
+        default=VerificationStatus.PENDING,
+        verbose_name=_("Verification status"),
+    )
+    verification_date = models.DateTimeField(
+        null=True, blank=True, verbose_name=_("Verification date")
+    )
+    verification_notes = models.TextField(
+        blank=True, verbose_name=_("Verification notes")
     )
 
-    # Location and availability
-    operating_cities = models.ManyToManyField(City, blank=True)
-    work_schedule = models.TextField(blank=True, help_text="Working hours and days")
-
-    # Services and languages
-    services = models.ManyToManyField(Service, blank=True)
-    languages = models.ManyToManyField("GuideLanguage", blank=True)
-
-    # Profile completion and verification
-    is_verified = models.BooleanField(default=False)
-    verification_date = models.DateTimeField(null=True, blank=True)
-    profile_completion = models.IntegerField(
-        default=0, validators=[MinValueValidator(0), MaxValueValidator(100)]
+    total_bookings = models.PositiveIntegerField(
+        default=0, verbose_name=_("Total bookings")
     )
-
-    # Response and activity
-    response_time_hours = models.IntegerField(default=24)
-    is_available = models.BooleanField(default=True)
-    last_active = models.DateTimeField(auto_now=True)
-
-    # Statistics
-    total_tours = models.IntegerField(default=0)
+    total_reviews = models.PositiveIntegerField(
+        default=0, verbose_name=_("Total reviews")
+    )
     average_rating = models.DecimalField(
         max_digits=3,
         decimal_places=2,
-        default=0.0,
+        default=0,
         validators=[MinValueValidator(0), MaxValueValidator(5)],
+        verbose_name=_("Average rating"),
+    )
+
+    is_available = models.BooleanField(
+        default=True, verbose_name=_("Currently available")
     )
 
     class Meta:
-        db_table = "guide_profiles"
-        verbose_name = "Guide Profile"
-        verbose_name_plural = "Guide Profiles"
+        verbose_name = _("Customer profile")
+        verbose_name_plural = _("Customer profiles")
         indexes = [
-            models.Index(fields=["is_verified"]),
-            models.Index(fields=["is_available"]),
+            models.Index(fields=["city", "is_available"]),
             models.Index(fields=["average_rating"]),
         ]
 
-    def __str__(self):
-        return f"Guide Profile: {self.user.full_name}"
-
-    def update_rating(self):
-        """Update average rating based on reviews"""
-        from apps.reviews.models import Review
-
-        reviews = Review.objects.filter(guide=self.user)
-        if reviews.exists():
-            self.average_rating = (
-                reviews.aggregate(avg_rating=models.Avg("rating"))["avg_rating"] or 0.0
-            )
-            self.save(update_fields=["average_rating"])
+    @property
+    def is_verified(self):
+        return self.verification_status == self.VerificationStatus.VERIFIED
 
 
-class GuideLanguage(TimeStampedModel):
-    """
-    Languages that a guide speaks with proficiency level
-    """
-
-    PROFICIENCY_CHOICES = [
-        ("Basic", "Basic"),
-        ("Intermediate", "Intermediate"),
-        ("Advanced", "Advanced"),
-        ("Native", "Native"),
-    ]
-
-    guide = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="guide_languages"
-    )
-    language = models.ForeignKey(Language, on_delete=models.CASCADE)
-    proficiency = models.CharField(max_length=20, choices=PROFICIENCY_CHOICES)
-
-    class Meta:
-        db_table = "guide_languages"
-        verbose_name = "Guide Language"
-        verbose_name_plural = "Guide Languages"
-        unique_together = ["guide", "language"]
-
-    def __str__(self):
-        return f"{self.guide.full_name} - {self.language.name} ({self.proficiency})"
-
-
-class Portfolio(TimeStampedModel):
-    """
-    Portfolio images for guides
-    """
-
-    guide = models.ForeignKey(User, on_delete=models.CASCADE, related_name="portfolio")
-    title = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    image_url = models.URLField()
-    order = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        db_table = "portfolios"
-        verbose_name = "Portfolio"
-        verbose_name_plural = "Portfolios"
-        ordering = ["order", "created_at"]
-
-    def __str__(self):
-        return f"{self.guide.full_name} - {self.title}"
-
-
-class Favorite(TimeStampedModel):
-    """
-    User favorites (guides or destinations)
-    """
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="favorites")
-    guide = models.ForeignKey(
-        User,
+class AbstractCustomerRelatedModel(BaseModel):
+    customer = models.ForeignKey(
+        CustomerProfile,
         on_delete=models.CASCADE,
-        related_name="favorited_by",
+        verbose_name=_("Customer"),
+    )
+
+    class Meta:
+        abstract = True
+
+
+class Portfolio(AbstractCustomerRelatedModel):
+    image = models.ImageField(upload_to="portfolio/%Y/%m/", verbose_name=_("Image"))
+    title = models.CharField(max_length=200, blank=True, verbose_name=_("Title"))
+    description = models.TextField(blank=True, verbose_name=_("Description"))
+    order = models.PositiveIntegerField(default=0, verbose_name=_("Display order"))
+
+    class Meta:
+        verbose_name = _("Portfolio item")
+        verbose_name_plural = _("Portfolio items")
+        ordering = ["order", "-created_at"]
+
+
+class VerificationDocument(AbstractCustomerRelatedModel):
+    class DocumentType(models.TextChoices):
+        ID_CARD = "id_card", _("ID Card")
+        PASSPORT = "passport", _("Passport")
+        LICENSE = "license", _("Professional License")
+        CERTIFICATE = "certificate", _("Certificate")
+        OTHER = "other", _("Other")
+
+    document_type = models.CharField(max_length=20, choices=DocumentType.choices)
+    file = models.FileField(upload_to="verification/%Y/%m/")
+    description = models.CharField(max_length=255, blank=True)
+    is_verified = models.BooleanField(default=False)
+    verified_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
+        related_name="verified_documents",
     )
-    city = models.ForeignKey(City, on_delete=models.CASCADE, null=True, blank=True)
+    verified_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        db_table = "favorites"
-        verbose_name = "Favorite"
-        verbose_name_plural = "Favorites"
-        unique_together = [["user", "guide"], ["user", "city"]]
+        verbose_name = _("Verification document")
+        verbose_name_plural = _("Verification documents")
+        ordering = ["-created_at"]
 
-    def __str__(self):
-        if self.guide:
-            return f"{self.user.full_name} likes {self.guide.full_name}"
-        return f"{self.user.full_name} likes {self.city.name}"
+
+class Availability(AbstractCustomerRelatedModel):
+    date = models.DateField(verbose_name=_("Date"))
+    is_available = models.BooleanField(default=True)
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
+    note = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        verbose_name = _("Availability")
+        verbose_name_plural = _("Availabilities")
+        unique_together = [["customer", "date"]]
+        ordering = ["date"]
+        indexes = [models.Index(fields=["customer", "date", "is_available"])]

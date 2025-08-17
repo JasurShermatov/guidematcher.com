@@ -1,25 +1,23 @@
 # apps/accounts/urls.py
-
 from django.urls import path
-from . import views
-
-app_name = "accounts"
+from .views import (
+    RequestCodeView,
+    RegisterView,
+    LoginView,
+    CustomTokenRefreshView,
+    LogoutView,
+    PasswordResetRequestView,
+    PasswordResetConfirmView,
+)
 
 urlpatterns = [
-    # Registration and authentication
-    path("request-code/", views.request_code, name="request_code"),
-    path("register/", views.register, name="register"),
-    path("login/", views.login, name="login"),
-    path("logout/", views.logout, name="logout"),
-    # Password reset
+    path("request-code/", RequestCodeView.as_view(), name="request-code"),
+    path("register/", RegisterView.as_view(), name="register"),
+    path("login/", LoginView.as_view(), name="login"),
+    path("refresh/", CustomTokenRefreshView.as_view(), name="token-refresh"),
+    path("logout/", LogoutView.as_view(), name="logout"),
     path(
-        "password-reset/", views.password_reset_request, name="password_reset_request"
+        "forgot-password/", PasswordResetRequestView.as_view(), name="forgot-password"
     ),
-    path(
-        "password-reset-confirm/",
-        views.password_reset_confirm,
-        name="password_reset_confirm",
-    ),
-    # Token management
-    path("refresh/", views.refresh_token, name="refresh_token"),
+    path("reset-password/", PasswordResetConfirmView.as_view(), name="reset-password"),
 ]

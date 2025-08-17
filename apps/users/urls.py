@@ -1,13 +1,17 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
-app_name = "users"
+from apps.users.views import (
+    GoogleLoginView,
+    UserListView,
+)
+
+router = DefaultRouter()
+router.register(r"users", UserListView, basename="users")
 
 urlpatterns = [
-    path("register/", views.register_user, name="register"),
-    path("login/", views.login_user, name="login"),
-    path("profile/", views.user_profile, name="profile"),
-    path("profile/<uuid:user_id>/", views.user_detail, name="user_detail"),
-    path("verify-email/", views.verify_email, name="verify_email"),
-    path("login-attempts/", views.login_attempts, name="login_attempts"),
+    # Google OAuth login
+    path("auth/google/", GoogleLoginView.as_view(), name="auth-google-login"),
+    # Users CRUD endpoints
+    path("", include(router.urls)),
 ]

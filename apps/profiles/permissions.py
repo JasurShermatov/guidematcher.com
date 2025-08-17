@@ -1,35 +1,32 @@
-from rest_framework import permissions
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
-class IsGuide(permissions.BasePermission):
-    """
-    Allows access only to users with role 'Guide'
-    """
-
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == "Guide"
-
-
-class IsProfileOwnerOrStaff(permissions.BasePermission):
-    """
-    Allows access to profile owners or staff members
-    """
-
+class IsOwnerOrAdmin(BasePermission):
     def has_object_permission(self, request, view, obj):
-        return request.user.is_authenticated and (
-            request.user.is_staff or obj.user == request.user
-        )
+        if request.method in SAFE_METHODS:
+            return True
+
+        user = request.user
+        if user.is_admin:
+            return True
+
+        # obj can be a profile or related object
+        if hasattr(obj, "user"):
+            return obj.user == user
+        elif hasattr(obj, "customer") and hasattr(obj.customer, "user"):
+            return obj.customer.user == user
+
+        return False
 
 
-class IsClientOrStaff(permissions.BasePermission):
-    """
-    Allows access to clients or staff members
-    """
-
+class RoleBasedProfilePermission(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and (
-            request.user.role == "Client" or request.user.is_staff
-        )
+        user = request.user
+        if not user.is_authenticated:
+            return False
+
+        if view.basename == "client-profile":
+            return user.is_client or user.is_admin
+        elif view.basename == "customer-profile":
+            return user.is_customer or user.is_admin
+        return True

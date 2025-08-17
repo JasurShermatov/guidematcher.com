@@ -1,173 +1,87 @@
 from django.contrib import admin
-from .models import ClientProfile, GuideProfile, GuideLanguage, Portfolio, Favorite
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
+from django.utils.html import format_html
+from django.urls import reverse
+from .models import (
+    ClientProfile,
+    CustomerProfile,
+    Portfolio,
+    VerificationDocument,
+    Availability,
+)
 
 
 @admin.register(ClientProfile)
 class ClientProfileAdmin(admin.ModelAdmin):
-    """
-    Admin configuration for the ClientProfile model
-    """
-
-    list_display = ("user", "birth_date", "gender", "created_at")
-    list_filter = ("gender", "created_at")
-    search_fields = ("user__email", "user__first_name", "user__last_name")
-    ordering = ("-created_at",)
-    readonly_fields = ("created_at", "updated_at")
-    list_per_page = 20
-    fieldsets = (
-        (None, {"fields": ("user",)}),
-        (
-            "Personal Info",
-            {
-                "fields": (
-                    "birth_date",
-                    "gender",
-                    "emergency_contact",
-                    "emergency_phone",
-                )
-            },
-        ),
-        ("Preferences", {"fields": ("travel_preferences", "dietary_restrictions")}),
-        ("Timestamps", {"fields": ("created_at", "updated_at")}),
-    )
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related("user")
-
-    class Media:
-        css = {"all": ("css/admin/profiles.css",)}  # Optional custom CSS
+    list_display = ("user", "date_of_birth", "preferred_contact")
+    search_fields = ("user__first_name", "user__email")
+    list_filter = ("preferred_contact",)
+    autocomplete_fields = ["user", "languages"]
+    ordering = ("user__first_name",)
 
 
-@admin.register(GuideProfile)
-class GuideProfileAdmin(admin.ModelAdmin):
-    """
-    Admin configuration for the GuideProfile model
-    """
-
+@admin.register(CustomerProfile)
+class CustomerProfileAdmin(admin.ModelAdmin):
     list_display = (
         "user",
-        "experience_years",
-        "is_verified",
+        "city",
         "is_available",
-        "average_rating",
-        "total_tours",
-        "created_at",
-    )
-    list_filter = ("is_verified", "is_available", "experience_years", "created_at")
-    search_fields = ("user__email", "user__first_name", "user__last_name")
-    ordering = ("-created_at",)
-    readonly_fields = (
-        "created_at",
-        "updated_at",
-        "verification_date",
-        "profile_completion",
-        "last_active",
-        "total_tours",
+        "verification_status",
         "average_rating",
     )
-    fieldsets = (
-        (None, {"fields": ("user", "is_verified", "verification_date")}),
-        (
-            "Professional Details",
-            {
-                "fields": (
-                    "experience_years",
-                    "hourly_rate",
-                    "daily_rate",
-                    "work_schedule",
-                )
-            },
-        ),
-        ("Locations and Services", {"fields": ("operating_cities", "services")}),
-        ("Languages", {"fields": ("languages",)}),
-        (
-            "Statistics",
-            {
-                "fields": (
-                    "profile_completion",
-                    "response_time_hours",
-                    "is_available",
-                    "last_active",
-                    "total_tours",
-                    "average_rating",
-                )
-            },
-        ),
-        ("Timestamps", {"fields": ("created_at", "updated_at")}),
-    )
-    filter_horizontal = ("operating_cities", "services", "languages")
-
-    def get_queryset(self, request):
-        return (
-            super()
-            .get_queryset(request)
-            .select_related("user")
-            .prefetch_related("operating_cities", "services", "languages")
-        )
-
-
-@admin.register(GuideLanguage)
-class GuideLanguageAdmin(admin.ModelAdmin):
-    """
-    Admin configuration for the GuideLanguage model
-    """
-
-    list_display = ("guide", "language", "proficiency", "created_at")
-    list_filter = ("proficiency", "created_at")
-    search_fields = (
-        "guide__email",
-        "guide__first_name",
-        "guide__last_name",
-        "language__name",
-    )
-    ordering = ("-created_at",)
-    readonly_fields = ("created_at", "updated_at")
-    list_per_page = 20
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related("guide", "language")
+    search_fields = ("user__first_name", "user__email", "city__name")
+    list_filter = ("city", "is_available", "verification_status")
+    autocomplete_fields = ["user", "languages", "service_types", "city"]
+    ordering = ("-average_rating",)
 
 
 @admin.register(Portfolio)
 class PortfolioAdmin(admin.ModelAdmin):
-    """
-    Admin configuration for the Portfolio model
-    """
+    list_display = ("linked_customer", "title", "order")
+    search_fields = ("title", "customer__user__first_name")
+    list_filter = ("customer",)
+    autocomplete_fields = ["customer"]
+    ordering = ("order",)
 
-    list_display = ("guide", "title", "order", "created_at")
-    list_filter = ("created_at",)
-    search_fields = ("guide__email", "guide__first_name", "guide__last_name", "title")
-    ordering = ("order", "created_at")
-    readonly_fields = ("created_at", "updated_at")
-    list_per_page = 20
+    def linked_customer(self, obj):
+        url = reverse("admin:profiles_customerprofile_change", args=[obj.customer.id])
+        return format_html('<a href="{}">{}</a>', url, obj.customer.user.email)
 
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related("guide")
+    linked_customer.short_description = "Customer"
 
 
-@admin.register(Favorite)
-class FavoriteAdmin(admin.ModelAdmin):
-    """
-    Admin configuration for the Favorite model
-    """
-
-    list_display = ("user", "guide", "city", "created_at")
-    list_filter = ("created_at",)
-    search_fields = (
-        "user__email",
-        "user__first_name",
-        "user__last_name",
-        "guide__email",
-        "guide__first_name",
-        "guide__last_name",
-        "city__name",
+@admin.register(VerificationDocument)
+class VerificationDocumentAdmin(admin.ModelAdmin):
+    list_display = (
+        "linked_customer",
+        "document_type",
+        "is_verified",
+        "linked_verified_by",
+        "verified_at",
     )
-    ordering = ("-created_at",)
-    readonly_fields = ("created_at", "updated_at")
-    list_per_page = 20
+    search_fields = ("customer__user__first_name", "document_type")
+    list_filter = ("document_type", "is_verified")
+    autocomplete_fields = ["customer", "verified_by"]
+    ordering = ("-verified_at",)
 
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related("user", "guide", "city")
+    def linked_customer(self, obj):
+        url = reverse("admin:profiles_customerprofile_change", args=[obj.customer.id])
+        return format_html('<a href="{}">{}</a>', url, obj.customer.user.email)
+
+    linked_customer.short_description = "Customer"
+
+    def linked_verified_by(self, obj):
+        if obj.verified_by:
+            url = reverse("admin:users_user_change", args=[obj.verified_by.id])
+            return format_html('<a href="{}">{}</a>', url, obj.verified_by.email)
+        return "-"
+
+    linked_verified_by.short_description = "Verified By"
+
+
+@admin.register(Availability)
+class AvailabilityAdmin(admin.ModelAdmin):
+    list_display = ("customer", "date", "is_available", "start_time", "end_time")
+    search_fields = ("customer__user__first_name",)
+    list_filter = ("is_available", "date")
+    autocomplete_fields = ["customer"]
+    ordering = ("-date",)

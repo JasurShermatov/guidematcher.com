@@ -1,0 +1,719 @@
+{
+  "header": {
+    "logo_text": "TravMatch",
+    "tagline": "Исследуйте с местными",
+    "find_guides": "Найти гидов",
+    "blog": "Блог",
+    "select_language": "Выберите язык",
+    "choose_appearance": "Выберите оформление",
+    "sign_in": "Войти",
+    "logout": "Выйти",
+    "account": "Аккаунт"
+  },
+  "theme": {
+    "light": "Светлый режим",
+    "dark": "Темный режим",
+    "default": "Системный",
+    "auto": "Авто время",
+    "light_desc": "Яркий и чистый",
+    "dark_desc": "Стильный и современный",
+    "default_desc": "Соответствует вашему устройству",
+    "auto_desc": "Тема, зависящая от времени"
+  },
+  "language": {
+    "en": "Английский",
+    "ru": "Русский",
+    "uz": "Узбекский",
+    "es": "Испанский",
+    "ar": "Арабский",
+    "en_native": "English",
+    "ru_native": "Русский",
+    "uz_native": "O'zbek",
+    "es_native": "Español",
+    "ar_native": "العربية"
+  },
+  "guide": {
+    "loading": {
+      "data": "Загрузка данных..."
+    },
+    "header": {
+      "tours": "туры"
+    },
+    "stats": {
+      "new_requests": "Новые запросы",
+      "confirmed": "Подтверждено",
+      "earnings": "Заработок",
+      "new_messages": "Новые сообщения"
+    },
+    "profile": {
+      "professional_profile": "Профессиональный профиль",
+      "bio": "Биография",
+      "no_bio": "Биография не добавлена",
+      "experience": "Опыт",
+      "no_experience": "Опыт не добавлен",
+      "languages": "Языки",
+      "no_languages": "Языки не добавлены",
+      "pricing": "Цены",
+      "hourly_rate": "${{rate}}/час",
+      "daily_rate": "${{rate}}/день",
+      "no_hourly_rate": "Часовая ставка не указана",
+      "no_daily_rate": "Дневная ставка не указана",
+      "portfolio": "Портфолио",
+      "portfolio_item": "Портфолио {{number}}",
+      "profile_picture_alt": "Фото профиля",
+      "avatar_alt": "Аватар",
+      "form": {
+        "avatar": "Изображение аватара",
+        "upload_image": "Загрузить изображение",
+        "first_name": "Имя",
+        "first_name_placeholder": "Введите ваше имя",
+        "last_name": "Фамилия",
+        "last_name_placeholder": "Введите вашу фамилию",
+        "email": "Электронная почта",
+        "email_placeholder": "Введите ваш email",
+        "phone": "Телефон",
+        "phone_placeholder": "+998901234567",
+        "bio": "О себе",
+        "bio_placeholder": "Краткая информация о вас...",
+        "experience": "Опыт работы",
+        "experience_placeholder": "Опишите ваш профессиональный опыт...",
+        "languages": "Языки",
+        "language_placeholder": "Название языка",
+        "native_language": "Родной",
+        "specializations": "Области специализации",
+        "specializations_placeholder": "Введите специализацию и нажмите Enter",
+        "hourly_rate": "Часовая ставка ($)",
+        "daily_rate": "Дневная ставка ($)",
+        "work_hours": "Рабочие часы",
+        "work_hours_placeholder": "Пример: 08:00 - 18:00, Пн-Сб",
+        "certificates": "Сертификаты",
+        "upload_certificate": "Загрузить сертификат"
+      },
+      "validation": {
+        "required_fields": "Пожалуйста, заполните все обязательные поля"
+      },
+      "success": {
+        "updated": "Профиль успешно обновлен"
+      },
+      "errors": {
+        "update_failed": "Не удалось обновить профиль"
+      }
+    },
+    "statistics": {
+      "title": "Статистика",
+      "completed_tours": "Завершенные туры",
+      "average_rating": "Средний рейтинг",
+      "response_rate": "Уровень ответа",
+      "total_earnings": "Общий заработок"
+    },
+    "requests": {
+      "title": "Управление запросами",
+      "new": "Новые",
+      "confirmed": "Подтвержденные",
+      "history": "История",
+      "no_requests_title": "Пока нет запросов",
+      "no_requests_desc": "Новые запросы появятся здесь, когда поступят",
+      "anonymous_client": "Анонимный клиент",
+      "no_date": "Дата не указана",
+      "no_duration": "Продолжительность не указана",
+      "no_travelers": "Количество путешественников не указано",
+      "no_service_type": "Тип услуги не указан"
+    },
+    "status": {
+      "pending": "Ожидает",
+      "confirmed": "Подтверждено",
+      "completed": "Завершено",
+      "rejected": "Отклонено"
+    },
+    "actions": {
+      "accept": "Принять",
+      "reject": "Отклонить",
+      "chat": "Чат",
+      "chat_with_client": "Чат с клиентом",
+      "view_route": "Посмотреть маршрут",
+      "send_message": "Отправить сообщение",
+      "retry": "Повторить",
+      "cancel": "Отменить",
+      "save": "Сохранить",
+      "change": "Изменить"
+    },
+    "modals": {
+      "edit_profile": "Редактировать профиль",
+      "settings": "Настройки",
+      "change_password": "Сменить пароль",
+      "portfolio": "Портфолио"
+    },
+    "settings": {
+      "profile_data": "Данные профиля",
+      "profile_data_desc": "Редактируйте вашу личную информацию",
+      "change_password": "Сменить пароль",
+      "change_password_desc": "Обеспечьте безопасность вашего аккаунта",
+      "theme": "Тема"
+    },
+    "password": {
+      "form": {
+        "current_password": "Текущий пароль",
+        "current_password_placeholder": "Введите ваш текущий пароль",
+        "new_password": "Новый пароль",
+        "new_password_placeholder": "Введите новый пароль",
+        "confirm_password": "Подтвердите новый пароль",
+        "confirm_password_placeholder": "Повторно введите новый пароль"
+      },
+      "validation": {
+        "all_fields_required": "Заполните все поля",
+        "passwords_not_match": "Новые пароли не совпадают",
+        "min_length": "Новый пароль должен содержать не менее 8 символов"
+      },
+      "success": {
+        "changed": "Пароль успешно изменен"
+      },
+      "errors": {
+        "change_failed": "Не удалось изменить пароль"
+      }
+    },
+    "portfolio": {
+      "add_new_image": "Добавить новое изображение"
+    },
+    "errors": {
+      "stats_api_unavailable": "API статистики гидов в настоящее время недоступен",
+      "requests_api_unavailable": "API запросов гидов в настоящее время недоступен",
+      "chat_api_unavailable": "API чата в настоящее время недоступен",
+      "password_api_unavailable": "API смены пароля в настоящее время недоступен",
+      "request_action_unavailable": "API действий с запросами в настоящее время недоступен",
+      "request_service_unavailable": "Служба запросов в настоящее время недоступна",
+      "general_error": "Произошла ошибка",
+      "data_fetch_error": "Ошибка загрузки данных",
+      "data_loading_error": "Ошибка загрузки данных",
+      "requests_loading_error": "Ошибка загрузки запросов",
+      "requests_loading_error_title": "Ошибка загрузки запросов",
+      "requests_loading_error_desc": "Служба запросов в настоящее время недоступна или произошла ошибка",
+      "statistics_loading_error": "Ошибка загрузки данных статистики"
+    }
+  },
+  "user": {
+    "loading": {
+      "data": "Загрузка данных из API аккаунтов..."
+    },
+    "profile": {
+      "title": "Мой профиль (API аккаунтов)",
+      "subtitle": "Личная информация из API аккаунтов",
+      "user": "Пользователь",
+      "client": "Клиент",
+      "email": "Электронная почта",
+      "no_email": "Email не указан",
+      "first_name": "Имя",
+      "no_first_name": "Имя не указано",
+      "last_name": "Фамилия",
+      "no_last_name": "Фамилия не указана",
+      "role": "Роль",
+      "country": "Страна",
+      "no_country": "Страна не указана"
+    },
+    "stats": {
+      "total_bookings": "Всего бронирований",
+      "active_chats": "Активные чаты",
+      "accounts_api": "API аккаунтов"
+    },
+    "bookings": {
+      "title": "Мои бронирования",
+      "subtitle": "Все мои бронирования путешествий"
+    },
+    "guides": {
+      "title": "Гиды",
+      "subtitle": "Найдите идеального гида для вас",
+      "travel_date": "Дата путешествия",
+      "travelers_count": "Количество путешественников",
+      "adults": "Взрослые",
+      "children": "Дети"
+    },
+    "tabs": {
+      "profile": "Профиль",
+      "bookings": "Бронирования",
+      "guides": "Гиды"
+    },
+    "form": {
+      "first_name": "Имя",
+      "first_name_placeholder": "Введите ваше имя",
+      "last_name": "Фамилия",
+      "last_name_placeholder": "Введите вашу фамилию",
+      "email": "Электронная почта",
+      "email_placeholder": "Введите ваш email",
+      "role": "Роль",
+      "client": "Клиент",
+      "customer": "Покупатель",
+      "country": "Страна",
+      "country_placeholder": "Введите вашу страну"
+    },
+    "validation": {
+      "required_fields": "Имя, фамилия и email являются обязательными полями",
+      "invalid_email": "Неверный формат email"
+    },
+    "success": {
+      "profile_updated": "Профиль успешно обновлен! (Сохранено в localStorage)"
+    },
+    "errors": {
+      "no_access_token": "Токен доступа не найден",
+      "user_data_not_found": "Данные пользователя не найдены в localStorage",
+      "backend_not_connected_fallback": "Бэкенд не подключен. Отображаются данные текущей сессии.",
+      "backend_and_user_data_missing": "Проблема с подключением к бэкенду, и данные пользователя не найдены.",
+      "no_profile_update_endpoint": "Конечная точка обновления профиля недоступна в API аккаунтов",
+      "profile_update_failed": "Не удалось обновить профиль"
+    },
+    "alerts": {
+      "warning": "Предупреждение",
+      "info": "Информация",
+      "localstorage_notice": "Конечная точка обновления профиля отсутствует в API аккаунтов. Данные сохраняются в localStorage.",
+      "booking_api_unavailable": "⚠️ API бронирований еще не подключен. Скоро будет доступен!",
+      "cancel_booking_api_unavailable": "⚠️ API отмены бронирований еще не подключен. Скоро будет доступен!",
+      "chat_api_unavailable": "⚠️ API чата еще не подключен. Скоро будет доступен!"
+    },
+    "api_not_connected": {
+      "title": "API не подключен",
+      "soon_available": "Скоро будет доступен",
+      "badge": "Нет API",
+      "bookings": "API бронирований еще не подключен. Все функции бронирования, управления и детали скоро будут добавлены.",
+      "guides": "API гидов еще не подключен. Просмотр, поиск и бронирование гидов скоро будут добавлены."
+    },
+    "backend_status": {
+      "connected": "API аккаунтов подключен",
+      "disconnected": "API аккаунтов отключен"
+    },
+    "actions": {
+      "menu": "Меню",
+      "edit_profile": "Редактировать профиль",
+      "settings": "Настройки",
+      "logout": "Выйти (API аккаунтов)",
+      "retry_connection": "Повторить подключение",
+      "close": "Закрыть",
+      "cancel": "Отменить",
+      "save_localstorage": "Сохранить (localStorage)",
+      "saving": "Сохранение...",
+      "filters": "Фильтры (Нет API)"
+    },
+    "confirm_logout": "Вы уверены, что хотите выйти?",
+    "console": {
+      "fetching_user_data": "Получение данных пользователя из API аккаунтов...",
+      "accounts_api_response": "Ответ API аккаунтов:",
+      "retrieved_user_data": "Получены данные пользователя из localStorage:",
+      "attempting_fetch_user_data": "Попытка получения данных пользователя из API аккаунтов...",
+      "using_saved_user_data": "Использование сохраненных данных пользователя:",
+      "user_data_loaded": "Данные пользователя успешно загружены:",
+      "failed_fetch_user_data": "Не удалось получить данные пользователя:",
+      "using_fallback_user_data": "Использование текущего состояния пользователя в качестве резерва:",
+      "attempting_update_profile": "Попытка обновления профиля через API аккаунтов...",
+      "profile_updated_localstorage": "Профиль обновлен в localStorage:",
+      "error_fetching_user": "Ошибка получения пользователя из API аккаунтов:",
+      "error_updating_profile": "Ошибка обновления профиля через API аккаунтов:",
+      "updating_profile_payload": "Обновление профиля с данными:",
+      "profile_update_response": "Ответ обновления профиля:",
+      "profile_update_error": "Ошибка обновления профиля:",
+      "logout_success": "Успешный выход через API аккаунтов",
+      "logout_error": "Ошибка выхода:"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Исследуйте мир с",
+      "title_highlight": "Надежными гидами",
+      "description": "Связывайтесь с проверенными местными гидами для аутентичных путешествий в более чем 150 странах.",
+      "guide_name": "Ахмед К.",
+      "guide_expert": "Эксперт по Стамбулу",
+      "guide_rating": "4.9 (127)",
+      "guide_alt": "Гид",
+      "tour_name": "Тур по Стамбулу",
+      "tour_date": "Завтра, 10:00",
+      "tour_duration": "4 часа",
+      "tour_status": "Подтверждено"
+    },
+    "search": {
+      "location_placeholder": "Куда вы путешествуете?",
+      "service_placeholder": "Какая услуга вам нужна?",
+      "location_aria": "Поиск по городу или стране",
+      "service_aria": "Поиск по типу услуги",
+      "results_aria": "Предложения по типу услуги",
+      "button": "Найти вашего гида",
+      "button_aria": "Найти гида с текущим поиском"
+    },
+    "stats": {
+      "verified_guides": "Проверенные гиды",
+      "countries": "Страны",
+      "happy_travelers": "Счастливые путешественники",
+      "average_rating": "Средний рейтинг"
+    },
+    "destinations": {
+      "title": "Популярные направления",
+      "subtitle": "Исследуйте лучшие направления с опытными гидами",
+      "view_all": "Посмотреть все направления",
+      "view_all_aria": "Посмотреть все популярные направления",
+      "guides_count": "{{count}} гидов",
+      "explore_aria": "Посмотреть детали для {{name}}",
+      "modal": {
+        "highlights": "Основные моменты",
+        "find_guides": "Найти гидов",
+        "find_guides_aria": "Найти гидов для {{name}}",
+        "close_aria": "Закрыть модальное окно с деталями направления"
+      },
+      "istanbul": {
+        "name": "Стамбул, Турция",
+        "price": "От $25/день",
+        "highlights": [
+          "Исторические туры",
+          "Местная кухня",
+          "Гид по шопингу"
+        ]
+      },
+      "barcelona": {
+        "name": "Барселона, Испания",
+        "price": "От $35/день",
+        "highlights": [
+          "Архитектура",
+          "Пляжные туры",
+          "Искусство и культура"
+        ]
+      },
+      "tokyo": {
+        "name": "Токио, Япония",
+        "price": "От $45/день",
+        "highlights": [
+          "Современная культура",
+          "Традиционные места",
+          "Гастрономические туры"
+        ]
+      },
+      "paris": {
+        "name": "Париж, Франция",
+        "price": "От $40/день",
+        "highlights": [
+          "Музеи",
+          "Романтические туры",
+          "Модные районы"
+        ]
+      },
+      "dubai": {
+        "name": "Дубай, ОАЭ",
+        "price": "От $50/день",
+        "highlights": [
+          "Роскошные туры",
+          "Сафари в пустыне",
+          "Современные чудеса"
+        ]
+      },
+      "rome": {
+        "name": "Рим, Италия",
+        "price": "От $30/день",
+        "highlights": [
+          "Древняя история",
+          "Туры по Ватикану",
+          "Кулинарные туры"
+        ]
+      }
+    },
+    "services": {
+      "city_tours": {
+        "name": "Городские туры",
+        "description": "Исследование города с опытными гидами",
+        "count": "2.5k+ гидов"
+      },
+      "language_support": {
+        "name": "Языковая поддержка",
+        "description": "Услуги перевода в реальном времени",
+        "count": "150+ языков"
+      },
+      "photography": {
+        "name": "Фотография",
+        "description": "Профессиональная фотография путешествий",
+        "count": "800+ фотографов"
+      },
+      "cultural_experiences": {
+        "name": "Культурные впечатления",
+        "description": "Аутентичные местные мероприятия",
+        "count": "1.2k+ впечатлений"
+      }
+    },
+    "features": {
+      "title": "Почему TravMatch?",
+      "subtitle": "Откройте преимущества путешествий с нами",
+      "verified_guides": {
+        "title": "Проверенные гиды",
+        "description": "Все гиды тщательно проверяются на безопасность.",
+        "stats": "99.8% Безопасность"
+      },
+      "top_quality": {
+        "title": "Высокое качество",
+        "description": "Высокооцененные впечатления с проверенными отзывами.",
+        "stats": "4.8★ Рейтинг"
+      },
+      "global_reach": {
+        "title": "Глобальный охват",
+        "description": "Связывайтесь с гидами в более чем 150 странах.",
+        "stats": "150+ Стран"
+      },
+      "instant_booking": {
+        "title": "Мгновенное бронирование",
+        "description": "Бронируйте мгновенно с реальной доступностью.",
+        "stats": "24/7 Поддержка"
+      }
+    },
+    "steps": {
+      "title": "Как это работает",
+      "subtitle": "Начните в 3 простых шага",
+      "search_browse": {
+        "title": "Поиск и просмотр",
+        "description": "Найдите проверенных местных гидов."
+      },
+      "connect_plan": {
+        "title": "Связь и планирование",
+        "description": "Общайтесь с гидами для планирования поездки."
+      },
+      "experience": {
+        "title": "Впечатления",
+        "description": "Наслаждайтесь аутентичными местными впечатлениями."
+      }
+    },
+    "testimonials": {
+      "title": "Что говорят путешественники",
+      "subtitle": "Услышьте от наших счастливых путешественников",
+      "dot_aria": "Выбрать отзыв {{index}}",
+      "sarah": {
+        "name": "Сара Джонсон",
+        "location": "Нью-Йорк, США",
+        "text": "Невероятный опыт в Стамбуле! Гид показал мне скрытые жемчужины.",
+        "tour": "Исторический тур по Стамбулу"
+      },
+      "marco": {
+        "name": "Марко Родригес",
+        "location": "Мадрид, Испания",
+        "text": "Фототур в Токио был идеальным! Потрясающие фото и культурные открытия.",
+        "tour": "Фототур по Токио"
+      },
+      "emma": {
+        "name": "Эмма Уилсон",
+        "location": "Лондон, Великобритания",
+        "text": "Соло-путешествие в Барселону было потрясающим благодаря TravMatch!",
+        "tour": "Культурный опыт Барселоны"
+      }
+    },
+    "cta": {
+      "title": "Начните свое приключение",
+      "description": "Присоединяйтесь к тысячам путешественников для аутентичных впечатлений по всему миру.",
+      "find_guide": "Найти вашего гида",
+      "learn_more": "Узнать больше"
+    },
+    "learn_more": {
+      "title": "О TravMatch",
+      "description": "TravMatch соединяет путешественников с проверенными местными гидами для создания аутентичных, незабываемых впечатлений в более чем 150 странах. Наша миссия — сделать путешествия доступными, безопасными и захватывающими, сотрудничая с увлеченными местными жителями, которые знают свои направления наизусть.",
+      "why_title": "Почему выбирают TravMatch?",
+      "vision_title": "Наше видение",
+      "vision_description": "Мы верим, что путешествия — это связь, открытие и истории. С TravMatch вы не просто посещаете место — вы проживаете его глазами местного жителя.",
+      "find_guide": "Найдите вашего гида сейчас",
+      "close": "Закрыть",
+      "features": {
+        "verified_guides": {
+          "title": "Проверенные гиды:",
+          "description": "Все гиды проверены на безопасность и экспертизу."
+        },
+        "global_reach": {
+          "title": "Глобальный охват:",
+          "description": "Исследуйте более 150 стран с местными экспертами."
+        },
+        "custom_experiences": {
+          "title": "Индивидуальные впечатления:",
+          "description": "Настройте свою поездку с персонализированными турами."
+        },
+        "support": {
+          "title": "24/7 Поддержка:",
+          "description": "Мгновенное бронирование и круглосуточная помощь."
+        }
+      }
+    }
+  },
+  "auth": {
+    "title": "TravMatch",
+    "subtitle": "Найдите спутника для путешествий",
+    "tabs": {
+      "login": "Вход",
+      "register": "Регистрация",
+      "forgot": "Сброс пароля"
+    },
+    "close_aria": "Закрыть модальное окно авторизации",
+    "login": {
+      "title": "Войдите в TravMatch",
+      "subtitle": "Войдите в свой аккаунт и продолжайте путешествие",
+      "email_label": "Электронная почта",
+      "email_placeholder": "Введите ваш email",
+      "password_label": "Пароль",
+      "password_placeholder": "Введите ваш пароль",
+      "submit_button": "Войти",
+      "show_password_aria": "Показать пароль",
+      "hide_password_aria": "Скрыть пароль",
+      "or": "или",
+      "social": {
+        "google": "Продолжить с Google",
+        "facebook": "Продолжить с Facebook"
+      }
+    },
+    "register": {
+      "title": "Зарегистрируйтесь в TravMatch",
+      "subtitle": "Создайте новый аккаунт и найдите спутников для путешествий",
+      "role_label": "Роль",
+      "role_client": "Клиент",
+      "role_customer": "Покупатель",
+      "first_name_label": "Имя",
+      "first_name_placeholder": "Введите ваше имя",
+      "last_name_label": "Фамилия",
+      "last_name_placeholder": "Введите вашу фамилию",
+      "email_label": "Электронная почта",
+      "email_placeholder": "Введите ваш email",
+      "password_label": "Пароль",
+      "password_placeholder": "Введите ваш пароль",
+      "confirm_password_label": "Подтвердите пароль",
+      "confirm_password_placeholder": "Повторно введите пароль",
+      "country_label": "Страна",
+      "country_placeholder": "Введите вашу страну",
+      "country_option_aria": "Выбрать страну {country}",
+      "checkboxes": {
+        "personal_data": "Я согласен с обработкой персональных данных",
+        "terms": "Я согласен с условиями TravMatch",
+        "travel_tips": "Я согласен получать советы по путешествиям и акции"
+      },
+      "submit_button": "Зарегистрироваться",
+      "verification": {
+        "title": "Проверка email",
+        "subtitle": "Введите 6-значный код подтверждения, отправленный на <strong>{email}</strong>",
+        "code_label": "Код подтверждения",
+        "code_placeholder": "000000",
+        "submit_button": "Подтвердить",
+        "resend_button": "Отправить код повторно"
+      }
+    },
+    "forgot": {
+      "title": "Сброс пароля",
+      "subtitle": "Сбросьте пароль через email",
+      "email_label": "Электронная почта",
+      "email_placeholder": "Введите ваш email",
+      "submit_button": "Отправить код подтверждения",
+      "reset": {
+        "title": "Обновить пароль",
+        "subtitle": "Введите код подтверждения, отправленный на <strong>{email}</strong>, и новый пароль",
+        "code_label": "Код подтверждения",
+        "code_placeholder": "000000",
+        "new_password_label": "Новый пароль",
+        "new_password_placeholder": "Введите новый пароль",
+        "confirm_password_label": "Подтвердите пароль",
+        "confirm_password_placeholder": "Повторно введите новый пароль",
+        "submit_button": "Обновить пароль",
+        "resend_button": "Отправить код повторно",
+        "show_password_aria": "Показать новый пароль",
+        "hide_password_aria": "Скрыть новый пароль"
+      }
+    },
+    "validation": {
+      "required_fields": "Пожалуйста, заполните все обязательные поля",
+      "required_checkboxes": "Вы должны согласиться с обработкой персональных данных и условиями",
+      "required_code": "Пожалуйста, введите код подтверждения",
+      "invalid_email": "Неверный формат email",
+      "passwords_not_match": "Пароли не совпадают",
+      "password_requirements": "Пароль должен содержать не менее 8 символов, включая заглавную букву, строчную букву, цифру и специальный символ (@$!%*?&)",
+      "invalid_code": "Код подтверждения должен быть 6-значным числом"
+    },
+    "success": {
+      "verification_sent": "Код подтверждения отправлен на ваш email",
+      "register_success": "Регистрация прошла успешно!",
+      "password_reset_sent": "Код подтверждения отправлен на ваш email",
+      "password_reset_success": "Пароль успешно обновлен!"
+    },
+    "errors": {
+      "login_failed": "Вход не удался. Пожалуйста, проверьте email или пароль",
+      "email_exists": "Этот email уже зарегистрирован. Пожалуйста, войдите или используйте другой email",
+      "code_request_failed": "Не удалось запросить код подтверждения",
+      "invalid_code": "Неверный код подтверждения. Пожалуйста, проверьте и попробуйте снова",
+      "expired_code": "Срок действия кода подтверждения истек. Пожалуйста, запросите новый код",
+      "register_failed": "Регистрация не удалась",
+      "password_reset_failed": "Не удалось сбросить пароль",
+      "resend_code_failed": "Не удалось повторно отправить код подтверждения"
+    },
+    "loading": "Загрузка...",
+    "social_login_dev": "Вход через {provider} находится в разработке"
+  },
+  "footer": {
+    "newsletter": {
+      "title": "Оставайтесь на связи",
+      "subtitle": "Подпишитесь на нашу рассылку для получения советов по путешествиям, эксклюзивных предложений и обновлений",
+      "email_placeholder": "Введите ваш email",
+      "email_aria": "Email для рассылки",
+      "subscribe_button": "Подписаться",
+      "privacy": "Мы уважаем вашу конфиденциальность"
+    },
+    "company": {
+      "logo": "TravMatch",
+      "description": "Соединяем путешественников с проверенными местными гидами по всему миру. Испытайте аутентичные путешествия с проверенными профессионалами в более чем 150 странах.",
+      "contact": {
+        "address": "Ташкент, Узбекистан",
+        "email": "hello@travmatch.com",
+        "phone": "+998 (90) 123-45-67"
+      }
+    },
+    "social": {
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "youtube": "YouTube"
+    },
+    "links": {
+      "platform": {
+        "title": "Платформа",
+        "how_it_works": "Как это работает",
+        "find_guide": "Найти гида",
+        "become_guide": "Стать гидом",
+        "safety_trust": "Безопасность и доверие",
+        "pricing": "Цены"
+      },
+      "support": {
+        "title": "Поддержка",
+        "help_center": "Центр помощи",
+        "contact_us": "Связаться с нами",
+        "faqs": "Часто задаваемые вопросы",
+        "dispute_center": "Центр разрешения споров",
+        "report_issue": "Сообщить о проблеме"
+      },
+      "legal": {
+        "title": "Юридическая информация",
+        "terms_of_service": "Условия использования",
+        "privacy_policy": "Политика конфиденциальности",
+        "cookie_policy": "Политика использования cookies",
+        "community_guidelines": "Правила сообщества",
+        "gdpr_compliance": "Соответствие GDPR"
+      },
+      "company": {
+        "title": "Компания",
+        "about_us": "О нас",
+        "careers": "Карьера",
+        "press_kit": "Пресс-кит",
+        "blog": "Блог",
+        "investors": "Инвесторы"
+      }
+    },
+    "app": {
+      "title": "Скачать приложение",
+      "description": "Скачайте наше мобильное приложение для лучшего опыта",
+      "ios_label": "Скачать в",
+      "ios_store": "App Store",
+      "android_label": "Доступно в",
+      "android_store": "Google Play",
+      "trust": {
+        "ssl": "Защищено SSL",
+        "gdpr": "Соответствует GDPR"
+      }
+    },
+    "bottom": {
+      "copyright": "© {year} TravMatch. Все права защищены.",
+      "links": {
+        "terms": "Условия",
+        "privacy": "Конфиденциальность",
+        "cookies": "Cookies",
+        "accessibility": "Доступность"
+      }
+    }
+  }
+}

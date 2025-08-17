@@ -1,40 +1,20 @@
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
-from rest_framework_nested.routers import NestedDefaultRouter
-from apps.chat.views import (
-    ChatRoomViewSet,
-    MessageViewSet,
-    MessageReadListView,
-    TypingStatusView,
-    ActiveTypersView,
-)
+from django.urls import path
+from . import views
 
-# Routers
-router = DefaultRouter()
-router.register(r"chats", ChatRoomViewSet, basename="chat-room")
+app_name = "chat"
 
-nested_router = NestedDefaultRouter(router, r"chats", lookup="room")
-nested_router.register(r"messages", MessageViewSet, basename="chat-message")
-
-# URL patterns
 urlpatterns = [
-    path("", include(router.urls)),
-    path("", include(nested_router.urls)),
-    # Read receipts
+    path("rooms/", views.chat_rooms, name="chat_rooms"),
+    path("rooms/<uuid:room_id>/", views.chat_room_detail, name="chat_room_detail"),
     path(
-        "chats/<uuid:room_pk>/messages/<uuid:message_pk>/read-receipts/",
-        MessageReadListView.as_view(),
-        name="message-read-receipts",
+        "rooms/<uuid:room_id>/messages/",
+        views.chat_room_messages,
+        name="chat_room_messages",
     ),
-    # Typing status
+    path("rooms/<uuid:room_id>/send/", views.send_message, name="send_message"),
     path(
-        "chats/<uuid:room_pk>/typing/",
-        TypingStatusView.as_view(),
-        name="typing-status",
-    ),
-    path(
-        "chats/<uuid:room_pk>/typing/active/",
-        ActiveTypersView.as_view(),
-        name="active-typers",
+        "messages/<uuid:message_id>/read/",
+        views.mark_message_read,
+        name="mark_message_read",
     ),
 ]

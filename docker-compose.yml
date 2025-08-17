@@ -13,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER}" ]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -27,6 +27,11 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     networks:
       - app-network
 
@@ -43,23 +48,18 @@ services:
       - media_data:/app/media
     ports:
       - "8000:8000"
-      - "587:587"
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_started
     healthcheck:
-
       test: ["CMD-SHELL", "curl -sSf http://localhost:8000/health/ || exit 1"]
-
-
       interval: 30s
       timeout: 5s
       retries: 5
     networks:
       - app-network
-
 
   bot:
     build:
@@ -73,9 +73,8 @@ services:
     depends_on:
       backend:
         condition: service_healthy
-
-
-  # ───────────── Celery worker ────────
+    networks:
+      - app-network
 
   celery:
     build: .
@@ -88,10 +87,8 @@ services:
         condition: service_started
       redis:
         condition: service_started
-
     networks:
       - app-network
-
 
   frontend:
     build:

@@ -1,0 +1,719 @@
+{
+  "header": {
+    "logo_text": "ترافماتش",
+    "tagline": "استكشف مع السكان المحليين",
+    "find_guides": "ابحث عن مرشدين",
+    "blog": "المدونة",
+    "select_language": "اختر اللغة",
+    "choose_appearance": "اختر المظهر",
+    "sign_in": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "account": "الحساب"
+  },
+  "theme": {
+    "light": "الوضع الفاتح",
+    "dark": "الوضع الداكن",
+    "default": "النظام",
+    "auto": "الوقت التلقائي",
+    "light_desc": "مشرق ونظيف",
+    "dark_desc": "أنيق وعصري",
+    "default_desc": "يتوافق مع جهازك",
+    "auto_desc": "مظهر يعتمد على الوقت"
+  },
+  "language": {
+    "en": "الإنجليزية",
+    "ru": "الروسية",
+    "uz": "الأوزبكية",
+    "es": "الإسبانية",
+    "ar": "العربية",
+    "en_native": "English",
+    "ru_native": "Русский",
+    "uz_native": "O'zbek",
+    "es_native": "Español",
+    "ar_native": "العربية"
+  },
+  "guide": {
+    "loading": {
+      "data": "جارٍ تحميل البيانات..."
+    },
+    "header": {
+      "tours": "جولات"
+    },
+    "stats": {
+      "new_requests": "طلبات جديدة",
+      "confirmed": "تم التأكيد",
+      "earnings": "الأرباح",
+      "new_messages": "رسائل جديدة"
+    },
+    "profile": {
+      "professional_profile": "الملف المهني",
+      "bio": "السيرة الذاتية",
+      "no_bio": "لم تُضف سيرة ذاتية",
+      "experience": "الخبرة",
+      "no_experience": "لم تُضف خبرة",
+      "languages": "اللغات",
+      "no_languages": "لم تُضف لغات",
+      "pricing": "التسعير",
+      "hourly_rate": "${{rate}}/ساعة",
+      "daily_rate": "${{rate}}/يوم",
+      "no_hourly_rate": "لم يتم تحديد سعر الساعة",
+      "no_daily_rate": "لم يتم تحديد السعر اليومي",
+      "portfolio": "المعرض",
+      "portfolio_item": "المعرض {{number}}",
+      "profile_picture_alt": "صورة الملف الشخصي",
+      "avatar_alt": "الصورة الرمزية",
+      "form": {
+        "avatar": "صورة رمزية",
+        "upload_image": "رفع صورة",
+        "first_name": "الاسم الأول",
+        "first_name_placeholder": "أدخل اسمك الأول",
+        "last_name": "الاسم الأخير",
+        "last_name_placeholder": "أدخل اسمك الأخير",
+        "email": "البريد الإلكتروني",
+        "email_placeholder": "أدخل بريدك الإلكتروني",
+        "phone": "الهاتف",
+        "phone_placeholder": "+998901234567",
+        "bio": "عن نفسك",
+        "bio_placeholder": "معلومات مختصرة عن نفسك...",
+        "experience": "الخبرة العملية",
+        "experience_placeholder": "صف خبرتك المهنية...",
+        "languages": "اللغات",
+        "language_placeholder": "اسم اللغة",
+        "native_language": "اللغة الأم",
+        "specializations": "مجالات التخصص",
+        "specializations_placeholder": "أدخل تخصصك واضغط Enter",
+        "hourly_rate": "السعر بالساعة ($)",
+        "daily_rate": "السعر اليومي ($)",
+        "work_hours": "ساعات العمل",
+        "work_hours_placeholder": "مثال: 08:00 - 18:00، الإثنين-السبت",
+        "certificates": "الشهادات",
+        "upload_certificate": "رفع شهادة"
+      },
+      "validation": {
+        "required_fields": "يرجى ملء جميع الحقول المطلوبة"
+      },
+      "success": {
+        "updated": "تم تحديث الملف الشخصي بنجاح"
+      },
+      "errors": {
+        "update_failed": "فشل تحديث الملف الشخصي"
+      }
+    },
+    "statistics": {
+      "title": "الإحصائيات",
+      "completed_tours": "الجولات المكتملة",
+      "average_rating": "التقييم المتوسط",
+      "response_rate": "معدل الاستجابة",
+      "total_earnings": "إجمالي الأرباح"
+    },
+    "requests": {
+      "title": "إدارة الطلبات",
+      "new": "جديد",
+      "confirmed": "تم التأكيد",
+      "history": "التاريخ",
+      "no_requests_title": "لا توجد طلبات بعد",
+      "no_requests_desc": "ستظهر الطلبات الجديدة هنا عند وصولها",
+      "anonymous_client": "عميل مجهول",
+      "no_date": "لم يتم تحديد التاريخ",
+      "no_duration": "لم يتم تحديد المدة",
+      "no_travelers": "لم يتم تحديد عدد المسافرين",
+      "no_service_type": "لم يتم تحديد نوع الخدمة"
+    },
+    "status": {
+      "pending": "معلق",
+      "confirmed": "تم التأكيد",
+      "completed": "مكتمل",
+      "rejected": "مرفوض"
+    },
+    "actions": {
+      "accept": "قبول",
+      "reject": "رفض",
+      "chat": "دردشة",
+      "chat_with_client": "الدردشة مع العميل",
+      "view_route": "عرض المسار",
+      "send_message": "إرسال رسالة",
+      "retry": "إعادة المحاولة",
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "change": "تغيير"
+    },
+    "modals": {
+      "edit_profile": "تعديل الملف الشخصي",
+      "settings": "الإعدادات",
+      "change_password": "تغيير كلمة المرور",
+      "portfolio": "المعرض"
+    },
+    "settings": {
+      "profile_data": "بيانات الملف الشخصي",
+      "profile_data_desc": "تعديل معلوماتك الشخصية",
+      "change_password": "تغيير كلمة المرور",
+      "change_password_desc": "ضمان أمان حسابك",
+      "theme": "السمة"
+    },
+    "password": {
+      "form": {
+        "current_password": "كلمة المرور الحالية",
+        "current_password_placeholder": "أدخل كلمة المرور الحالية",
+        "new_password": "كلمة المرور الجديدة",
+        "new_password_placeholder": "أدخل كلمة المرور الجديدة",
+        "confirm_password": "تأكيد كلمة المرور الجديدة",
+        "confirm_password_placeholder": "أعد إدخال كلمة المرور الجديدة"
+      },
+      "validation": {
+        "all_fields_required": "املأ جميع الحقول",
+        "passwords_not_match": "كلمات المرور الجديدة غير متطابقة",
+        "min_length": "يجب أن تتكون كلمة المرور الجديدة من 8 أحرف على الأقل"
+      },
+      "success": {
+        "changed": "تم تغيير كلمة المرور بنجاح"
+      },
+      "errors": {
+        "change_failed": "فشل تغيير كلمة المرور"
+      }
+    },
+    "portfolio": {
+      "add_new_image": "إضافة صورة جديدة"
+    },
+    "errors": {
+      "stats_api_unavailable": "واجهة برمجة التطبيقات لإحصائيات المرشدين غير متوفرة حاليًا",
+      "requests_api_unavailable": "واجهة برمجة التطبيقات لطلبات المرشدين غير متوفرة حاليًا",
+      "chat_api_unavailable": "واجهة برمجة التطبيقات للدردشة غير متوفرة حاليًا",
+      "password_api_unavailable": "واجهة برمجة التطبيقات لتغيير كلمة المرور غير متوفرة حاليًا",
+      "request_action_unavailable": "واجهة برمجة التطبيقات للإجراءات على الطلبات غير متوفرة حاليًا",
+      "request_service_unavailable": "خدمة الطلبات غير متوفرة حاليًا",
+      "general_error": "حدث خطأ",
+      "data_fetch_error": "خطأ في تحميل البيانات",
+      "data_loading_error": "خطأ في تحميل البيانات",
+      "requests_loading_error": "خطأ في تحميل الطلبات",
+      "requests_loading_error_title": "خطأ في تحميل الطلبات",
+      "requests_loading_error_desc": "خدمة الطلبات غير متوفرة حاليًا أو حدث خطأ",
+      "statistics_loading_error": "خطأ في تحميل بيانات الإحصائيات"
+    }
+  },
+  "user": {
+    "loading": {
+      "data": "جارٍ تحميل البيانات من واجهة برمجة التطبيقات للحسابات..."
+    },
+    "profile": {
+      "title": "ملفي الشخصي (واجهة برمجة التطبيقات للحسابات)",
+      "subtitle": "المعلومات الشخصية من واجهة برمجة التطبيقات للحسابات",
+      "user": "مستخدم",
+      "client": "عميل",
+      "email": "البريد الإلكتروني",
+      "no_email": "لم يتم تقديم بريد إلكتروني",
+      "first_name": "الاسم الأول",
+      "no_first_name": "لم يتم تقديم الاسم الأول",
+      "last_name": "الاسم الأخير",
+      "no_last_name": "لم يتم تقديم الاسم الأخير",
+      "role": "الدور",
+      "country": "الدولة",
+      "no_country": "لم يتم تقديم دولة"
+    },
+    "stats": {
+      "total_bookings": "إجمالي الحجوزات",
+      "active_chats": "الدردشات النشطة",
+      "accounts_api": "واجهة برمجة التطبيقات للحسابات"
+    },
+    "bookings": {
+      "title": "حجوزاتي",
+      "subtitle": "جميع حجوزات السفر الخاصة بي"
+    },
+    "guides": {
+      "title": "المرشدون",
+      "subtitle": "ابحث عن المرشد المثالي لك",
+      "travel_date": "تاريخ السفر",
+      "travelers_count": "عدد المسافرين",
+      "adults": "البالغون",
+      "children": "الأطفال"
+    },
+    "tabs": {
+      "profile": "الملف الشخصي",
+      "bookings": "الحجوزات",
+      "guides": "المرشدون"
+    },
+    "form": {
+      "first_name": "الاسم الأول",
+      "first_name_placeholder": "أدخل اسمك الأول",
+      "last_name": "الاسم الأخير",
+      "last_name_placeholder": "أدخل اسمك الأخير",
+      "email": "البريد الإلكتروني",
+      "email_placeholder": "أدخل بريدك الإلكتروني",
+      "role": "الدور",
+      "client": "عميل",
+      "customer": "زبون",
+      "country": "الدولة",
+      "country_placeholder": "أدخل دولتك"
+    },
+    "validation": {
+      "required_fields": "الاسم الأول، الاسم الأخير، والبريد الإلكتروني هي حقول مطلوبة",
+      "invalid_email": "صيغة بريد إلكتروني غير صالحة"
+    },
+    "success": {
+      "profile_updated": "تم تحديث الملف الشخصي بنجاح! (تم الحفظ في localStorage)"
+    },
+    "errors": {
+      "no_access_token": "لم يتم العثور على رمز الوصول",
+      "user_data_not_found": "لم يتم العثور على بيانات المستخدم في localStorage",
+      "backend_not_connected_fallback": "الخادم غير متصل. يتم عرض بيانات الجلسة الحالية.",
+      "backend_and_user_data_missing": "مشكلة في الاتصال بالخادم ولم يتم العثور على بيانات المستخدم.",
+      "no_profile_update_endpoint": "لا توجد نقطة نهاية لتحديث الملف الشخصي في واجهة برمجة التطبيقات للحسابات",
+      "profile_update_failed": "فشل تحديث الملف الشخصي"
+    },
+    "alerts": {
+      "warning": "تحذير",
+      "info": "معلومات",
+      "localstorage_notice": "لا توجد نقطة نهاية لتحديث الملف الشخصي في واجهة برمجة التطبيقات للحسابات. يتم حفظ البيانات في localStorage.",
+      "booking_api_unavailable": "⚠️ واجهة برمجة التطبيقات للحجوزات لم تتصل بعد. ستكون متاحة قريبًا!",
+      "cancel_booking_api_unavailable": "⚠️ واجهة برمجة التطبيقات لإلغاء الحجوزات لم تتصل بعد. ستكون متاحة قريبًا!",
+      "chat_api_unavailable": "⚠️ واجهة برمجة التطبيقات للدردشة لم تتصل بعد. ستكون متاحة قريبًا!"
+    },
+    "api_not_connected": {
+      "title": "واجهة برمجة التطبيقات غير متصلة",
+      "soon_available": "ستكون متاحة قريبًا",
+      "badge": "لا توجد واجهة برمجة",
+      "bookings": "واجهة برمجة التطبيقات للحجوزات لم تتصل بعد. سيتم إضافة جميع تفاصيل الحجز، والحجز، ووظائف الإدارة قريبًا.",
+      "guides": "واجهة برمجة التطبيقات للمرشدين لم تتصل بعد. سيتم إضافة العرض، والبحث، وحجز المرشدين قريبًا."
+    },
+    "backend_status": {
+      "connected": "واجهة برمجة التطبيقات للحسابات متصلة",
+      "disconnected": "واجهة برمجة التطبيقات للحسابات غير متصلة"
+    },
+    "actions": {
+      "menu": "القائمة",
+      "edit_profile": "تعديل الملف الشخصي",
+      "settings": "الإعدادات",
+      "logout": "تسجيل الخروج (واجهة برمجة التطبيقات للحسابات)",
+      "retry_connection": "إعادة محاولة الاتصال",
+      "close": "إغلاق",
+      "cancel": "إلغاء",
+      "save_localstorage": "حفظ (localStorage)",
+      "saving": "جارٍ الحفظ...",
+      "filters": "الفلاتر (لا توجد واجهة برمجة)"
+    },
+    "confirm_logout": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+    "console": {
+      "fetching_user_data": "جارٍ جلب بيانات المستخدم من واجهة برمجة التطبيقات للحسابات...",
+      "accounts_api_response": "استجابة واجهة برمجة التطبيقات للحسابات:",
+      "retrieved_user_data": "تم استرداد بيانات المستخدم من localStorage:",
+      "attempting_fetch_user_data": "محاولة جلب بيانات المستخدم من واجهة برمجة التطبيقات للحسابات...",
+      "using_saved_user_data": "استخدام بيانات المستخدم المحفوظة:",
+      "user_data_loaded": "تم تحميل بيانات المستخدم بنجاح:",
+      "failed_fetch_user_data": "فشل جلب بيانات المستخدم:",
+      "using_fallback_user_data": "استخدام حالة المستخدم الحالية كبديل:",
+      "attempting_update_profile": "محاولة تحديث الملف الشخصي عبر واجهة برمجة التطبيقات للحسابات...",
+      "profile_updated_localstorage": "تم تحديث الملف الشخصي في localStorage:",
+      "error_fetching_user": "خطأ في جلب المستخدم من الحسابات:",
+      "error_updating_profile": "خطأ في تحديث الملف الشخصي عبر الحسابات:",
+      "updating_profile_payload": "تحديث الملف الشخصي بالبيانات:",
+      "profile_update_response": "استجابة تحديث الملف الشخصي:",
+      "profile_update_error": "خطأ تحديث الملف الشخصي:",
+      "logout_success": "تم تسجيل الخروج بنجاح عبر واجهة برمجة التطبيقات للحسابات",
+      "logout_error": "خطأ تسجيل الخروج:"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "اكتشف العالم مع",
+      "title_highlight": "مرشدين موثوقين",
+      "description": "تواصل مع مرشدين محليين موثوقين لتجارب سفر أصيلة في أكثر من 150 دولة.",
+      "guide_name": "أحمد ك.",
+      "guide_expert": "خبير إسطنبول",
+      "guide_rating": "4.9 (127)",
+      "guide_alt": "مرشد",
+      "tour_name": "جولة إسطنبول",
+      "tour_date": "غدًا، 10:00 صباحًا",
+      "tour_duration": "4 ساعات",
+      "tour_status": "تم التأكيد"
+    },
+    "search": {
+      "location_placeholder": "إلى أين تسافر؟",
+      "service_placeholder": "ما الخدمة التي تحتاجها؟",
+      "location_aria": "البحث حسب المدينة أو الدولة",
+      "service_aria": "البحث حسب نوع الخدمة",
+      "results_aria": "اقتراحات نوع الخدمة",
+      "button": "ابحث عن مرشدك",
+      "button_aria": "ابحث عن مرشدك مع البحث الحالي"
+    },
+    "stats": {
+      "verified_guides": "مرشدون موثوقون",
+      "countries": "دول",
+      "happy_travelers": "مسافرون سعداء",
+      "average_rating": "التقييم المتوسط"
+    },
+    "destinations": {
+      "title": "الوجهات الشعبية",
+      "subtitle": "استكشف أفضل الوجهات مع مرشدين خبراء",
+      "view_all": "عرض جميع الوجهات",
+      "view_all_aria": "عرض جميع الوجهات الشعبية",
+      "guides_count": "{{count}} مرشدين",
+      "explore_aria": "عرض التفاصيل لـ {{name}}",
+      "modal": {
+        "highlights": "المعالم البارزة",
+        "find_guides": "ابحث عن مرشدين",
+        "find_guides_aria": "ابحث عن مرشدين لـ {{name}}",
+        "close_aria": "إغلاق نافذة تفاصيل الوجهة"
+      },
+      "istanbul": {
+        "name": "إسطنبول، تركيا",
+        "price": "من $25/يوم",
+        "highlights": [
+          "جولات تاريخية",
+          "المطبخ المحلي",
+          "دليل التسوق"
+        ]
+      },
+      "barcelona": {
+        "name": "برشلونة، إسبانيا",
+        "price": "من $35/يوم",
+        "highlights": [
+          "الهندسة المعمارية",
+          "جولات الشاطئ",
+          "الفن والثقافة"
+        ]
+      },
+      "tokyo": {
+        "name": "طوكيو، اليابان",
+        "price": "من $45/يوم",
+        "highlights": [
+          "الثقافة الحديثة",
+          "المواقع التقليدية",
+          "جولات الطعام"
+        ]
+      },
+      "paris": {
+        "name": "باريس، فرنسا",
+        "price": "من $40/يوم",
+        "highlights": [
+          "المتاحف",
+          "جولات رومانسية",
+          "أحياء الموضة"
+        ]
+      },
+      "dubai": {
+        "name": "دبي، الإمارات",
+        "price": "من $50/يوم",
+        "highlights": [
+          "جولات فاخرة",
+          "سفاري الصحراء",
+          "العجائب الحديثة"
+        ]
+      },
+      "rome": {
+        "name": "روما، إيطاليا",
+        "price": "من $30/يوم",
+        "highlights": [
+          "التاريخ القديم",
+          "جولات الفاتيكان",
+          "جولات الطهي"
+        ]
+      }
+    },
+    "services": {
+      "city_tours": {
+        "name": "جولات المدينة",
+        "description": "استكشاف المدينة بمساعدة مرشدين خبراء",
+        "count": "أكثر من 2.5 ألف مرشد"
+      },
+      "language_support": {
+        "name": "دعم اللغة",
+        "description": "خدمات الترجمة في الوقت الحقيقي",
+        "count": "أكثر من 150 لغة"
+      },
+      "photography": {
+        "name": "التصوير الفوتوغرافي",
+        "description": "تصوير سفر احترافي",
+        "count": "أكثر من 800 مصور"
+      },
+      "cultural_experiences": {
+        "name": "تجارب ثقافية",
+        "description": "أنشطة محلية أصيلة",
+        "count": "أكثر من 1.2 ألف تجربة"
+      }
+    },
+    "features": {
+      "title": "لماذا ترافماتش؟",
+      "subtitle": "اكتشف فوائد السفر معنا",
+      "verified_guides": {
+        "title": "مرشدون موثوقون",
+        "description": "يتم فحص جميع المرشدين بعناية من أجل السلامة.",
+        "stats": "99.8% سلامة"
+      },
+      "top_quality": {
+        "title": "أعلى جودة",
+        "description": "تجارب عالية التقييم مع مراجعات موثوقة.",
+        "stats": "تقييم 4.8★"
+      },
+      "global_reach": {
+        "title": "التغطية العالمية",
+        "description": "تواصل مع مرشدين في أكثر من 150 دولة.",
+        "stats": "أكثر من 150 دولة"
+      },
+      "instant_booking": {
+        "title": "الحجز الفوري",
+        "description": "احجز فورًا مع توفر في الوقت الحقيقي.",
+        "stats": "دعم 24/7"
+      }
+    },
+    "steps": {
+      "title": "كيف يعمل",
+      "subtitle": "ابدأ في 3 خطوات بسيطة",
+      "search_browse": {
+        "title": "البحث والتصفح",
+        "description": "ابحث عن مرشدين محليين موثوقين."
+      },
+      "connect_plan": {
+        "title": "التواصل والتخطيط",
+        "description": "تحدث مع المرشدين لتخطيط رحلتك."
+      },
+      "experience": {
+        "title": "التجربة",
+        "description": "استمتع بتجارب محلية أصيلة."
+      }
+    },
+    "testimonials": {
+      "title": "ماذا يقول المسافرون",
+      "subtitle": "استمع إلى مسافرينا السعداء",
+      "dot_aria": "اختر شهادة {{index}}",
+      "sarah": {
+        "name": "سارة جونسون",
+        "location": "نيويورك، الولايات المتحدة",
+        "text": "تجربة رائعة في إسطنبول! أراني المرشد جواهر مخفية.",
+        "tour": "جولة إسطنبول التاريخية"
+      },
+      "marco": {
+        "name": "ماركو رودريغيز",
+        "location": "مدريد، إسبانيا",
+        "text": "كانت جولة التصوير في طوكيو مثالية! صور مذهلة ورؤى ثقافية.",
+        "tour": "جولة التصوير في طوكيو"
+      },
+      "emma": {
+        "name": "إيما ويلسون",
+        "location": "لندن، المملكة المتحدة",
+        "text": "كانت رحلة منفردة إلى برشلونة رائعة بفضل ترافماتش!",
+        "tour": "تجربة برشلونة الثقافية"
+      }
+    },
+    "cta": {
+      "title": "ابدأ مغامرتك",
+      "description": "انضم إلى آلاف المسافرين لتجارب أصيلة في جميع أنحاء العالم.",
+      "find_guide": "ابحث عن مرشدك",
+      "learn_more": "تعرف على المزيد"
+    },
+    "learn_more": {
+      "title": "عن ترافماتش",
+      "description": "ترافماتش يربط المسافرين بمرشدين محليين موثوقين لخلق تجارب أصيلة ولا تُنسى في أكثر من 150 دولة. مهمتنا هي جعل السفر متاحًا وآمنًا وغامرًا من خلال الشراكة مع محليين متحمسين يعرفون وجهاتهم جيدًا.",
+      "why_title": "لماذا تختار ترافماتش؟",
+      "vision_title": "رؤيتنا",
+      "vision_description": "نؤمن أن السفر يتعلق بالتواصل، الاكتشاف، والقصص. مع ترافماتش، أنت لا تزور مكانًا فحسب، بل تعيشه من خلال عيون محلي.",
+      "find_guide": "ابحث عن مرشدك الآن",
+      "close": "إغلاق",
+      "features": {
+        "verified_guides": {
+          "title": "مرشدون موثوقون:",
+          "description": "يتم فحص جميع المرشدين بعناية من أجل السلامة والخبرة."
+        },
+        "global_reach": {
+          "title": "التغطية العالمية:",
+          "description": "استكشف أكثر من 150 دولة مع خبراء محليين."
+        },
+        "custom_experiences": {
+          "title": "تجارب مخصصة:",
+          "description": "خصص رحلتك بجولات شخصية."
+        },
+        "support": {
+          "title": "دعم 24/7:",
+          "description": "حجز فوري ومساعدة على مدار الساعة."
+        }
+      }
+    }
+  },
+  "auth": {
+    "title": "ترافماتش",
+    "subtitle": "ابحث عن رفيق سفرك",
+    "tabs": {
+      "login": "تسجيل الدخول",
+      "register": "التسجيل",
+      "forgot": "إعادة تعيين كلمة المرور"
+    },
+    "close_aria": "إغلاق نافذة المصادقة",
+    "login": {
+      "title": "تسجيل الدخول إلى ترافماتش",
+      "subtitle": "سجل الدخول إلى حسابك وواصل رحلتك",
+      "email_label": "عنوان البريد الإلكتروني",
+      "email_placeholder": "أدخل بريدك الإلكتروني",
+      "password_label": "كلمة المرور",
+      "password_placeholder": "أدخل كلمة المرور",
+      "submit_button": "تسجيل الدخول",
+      "show_password_aria": "إظهار كلمة المرور",
+      "hide_password_aria": "إخفاء كلمة المرور",
+      "or": "أو",
+      "social": {
+        "google": "المتابعة مع جوجل",
+        "facebook": "المتابعة مع فيسبوك"
+      }
+    },
+    "register": {
+      "title": "سجل في ترافماتش",
+      "subtitle": "أنشئ حسابًا جديدًا وابحث عن رفاق السفر",
+      "role_label": "الدور",
+      "role_client": "عميل",
+      "role_customer": "زبون",
+      "first_name_label": "الاسم الأول",
+      "first_name_placeholder": "أدخل اسمك الأول",
+      "last_name_label": "الاسم الأخير",
+      "last_name_placeholder": "أدخل اسمك الأخير",
+      "email_label": "عنوان البريد الإلكتروني",
+      "email_placeholder": "أدخل بريدك الإلكتروني",
+      "password_label": "كلمة المرور",
+      "password_placeholder": "أدخل كلمة المرور",
+      "confirm_password_label": "تأكيد كلمة المرور",
+      "confirm_password_placeholder": "أعد إدخال كلمة المرور",
+      "country_label": "الدولة",
+      "country_placeholder": "أدخل دولتك",
+      "country_option_aria": "اختر الدولة {country}",
+      "checkboxes": {
+        "personal_data": "أوافق على معالجة البيانات الشخصية",
+        "terms": "أوافق على شروط ترافماتش",
+        "travel_tips": "أوافق على تلقي نصائح السفر والعروض الترويجية"
+      },
+      "submit_button": "التسجيل",
+      "verification": {
+        "title": "التحقق من البريد الإلكتروني",
+        "subtitle": "أدخل رمز التحقق المكون من 6 أرقام المرسل إلى <strong>{email}</strong>",
+        "code_label": "رمز التحقق",
+        "code_placeholder": "000000",
+        "submit_button": "التحقق",
+        "resend_button": "إعادة إرسال الرمز"
+      }
+    },
+    "forgot": {
+      "title": "إعادة تعيين كلمة المرور",
+      "subtitle": "إعادة تعيين كلمة المرور عبر البريد الإلكتروني",
+      "email_label": "عنوان البريد الإلكتروني",
+      "email_placeholder": "أدخل بريدك الإلكتروني",
+      "submit_button": "إرسال رمز التحقق",
+      "reset": {
+        "title": "تحديث كلمة المرور",
+        "subtitle": "أدخل رمز التحقق المرسل إلى <strong>{email}</strong> وكلمة المرور الجديدة",
+        "code_label": "رمز التحقق",
+        "code_placeholder": "000000",
+        "new_password_label": "كلمة المرور الجديدة",
+        "new_password_placeholder": "أدخل كلمة المرور الجديدة",
+        "confirm_password_label": "تأكيد كلمة المرور",
+        "confirm_password_placeholder": "أعد إدخال كلمة المرور الجديدة",
+        "submit_button": "تحديث كلمة المرور",
+        "resend_button": "إعادة إرسال الرمز",
+        "show_password_aria": "إظهار كلمة المرور الجديدة",
+        "hide_password_aria": "إخفاء كلمة المرور الجديدة"
+      }
+    },
+    "validation": {
+      "required_fields": "يرجى ملء جميع الحقول المطلوبة",
+      "required_checkboxes": "يجب أن توافق على معالجة البيانات الشخصية والشروط",
+      "required_code": "يرجى إدخال رمز التحقق",
+      "invalid_email": "صيغة بريد إلكتروني غير صالحة",
+      "passwords_not_match": "كلمات المرور غير متطابقة",
+      "password_requirements": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل، وتشمل حرفًا كبيرًا، وحرفًا صغيرًا، ورقمًا، وأحد الرموز الخاصة (@$!%*?&)",
+      "invalid_code": "يجب أن يكون رمز التحقق عددًا مكونًا من 6 أرقام"
+    },
+    "success": {
+      "verification_sent": "تم إرسال رمز التحقق إلى بريدك الإلكتروني",
+      "register_success": "تم التسجيل بنجاح!",
+      "password_reset_sent": "تم إرسال رمز التحقق إلى بريدك الإلكتروني",
+      "password_reset_success": "تم تحديث كلمة المرور بنجاح!"
+    },
+    "errors": {
+      "login_failed": "فشل تسجيل الدخول. يرجى التحقق من بريدك الإلكتروني أو كلمة المرور",
+      "email_exists": "هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد إلكتروني آخر",
+      "code_request_failed": "فشل طلب رمز التحقق",
+      "invalid_code": "رمز التحقق غير صالح. يرجى التحقق وإعادة المحاولة",
+      "expired_code": "انتهت صلاحية رمز التحقق. يرجى طلب رمز جديد",
+      "register_failed": "فشل التسجيل",
+      "password_reset_failed": "فشل إعادة تعيين كلمة المرور",
+      "resend_code_failed": "فشل إعادة إرسال رمز التحقق"
+    },
+    "loading": "جارٍ التحميل...",
+    "social_login_dev": "تسجيل الدخول عبر {provider} قيد التطوير حاليًا"
+  },
+  "footer": {
+    "newsletter": {
+      "title": "ابقَ على تواصل",
+      "subtitle": "اشترك في نشرتنا الإخبارية للحصول على نصائح السفر، العروض الحصرية، والتحديثات",
+      "email_placeholder": "أدخل بريدك الإلكتروني",
+      "email_aria": "البريد الإلكتروني للنشرة الإخبارية",
+      "subscribe_button": "اشترك",
+      "privacy": "نحن نحترم خصوصيتك"
+    },
+    "company": {
+      "logo": "ترافماتش",
+      "description": "نربط المسافرين بمرشدين محليين موثوقين في جميع أنحاء العالم. استمتع بتجربة سفر أصيلة مع محترفين موثوقين في أكثر من 150 دولة.",
+      "contact": {
+        "address": "طشقند، أوزبكستان",
+        "email": "مرحبا@ترافماتش.كوم",
+        "phone": "+998 (90) 123-45-67"
+      }
+    },
+    "social": {
+      "facebook": "فيسبوك",
+      "twitter": "تويتر",
+      "instagram": "إنستغرام",
+      "linkedin": "لينكدإن",
+      "youtube": "يوتيوب"
+    },
+    "links": {
+      "platform": {
+        "title": "المنصة",
+        "how_it_works": "كيف يعمل",
+        "find_guide": "ابحث عن مرشد",
+        "become_guide": "كن مرشدًا",
+        "safety_trust": "السلامة والثقة",
+        "pricing": "التسعير"
+      },
+      "support": {
+        "title": "الدعم",
+        "help_center": "مركز المساعدة",
+        "contact_us": "اتصل بنا",
+        "faqs": "الأسئلة الشائعة",
+        "dispute_center": "مركز النزاعات",
+        "report_issue": "الإبلاغ عن مشكلة"
+      },
+      "legal": {
+        "title": "القانونية",
+        "terms_of_service": "شروط الخدمة",
+        "privacy_policy": "سياسة الخصوصية",
+        "cookie_policy": "سياسة ملفات تعريف الارتباط",
+        "community_guidelines": "إرشادات المجتمع",
+        "gdpr_compliance": "الامتثال للائحة حماية البيانات العامة"
+      },
+      "company": {
+        "title": "الشركة",
+        "about_us": "معلومات عنا",
+        "careers": "الوظائف",
+        "press_kit": "مجموعة الصحافة",
+        "blog": "المدونة",
+        "investors": "المستثمرون"
+      }
+    },
+    "app": {
+      "title": "احصل على التطبيق",
+      "description": "قم بتنزيل تطبيقنا المحمول لتجربة أفضل",
+      "ios_label": "تنزيل من",
+      "ios_store": "متجر التطبيقات",
+      "android_label": "احصل عليه من",
+      "android_store": "جوجل بلاي",
+      "trust": {
+        "ssl": "محمي بـ SSL",
+        "gdpr": "متوافق مع GDPR"
+      }
+    },
+    "bottom": {
+      "copyright": "© {year} ترافماتش. جميع الحقوق محفوظة.",
+      "links": {
+        "terms": "الشروط",
+        "privacy": "الخصوصية",
+        "cookies": "ملفات تعريف الارتباط",
+        "accessibility": "إمكانية الوصول"
+      }
+    }
+  }
+}

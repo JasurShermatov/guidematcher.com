@@ -27,7 +27,7 @@ api.interceptors.response.use(
         const refreshResponse = await api.post("accounts/refresh/", {
           refresh: localStorage.getItem("refresh_token"),
         });
-        const newAccessToken = refreshResponse.data.access;
+        const newAccessToken = refreshResponse.data.access_token;
         localStorage.setItem("access_token", newAccessToken);
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
@@ -52,8 +52,8 @@ api.interceptors.response.use(
 export const requestCode = (data) =>
   api.post("accounts/request-code/", data).then((r) => r.data);
 
-export const registerUser = (payload) =>
-  api.post("accounts/register/", payload).then((r) => r.data);
+export const registerUser = (data) =>
+  api.post("accounts/register/", data).then((r) => r.data);
 
 export const loginUser = (payload) =>
   api.post("accounts/login/", payload).then((r) => ({
@@ -93,11 +93,31 @@ export const refreshToken = () =>
       refresh: localStorage.getItem("refresh_token"),
     })
     .then((r) => {
-      localStorage.setItem("access_token", r.data.access);
+      localStorage.setItem("access_token", r.data.access_token);
       return r.data;
     });
 
 export const getCurrentUser = () =>
-  api.get("users/profiles/").then((r) => r.data);
+  api.get("profiles/").then((r) => r.data);
+
+export const updateUserProfile = (payload) =>
+  api.patch("profiles/", payload).then((r) => ({
+    id: r.data.id,
+    first_name: r.data.first_name,
+    last_name: r.data.last_name,
+    email: r.data.email,
+    role: r.data.role,
+    bio: r.data.bio,
+    experience: r.data.experience,
+    price_per_hour: r.data.price_per_hour,
+    price_per_day: r.data.price_per_day,
+    work_hours: r.data.work_hours,
+  }));
+
+export const requestPasswordReset = (data) =>
+  api.post("accounts/forgot-password/", data).then((r) => r.data);
+
+export const confirmPasswordReset = (payload) =>
+  api.post("accounts/reset-password/", payload).then((r) => r.data);
 
 export default api;

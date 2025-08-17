@@ -1,188 +1,90 @@
-from django.contrib import admin, messages
-from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
-from rangefilter.filters import DateRangeFilter
+# apps/bookings/admin.py
 
-from .models import Booking, BookingMessage
-
-
-class BookingMessageInline(admin.TabularInline):
-    model = BookingMessage
-    extra = 0
-    fields = ("created_at", "sender", "message", "is_system_message")
-    readonly_fields = fields
-    ordering = ("created_at",)
-    verbose_name_plural = _("Booking messages (read only)")
-    can_delete = False
-    show_change_link = False
+from django.contrib import admin
+from .models import Booking, BookingRequest, BookingUpdate
 
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
     list_display = (
         "id",
-        "title",
         "client",
-        "get_customer_name",
-        "service_type",
+        "guide",
+        "service",
+        "title",
         "start_date",
         "end_date",
-        "rate_type",
-        "currency",
         "status",
-        "proposed_rate",
+        "total_amount",
+        "is_paid",
         "created_at",
     )
-    list_filter = (
-        "status",
-        "rate_type",
-        "service_type",
-        "currency",
-        ("start_date", DateRangeFilter),
-        ("created_at", DateRangeFilter),
-    )
-    search_fields = (
-        "title",
-        "description",
-        "client__first_name",
-        "client__last_name",
-        "client__email",
-        "customer__user__first_name",
-        "customer__user__last_name",
-        "customer__user__email",
-        "location",
-        "location_details",
-    )
-    autocomplete_fields = ["client", "customer", "service_type", "cancelled_by"]
+    list_filter = ("status", "is_paid", "duration_type", "created_at")
+    search_fields = ("title", "client__email", "guide__email")
+    date_hierarchy = "start_date"
+    ordering = ("-created_at",)
     readonly_fields = (
         "created_at",
         "updated_at",
-        "responded_at",
-        "accepted_at",
+        "confirmed_at",
+        "started_at",
         "completed_at",
         "cancelled_at",
     )
-    inlines = [BookingMessageInline]
-    ordering = ("-created_at",)
+    list_per_page = 20
 
-    fieldsets = (
-        (
-            _("Basic Info"),
-            {"fields": ("title", "description", "service_type", "client", "customer")},
-        ),
-        (
-            _("Schedule"),
-            {
-                "fields": (
-                    ("start_date", "end_date"),
-                    ("start_time", "duration_hours"),
-                    "number_of_people",
-                    "special_requirements",
-                )
-            },
-        ),
-        (
-            _("Location"),
-            {
-                "classes": ("collapse",),
-                "fields": (("location", "location_details"), ("latitude", "longitude")),
-            },
-        ),
-        (
-            _("Pricing"),
-            {
-                "fields": (
-                    ("proposed_rate", "counter_offer_rate"),
-                    ("rate_type", "currency"),
-                )
-            },
-        ),
-        (
-            _("Status & Response"),
-            {
-                "fields": (
-                    "status",
-                    "provider_response",
-                    "responded_at",
-                    "accepted_at",
-                    "completed_at",
-                )
-            },
-        ),
-        (
-            _("Cancellation"),
-            {"fields": ("cancelled_at", "cancelled_by", "cancellation_reason")},
-        ),
-        (
-            _("System Meta"),
-            {"classes": ("collapse",), "fields": ("created_at", "updated_at")},
-        ),
-    )
-
-    actions = [
-        "mark_as_accepted",
-        "mark_as_rejected",
-        "mark_as_completed",
-        "mark_as_cancelled",
-    ]
-
-    @admin.display(description=_("Provider"))
-    def get_customer_name(self, obj):
+    def get_queryset(self, request):
         return (
-            obj.customer.user.get_full_name()
-            if obj.customer and obj.customer.user
-            else "-"
+            super().get_queryset(request).select_related("client", "guide", "service")
         )
 
-    # --- Actions ---
-    @admin.action(description=_("Mark selected bookings as Accepted"))
-    def mark_as_accepted(self, request, queryset):
-        updated = queryset.filter(status=Booking.BookingStatus.PENDING).update(
-            status=Booking.BookingStatus.ACCEPTED, accepted_at=timezone.now()
-        )
-        self.message_user(
-            request, _("%d booking(s) marked as accepted.") % updated, messages.SUCCESS
-        )
-
-    @admin.action(description=_("Mark selected bookings as Rejected"))
-    def mark_as_rejected(self, request, queryset):
-        updated = queryset.filter(status=Booking.BookingStatus.PENDING).update(
-            status=Booking.BookingStatus.REJECTED, responded_at=timezone.now()
-        )
-        self.message_user(
-            request, _("%d booking(s) marked as rejected.") % updated, messages.WARNING
-        )
-
-    @admin.action(description=_("Mark selected bookings as Completed"))
-    def mark_as_completed(self, request, queryset):
-        updated = queryset.filter(status=Booking.BookingStatus.ACCEPTED).update(
-            status=Booking.BookingStatus.COMPLETED, completed_at=timezone.now()
-        )
-        self.message_user(
-            request, _("%d booking(s) marked as completed.") % updated, messages.SUCCESS
-        )
-
-    @admin.action(description=_("Mark selected bookings as Cancelled"))
-    def mark_as_cancelled(self, request, queryset):
-        updated = queryset.filter(
-            status__in=[Booking.BookingStatus.PENDING, Booking.BookingStatus.ACCEPTED]
-        ).update(status=Booking.BookingStatus.CANCELLED, cancelled_at=timezone.now())
-        self.message_user(
-            request, _("%d booking(s) marked as cancelled.") % updated, messages.ERROR
-        )
+    class Media:
+        css = {"all": ("css/admin/bookings.css",)}  # Optional custom CSS
 
 
-@admin.register(BookingMessage)
-class BookingMessageAdmin(admin.ModelAdmin):
-    list_display = ("id", "booking", "sender", "created_at", "is_system_message")
-    list_filter = ("is_system_message", "created_at", "sender", "booking")
-    search_fields = (
-        "message",
-        "sender__first_name",
-        "sender__last_name",
-        "sender__email",
-        "booking__title",
+@admin.register(BookingRequest)
+class BookingRequestAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "client",
+        "guide",
+        "requested_service",
+        "requested_date",
+        "status",
+        "expires_at",
+        "created_at",
     )
-    readonly_fields = ("created_at", "updated_at")
-    autocomplete_fields = ["booking", "sender"]
+    list_filter = ("status", "created_at")
+    search_fields = ("client__email", "guide__email", "requested_service__name")
+    date_hierarchy = "requested_date"
     ordering = ("-created_at",)
+    readonly_fields = ("created_at", "updated_at", "responded_at", "expires_at")
+    list_per_page = 20
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("client", "guide", "requested_service")
+        )
+
+
+@admin.register(BookingUpdate)
+class BookingUpdateAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "booking",
+        "updated_by",
+        "old_status",
+        "new_status",
+        "created_at",
+    )
+    list_filter = ("new_status", "created_at")
+    search_fields = ("booking__title", "updated_by__email")
+    date_hierarchy = "created_at"
+    ordering = ("-created_at",)
+    readonly_fields = ("created_at", "updated_at")
+    list_per_page = 20
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("booking", "updated_by")

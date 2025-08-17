@@ -1,27 +1,20 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
+from . import views
 
-from apps.notifications.views import (
-    NotificationTypeViewSet,
-    NotificationViewSet,
-    UserNotificationSettingsView,
-    UserNotificationTypeSettingsViewSet,
-    EmailLogViewSet,
-)
-
-router = DefaultRouter()
-router.register(r"types", NotificationTypeViewSet, basename="notification-type")
-router.register(r"list", NotificationViewSet, basename="notification")
-router.register(
-    r"settings", UserNotificationSettingsView, basename="notification-settings"
-)
-router.register(
-    r"type-settings",
-    UserNotificationTypeSettingsViewSet,
-    basename="notification-type-settings",
-)
-router.register(r"email-logs", EmailLogViewSet, basename="email-log")
+app_name = "notifications"
 
 urlpatterns = [
-    path("", include(router.urls)),
+    path("", views.notification_list, name="notification_list"),
+    path(
+        "<uuid:notification_id>/", views.notification_detail, name="notification_detail"
+    ),
+    path(
+        "mark-read/<uuid:notification_id>/",
+        views.mark_notification_read,
+        name="mark_notification_read",
+    ),
+    path(
+        "preferences/", views.notification_preferences, name="notification_preferences"
+    ),
+    path("email-logs/", views.email_log_list, name="email_log_list"),
 ]

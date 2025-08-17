@@ -987,3 +987,17 @@ html {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
+/* Header i18n uchun qismi */
+/* RTL tillar uchun */
+html[dir="rtl"] .header-container {
+    direction: rtl;
+}
+
+html[dir="rtl"] .header-nav-list {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .header-logo-text-container {
+    text-align: right;
+}

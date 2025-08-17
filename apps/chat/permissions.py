@@ -1,35 +1,35 @@
-# apps/common/permissions.py (if not exists)
 from rest_framework import permissions
-from apps.chat.models import ChatRoom
+from django.contrib.auth import get_user_model
+from .models import ChatRoom
+
+User = get_user_model()
 
 
 class IsChatParticipant(permissions.BasePermission):
     """
-    Permission to check if user is participant of chat room.
+    Allows access only to chat room participants
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return request.user.is_authenticated and (
+            isinstance(obj, ChatRoom)
+            and (obj.client == request.user or obj.guide == request.user)
+        )
+
+
+class CanSendMessage(permissions.BasePermission):
+    """
+    Allows sending messages only if user is a participant and chat room is active
     """
 
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
-
-        # Get room_pk from URL kwargs
-        room_pk = view.kwargs.get("room_pk") or view.kwargs.get("pk")
-        if not room_pk:
-            return True  # Let view handle this
-
+        room_id = view.kwargs.get("room_id")
         try:
-            room = ChatRoom.objects.get(pk=room_pk)
-            return room.participants.filter(id=request.user.id).exists()
+            room = ChatRoom.objects.get(id=room_id)
+            return room.is_active and (
+                room.client == request.user or room.guide == request.user
+            )
         except ChatRoom.DoesNotExist:
             return False
-
-    def has_object_permission(self, request, view, obj):
-        # For message objects, check room participation
-        if hasattr(obj, "room"):
-            return obj.room.participants.filter(id=request.user.id).exists()
-
-        # For room objects
-        if hasattr(obj, "participants"):
-            return obj.participants.filter(id=request.user.id).exists()
-
-        return False

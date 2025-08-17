@@ -1583,3 +1583,15 @@
 2025-08-17 00:33:14,685 - __main__ - INFO - Bot ishga tushdi
 2025-08-17 00:33:14,685 - aiogram.dispatcher - INFO - Start polling
 2025-08-17 00:33:15,256 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-17 01:43:43,110 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 01:43:43,110 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-17 01:43:43,117 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-17 01:43:43,120 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-17 01:43:43,120 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-17 01:43:43,121 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-17 01:43:43,122 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-17 01:43:43,122 - utils.database.db_init - INFO - Database connection closed
+2025-08-17 01:43:43,128 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-17 01:43:43,128 - __main__ - INFO - Bot ishga tushdi
+2025-08-17 01:43:43,128 - aiogram.dispatcher - INFO - Start polling
+2025-08-17 01:43:43,683 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'

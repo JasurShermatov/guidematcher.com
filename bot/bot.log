@@ -6192,3 +6192,86 @@
 2025-08-17 11:05:38,959 - aiogram.dispatcher - WARNING - Sleep for 4.949528 seconds and try again... (tryings = 12, bot id = 7857439280)
 2025-08-17 11:05:49,379 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
 2025-08-17 11:05:49,379 - aiogram.dispatcher - WARNING - Sleep for 4.928503 seconds and try again... (tryings = 13, bot id = 7857439280)
+2025-08-17 12:10:56,800 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 12:10:56,800 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-17 12:10:56,809 - utils.database.db_init - ERROR - Database error occurred: connection to server at "host.docker.internal" (192.168.65.254), port 5432 failed: FATAL:  database "UzGuideBot" does not exist
+
+2025-08-17 12:10:56,815 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-17 12:10:56,815 - __main__ - INFO - Bot ishga tushdi
+2025-08-17 12:10:56,815 - aiogram.dispatcher - INFO - Start polling
+2025-08-17 12:10:57,352 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-17 12:49:57,939 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 12:49:57,939 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-17 12:49:57,948 - utils.database.db_init - ERROR - Database error occurred: connection to server at "host.docker.internal" (192.168.65.254), port 5432 failed: FATAL:  database "UzGuideBot" does not exist
+
+2025-08-17 12:49:57,954 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-17 12:49:57,954 - __main__ - INFO - Bot ishga tushdi
+2025-08-17 12:49:57,954 - aiogram.dispatcher - INFO - Start polling
+2025-08-17 12:49:58,577 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-17 13:01:38,997 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 13:01:38,998 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-17 13:01:39,006 - utils.database.db_init - ERROR - Database error occurred: connection to server at "host.docker.internal" (192.168.65.254), port 5432 failed: FATAL:  database "UzGuideBot" does not exist
+
+2025-08-17 13:01:39,012 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-17 13:01:39,012 - __main__ - INFO - Bot ishga tushdi
+2025-08-17 13:01:39,013 - aiogram.dispatcher - INFO - Start polling
+2025-08-17 13:01:39,622 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-17 13:23:13,334 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 13:23:13,334 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-17 13:23:13,342 - utils.database.db_init - ERROR - Database error occurred: connection to server at "host.docker.internal" (192.168.65.254), port 5432 failed: FATAL:  database "UzGuideBot" does not exist
+
+2025-08-17 13:23:13,349 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-17 13:23:13,349 - __main__ - INFO - Bot ishga tushdi
+2025-08-17 13:23:13,350 - aiogram.dispatcher - INFO - Start polling
+2025-08-17 13:23:14,411 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-17 13:26:31,692 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 13:26:31,692 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-17 13:26:31,702 - utils.database.db_init - ERROR - Database error occurred: connection to server at "host.docker.internal" (192.168.65.254), port 5432 failed: FATAL:  database "UzGuideBot" does not exist
+
+2025-08-17 13:26:31,708 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-17 13:26:31,709 - __main__ - INFO - Bot ishga tushdi
+2025-08-17 13:26:31,709 - aiogram.dispatcher - INFO - Start polling
+2025-08-17 13:26:32,276 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-17 13:30:08,887 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 13:30:08,887 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-17 13:30:08,898 - utils.database.db_init - ERROR - Database error occurred: connection to server at "host.docker.internal" (192.168.65.254), port 5432 failed: FATAL:  database "UzGuideBot" does not exist
+
+2025-08-17 13:30:08,906 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-17 13:30:08,906 - __main__ - INFO - Bot ishga tushdi
+2025-08-17 13:30:08,906 - aiogram.dispatcher - INFO - Start polling
+2025-08-17 13:30:09,517 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-17 13:39:41,001 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 13:39:41,001 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-17 13:39:41,011 - utils.database.db_init - ERROR - Database error occurred: connection to server at "host.docker.internal" (192.168.65.254), port 5432 failed: FATAL:  database "UzGuideBot" does not exist
+
+2025-08-17 13:39:41,017 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-17 13:39:41,017 - __main__ - INFO - Bot ishga tushdi
+2025-08-17 13:39:41,018 - aiogram.dispatcher - INFO - Start polling
+2025-08-17 13:39:41,580 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-17 13:45:09,511 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 13:45:09,511 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-17 13:45:09,529 - utils.database.db_init - ERROR - Database error occurred: connection to server at "host.docker.internal" (192.168.65.254), port 5432 failed: FATAL:  database "UzGuideBot" does not exist
+
+2025-08-17 13:45:09,535 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-17 13:45:09,535 - __main__ - INFO - Bot ishga tushdi
+2025-08-17 13:45:09,536 - aiogram.dispatcher - INFO - Start polling
+2025-08-17 13:45:10,015 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-17 13:50:06,312 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 13:50:06,312 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-17 13:50:06,321 - utils.database.db_init - ERROR - Database error occurred: connection to server at "host.docker.internal" (192.168.65.254), port 5432 failed: FATAL:  database "UzGuideBot" does not exist
+
+2025-08-17 13:50:06,327 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-17 13:50:06,327 - __main__ - INFO - Bot ishga tushdi
+2025-08-17 13:50:06,327 - aiogram.dispatcher - INFO - Start polling
+2025-08-17 13:50:06,973 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-17 13:54:17,525 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 13:54:17,525 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-17 13:54:17,534 - utils.database.db_init - ERROR - Database error occurred: connection to server at "host.docker.internal" (192.168.65.254), port 5432 failed: FATAL:  database "UzGuideBot" does not exist
+
+2025-08-17 13:54:17,540 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-17 13:54:17,540 - __main__ - INFO - Bot ishga tushdi
+2025-08-17 13:54:17,540 - aiogram.dispatcher - INFO - Start polling
+2025-08-17 13:54:18,134 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-17 13:59:59,872 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+2025-08-17 13:59:59,875 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7857439280)
+2025-08-17 14:00:24,008 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 7857439280)

@@ -1,3 +1,4 @@
+# apps/profiles/models.py
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -50,16 +51,26 @@ class CustomerProfile(AbstractProfile):
         VERIFIED = "verified", _("Verified")
         REJECTED = "rejected", _("Rejected")
 
-    professional_bio = models.TextField(verbose_name=_("Professional biography"))
+    professional_bio = models.TextField(
+        blank=True,  # 👈 Ixtiyoriy qildik
+        default="",  # 👈 Default qiymat
+        verbose_name=_("Professional biography"),
+    )
     years_of_experience = models.PositiveIntegerField(
         default=0, verbose_name=_("Years of experience")
     )
     service_types = models.ManyToManyField(
-        "common.ServiceType", verbose_name=_("Service types offered")
+        "common.ServiceType",
+        blank=True,  # 👈 ManyToMany doim blank=True bo'lishi kerak
+        verbose_name=_("Service types offered"),
     )
 
     city = models.ForeignKey(
-        "common.City", on_delete=models.PROTECT, verbose_name=_("Service city")
+        "common.City",
+        on_delete=models.PROTECT,
+        null=True,  # 👈 NULL qiymatga ruxsat
+        blank=True,  # 👈 Formada bo'sh bo'lishi mumkin
+        verbose_name=_("Service city"),
     )
     service_areas = models.TextField(blank=True, verbose_name=_("Service areas"))
 

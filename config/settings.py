@@ -3,9 +3,9 @@
 #  Mode-agnostic (prod & dev) konfiguratsiya
 # ────────────────────────────────────────────────────────────────
 import os
-import sys
 from pathlib import Path
 from datetime import timedelta
+
 
 import environ
 
@@ -295,45 +295,68 @@ FRONTEND_PASSWORD_RESET_URL = env.str(
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
 
 
+# Logs papkasini dinamik yaratish
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)  # 👈 parents=True muhim!
+
+# Log fayl yo'li
+LOG_FILE = LOG_DIR / "project.log"
+
+# Agar fayl yo'q bo'lsa, yaratish
+if not LOG_FILE.exists():
+    LOG_FILE.touch()  # 👈 Bo'sh fayl yaratish
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
         "verbose": {
-            "format": "[{asctime}] {levelname} {name}: {message}",
+            "format": "{levelname} {asctime} {module} {message}",
             "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
         },
     },
     "handlers": {
         "console": {
+            "level": "INFO",
             "class": "logging.StreamHandler",
-            "formatter": "verbose",
-            "stream": sys.stdout,
+            "formatter": "simple",
         },
         "file": {
             "level": "INFO",
-            "class": "logging.FileHandler",
-            "filename": os.path.join(BASE_DIR, "logs", "project.log"),
+            "class": "logging.handlers.RotatingFileHandler",  # 👈 RotatingFileHandler yaxshiroq
+            "filename": str(LOG_FILE),  # 👈 str() muhim!
+            "maxBytes": 1024 * 1024 * 15,  # 15MB
+            "backupCount": 10,
             "formatter": "verbose",
         },
     },
+    "root": {
+        "handlers": ["console"],  # 👈 Faqat console, file ni vaqtincha o'chirish
+        "level": "INFO",
+    },
     "loggers": {
         "django": {
-            "handlers": ["console", "file"],
-            "level": "INFO",
-            "propagate": True,
+            "handlers": ["console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "propagate": False,
         },
-        "apps.chat": {
-            "handlers": ["console", "file"],
+        "apps": {
+            "handlers": ["console"],
             "level": "DEBUG",
             "propagate": False,
         },
     },
-    "root": {
-        "handlers": ["console", "file"],
-        "level": "WARNING",
-    },
 }
+
 
 # settings.py
 ACCOUNTS_VERIFICATION_CODE_TTL_SECONDS = 300  # 5 minutes

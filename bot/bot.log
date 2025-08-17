@@ -1595,3 +1595,18 @@
 2025-08-17 01:43:43,128 - __main__ - INFO - Bot ishga tushdi
 2025-08-17 01:43:43,128 - aiogram.dispatcher - INFO - Start polling
 2025-08-17 01:43:43,683 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-17 01:46:03,848 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 01:46:03,848 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-17 01:46:03,855 - utils.database.db_init - INFO - Checking if 'users' table exists...
+2025-08-17 01:46:03,857 - utils.database.db_init - INFO - 'users' table already exists. Skipping creation.
+2025-08-17 01:46:03,857 - utils.database.db_init - INFO - Checking if 'subscription' table exists...
+2025-08-17 01:46:03,858 - utils.database.db_init - INFO - 'subscription' table already exists. Skipping creation.
+2025-08-17 01:46:03,859 - utils.database.db_init - INFO - Verified: 'users' table exists in database.
+2025-08-17 01:46:03,859 - utils.database.db_init - INFO - Database connection closed
+2025-08-17 01:46:03,865 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-17 01:46:03,865 - __main__ - INFO - Bot ishga tushdi
+2025-08-17 01:46:03,865 - aiogram.dispatcher - INFO - Start polling
+2025-08-17 01:46:04,345 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-17 02:07:40,099 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+2025-08-17 02:07:40,102 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7857439280)
+2025-08-17 02:07:51,526 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 7857439280)

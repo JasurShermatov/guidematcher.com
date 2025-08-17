@@ -1710,3 +1710,15 @@ DETAIL:  Key (email)=(pythondev2005@gmail.com) already exists.
 [2025-08-17 06:43:13,931] INFO apps.chat.apps: Chat WebSocket consumers loaded
 [2025-08-17 06:43:13,932] INFO apps.chat.apps: Chat periodic tasks registered
 [2025-08-17 06:43:13,932] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-17 06:45:33,103] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-17 06:45:33,164] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-17 06:45:33,164] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-17 06:45:33,165] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-17 06:45:33,970] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-17 06:45:34,028] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-17 06:45:34,029] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-17 06:45:34,029] INFO apps.chat.apps: Chat app initialized successfully
+[2025-08-17 06:45:34,619] INFO apps.chat.apps: Chat signals registered successfully
+[2025-08-17 06:45:34,657] INFO apps.chat.apps: Chat WebSocket consumers loaded
+[2025-08-17 06:45:34,658] INFO apps.chat.apps: Chat periodic tasks registered
+[2025-08-17 06:45:34,658] INFO apps.chat.apps: Chat app initialized successfully

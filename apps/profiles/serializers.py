@@ -1,3 +1,4 @@
+#  apps/profiles/serializers.py
 from rest_framework import serializers
 from apps.users.serializers import UserShortSerializer
 from .models import (

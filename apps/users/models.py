@@ -1,3 +1,4 @@
+#  apps/users/models.py
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
@@ -9,16 +10,16 @@ from .managers import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin, BaseModel):
-
     class UserRole(models.TextChoices):
-        CLIENT = "client", _("Client (Tourist)")
-        CUSTOMER = "customer", _("Customer (Service Provider)")
-        ADMIN = "admin", _("Admin")
-        SUPERADMIN = "superadmin", _("Superadmin")
+        CLIENT = "client", "Client"
+        CUSTOMER = "customer", "Customer"
+        ADMIN = "admin", "Admin"
+        SUPERADMIN = "superadmin", "Superadmin"
 
     email = models.EmailField(unique=True, verbose_name=_("Email address"))
     first_name = models.CharField(max_length=150, verbose_name=_("First name"))
     last_name = models.CharField(max_length=150, verbose_name=_("Last name"))
+
     role = models.CharField(
         max_length=20,
         choices=UserRole.choices,

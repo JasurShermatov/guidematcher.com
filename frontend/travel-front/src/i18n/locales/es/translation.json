@@ -1,0 +1,719 @@
+{
+  "header": {
+    "logo_text": "TravMatch",
+    "tagline": "Explora con locales",
+    "find_guides": "Encontrar guías",
+    "blog": "Blog",
+    "select_language": "Seleccionar idioma",
+    "choose_appearance": "Elegir apariencia",
+    "sign_in": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "account": "Cuenta"
+  },
+  "theme": {
+    "light": "Modo claro",
+    "dark": "Modo oscuro",
+    "default": "Sistema",
+    "auto": "Hora automática",
+    "light_desc": "Brillante y limpio",
+    "dark_desc": "Elegante y moderno",
+    "default_desc": "Coincide con tu dispositivo",
+    "auto_desc": "Tema basado en la hora"
+  },
+  "language": {
+    "en": "Inglés",
+    "ru": "Ruso",
+    "uz": "Uzbeko",
+    "es": "Español",
+    "ar": "Árabe",
+    "en_native": "English",
+    "ru_native": "Русский",
+    "uz_native": "O'zbek",
+    "es_native": "Español",
+    "ar_native": "العربية"
+  },
+  "guide": {
+    "loading": {
+      "data": "Cargando datos..."
+    },
+    "header": {
+      "tours": "tours"
+    },
+    "stats": {
+      "new_requests": "Nuevas solicitudes",
+      "confirmed": "Confirmado",
+      "earnings": "Ganancias",
+      "new_messages": "Nuevos mensajes"
+    },
+    "profile": {
+      "professional_profile": "Perfil profesional",
+      "bio": "Biografía",
+      "no_bio": "No se ha añadido biografía",
+      "experience": "Experiencia",
+      "no_experience": "No se ha añadido experiencia",
+      "languages": "Idiomas",
+      "no_languages": "No se han añadido idiomas",
+      "pricing": "Precios",
+      "hourly_rate": "${{rate}}/hora",
+      "daily_rate": "${{rate}}/día",
+      "no_hourly_rate": "No se ha establecido tarifa por hora",
+      "no_daily_rate": "No se ha establecido tarifa diaria",
+      "portfolio": "Portafolio",
+      "portfolio_item": "Portafolio {{number}}",
+      "profile_picture_alt": "Foto de perfil",
+      "avatar_alt": "Avatar",
+      "form": {
+        "avatar": "Imagen de avatar",
+        "upload_image": "Subir imagen",
+        "first_name": "Nombre",
+        "first_name_placeholder": "Ingresa tu nombre",
+        "last_name": "Apellido",
+        "last_name_placeholder": "Ingresa tu apellido",
+        "email": "Correo electrónico",
+        "email_placeholder": "Ingresa tu correo electrónico",
+        "phone": "Teléfono",
+        "phone_placeholder": "+998901234567",
+        "bio": "Acerca de ti",
+        "bio_placeholder": "Breve información sobre ti...",
+        "experience": "Experiencia laboral",
+        "experience_placeholder": "Describe tu experiencia profesional...",
+        "languages": "Idiomas",
+        "language_placeholder": "Nombre del idioma",
+        "native_language": "Nativo",
+        "specializations": "Áreas de especialización",
+        "specializations_placeholder": "Ingresa tu especialización y presiona Enter",
+        "hourly_rate": "Tarifa por hora ($)",
+        "daily_rate": "Tarifa diaria ($)",
+        "work_hours": "Horario de trabajo",
+        "work_hours_placeholder": "Ejemplo: 08:00 - 18:00, Lunes-Sábado",
+        "certificates": "Certificados",
+        "upload_certificate": "Subir certificado"
+      },
+      "validation": {
+        "required_fields": "Por favor, completa todos los campos obligatorios"
+      },
+      "success": {
+        "updated": "Perfil actualizado exitosamente"
+      },
+      "errors": {
+        "update_failed": "No se pudo actualizar el perfil"
+      }
+    },
+    "statistics": {
+      "title": "Estadísticas",
+      "completed_tours": "Tours completados",
+      "average_rating": "Calificación promedio",
+      "response_rate": "Tasa de respuesta",
+      "total_earnings": "Ganancias totales"
+    },
+    "requests": {
+      "title": "Gestión de solicitudes",
+      "new": "Nuevas",
+      "confirmed": "Confirmadas",
+      "history": "Historial",
+      "no_requests_title": "Aún no hay solicitudes",
+      "no_requests_desc": "Verás las nuevas solicitudes aquí cuando lleguen",
+      "anonymous_client": "Cliente anónimo",
+      "no_date": "Fecha no especificada",
+      "no_duration": "Duración no especificada",
+      "no_travelers": "Número de viajeros no especificado",
+      "no_service_type": "Tipo de servicio no especificado"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "confirmed": "Confirmado",
+      "completed": "Completado",
+      "rejected": "Rechazado"
+    },
+    "actions": {
+      "accept": "Aceptar",
+      "reject": "Rechazar",
+      "chat": "Chat",
+      "chat_with_client": "Chatear con el cliente",
+      "view_route": "Ver ruta",
+      "send_message": "Enviar mensaje",
+      "retry": "Reintentar",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "change": "Cambiar"
+    },
+    "modals": {
+      "edit_profile": "Editar perfil",
+      "settings": "Configuraciones",
+      "change_password": "Cambiar contraseña",
+      "portfolio": "Portafolio"
+    },
+    "settings": {
+      "profile_data": "Datos del perfil",
+      "profile_data_desc": "Edita tu información personal",
+      "change_password": "Cambiar contraseña",
+      "change_password_desc": "Asegura la seguridad de tu cuenta",
+      "theme": "Tema"
+    },
+    "password": {
+      "form": {
+        "current_password": "Contraseña actual",
+        "current_password_placeholder": "Ingresa tu contraseña actual",
+        "new_password": "Nueva contraseña",
+        "new_password_placeholder": "Ingresa tu nueva contraseña",
+        "confirm_password": "Confirmar nueva contraseña",
+        "confirm_password_placeholder": "Vuelve a ingresar tu nueva contraseña"
+      },
+      "validation": {
+        "all_fields_required": "Completa todos los campos",
+        "passwords_not_match": "Las nuevas contraseñas no coinciden",
+        "min_length": "La nueva contraseña debe tener al menos 8 caracteres"
+      },
+      "success": {
+        "changed": "Contraseña cambiada exitosamente"
+      },
+      "errors": {
+        "change_failed": "No se pudo cambiar la contraseña"
+      }
+    },
+    "portfolio": {
+      "add_new_image": "Añadir nueva imagen"
+    },
+    "errors": {
+      "stats_api_unavailable": "La API de estadísticas de guías no está disponible actualmente",
+      "requests_api_unavailable": "La API de solicitudes de guías no está disponible actualmente",
+      "chat_api_unavailable": "La API de chats de guías no está disponible actualmente",
+      "password_api_unavailable": "La API de cambio de contraseña no está disponible actualmente",
+      "request_action_unavailable": "La API de acciones de solicitudes no está disponible actualmente",
+      "request_service_unavailable": "El servicio de solicitudes no está disponible actualmente",
+      "general_error": "Ocurrió un error",
+      "data_fetch_error": "Error al cargar datos",
+      "data_loading_error": "Error al cargar datos",
+      "requests_loading_error": "Error al cargar solicitudes",
+      "requests_loading_error_title": "Error al cargar solicitudes",
+      "requests_loading_error_desc": "El servicio de solicitudes no está disponible actualmente o ocurrió un error",
+      "statistics_loading_error": "Error al cargar datos de estadísticas"
+    }
+  },
+  "user": {
+    "loading": {
+      "data": "Cargando datos desde la API de cuentas..."
+    },
+    "profile": {
+      "title": "Mi perfil (API de cuentas)",
+      "subtitle": "Información personal desde la API de cuentas",
+      "user": "Usuario",
+      "client": "Cliente",
+      "email": "Correo electrónico",
+      "no_email": "No se proporcionó correo electrónico",
+      "first_name": "Nombre",
+      "no_first_name": "No se proporcionó nombre",
+      "last_name": "Apellido",
+      "no_last_name": "No se proporcionó apellido",
+      "role": "Rol",
+      "country": "País",
+      "no_country": "No se proporcionó país"
+    },
+    "stats": {
+      "total_bookings": "Reservas totales",
+      "active_chats": "Chats activos",
+      "accounts_api": "API de cuentas"
+    },
+    "bookings": {
+      "title": "Mis reservas",
+      "subtitle": "Todas mis reservas de viaje"
+    },
+    "guides": {
+      "title": "Guías",
+      "subtitle": "Encuentra el guía perfecto para ti",
+      "travel_date": "Fecha de viaje",
+      "travelers_count": "Número de viajeros",
+      "adults": "Adultos",
+      "children": "Niños"
+    },
+    "tabs": {
+      "profile": "Perfil",
+      "bookings": "Reservas",
+      "guides": "Guías"
+    },
+    "form": {
+      "first_name": "Nombre",
+      "first_name_placeholder": "Ingresa tu nombre",
+      "last_name": "Apellido",
+      "last_name_placeholder": "Ingresa tu apellido",
+      "email": "Correo electrónico",
+      "email_placeholder": "Ingresa tu correo electrónico",
+      "role": "Rol",
+      "client": "Cliente",
+      "customer": "Cliente",
+      "country": "País",
+      "country_placeholder": "Ingresa tu país"
+    },
+    "validation": {
+      "required_fields": "Nombre, apellido y correo electrónico son campos obligatorios",
+      "invalid_email": "Formato de correo electrónico inválido"
+    },
+    "success": {
+      "profile_updated": "¡Perfil actualizado exitosamente! (Guardado en localStorage)"
+    },
+    "errors": {
+      "no_access_token": "No se encontró token de acceso",
+      "user_data_not_found": "No se encontraron datos de usuario en localStorage",
+      "backend_not_connected_fallback": "Backend no conectado. Mostrando datos de la sesión actual.",
+      "backend_and_user_data_missing": "Problema al conectar con el backend y no se encontraron datos de usuario.",
+      "no_profile_update_endpoint": "No hay endpoint de actualización de perfil disponible en la API de cuentas",
+      "profile_update_failed": "No se pudo actualizar el perfil"
+    },
+    "alerts": {
+      "warning": "Advertencia",
+      "info": "Información",
+      "localstorage_notice": "No hay endpoint de actualización de perfil en la API de cuentas. Los datos se guardan en localStorage.",
+      "booking_api_unavailable": "⚠️ La API de reservas aún no está conectada. ¡Estará disponible pronto!",
+      "cancel_booking_api_unavailable": "⚠️ La API de cancelación de reservas aún no está conectada. ¡Estará disponible pronto!",
+      "chat_api_unavailable": "⚠️ La API de chat aún no está conectada. ¡Estará disponible pronto!"
+    },
+    "api_not_connected": {
+      "title": "API no conectada",
+      "soon_available": "Estará disponible pronto",
+      "badge": "Sin API",
+      "bookings": "La API de reservas aún no está conectada. Todos los detalles, funciones de reserva y gestión se añadirán pronto.",
+      "guides": "La API de guías aún no está conectada. La visualización, búsqueda y reserva de guías se añadirán pronto."
+    },
+    "backend_status": {
+      "connected": "API de cuentas conectada",
+      "disconnected": "API de cuentas desconectada"
+    },
+    "actions": {
+      "menu": "Menú",
+      "edit_profile": "Editar perfil",
+      "settings": "Configuraciones",
+      "logout": "Cerrar sesión (API de cuentas)",
+      "retry_connection": "Reintentar conexión",
+      "close": "Cerrar",
+      "cancel": "Cancelar",
+      "save_localstorage": "Guardar (localStorage)",
+      "saving": "Guardando...",
+      "filters": "Filtros (Sin API)"
+    },
+    "confirm_logout": "¿Estás seguro de que quieres cerrar sesión?",
+    "console": {
+      "fetching_user_data": "Obteniendo datos de usuario desde la API de cuentas...",
+      "accounts_api_response": "Respuesta de la API de cuentas:",
+      "retrieved_user_data": "Datos de usuario recuperados desde localStorage:",
+      "attempting_fetch_user_data": "Intentando obtener datos de usuario desde la API de cuentas...",
+      "using_saved_user_data": "Usando datos de usuario guardados:",
+      "user_data_loaded": "Datos de usuario cargados exitosamente:",
+      "failed_fetch_user_data": "No se pudieron obtener los datos de usuario:",
+      "using_fallback_user_data": "Usando el estado actual del usuario como respaldo:",
+      "attempting_update_profile": "Intentando actualizar el perfil a través de la API de cuentas...",
+      "profile_updated_localstorage": "Perfil actualizado en localStorage:",
+      "error_fetching_user": "Error al obtener el usuario desde cuentas:",
+      "error_updating_profile": "Error al actualizar el perfil a través de cuentas:",
+      "updating_profile_payload": "Actualizando perfil con datos:",
+      "profile_update_response": "Respuesta de actualización de perfil:",
+      "profile_update_error": "Error de actualización de perfil:",
+      "logout_success": "Cierre de sesión exitoso a través de la API de cuentas",
+      "logout_error": "Error de cierre de sesión:"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Descubre el mundo con",
+      "title_highlight": "Guías confiables",
+      "description": "Conecta con guías locales verificados para experiencias de viaje auténticas en más de 150 países.",
+      "guide_name": "Ahmed K.",
+      "guide_expert": "Experto en Estambul",
+      "guide_rating": "4.9 (127)",
+      "guide_alt": "Guía",
+      "tour_name": "Tour por Estambul",
+      "tour_date": "Mañana, 10:00 AM",
+      "tour_duration": "4 horas",
+      "tour_status": "Confirmado"
+    },
+    "search": {
+      "location_placeholder": "¿A dónde viajas?",
+      "service_placeholder": "¿Qué servicio necesitas?",
+      "location_aria": "Buscar por ciudad o país",
+      "service_aria": "Buscar por tipo de servicio",
+      "results_aria": "Sugerencias de tipo de servicio",
+      "button": "Encuentra tu guía",
+      "button_aria": "Encuentra tu guía con la búsqueda actual"
+    },
+    "stats": {
+      "verified_guides": "Guías verificados",
+      "countries": "Países",
+      "happy_travelers": "Viajeros felices",
+      "average_rating": "Calificación promedio"
+    },
+    "destinations": {
+      "title": "Destinos populares",
+      "subtitle": "Explora los mejores destinos con guías expertos",
+      "view_all": "Ver todos los destinos",
+      "view_all_aria": "Ver todos los destinos populares",
+      "guides_count": "{{count}} guías",
+      "explore_aria": "Ver detalles para {{name}}",
+      "modal": {
+        "highlights": "Destacados",
+        "find_guides": "Encontrar guías",
+        "find_guides_aria": "Encontrar guías para {{name}}",
+        "close_aria": "Cerrar modal de detalles de destino"
+      },
+      "istanbul": {
+        "name": "Estambul, Turquía",
+        "price": "Desde $25/día",
+        "highlights": [
+          "Tours históricos",
+          "Cocina local",
+          "Guía de compras"
+        ]
+      },
+      "barcelona": {
+        "name": "Barcelona, España",
+        "price": "Desde $35/día",
+        "highlights": [
+          "Arquitectura",
+          "Tours de playa",
+          "Arte y cultura"
+        ]
+      },
+      "tokyo": {
+        "name": "Tokio, Japón",
+        "price": "Desde $45/día",
+        "highlights": [
+          "Cultura moderna",
+          "Sitios tradicionales",
+          "Tours gastronómicos"
+        ]
+      },
+      "paris": {
+        "name": "París, Francia",
+        "price": "Desde $40/día",
+        "highlights": [
+          "Museos",
+          "Tours románticos",
+          "Distritos de moda"
+        ]
+      },
+      "dubai": {
+        "name": "Dubái, EAU",
+        "price": "Desde $50/día",
+        "highlights": [
+          "Tours de lujo",
+          "Safari en el desierto",
+          "Maravillas modernas"
+        ]
+      },
+      "rome": {
+        "name": "Roma, Italia",
+        "price": "Desde $30/día",
+        "highlights": [
+          "Historia antigua",
+          "Tours por el Vaticano",
+          "Tours culinarios"
+        ]
+      }
+    },
+    "services": {
+      "city_tours": {
+        "name": "Tours por la ciudad",
+        "description": "Exploración de la ciudad con guías expertos",
+        "count": "Más de 2.5k guías"
+      },
+      "language_support": {
+        "name": "Soporte de idiomas",
+        "description": "Servicios de traducción en tiempo real",
+        "count": "Más de 150 idiomas"
+      },
+      "photography": {
+        "name": "Fotografía",
+        "description": "Fotografía profesional de viajes",
+        "count": "Más de 800 fotógrafos"
+      },
+      "cultural_experiences": {
+        "name": "Experiencias culturales",
+        "description": "Actividades locales auténticas",
+        "count": "Más de 1.2k experiencias"
+      }
+    },
+    "features": {
+      "title": "¿Por qué TravMatch?",
+      "subtitle": "Descubre los beneficios de viajar con nosotros",
+      "verified_guides": {
+        "title": "Guías verificados",
+        "description": "Todos los guías son rigurosamente evaluados por seguridad.",
+        "stats": "99.8% Seguridad"
+      },
+      "top_quality": {
+        "title": "Máxima calidad",
+        "description": "Experiencias de alta calidad con reseñas verificadas.",
+        "stats": "4.8★ Calificación"
+      },
+      "global_reach": {
+        "title": "Alcance global",
+        "description": "Conecta con guías en más de 150 países.",
+        "stats": "Más de 150 países"
+      },
+      "instant_booking": {
+        "title": "Reserva instantánea",
+        "description": "Reserva al instante con disponibilidad en tiempo real.",
+        "stats": "Soporte 24/7"
+      }
+    },
+    "steps": {
+      "title": "Cómo funciona",
+      "subtitle": "Comienza en 3 simples pasos",
+      "search_browse": {
+        "title": "Buscar y explorar",
+        "description": "Encuentra guías locales verificados."
+      },
+      "connect_plan": {
+        "title": "Conectar y planificar",
+        "description": "Chatea con guías para planificar tu viaje."
+      },
+      "experience": {
+        "title": "Experiencia",
+        "description": "Disfruta de experiencias locales auténticas."
+      }
+    },
+    "testimonials": {
+      "title": "Lo que dicen los viajeros",
+      "subtitle": "Escucha a nuestros viajeros felices",
+      "dot_aria": "Seleccionar testimonio {{index}}",
+      "sarah": {
+        "name": "Sarah Johnson",
+        "location": "Nueva York, EE. UU.",
+        "text": "¡Increíble experiencia en Estambul! El guía me mostró joyas ocultas.",
+        "tour": "Tour histórico por Estambul"
+      },
+      "marco": {
+        "name": "Marco Rodríguez",
+        "location": "Madrid, España",
+        "text": "El tour fotográfico por Tokio fue perfecto. ¡Fotos increíbles y conocimientos culturales!",
+        "tour": "Tour fotográfico por Tokio"
+      },
+      "emma": {
+        "name": "Emma Wilson",
+        "location": "Londres, Reino Unido",
+        "text": "¡El viaje en solitario a Barcelona fue increíble gracias a TravMatch!",
+        "tour": "Experiencia cultural en Barcelona"
+      }
+    },
+    "cta": {
+      "title": "Comienza tu aventura",
+      "description": "Únete a miles de viajeros para experiencias auténticas en todo el mundo.",
+      "find_guide": "Encuentra tu guía",
+      "learn_more": "Saber más"
+    },
+    "learn_more": {
+      "title": "Acerca de TravMatch",
+      "description": "TravMatch conecta a viajeros con guías locales verificados para crear experiencias auténticas e inolvidables en más de 150 países. Nuestra misión es hacer que los viajes sean accesibles, seguros e inmersivos al asociarnos con locales apasionados que conocen sus destinos al detalle.",
+      "why_title": "¿Por qué elegir TravMatch?",
+      "vision_title": "Nuestra visión",
+      "vision_description": "Creemos que viajar se trata de conexión, descubrimiento e historias. Con TravMatch, no solo visitas un lugar, lo vives a través de los ojos de un local.",
+      "find_guide": "Encuentra tu guía ahora",
+      "close": "Cerrar",
+      "features": {
+        "verified_guides": {
+          "title": "Guías verificados:",
+          "description": "Todos los guías son evaluados por seguridad y experiencia."
+        },
+        "global_reach": {
+          "title": "Alcance global:",
+          "description": "Explora más de 150 países con expertos locales."
+        },
+        "custom_experiences": {
+          "title": "Experiencias personalizadas:",
+          "description": "Adapta tu viaje con tours personalizados."
+        },
+        "support": {
+          "title": "Soporte 24/7:",
+          "description": "Reserva instantánea y asistencia las 24 horas."
+        }
+      }
+    }
+  },
+  "auth": {
+    "title": "TravMatch",
+    "subtitle": "Encuentra tu compañero de viaje",
+    "tabs": {
+      "login": "Iniciar sesión",
+      "register": "Registrarse",
+      "forgot": "Restablecer contraseña"
+    },
+    "close_aria": "Cerrar modal de autenticación",
+    "login": {
+      "title": "Inicia sesión en TravMatch",
+      "subtitle": "Accede a tu cuenta y continúa tu viaje",
+      "email_label": "Dirección de correo electrónico",
+      "email_placeholder": "Ingresa tu correo electrónico",
+      "password_label": "Contraseña",
+      "password_placeholder": "Ingresa tu contraseña",
+      "submit_button": "Iniciar sesión",
+      "show_password_aria": "Mostrar contraseña",
+      "hide_password_aria": "Ocultar contraseña",
+      "or": "o",
+      "social": {
+        "google": "Continuar con Google",
+        "facebook": "Continuar con Facebook"
+      }
+    },
+    "register": {
+      "title": "Regístrate en TravMatch",
+      "subtitle": "Crea una nueva cuenta y encuentra compañeros de viaje",
+      "role_label": "Rol",
+      "role_client": "Cliente",
+      "role_customer": "Cliente",
+      "first_name_label": "Nombre",
+      "first_name_placeholder": "Ingresa tu nombre",
+      "last_name_label": "Apellido",
+      "last_name_placeholder": "Ingresa tu apellido",
+      "email_label": "Dirección de correo electrónico",
+      "email_placeholder": "Ingresa tu correo electrónico",
+      "password_label": "Contraseña",
+      "password_placeholder": "Ingresa tu contraseña",
+      "confirm_password_label": "Confirmar contraseña",
+      "confirm_password_placeholder": "Vuelve a ingresar tu contraseña",
+      "country_label": "País",
+      "country_placeholder": "Ingresa tu país",
+      "country_option_aria": "Seleccionar país {country}",
+      "checkboxes": {
+        "personal_data": "Acepto el procesamiento de datos personales",
+        "terms": "Acepto los términos de TravMatch",
+        "travel_tips": "Acepto recibir consejos de viaje y promociones"
+      },
+      "submit_button": "Registrarse",
+      "verification": {
+        "title": "Verificación de correo electrónico",
+        "subtitle": "Ingresa el código de verificación de 6 dígitos enviado a <strong>{email}</strong>",
+        "code_label": "Código de verificación",
+        "code_placeholder": "000000",
+        "submit_button": "Verificar",
+        "resend_button": "Reenviar código"
+      }
+    },
+    "forgot": {
+      "title": "Restablecer contraseña",
+      "subtitle": "Restablece tu contraseña por correo electrónico",
+      "email_label": "Dirección de correo electrónico",
+      "email_placeholder": "Ingresa tu correo electrónico",
+      "submit_button": "Enviar código de verificación",
+      "reset": {
+        "title": "Actualizar contraseña",
+        "subtitle": "Ingresa el código de verificación enviado a <strong>{email}</strong> y tu nueva contraseña",
+        "code_label": "Código de verificación",
+        "code_placeholder": "000000",
+        "new_password_label": "Nueva contraseña",
+        "new_password_placeholder": "Ingresa tu nueva contraseña",
+        "confirm_password_label": "Confirmar contraseña",
+        "confirm_password_placeholder": "Vuelve a ingresar tu nueva contraseña",
+        "submit_button": "Actualizar contraseña",
+        "resend_button": "Reenviar código",
+        "show_password_aria": "Mostrar nueva contraseña",
+        "hide_password_aria": "Ocultar nueva contraseña"
+      }
+    },
+    "validation": {
+      "required_fields": "Por favor, completa todos los campos obligatorios",
+      "required_checkboxes": "Debes aceptar el procesamiento de datos personales y los términos",
+      "required_code": "Por favor, ingresa el código de verificación",
+      "invalid_email": "Formato de correo electrónico inválido",
+      "passwords_not_match": "Las contraseñas no coinciden",
+      "password_requirements": "La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula, una minúscula, un número y un carácter especial (@$!%*?&)",
+      "invalid_code": "El código de verificación debe ser un número de 6 dígitos"
+    },
+    "success": {
+      "verification_sent": "Código de verificación enviado a tu correo electrónico",
+      "register_success": "¡Registro exitoso!",
+      "password_reset_sent": "Código de verificación enviado a tu correo electrónico",
+      "password_reset_success": "¡Contraseña actualizada exitosamente!"
+    },
+    "errors": {
+      "login_failed": "Inicio de sesión fallido. Por favor, verifica tu correo electrónico o contraseña",
+      "email_exists": "Este correo electrónico ya está registrado. Por favor, inicia sesión o usa otro correo electrónico",
+      "code_request_failed": "No se pudo solicitar el código de verificación",
+      "invalid_code": "Código de verificación inválido. Por favor, verifica e intenta de nuevo",
+      "expired_code": "El código de verificación ha expirado. Por favor, solicita un nuevo código",
+      "register_failed": "Registro fallido",
+      "password_reset_failed": "No se pudo restablecer la contraseña",
+      "resend_code_failed": "No se pudo reenviar el código de verificación"
+    },
+    "loading": "Cargando...",
+    "social_login_dev": "El inicio de sesión con {provider} está actualmente en desarrollo"
+  },
+  "footer": {
+    "newsletter": {
+      "title": "Mantente conectado",
+      "subtitle": "Suscríbete a nuestro boletín para consejos de viaje, ofertas exclusivas y actualizaciones",
+      "email_placeholder": "Ingresa tu correo electrónico",
+      "email_aria": "Correo electrónico para el boletín",
+      "subscribe_button": "Suscribirse",
+      "privacy": "Respetamos tu privacidad"
+    },
+    "company": {
+      "logo": "TravMatch",
+      "description": "Conectamos a viajeros con guías locales confiables en todo el mundo. Experimenta viajes auténticos con profesionales verificados en más de 150 países.",
+      "contact": {
+        "address": "Taskent, Uzbekistán",
+        "email": "hola@travmatch.com",
+        "phone": "+998 (90) 123-45-67"
+      }
+    },
+    "social": {
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "youtube": "YouTube"
+    },
+    "links": {
+      "platform": {
+        "title": "Plataforma",
+        "how_it_works": "Cómo funciona",
+        "find_guide": "Encontrar un guía",
+        "become_guide": "Conviértete en guía",
+        "safety_trust": "Seguridad y confianza",
+        "pricing": "Precios"
+      },
+      "support": {
+        "title": "Soporte",
+        "help_center": "Centro de ayuda",
+        "contact_us": "Contáctanos",
+        "faqs": "Preguntas frecuentes",
+        "dispute_center": "Centro de disputas",
+        "report_issue": "Reportar problema"
+      },
+      "legal": {
+        "title": "Legal",
+        "terms_of_service": "Términos de servicio",
+        "privacy_policy": "Política de privacidad",
+        "cookie_policy": "Política de cookies",
+        "community_guidelines": "Directrices de la comunidad",
+        "gdpr_compliance": "Cumplimiento con GDPR"
+      },
+      "company": {
+        "title": "Compañía",
+        "about_us": "Sobre nosotros",
+        "careers": "Carreras",
+        "press_kit": "Kit de prensa",
+        "blog": "Blog",
+        "investors": "Inversores"
+      }
+    },
+    "app": {
+      "title": "Obtén la aplicación",
+      "description": "Descarga nuestra aplicación móvil para una mejor experiencia",
+      "ios_label": "Descargar en",
+      "ios_store": "App Store",
+      "android_label": "Obtener en",
+      "android_store": "Google Play",
+      "trust": {
+        "ssl": "Protegido por SSL",
+        "gdpr": "Cumple con GDPR"
+      }
+    },
+    "bottom": {
+      "copyright": "© {year} TravMatch. Todos los derechos reservados.",
+      "links": {
+        "terms": "Términos",
+        "privacy": "Privacidad",
+        "cookies": "Cookies",
+        "accessibility": "Accesibilidad"
+      }
+    }
+  }
+}

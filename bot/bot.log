@@ -1610,3 +1610,16 @@
 2025-08-17 02:07:40,099 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
 2025-08-17 02:07:40,102 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7857439280)
 2025-08-17 02:07:51,526 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 7857439280)
+2025-08-17 02:45:55,644 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 02:45:55,645 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-17 02:48:09,888 - utils.database.db_init - ERROR - Database error occurred: connection to server at "host.docker.internal" (185.183.243.161), port 5432 failed: Connection timed out
+	Is the server running on that host and accepting TCP/IP connections?
+
+2025-08-17 02:48:09,904 - __main__ - INFO - Barcha handlerlar va middleware'lar ulandi
+2025-08-17 02:48:09,904 - __main__ - INFO - Bot ishga tushdi
+2025-08-17 02:48:09,905 - aiogram.dispatcher - INFO - Start polling
+2025-08-17 02:48:10,853 - aiogram.dispatcher - INFO - Run polling for bot @uzguidecombot id=7857439280 - '𝗨𝘇𝗚𝘂𝗶𝗱𝗲'
+2025-08-17 02:51:51,707 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 02:51:51,707 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}
+2025-08-17 02:53:37,058 - utils.database.db_init - INFO - Starting database initialization...
+2025-08-17 02:53:37,058 - utils.database.db_init - INFO - Trying to connect to database with params: {'dbname': 'UzGuideBot', 'user': 'postgres', 'password': 'postgres', 'host': 'host.docker.internal', 'port': 5432}

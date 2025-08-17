@@ -2199,6 +2199,7 @@ KeyError: 'user'
 [2025-07-26 04:14:02,937] WARNING django.request: Bad Request: /api/v1/accounts/register/
 [2025-07-26 04:14:17,019] WARNING django.request: Bad Request: /api/v1/accounts/register/
 [2025-07-26 04:14:17,019] WARNING django.request: Bad Request: /api/v1/accounts/register/
+<<<<<<< HEAD
 [2025-07-26 04:34:35,816] INFO apps.chat.apps: Chat signals registered successfully
 [2025-07-26 04:34:35,943] INFO apps.chat.apps: Chat WebSocket consumers loaded
 [2025-07-26 04:34:35,944] INFO apps.chat.apps: Chat periodic tasks registered
@@ -47982,3 +47983,5 @@ DETAIL:  Key (user_id)=(7f22ca9a-c13b-4602-9af1-cb639c501bf6) already exists.
 [2025-08-05 14:35:24,955] WARNING django.request: Unauthorized: /api/v1/accounts/refresh/
 [2025-08-05 14:35:24,972] WARNING django.request: Unauthorized: /api/v1/accounts/refresh/
 [2025-08-05 14:35:24,972] WARNING django.request: Unauthorized: /api/v1/accounts/refresh/
+=======
+>>>>>>> 23b31a3 (Local changes before pull)

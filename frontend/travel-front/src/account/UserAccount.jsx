@@ -31,7 +31,7 @@ import {
     FiWifiOff,
     FiRefreshCw
 } from 'react-icons/fi';
-import UserChatWidget from './UserChatWidget';
+import UserChatWidget from './ChatWidgets';
 import './UserAccount.css';
 import { logoutUser } from '../api/api';
 import api from '../api/api';

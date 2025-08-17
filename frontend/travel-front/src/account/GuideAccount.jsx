@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { FiUser, FiMail, FiLogOut, FiSettings, FiMapPin, FiX, FiCheck, FiCalendar, FiStar, FiDollarSign, FiImage, FiCheckCircle, FiUsers, FiClock, FiGlobe, FiAward, FiEdit, FiEye, FiMessageSquare, FiTrendingUp, FiHeart, FiPhone, FiDownload, FiLock, FiUpload, FiPlus, FiMinus } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import './GuideAccount.css';
-import GuideChatWidget from './GuideChatWidget';
+import GuideChatWidget from './ChatWidgets';
 import api, { getCurrentUser, updateUserProfile } from '../api/api';
 
 const GuideAccount = () => {

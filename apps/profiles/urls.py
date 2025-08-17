@@ -1,3 +1,4 @@
+# apps/profiles/urls.py
 from rest_framework.routers import DefaultRouter
 from django.urls import path, include
 from apps.profiles.views import (

@@ -2,8 +2,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from apps.users.models import User
+
 from .models import (
     ClientProfile,
     CustomerProfile,

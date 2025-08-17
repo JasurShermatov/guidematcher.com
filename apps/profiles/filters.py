@@ -1,3 +1,4 @@
+#  apps/profiles/filters.py
 import django_filters as df
 from apps.profiles.models import CustomerProfile
 

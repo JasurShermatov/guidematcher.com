@@ -23,15 +23,21 @@ class AuthTokenSerializer(TokenObtainPairSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
-    role = serializers.ChoiceField(
-        choices=User.UserRole.choices,
-        default=User.UserRole.CLIENT,
-        required=False,
-    )
+    role = serializers.CharField(required=True)  # ChoiceField emas
 
     class Meta:
         model = User
         fields = ("email", "first_name", "last_name", "password", "role", "country")
+
+    def validate_role(self, value):
+        value = value.lower().strip()
+
+        valid_roles = [User.UserRole.CLIENT, User.UserRole.CUSTOMER]
+        if value not in valid_roles:
+            raise serializers.ValidationError(
+                f"Role must be one of: {', '.join(valid_roles)}."
+            )
+        return value
 
     def create(self, validated_data):
         password = validated_data.pop("password")
@@ -39,7 +45,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.is_active = True
         user.save()
 
-        # cache update
         from django.core.cache import cache
 
         cache.set(f"user:{user.pk}", user, timeout=3600)

@@ -6,6 +6,9 @@ from .models import User
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
+    """Custom User model admin"""
+
+    # User detail view
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         (
@@ -41,6 +44,8 @@ class UserAdmin(BaseUserAdmin):
             {"fields": ("date_joined", "last_login", "last_login_ip")},
         ),
     )
+
+    # Add form
     add_fieldsets = (
         (
             None,
@@ -56,10 +61,14 @@ class UserAdmin(BaseUserAdmin):
                     "country",
                     "avatar",
                     "bio",
+                    "is_active",
+                    "is_verified",
                 ),
             },
         ),
     )
+
+    # List view
     list_display = (
         "email",
         "full_name",
@@ -88,3 +97,10 @@ class UserAdmin(BaseUserAdmin):
     )
     ordering = ("-date_joined",)
     filter_horizontal = ("groups", "user_permissions")
+    readonly_fields = (
+        "full_name",
+        "country_name",
+        "date_joined",
+        "last_login",
+        "last_login_ip",
+    )

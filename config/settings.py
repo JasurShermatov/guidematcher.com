@@ -66,7 +66,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "apps.common",
-    "apps.users",
+    "apps.users.apps.UsersConfig",
     "apps.profiles",
     "apps.bookings",
     "apps.chat",

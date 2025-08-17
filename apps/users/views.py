@@ -1,9 +1,22 @@
 # apps/users/views.py
-from rest_framework import generics, permissions, status, viewsets
+from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema
+import logging
 from django.core.cache import cache
+
+from rest_framework import permissions, status
+from rest_framework.exceptions import NotFound
+
+
+logger = logging.getLogger(__name__)
+
+
+from rest_framework.exceptions import PermissionDenied
+from rest_framework import generics
+from apps.profiles.models import CustomerProfile
+
 
 from apps.users.models import User
 from apps.users.serializers import (
@@ -100,3 +113,39 @@ class UserListView(viewsets.ModelViewSet):
     def short(self, request):
         serializer = UserShortSerializer(request.user)
         return Response(serializer.data)
+
+
+class CustomerDetailView(generics.RetrieveAPIView):
+    """
+    Customer profili ko'rish view.
+    - Admin / Superadmin → har qanday customer profili ko'rishi mumkin.
+    - Oddiy customer → faqat o'z profilini ko'radi.
+    - Profil mavjud bo'lmasa → 404 qaytaradi.
+    """
+
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        user_id = self.kwargs.get("pk")
+
+        try:
+            customer_profile = CustomerProfile.objects.select_related("user").get(
+                user__id=user_id
+            )
+        except CustomerProfile.DoesNotExist:
+            raise NotFound({"detail": "Customer profile mavjud emas."})
+
+        user = customer_profile.user
+        request_user = self.request.user
+
+        # Admin / Superadmin har doim ko'rishi mumkin
+        if request_user.is_admin or request_user.is_superadmin:
+            return user
+
+        # Oddiy customer faqat o'zini ko'rishi mumkin
+        if request_user.is_customer and request_user.id == user.id:
+            return user
+
+        # Boshqalar boshqa profilingni ko'ra olmaydi
+        raise PermissionDenied({"detail": "Siz faqat o'z profilingizni ko'ra olasiz."})

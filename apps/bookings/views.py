@@ -21,31 +21,28 @@ from apps.common.permissions import (
 )
 
 
-
 @extend_schema_view(
     list=extend_schema(
         summary="List Bookings",
-        description="Retrieve a list of bookings. Clients see only their own bookings."
+        description="Retrieve a list of bookings. Clients see only their own bookings.",
     ),
     create=extend_schema(
-        summary="Create Booking",
-        description="Client creates a new booking."
+        summary="Create Booking", description="Client creates a new booking."
     ),
     retrieve=extend_schema(
         summary="Retrieve Booking",
-        description="Get details of a specific booking by ID."
+        description="Get details of a specific booking by ID.",
     ),
     update=extend_schema(
         summary="Update Booking",
-        description="Update all fields of a booking (owner or admin only)."
+        description="Update all fields of a booking (owner or admin only).",
     ),
     partial_update=extend_schema(
         summary="Partial Update Booking",
-        description="Update some fields of a booking (owner or admin only)."
+        description="Update some fields of a booking (owner or admin only).",
     ),
     destroy=extend_schema(
-        summary="Delete Booking",
-        description="Delete a booking (owner or admin only)."
+        summary="Delete Booking", description="Delete a booking (owner or admin only)."
     ),
 )
 @extend_schema(tags=["booking"])
@@ -117,7 +114,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     @extend_schema(
         summary="Respond to Booking",
-        description="Customer responds to a booking with optional counter-offer."
+        description="Customer responds to a booking with optional counter-offer.",
     )
     def respond(self, request, pk=None):
         booking = self.get_object()
@@ -145,7 +142,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     @extend_schema(
         summary="Accept Counter-offer",
-        description="Client accepts a provider's counter-offer."
+        description="Client accepts a provider's counter-offer.",
     )
     def accept_counter(self, request, pk=None):
         booking = self.get_object()
@@ -179,7 +176,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     @extend_schema(
         summary="Accept Booking",
-        description="Provider accepts a pending booking request."
+        description="Provider accepts a pending booking request.",
     )
     def accept(self, request, pk=None):
         booking = self.get_object()
@@ -204,7 +201,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     @extend_schema(
         summary="Reject Booking",
-        description="Provider rejects a pending booking request."
+        description="Provider rejects a pending booking request.",
     )
     def reject(self, request, pk=None):
         booking = self.get_object()
@@ -228,7 +225,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     @extend_schema(
         summary="Cancel Booking",
-        description="Client or provider can cancel booking if not completed/cancelled."
+        description="Client or provider can cancel booking if not completed/cancelled.",
     )
     def cancel(self, request, pk=None):
         booking = self.get_object()
@@ -259,7 +256,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     @extend_schema(
         summary="Complete Booking",
-        description="Mark booking as completed by client or provider if accepted."
+        description="Mark booking as completed by client or provider if accepted.",
     )
     def complete(self, request, pk=None):
         booking = self.get_object()
@@ -284,30 +281,29 @@ class BookingViewSet(viewsets.ModelViewSet):
 
 # ──────────────────────────── BookingMessageViewSet ──────────────────────────── #
 
+
 @extend_schema_view(
     list=extend_schema(
         summary="List Booking Messages",
-        description="Retrieve all messages for a booking."
+        description="Retrieve all messages for a booking.",
     ),
     create=extend_schema(
         summary="Create Booking Message",
-        description="Create a new message in the booking chat."
+        description="Create a new message in the booking chat.",
     ),
     retrieve=extend_schema(
         summary="Retrieve Message",
-        description="Retrieve details of a specific booking message."
+        description="Retrieve details of a specific booking message.",
     ),
     update=extend_schema(
-        summary="Update Message",
-        description="Update all fields of a booking message."
+        summary="Update Message", description="Update all fields of a booking message."
     ),
     partial_update=extend_schema(
         summary="Partial Update Message",
-        description="Update some fields of a booking message."
+        description="Update some fields of a booking message.",
     ),
     destroy=extend_schema(
-        summary="Delete Message",
-        description="Delete a booking message (only sender)."
+        summary="Delete Message", description="Delete a booking message (only sender)."
     ),
 )
 @extend_schema(tags=["booking"])

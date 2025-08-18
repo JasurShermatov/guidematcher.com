@@ -196,9 +196,8 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "GuideMatcher API",
     "DESCRIPTION": "TravMatch platform REST API",
     "VERSION": "1.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,
+    "SERVE_INCLUDE_SCHEMA": True,
 }
-
 # ╭──────────────────────────────────────────────────────────────╮
 # | 11. E-mail (Gmail SMTP)                                     |
 # ╰──────────────────────────────────────────────────────────────╯

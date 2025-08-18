@@ -5,9 +5,9 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError, NotFound
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from .filters import CustomerProfileFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+
 from .models import (
     ClientProfile,
     CustomerProfile,
@@ -15,68 +15,89 @@ from .models import (
     Availability,
     VerificationDocument,
 )
-from .permissions import RoleBasedProfilePermission, IsOwnerOrAdmin
 from .serializers import (
     ClientProfileSerializer,
+    ClientProfileCreateUpdateSerializer,
     CustomerProfileSerializer,
     CustomerProfileCreateUpdateSerializer,
-    ClientProfileCreateUpdateSerializer,
     PortfolioSerializer,
-    AvailabilitySerializer,
     VerificationDocumentSerializer,
+    AvailabilitySerializer,
 )
+from .permissions import IsOwnerOrAdmin
+from .filters import CustomerProfileFilter
 
 
-@extend_schema(tags=["Client Profile"])
-class ClientProfileViewSet(viewsets.ModelViewSet):
-    serializer_class = ClientProfileSerializer
-    queryset = ClientProfile.objects.all()
+# ================== BASE PROFILE VIEWSET ==================
+class BaseProfileViewSet(viewsets.ModelViewSet):
+    """
+    Common logic for ClientProfile & CustomerProfile
+    Supports user_id lookup instead of profile_id.
+    """
+
+    lookup_field = "user_id"  # <-- Endi user_id orqali ishlaydi
 
     def get_permissions(self):
-        """Permission'larni action bo'yicha sozlash"""
         if self.action in ["list", "retrieve"]:
-            # Hamma ko'ra oladi
             permission_classes = [AllowAny]
         elif self.action in ["my_profile"]:
-            # Faqat login qilganlar
             permission_classes = [IsAuthenticated]
         else:
-            # Create/Update/Delete - faqat owner yoki admin
             permission_classes = [IsAuthenticated]
-
         return [permission() for permission in permission_classes]
 
     def get_serializer_class(self):
-        """Action bo'yicha serializer tanlash"""
         if self.action in ["create", "update", "partial_update"]:
-            return ClientProfileCreateUpdateSerializer
-        return ClientProfileSerializer
+            return self.create_update_serializer_class
+        return self.serializer_class
 
     def get_object(self):
-        """Object olish - ID orqali yoki own profile"""
         if self.action == "my_profile":
             try:
-                return self.request.user.clientprofile
-            except ClientProfile.DoesNotExist:
-                raise NotFound({"detail": "You don't have a client profile yet."})
+                return getattr(self.request.user, self.profile_attr)
+            except self.model.DoesNotExist:
+                raise NotFound({"detail": "Profile not found."})
 
-        # Normal ID orqali olish
-        return super().get_object()
-
-    def perform_create(self, serializer):
-        """Profile yaratish"""
-        if hasattr(self.request.user, "clientprofile"):
-            raise ValidationError({"detail": "You already have a client profile."})
-
-        if self.request.user.role != "client":
-            raise ValidationError(
-                {"detail": "Only clients can create client profiles."}
+        # user_id bo'yicha olish
+        user_id = self.kwargs.get("user_id")
+        try:
+            return self.model.objects.get(user_id=user_id)
+        except self.model.DoesNotExist:
+            raise NotFound(
+                {"detail": f"No {self.model.__name__} matches this user ID."}
             )
 
+    @action(detail=False, methods=["get", "put", "patch"], url_path="my")
+    def my_profile(self, request):
+        """
+        O'z profilini olish va yangilash
+        """
+        profile = getattr(request.user, self.profile_attr, None)
+        if not profile:
+            raise NotFound({"detail": "Profile not found."})
+
+        if request.method == "GET":
+            serializer = self.serializer_class(profile)
+            return Response(serializer.data)
+
+        partial = request.method == "PATCH"
+        serializer = self.create_update_serializer_class(
+            profile, data=request.data, partial=partial
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(self.serializer_class(profile).data)
+
+    def perform_create(self, serializer):
+        if hasattr(self.request.user, self.profile_attr):
+            raise ValidationError({"detail": "You already have a profile."})
+        if self.request.user.role != self.user_role:
+            raise ValidationError(
+                {"detail": f"Only {self.user_role}s can create profile."}
+            )
         serializer.save(user=self.request.user)
 
     def perform_update(self, serializer):
-        """Faqat o'z profilini update qila oladi"""
         obj = self.get_object()
         if obj.user != self.request.user and not getattr(
             self.request.user, "is_admin", False
@@ -84,129 +105,43 @@ class ClientProfileViewSet(viewsets.ModelViewSet):
             raise PermissionDenied({"detail": "You can only update your own profile."})
         serializer.save()
 
-    @action(detail=False, methods=["get", "put", "patch"], url_path="my")
-    def my_profile(self, request):
-        """O'z profilini ko'rish/yangilash"""
-        try:
-            profile = request.user.clientprofile
-        except ClientProfile.DoesNotExist:
-            raise NotFound({"detail": "You don't have a client profile yet."})
 
-        if request.method == "GET":
-            serializer = ClientProfileSerializer(profile)
-            return Response(serializer.data)
-
-        elif request.method in ["PUT", "PATCH"]:
-            partial = request.method == "PATCH"
-            serializer = ClientProfileCreateUpdateSerializer(
-                profile, data=request.data, partial=partial
-            )
-            if serializer.is_valid():
-                serializer.save()
-                response_serializer = ClientProfileSerializer(profile)
-                return Response(response_serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# ================== CLIENT PROFILE ==================
+@extend_schema(tags=["Client Profile"])
+class ClientProfileViewSet(BaseProfileViewSet):
+    model = ClientProfile
+    queryset = ClientProfile.objects.all()
+    serializer_class = ClientProfileSerializer
+    create_update_serializer_class = ClientProfileCreateUpdateSerializer
+    profile_attr = "clientprofile"
+    user_role = "client"
 
 
+# ================== CUSTOMER PROFILE ==================
 @extend_schema(tags=["Customer Profile"])
-class CustomerProfileViewSet(viewsets.ModelViewSet):
-    serializer_class = CustomerProfileSerializer
+class CustomerProfileViewSet(BaseProfileViewSet):
+    model = CustomerProfile
     queryset = CustomerProfile.objects.all()
+    serializer_class = CustomerProfileSerializer
+    create_update_serializer_class = CustomerProfileCreateUpdateSerializer
+    profile_attr = "customerprofile"
+    user_role = "customer"
+
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = CustomerProfileFilter
     search_fields = ["user__first_name", "user__last_name", "professional_bio"]
     ordering_fields = ["average_rating", "created_at", "years_of_experience"]
     ordering = ["-average_rating"]
 
-    def get_permissions(self):
-        """Permission'larni action bo'yicha sozlash"""
-        if self.action in ["list", "retrieve"]:
-            # Hamma ko'ra oladi (public profiles)
-            permission_classes = [AllowAny]
-        elif self.action in ["my_profile"]:
-            # Faqat login qilganlar
-            permission_classes = [IsAuthenticated]
-        else:
-            # Create/Update/Delete - faqat owner yoki admin
-            permission_classes = [IsAuthenticated]
-
-        return [permission() for permission in permission_classes]
-
-    def get_serializer_class(self):
-        """Action bo'yicha serializer tanlash"""
-        if self.action in ["create", "update", "partial_update"]:
-            return CustomerProfileCreateUpdateSerializer
-        return CustomerProfileSerializer
-
-    def get_object(self):
-        """Object olish - ID orqali yoki own profile"""
-        if self.action == "my_profile":
-            try:
-                return self.request.user.customerprofile
-            except CustomerProfile.DoesNotExist:
-                raise NotFound({"detail": "You don't have a customer profile yet."})
-
-        # Normal ID orqali olish
-        return super().get_object()
-
     def get_queryset(self):
-        """Queryset filtrlash"""
         if self.action in ["list", "retrieve"]:
-            # Public view - hamma available customer'lar
+            # Public view
             return CustomerProfile.objects.filter(is_available=True)
-        else:
-            # Private operations - faqat o'ziniki
-            if hasattr(self.request.user, "customerprofile"):
-                return CustomerProfile.objects.filter(user=self.request.user)
-            return CustomerProfile.objects.none()
-
-    def perform_create(self, serializer):
-        """Profile yaratish"""
-        if CustomerProfile.objects.filter(user=self.request.user).exists():
-            raise ValidationError({"detail": "You already have a customer profile."})
-
-        if self.request.user.role != "customer":
-            raise ValidationError(
-                {"detail": "Only customers can create customer profiles."}
-            )
-
-        serializer.save(user=self.request.user)
-
-    def perform_update(self, serializer):
-        """Faqat o'z profilini update qila oladi"""
-        obj = self.get_object()
-        if obj.user != self.request.user and not getattr(
-            self.request.user, "is_admin", False
-        ):
-            raise PermissionDenied({"detail": "You can only update your own profile."})
-        serializer.save()
-
-    @action(detail=False, methods=["get", "put", "patch"], url_path="my")
-    def my_profile(self, request):
-        """O'z profilini ko'rish/yangilash"""
-        try:
-            profile = request.user.customerprofile
-        except CustomerProfile.DoesNotExist:
-            raise NotFound({"detail": "You don't have a customer profile yet."})
-
-        if request.method == "GET":
-            serializer = CustomerProfileSerializer(profile)
-            return Response(serializer.data)
-
-        elif request.method in ["PUT", "PATCH"]:
-            partial = request.method == "PATCH"
-            serializer = CustomerProfileCreateUpdateSerializer(
-                profile, data=request.data, partial=partial
-            )
-            if serializer.is_valid():
-                serializer.save()
-                response_serializer = CustomerProfileSerializer(profile)
-                return Response(response_serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Private: faqat o'z profili
+        return CustomerProfile.objects.filter(user=self.request.user)
 
 
-# === Qolgan ViewSet'lar ===
-@extend_schema(tags=["CustomerOwnedModel"])
+# ================== BASE CUSTOMER-OWNED VIEWSET ==================
 class CustomerOwnedModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
 
@@ -220,7 +155,7 @@ class CustomerOwnedModelViewSet(viewsets.ModelViewSet):
         customer = self.get_customer_profile()
         if not customer and not getattr(self.request.user, "is_admin", False):
             raise PermissionDenied(
-                detail={"message": "❌ You must be a customer to create this resource."}
+                {"detail": "You must be a customer to create this resource."}
             )
         serializer.save(customer=customer)
 
@@ -231,6 +166,7 @@ class CustomerOwnedModelViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+# ================== PORTFOLIO ==================
 @extend_schema(tags=["Portfolio"])
 class PortfolioViewSet(CustomerOwnedModelViewSet):
     serializer_class = PortfolioSerializer
@@ -243,6 +179,7 @@ class PortfolioViewSet(CustomerOwnedModelViewSet):
         return Portfolio.objects.filter(customer__user=user)
 
 
+# ================== VERIFICATION DOCUMENT ==================
 @extend_schema(tags=["VerificationDocument"])
 class VerificationDocumentViewSet(CustomerOwnedModelViewSet):
     serializer_class = VerificationDocumentSerializer
@@ -255,6 +192,7 @@ class VerificationDocumentViewSet(CustomerOwnedModelViewSet):
         return VerificationDocument.objects.filter(customer__user=user)
 
 
+# ================== AVAILABILITY ==================
 @extend_schema(tags=["Availability"])
 class AvailabilityViewSet(CustomerOwnedModelViewSet):
     serializer_class = AvailabilitySerializer
@@ -267,9 +205,8 @@ class AvailabilityViewSet(CustomerOwnedModelViewSet):
         return Availability.objects.filter(customer__user=user)
 
     def perform_create(self, serializer):
-        try:
-            customer_profile = self.request.user.customerprofile
-        except CustomerProfile.DoesNotExist:
+        customer_profile = self.get_customer_profile()
+        if not customer_profile:
             raise ValidationError({"detail": "You don't have a customer profile yet."})
 
         date = serializer.validated_data.get("date")
@@ -277,4 +214,5 @@ class AvailabilityViewSet(CustomerOwnedModelViewSet):
             raise ValidationError(
                 {"detail": f"Availability for {date} already exists."}
             )
+
         serializer.save(customer=customer_profile)

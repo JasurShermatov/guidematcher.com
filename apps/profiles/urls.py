@@ -9,13 +9,22 @@ from apps.profiles.views import (
     VerificationDocumentViewSet,
 )
 
+# REST Framework Router
 router = DefaultRouter()
+
+# Profile endpoints - user-friendly naming
 router.register(r"clients", ClientProfileViewSet, basename="client-profile")
 router.register(r"customers", CustomerProfileViewSet, basename="customer-profile")
-router.register(r"portfolio", PortfolioViewSet, basename="portfolio")
-router.register(r"availability", AvailabilityViewSet, basename="availability")
+
+# Customer-related endpoints - grouped logically
+router.register(r"portfolios", PortfolioViewSet, basename="portfolio")
+router.register(r"availabilities", AvailabilityViewSet, basename="availability")
 router.register(
-    r"documents", VerificationDocumentViewSet, basename="verification-document"
+    r"verifications", VerificationDocumentViewSet, basename="verification-document"
 )
 
-urlpatterns = [path("", include(router.urls))]
+# Main URL patterns
+urlpatterns = [
+    # Router URLs
+    path("", include(router.urls)),
+]

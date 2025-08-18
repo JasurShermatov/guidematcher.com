@@ -72,7 +72,9 @@ class CustomerProfile(AbstractProfile):
         blank=True,  # 👈 Formada bo'sh bo'lishi mumkin
         verbose_name=_("Service city"),
     )
-    service_areas = models.TextField(blank=True, verbose_name=_("Service areas"))
+    service_areas = models.TextField(
+        blank=True, default="", verbose_name=_("Service areas")
+    )
 
     hourly_rate = models.DecimalField(
         max_digits=10,

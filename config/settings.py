@@ -57,6 +57,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
     "django_filters",
+    "rangefilter",
     "corsheaders",
     "drf_spectacular",
     "django_celery_results",  # Celery natijalarini DB'da saqlash

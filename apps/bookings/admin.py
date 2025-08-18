@@ -126,13 +126,11 @@ class BookingAdmin(admin.ModelAdmin):
         "mark_as_cancelled",
     ]
 
-    @admin.display(description=_("Provider"))
+    @admin.display(description=_("Customer"))
     def get_customer_name(self, obj):
-        return (
-            obj.customer.user.get_full_name()
-            if obj.customer and obj.customer.user
-            else "-"
-        )
+        if obj.customer and obj.customer.user:
+            return f"{obj.customer.user.first_name} {obj.customer.user.last_name}"
+        return "-"
 
     # --- Actions ---
     @admin.action(description=_("Mark selected bookings as Accepted"))
@@ -175,7 +173,12 @@ class BookingAdmin(admin.ModelAdmin):
 @admin.register(BookingMessage)
 class BookingMessageAdmin(admin.ModelAdmin):
     list_display = ("id", "booking", "sender", "created_at", "is_system_message")
-    list_filter = ("is_system_message", "created_at", "sender", "booking")
+    list_filter = (
+        "is_system_message",
+        ("created_at", DateRangeFilter),
+        "sender",
+        "booking",
+    )
     search_fields = (
         "message",
         "sender__first_name",

@@ -8,17 +8,38 @@ from .models import (
     VerificationDocument,
     Availability,
 )
+from apps.common.models import Language, ServiceType
 
 
-# === CLIENT SERIALIZERS ===
+# ================== CLIENT SERIALIZERS ==================
+class ClientProfileCreateUpdateSerializer(serializers.ModelSerializer):
+    """
+    Client profil yaratish/yangilash uchun
+    """
+
+    languages = serializers.PrimaryKeyRelatedField(
+        queryset=Language.objects.all(), many=True, required=False
+    )
+
+    class Meta:
+        model = ClientProfile
+        fields = ["date_of_birth", "preferred_contact", "languages"]
+
+    def update(self, instance, validated_data):
+        languages = validated_data.pop("languages", None)
+        for attr, val in validated_data.items():
+            setattr(instance, attr, val)
+        instance.save()
+        if languages is not None:
+            instance.languages.set(languages)
+        return instance
+
+
 class ClientProfileSerializer(serializers.ModelSerializer):
-    """
-    Client uchun oddiy serializer - faqat kerakli ma'lumotlar
-    """
-
     user = UserShortSerializer(read_only=True)
     full_name = serializers.CharField(source="user.full_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
+    profile_id = serializers.IntegerField(source="id", read_only=True)
 
     class Meta:
         model = ClientProfile
@@ -27,6 +48,7 @@ class ClientProfileSerializer(serializers.ModelSerializer):
             "user",
             "full_name",
             "email",
+            "profile_id",
             "date_of_birth",
             "preferred_contact",
             "languages",
@@ -43,21 +65,7 @@ class ClientProfileSerializer(serializers.ModelSerializer):
         ]
 
 
-class ClientProfileCreateUpdateSerializer(serializers.ModelSerializer):
-    """
-    Client profil yaratish/yangilash uchun
-    """
-
-    class Meta:
-        model = ClientProfile
-        fields = ["date_of_birth", "preferred_contact", "languages"]
-
-
 class ClientProfileShortSerializer(serializers.ModelSerializer):
-    """
-    Client ning qisqa ma'lumotlari
-    """
-
     full_name = serializers.CharField(source="user.full_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
 
@@ -66,15 +74,63 @@ class ClientProfileShortSerializer(serializers.ModelSerializer):
         fields = ["id", "full_name", "email", "preferred_contact"]
 
 
-# === CUSTOMER SERIALIZERS ===
-class CustomerProfileSerializer(serializers.ModelSerializer):
-    """
-    Customer uchun to'liq serializer
-    """
+# ================== CUSTOMER SERIALIZERS ==================
+class CustomerProfileCreateUpdateSerializer(serializers.ModelSerializer):
+    languages = serializers.PrimaryKeyRelatedField(
+        queryset=Language.objects.all(), many=True, required=False
+    )
+    service_types = serializers.PrimaryKeyRelatedField(
+        queryset=ServiceType.objects.all(), many=True, required=False
+    )
 
+    class Meta:
+        model = CustomerProfile
+        fields = [
+            "professional_bio",
+            "years_of_experience",
+            "service_types",
+            "city",
+            "service_areas",
+            "hourly_rate",
+            "daily_rate",
+            "currency",
+            "languages",
+            "is_available",
+        ]
+
+    def validate_years_of_experience(self, value):
+        if value < 0:
+            raise serializers.ValidationError("Years of experience cannot be negative.")
+        return value
+
+    def validate_hourly_rate(self, value):
+        if value is not None and value < 0:
+            raise serializers.ValidationError("Hourly rate cannot be negative.")
+        return value
+
+    def validate_daily_rate(self, value):
+        if value is not None and value < 0:
+            raise serializers.ValidationError("Daily rate cannot be negative.")
+        return value
+
+    def update(self, instance, validated_data):
+        languages = validated_data.pop("languages", None)
+        service_types = validated_data.pop("service_types", None)
+        for attr, val in validated_data.items():
+            setattr(instance, attr, val)
+        instance.save()
+        if languages is not None:
+            instance.languages.set(languages)
+        if service_types is not None:
+            instance.service_types.set(service_types)
+        return instance
+
+
+class CustomerProfileSerializer(serializers.ModelSerializer):
     user = UserShortSerializer(read_only=True)
     full_name = serializers.CharField(source="user.full_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
+    profile_id = serializers.IntegerField(source="id", read_only=True)
     city_name = serializers.CharField(source="city.name", read_only=True)
     country_name = serializers.CharField(source="user.country_name", read_only=True)
 
@@ -85,6 +141,7 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             "user",
             "full_name",
             "email",
+            "profile_id",
             "country_name",
             "professional_bio",
             "years_of_experience",
@@ -124,32 +181,7 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
         ]
 
 
-class CustomerProfileCreateUpdateSerializer(serializers.ModelSerializer):
-    """
-    Customer profil yaratish/yangilash uchun
-    """
-
-    class Meta:
-        model = CustomerProfile
-        fields = [
-            "professional_bio",
-            "years_of_experience",
-            "service_types",
-            "city",
-            "service_areas",
-            "hourly_rate",
-            "daily_rate",
-            "currency",
-            "languages",
-            "is_available",
-        ]
-
-
 class CustomerProfileShortSerializer(serializers.ModelSerializer):
-    """
-    Customer ning qisqa ma'lumotlari (search results uchun)
-    """
-
     user = UserShortSerializer(read_only=True)
     city_name = serializers.CharField(source="city.name", read_only=True)
 
@@ -167,7 +199,7 @@ class CustomerProfileShortSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "user", "city_name", "average_rating", "is_verified"]
 
 
-# === PORTFOLIO SERIALIZERS ===
+# ================== PORTFOLIO SERIALIZERS ==================
 class PortfolioSerializer(serializers.ModelSerializer):
     customer_name = serializers.CharField(
         source="customer.user.full_name", read_only=True
@@ -188,7 +220,7 @@ class PortfolioSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "customer", "customer_name", "created_at"]
 
 
-# === VERIFICATION DOCUMENT SERIALIZERS ===
+# ================== VERIFICATION DOCUMENT SERIALIZERS ==================
 class VerificationDocumentSerializer(serializers.ModelSerializer):
     customer_name = serializers.CharField(
         source="customer.user.full_name", read_only=True
@@ -224,7 +256,7 @@ class VerificationDocumentSerializer(serializers.ModelSerializer):
         ]
 
 
-# === AVAILABILITY SERIALIZERS ===
+# ================== AVAILABILITY SERIALIZERS ==================
 class AvailabilitySerializer(serializers.ModelSerializer):
     customer_name = serializers.CharField(
         source="customer.user.full_name", read_only=True
@@ -244,3 +276,21 @@ class AvailabilitySerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = ["id", "customer", "customer_name", "created_at"]
+
+    def validate_date(self, value):
+        user = self.context["request"].user
+        try:
+            customer = user.customerprofile
+        except CustomerProfile.DoesNotExist:
+            raise serializers.ValidationError("You don't have a customer profile yet.")
+        if Availability.objects.filter(customer=customer, date=value).exists():
+            raise serializers.ValidationError(
+                f"Availability for {value} already exists."
+            )
+        return value
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        customer = user.customerprofile
+        validated_data["customer"] = customer
+        return super().create(validated_data)

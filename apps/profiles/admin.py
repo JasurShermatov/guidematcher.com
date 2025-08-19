@@ -12,110 +12,152 @@ from .models import (
 )
 
 
-# --- Inline klasslar ---
-class ClientProfileInline(admin.StackedInline):
-    model = ClientProfile
-    can_delete = False
-    verbose_name_plural = "Client Profile"
-    fk_name = "user"
-    autocomplete_fields = ["languages"]
-    fields = ("date_of_birth", "preferred_contact", "languages")
-    filter_horizontal = ("languages",)
-
-
-class CustomerProfileInline(admin.StackedInline):
-    model = CustomerProfile
-    can_delete = False
-    verbose_name_plural = "Customer Profile"
-    fk_name = "user"
-    autocomplete_fields = ["languages", "service_types", "city"]
-    fields = (
-        "professional_bio",
-        "years_of_experience",
-        "service_types",
-        "city",
-        "service_areas",
-        "hourly_rate",
-        "daily_rate",
-        "currency",
-        "languages",
-        "is_available",
-        "verification_status",
-        "verification_date",
-        "verification_notes",
-        "total_bookings",
-        "total_reviews",
-        "average_rating",
-    )
-    filter_horizontal = ("languages", "service_types")
-
-
-class PortfolioInline(admin.TabularInline):
-    model = Portfolio
-    extra = 0
-    autocomplete_fields = ["customer"]
-    fields = ("title", "image", "description", "order")
-    ordering = ("order",)
-
-
-class VerificationDocumentInline(admin.TabularInline):
-    model = VerificationDocument
-    extra = 0
-    autocomplete_fields = ["customer", "verified_by"]
-    fields = (
-        "document_type",
-        "file",
-        "description",
-        "is_verified",
-        "verified_by",
-        "verified_at",
-    )
-
-
-class AvailabilityInline(admin.TabularInline):
-    model = Availability
-    extra = 0
-    autocomplete_fields = ["customer"]
-    fields = ("date", "is_available", "start_time", "end_time", "note")
-
-
-# --- Profil alohida adminlari ---
+# --- Client Profile Admin ---
 @admin.register(ClientProfile)
 class ClientProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "date_of_birth", "preferred_contact")
-    search_fields = ("user__first_name", "user__email")
-    list_filter = ("preferred_contact",)
+    list_display = (
+        "get_user_email",  # User email
+        "get_user_full_name",  # User full name
+        "get_user_country",  # User country
+        "date_of_birth",
+        "preferred_contact",
+        "get_user_role",  # User role
+    )
+    search_fields = (
+        "user__first_name",
+        "user__last_name",
+        "user__email",
+        "user__country__name",
+    )
+    list_filter = (
+        "preferred_contact",
+        "user__country",
+        "user__is_verified",
+        "user__is_active",
+    )
     autocomplete_fields = ["user", "languages"]
     ordering = ("user__first_name",)
-    fields = ("user", "date_of_birth", "preferred_contact", "languages")
+
+    # Fieldsets - User ma'lumotlarini ham ko'rsatish
+    fieldsets = (
+        (
+            "User Information",
+            {
+                "fields": (
+                    "user",  # User tanlash
+                    "get_user_details",  # User ma'lumotlarini ko'rsatish
+                ),
+                "description": "Basic user information",
+            },
+        ),
+        (
+            "Profile Information",
+            {"fields": ("date_of_birth", "preferred_contact", "languages")},
+        ),
+    )
+    readonly_fields = ("get_user_details",)
     filter_horizontal = ("languages",)
 
+    # Custom metodlar - User ma'lumotlarini ko'rsatish uchun
+    def get_user_email(self, obj):
+        return obj.user.email
 
+    get_user_email.short_description = "Email"
+    get_user_email.admin_order_field = "user__email"
+
+    def get_user_full_name(self, obj):
+        return obj.user.full_name
+
+    get_user_full_name.short_description = "Full Name"
+    get_user_full_name.admin_order_field = "user__first_name"
+
+    def get_user_country(self, obj):
+        return obj.user.country_name if obj.user.country_name else "-"
+
+    get_user_country.short_description = "Country"
+    get_user_country.admin_order_field = "user__country__name"
+
+    def get_user_role(self, obj):
+        return obj.user.get_role_display()
+
+    get_user_role.short_description = "Role"
+    get_user_role.admin_order_field = "user__role"
+
+    def get_user_details(self, obj):
+        """User ning barcha ma'lumotlarini ko'rsatadi"""
+        if obj.user:
+            return format_html(
+                """
+                <div style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                    <strong>Email:</strong> {}<br>
+                    <strong>Name:</strong> {} {}<br>
+                    <strong>Country:</strong> {}<br>
+                    <strong>Role:</strong> {}<br>
+                    <strong>Verified:</strong> {}<br>
+                    <strong>Active:</strong> {}<br>
+                    <strong>Joined:</strong> {}
+                </div>
+                """,
+                obj.user.email,
+                obj.user.first_name,
+                obj.user.last_name,
+                obj.user.country_name or "Not specified",
+                obj.user.get_role_display(),
+                "✅" if obj.user.is_verified else "❌",
+                "✅" if obj.user.is_active else "❌",
+                obj.user.date_joined.strftime("%Y-%m-%d %H:%M"),
+            )
+        return "No user assigned"
+
+    get_user_details.short_description = "User Details"
+
+
+# --- Customer Profile Admin (yaxshilangan) ---
 @admin.register(CustomerProfile)
 class CustomerProfileAdmin(admin.ModelAdmin):
     list_display = (
-        "user",
+        "get_user_email",
+        "get_user_full_name",
         "city",
         "is_available",
         "verification_status",
         "average_rating",
+        "total_bookings",
     )
-    search_fields = ("user__first_name", "user__email", "city__name")
-    list_filter = ("city", "is_available", "verification_status")
+    search_fields = ("user__first_name", "user__last_name", "user__email", "city__name")
+    list_filter = ("city", "is_available", "verification_status", "user__country")
     autocomplete_fields = ["user", "languages", "service_types", "city"]
     ordering = ("-average_rating",)
+
     fieldsets = (
-        (None, {"fields": ("user", "professional_bio", "years_of_experience")}),
         (
-            "Service Info",
+            "User Information",
+            {
+                "fields": ("user", "get_user_details"),
+                "description": "Basic user information",
+            },
+        ),
+        (
+            "Professional Information",
             {
                 "fields": (
+                    "professional_bio",
+                    "years_of_experience",
                     "service_types",
+                    "languages",
+                )
+            },
+        ),
+        (
+            "Location & Service",
+            {
+                "fields": (
                     "city",
                     "service_areas",
                     "hourly_rate",
                     "daily_rate",
                     "currency",
+                    "is_available",
                 )
             },
         ),
@@ -130,11 +172,9 @@ class CustomerProfileAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Other",
+            "Statistics",
             {
                 "fields": (
-                    "languages",
-                    "is_available",
                     "total_bookings",
                     "total_reviews",
                     "average_rating",
@@ -142,9 +182,51 @@ class CustomerProfileAdmin(admin.ModelAdmin):
             },
         ),
     )
+    readonly_fields = ("get_user_details",)
     filter_horizontal = ("languages", "service_types")
 
+    # User ma'lumotlarini ko'rsatish
+    def get_user_email(self, obj):
+        return obj.user.email
 
+    get_user_email.short_description = "Email"
+    get_user_email.admin_order_field = "user__email"
+
+    def get_user_full_name(self, obj):
+        return obj.user.full_name
+
+    get_user_full_name.short_description = "Full Name"
+
+    def get_user_details(self, obj):
+        """User ning barcha ma'lumotlarini ko'rsatadi"""
+        if obj.user:
+            return format_html(
+                """
+                <div style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                    <strong>Email:</strong> {}<br>
+                    <strong>Name:</strong> {} {}<br>
+                    <strong>Country:</strong> {}<br>
+                    <strong>Role:</strong> {}<br>
+                    <strong>Verified:</strong> {}<br>
+                    <strong>Active:</strong> {}<br>
+                    <strong>Joined:</strong> {}
+                </div>
+                """,
+                obj.user.email,
+                obj.user.first_name,
+                obj.user.last_name,
+                obj.user.country_name or "Not specified",
+                obj.user.get_role_display(),
+                "✅" if obj.user.is_verified else "❌",
+                "✅" if obj.user.is_active else "❌",
+                obj.user.date_joined.strftime("%Y-%m-%d %H:%M"),
+            )
+        return "No user assigned"
+
+    get_user_details.short_description = "User Details"
+
+
+# --- Qolgan admin klasslar (o'zgarishsiz) ---
 @admin.register(Portfolio)
 class PortfolioAdmin(admin.ModelAdmin):
     list_display = ("linked_customer", "title", "order")

@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 class EmailVerification(models.Model):
-    email = models.EmailField(db_index=True, unique=True)  # 1-email=1-aktiKodni
+    email = models.EmailField(db_index=True, unique=True)
     code = models.CharField(max_length=6, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()

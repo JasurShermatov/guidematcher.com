@@ -1,22 +1,18 @@
-# apps/accounts/views.py
+#  apps/accounts/views.py
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from drf_spectacular.utils import extend_schema
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenBlacklistView,
-)
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
-from apps.users.serializers import AuthTokenSerializer
 
 from .serializers import (
+    CustomTokenObtainPairSerializer,
     RequestVerificationCodeSerializer,
     RegisterSerializer,
     PasswordResetRequestSerializer,
     PasswordResetConfirmSerializer,
-    LogoutSerializer,  # ← Import qilish
+    LogoutSerializer,
 )
 
 
@@ -25,8 +21,8 @@ from .serializers import (
     summary="User Login",
     description="Authenticate user with email and password",
 )
-class LoginView(TokenObtainPairView):
-    serializer_class = AuthTokenSerializer
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
     def post(self, request, *args, **kwargs):
         request.data["email"] = request.data.get("email", "").lower().strip()
@@ -35,6 +31,21 @@ class LoginView(TokenObtainPairView):
         user = serializer.user
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
+
+        # 🔑 Profile ID aniqlash (lazy import)
+        profile_id = None
+        if user.role == "Client":
+            from apps.clients.models import ClientProfile
+
+            profile = ClientProfile.objects.filter(user=user).first()
+            if profile:
+                profile_id = profile.id
+        elif user.role == "Customer":
+            from apps.customers.models import CustomerProfile
+
+            profile = CustomerProfile.objects.filter(user=user).first()
+            if profile:
+                profile_id = profile.id
 
         response_data = {
             "message": "Login successful.",
@@ -47,6 +58,7 @@ class LoginView(TokenObtainPairView):
                 "last_name": user.last_name,
                 "role": user.role,
                 "country": user.country_name if user.country else None,
+                "profile_id": profile_id,
             },
         }
         return Response(response_data, status=status.HTTP_200_OK)
@@ -89,23 +101,22 @@ class RegisterView(generics.CreateAPIView):
         user = serializer.save()
 
         refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
-
-        response_data = {
-            "message": "User registered successfully.",
-            "user": {
-                "id": user.id,
-                "email": user.email,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "role": user.role,
-                "country": user.country_name if user.country else None,
+        return Response(
+            {
+                "message": "User registered successfully.",
+                "user": {
+                    "id": user.id,
+                    "email": user.email,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "role": user.role,
+                    "country": user.country_name if user.country else None,
+                },
+                "access_token": str(refresh.access_token),
+                "refresh_token": str(refresh),
             },
-            "access_token": access_token,
-            "refresh_token": str(refresh),
-        }
-
-        return Response(response_data, status=status.HTTP_201_CREATED)
+            status=status.HTTP_201_CREATED,
+        )
 
 
 @extend_schema(
@@ -166,18 +177,16 @@ class PasswordResetConfirmView(generics.CreateAPIView):
     summary="Logout User",
     description="Blacklist the refresh token to logout user",
 )
-class LogoutView(generics.GenericAPIView):  # ← GenericAPIView ishlatish
+class LogoutView(generics.GenericAPIView):
     permission_classes = [AllowAny]
-    serializer_class = LogoutSerializer  # ← Serializer qo'shish
+    serializer_class = LogoutSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         try:
-            token = RefreshToken(serializer.validated_data["refresh"])
-            token.blacklist()
-
+            RefreshToken(serializer.validated_data["refresh"]).blacklist()
             return Response(
                 {"message": "Successfully logged out"}, status=status.HTTP_200_OK
             )

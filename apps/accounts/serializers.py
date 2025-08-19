@@ -5,6 +5,10 @@ import string
 import logging
 from django.conf import settings
 from django.utils import timezone
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
 from django.core.cache import cache
 from rest_framework import serializers
 from apps.users.models import User, Country
@@ -162,6 +166,27 @@ class RegisterSerializer(serializers.ModelSerializer):
         send_welcome_email.delay(user.email, user.first_name)
 
         return user
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        return super().get_token(user)
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        user = self.user
+
+        data.update(
+            {
+                "user_id": user.id,
+                "email": user.email,
+                "role": user.role,
+                # Profile ID hozircha None, view’da to‘ldiriladi
+                "profile_id": None,
+            }
+        )
+        return data
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):

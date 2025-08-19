@@ -57,6 +57,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
     "django_filters",
+    "rangefilter",
     "corsheaders",
     "drf_spectacular",
     "django_celery_results",  # Celery natijalarini DB'da saqlash
@@ -118,11 +119,11 @@ TEMPLATES = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("POSTGRES_DB", default="postgres"),
-        "USER": env("POSTGRES_USER", default="postgres"),
-        "PASSWORD": env("POSTGRES_PASSWORD", default="postgres"),
-        "HOST": env("POSTGRES_HOST", default="db"),
-        "PORT": env("POSTGRES_PORT", default="5432"),
+        "NAME": env("POSTGRES_DB"),
+        "USER": env("POSTGRES_USER"),
+        "PASSWORD": env("POSTGRES_PASSWORD"),
+        "HOST": env("POSTGRES_HOST"),
+        "PORT": env("POSTGRES_PORT"),
     }
 }
 
@@ -196,9 +197,8 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "GuideMatcher API",
     "DESCRIPTION": "TravMatch platform REST API",
     "VERSION": "1.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,
+    "SERVE_INCLUDE_SCHEMA": True,
 }
-
 # ╭──────────────────────────────────────────────────────────────╮
 # | 11. E-mail (Gmail SMTP)                                     |
 # ╰──────────────────────────────────────────────────────────────╯

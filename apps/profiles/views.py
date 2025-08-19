@@ -1,13 +1,13 @@
-#  apps/profiles/views.py
+# apps/profiles/views.py
 from drf_spectacular.utils import extend_schema
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied, ValidationError
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied, ValidationError, NotFound
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from .filters import CustomerProfileFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+
 from .models import (
     ClientProfile,
     CustomerProfile,
@@ -15,61 +15,133 @@ from .models import (
     Availability,
     VerificationDocument,
 )
-from .permissions import RoleBasedProfilePermission, IsOwnerOrAdmin
 from .serializers import (
     ClientProfileSerializer,
+    ClientProfileCreateUpdateSerializer,
     CustomerProfileSerializer,
+    CustomerProfileCreateUpdateSerializer,
     PortfolioSerializer,
-    AvailabilitySerializer,
     VerificationDocumentSerializer,
+    AvailabilitySerializer,
 )
+from .permissions import IsOwnerOrAdmin
+from .filters import CustomerProfileFilter
 
 
-@extend_schema(tags=["Client Profile"])
-class ClientProfileViewSet(viewsets.ModelViewSet):
-    serializer_class = ClientProfileSerializer
-    queryset = ClientProfile.objects.all()
-    permission_classes = [IsAuthenticated, RoleBasedProfilePermission, IsOwnerOrAdmin]
+# ================== BASE PROFILE VIEWSET ==================
+class BaseProfileViewSet(viewsets.ModelViewSet):
+    """
+    Common logic for ClientProfile & CustomerProfile
+    Supports user_id lookup instead of profile_id.
+    """
+
+    lookup_field = "user_id"  # <-- Endi user_id orqali ishlaydi
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            permission_classes = [AllowAny]
+        elif self.action in ["my_profile"]:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
+    def get_serializer_class(self):
+        if self.action in ["create", "update", "partial_update"]:
+            return self.create_update_serializer_class
+        return self.serializer_class
+
+    def get_object(self):
+        if self.action == "my_profile":
+            try:
+                return getattr(self.request.user, self.profile_attr)
+            except self.model.DoesNotExist:
+                raise NotFound({"detail": "Profile not found."})
+
+        # user_id bo'yicha olish
+        user_id = self.kwargs.get("user_id")
+        try:
+            return self.model.objects.get(user_id=user_id)
+        except self.model.DoesNotExist:
+            raise NotFound(
+                {"detail": f"No {self.model.__name__} matches this user ID."}
+            )
+
+    @action(detail=False, methods=["get", "put", "patch"], url_path="my")
+    def my_profile(self, request):
+        """
+        O'z profilini olish va yangilash
+        """
+        profile = getattr(request.user, self.profile_attr, None)
+        if not profile:
+            raise NotFound({"detail": "Profile not found."})
+
+        if request.method == "GET":
+            serializer = self.serializer_class(profile)
+            return Response(serializer.data)
+
+        partial = request.method == "PATCH"
+        serializer = self.create_update_serializer_class(
+            profile, data=request.data, partial=partial
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(self.serializer_class(profile).data)
 
     def perform_create(self, serializer):
-        if hasattr(self.request.user, "clientprofile"):
-            raise ValidationError({"detail": "You already have a client profile."})
+        if hasattr(self.request.user, self.profile_attr):
+            raise ValidationError({"detail": "You already have a profile."})
+        if self.request.user.role != self.user_role:
+            raise ValidationError(
+                {"detail": f"Only {self.user_role}s can create profile."}
+            )
         serializer.save(user=self.request.user)
 
-    @action(detail=False, methods=["get"], url_path="my")
-    def my_profile(self, request):
-        try:
-            profile = request.user.clientprofile
-        except ClientProfile.DoesNotExist:
-            raise ValidationError({"detail": "You don’t have a client profile yet."})
-        serializer = self.get_serializer(profile)
-        return Response(serializer.data)
+    def perform_update(self, serializer):
+        obj = self.get_object()
+        if obj.user != self.request.user and not getattr(
+            self.request.user, "is_admin", False
+        ):
+            raise PermissionDenied({"detail": "You can only update your own profile."})
+        serializer.save()
 
 
+# ================== CLIENT PROFILE ==================
+@extend_schema(tags=["Client Profile"])
+class ClientProfileViewSet(BaseProfileViewSet):
+    model = ClientProfile
+    queryset = ClientProfile.objects.all()
+    serializer_class = ClientProfileSerializer
+    create_update_serializer_class = ClientProfileCreateUpdateSerializer
+    profile_attr = "clientprofile"
+    user_role = "client"
+
+
+# ================== CUSTOMER PROFILE ==================
 @extend_schema(tags=["Customer Profile"])
-class CustomerProfileViewSet(viewsets.ModelViewSet):
-    serializer_class = CustomerProfileSerializer
+class CustomerProfileViewSet(BaseProfileViewSet):
+    model = CustomerProfile
     queryset = CustomerProfile.objects.all()
-    permission_classes = [IsAuthenticated, RoleBasedProfilePermission, IsOwnerOrAdmin]
+    serializer_class = CustomerProfileSerializer
+    create_update_serializer_class = CustomerProfileCreateUpdateSerializer
+    profile_attr = "customerprofile"
+    user_role = "customer"
+
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = CustomerProfileFilter
+    search_fields = ["user__first_name", "user__last_name", "professional_bio"]
+    ordering_fields = ["average_rating", "created_at", "years_of_experience"]
+    ordering = ["-average_rating"]
 
-    def perform_create(self, serializer):
-        if CustomerProfile.objects.filter(user=self.request.user).exists():
-            raise ValidationError({"detail": "You already have a customer profile."})
-        serializer.save(user=self.request.user)
-
-    @action(detail=False, methods=["get"], url_path="my")
-    def my_profile(self, request):
-        try:
-            profile = request.user.customerprofile
-        except CustomerProfile.DoesNotExist:
-            raise ValidationError({"detail": "You don’t have a customer profile yet."})
-        serializer = self.get_serializer(profile)
-        return Response(serializer.data)
+    def get_queryset(self):
+        if self.action in ["list", "retrieve"]:
+            # Public view
+            return CustomerProfile.objects.filter(is_available=True)
+        # Private: faqat o'z profili
+        return CustomerProfile.objects.filter(user=self.request.user)
 
 
-@extend_schema(tags=["CustomerOwnedModel"])
+# ================== BASE CUSTOMER-OWNED VIEWSET ==================
 class CustomerOwnedModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
 
@@ -81,9 +153,9 @@ class CustomerOwnedModelViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         customer = self.get_customer_profile()
-        if not customer and not self.request.user.is_admin:
+        if not customer and not getattr(self.request.user, "is_admin", False):
             raise PermissionDenied(
-                detail={"message": "❌ You must be a customer to create this resource."}
+                {"detail": "You must be a customer to create this resource."}
             )
         serializer.save(customer=customer)
 
@@ -94,6 +166,7 @@ class CustomerOwnedModelViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+# ================== PORTFOLIO ==================
 @extend_schema(tags=["Portfolio"])
 class PortfolioViewSet(CustomerOwnedModelViewSet):
     serializer_class = PortfolioSerializer
@@ -101,11 +174,12 @@ class PortfolioViewSet(CustomerOwnedModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_admin:
+        if getattr(user, "is_admin", False):
             return Portfolio.objects.all()
         return Portfolio.objects.filter(customer__user=user)
 
 
+# ================== VERIFICATION DOCUMENT ==================
 @extend_schema(tags=["VerificationDocument"])
 class VerificationDocumentViewSet(CustomerOwnedModelViewSet):
     serializer_class = VerificationDocumentSerializer
@@ -113,31 +187,32 @@ class VerificationDocumentViewSet(CustomerOwnedModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_admin:
+        if getattr(user, "is_admin", False):
             return VerificationDocument.objects.all()
         return VerificationDocument.objects.filter(customer__user=user)
 
 
-@extend_schema(tags=["Ability"])
+# ================== AVAILABILITY ==================
+@extend_schema(tags=["Availability"])
 class AvailabilityViewSet(CustomerOwnedModelViewSet):
     serializer_class = AvailabilitySerializer
     queryset = Availability.objects.all()
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_admin:
+        if getattr(user, "is_admin", False):
             return Availability.objects.all()
         return Availability.objects.filter(customer__user=user)
 
     def perform_create(self, serializer):
-        try:
-            customer_profile = self.request.user.customerprofile
-        except CustomerProfile.DoesNotExist:
-            raise ValidationError({"detail": "You don’t have a customer profile yet."})
+        customer_profile = self.get_customer_profile()
+        if not customer_profile:
+            raise ValidationError({"detail": "You don't have a customer profile yet."})
 
         date = serializer.validated_data.get("date")
         if Availability.objects.filter(customer=customer_profile, date=date).exists():
             raise ValidationError(
                 {"detail": f"Availability for {date} already exists."}
             )
+
         serializer.save(customer=customer_profile)

@@ -141,6 +141,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     country_name = serializers.CharField(read_only=True)
+    profile_id = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -157,6 +158,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "country",
             "country_name",
             "date_joined",
+            "profile_id",  # qo‘shildi
         )
         read_only_fields = (
             "id",
@@ -166,13 +168,46 @@ class ProfileSerializer(serializers.ModelSerializer):
             "full_name",
             "country_name",
             "date_joined",
+            "profile_id",
         )
+
+    def get_profile_id(self, obj):
+        # CustomerProfile bormi?
+        if hasattr(obj, "customerprofile") and obj.customerprofile:
+            return obj.customerprofile.id
+        # ClientProfile bormi?
+        if hasattr(obj, "clientprofile") and obj.clientprofile:
+            return obj.clientprofile.id
+        return None
 
 
 class UserShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "full_name", "avatar")
+
+
+class UserResponseSerializer(serializers.ModelSerializer):
+    profile_id = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "role",
+            "country",
+            "profile_id",
+        ]
+
+    def get_profile_id(self, obj):
+        if obj.role == User.UserRole.CUSTOMER and hasattr(obj, "customerprofile"):
+            return obj.customerprofile.id
+        elif obj.role == User.UserRole.CLIENT and hasattr(obj, "clientprofile"):
+            return obj.clientprofile.id
+        return None
 
 
 __all__ = [

@@ -307,15 +307,9 @@ class ChatRoomManager(models.Manager):
         """O'qilmagan xabarlari bor xonalarni topish"""
         user_id = str(user.id)
 
-        # Xavfsiz PostgreSQL JSON query
-        return (
-            self.filter(participants=user, is_active=True)
-            .annotate(
-                user_unread=Cast(
-                    KeyTextTransform(user_id, "unread_counts"), IntegerField()
-                )
-            )
-            .filter(user_unread__gt=0)
+        # PostgreSQL uchun
+        return self.filter(participants=user, is_active=True).extra(
+            where=["(unread_counts->>%s)::int > 0"], params=[user_id]
         )
 
 

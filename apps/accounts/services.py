@@ -79,7 +79,6 @@ def create_and_send_password_reset_code(
 
 
 def validate_password_reset_code(email: str, code: str) -> User:
-    """Validate password reset code and return user"""
     try:
         ev = EmailVerification.objects.get(
             email=email.lower().strip(), code=code, is_used=False
@@ -88,7 +87,6 @@ def validate_password_reset_code(email: str, code: str) -> User:
         if ev.is_expired():
             raise ValueError("Code has expired")
 
-        # Mark as used
         ev.mark_used()
 
         return User.objects.get(email=email)

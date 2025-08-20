@@ -132,7 +132,6 @@ class BookingAdmin(admin.ModelAdmin):
             return f"{obj.customer.user.first_name} {obj.customer.user.last_name}"
         return "-"
 
-    # --- Actions ---
     @admin.action(description=_("Mark selected bookings as Accepted"))
     def mark_as_accepted(self, request, queryset):
         updated = queryset.filter(status=Booking.BookingStatus.PENDING).update(

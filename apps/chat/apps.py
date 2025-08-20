@@ -6,25 +6,13 @@ logger = logging.getLogger(__name__)
 
 
 class ChatConfig(AppConfig):
-    """
-    Optimized Chat application configuration with signal registration
-    and performance monitoring.
-    """
 
     default_auto_field = "django.db.models.BigAutoField"
     name = "apps.chat"
     verbose_name = "Chat System"
 
     def ready(self):
-        """
-        Initialize chat system components when Django starts.
 
-        This method:
-        1. Registers all signal handlers
-        2. Sets up background tasks
-        3. Configures performance monitoring
-        4. Initializes WebSocket connections
-        """
         try:
             # Import signals to register them
             from . import signals
@@ -53,9 +41,7 @@ class ChatConfig(AppConfig):
             # Don't raise exception to avoid breaking Django startup
 
     def _setup_periodic_tasks(self):
-        """
-        Setup periodic background tasks for chat maintenance.
-        """
+
         try:
             # Only setup if Celery is available
             try:
@@ -72,9 +58,7 @@ class ChatConfig(AppConfig):
             logger.warning("Could not setup periodic tasks: %s", e)
 
     def _register_periodic_tasks(self):
-        """
-        Register periodic tasks for chat maintenance.
-        """
+
         from celery.schedules import crontab
         from django.conf import settings
 
@@ -100,9 +84,7 @@ class ChatConfig(AppConfig):
         )
 
     def _setup_performance_monitoring(self):
-        """
-        Setup performance monitoring for chat operations.
-        """
+
         try:
             from django.conf import settings
 
@@ -126,21 +108,15 @@ class ChatConfig(AppConfig):
             logger.warning("Could not setup performance monitoring: %s", e)
 
     def _should_validate_on_startup(self):
-        """
-        Check if data validation should run on startup.
-        """
         from django.conf import settings
 
         return getattr(settings, "CHAT_VALIDATE_ON_STARTUP", False)
 
     def _validate_data_consistency(self):
-        """
-        Run data consistency validation on startup.
-        """
+
         try:
             from .signals import validate_room_data_consistency
 
-            # Run validation asynchronously to avoid blocking startup
             from threading import Thread
 
             def run_validation():
@@ -163,10 +139,6 @@ class ChatConfig(AppConfig):
         except Exception as e:
             logger.warning("Could not start data validation: %s", e)
 
-
-# ══════════════════════════════════════════════════════════════════════
-# CELERY TASKS (Optional - only if Celery is available)
-# ══════════════════════════════════════════════════════════════════════
 
 # apps/chat/tasks.py
 """

@@ -18,7 +18,6 @@ class Booking(BaseModel):
         COMPLETED = "completed", _("Completed")
         EXPIRED = "expired", _("Expired")
 
-    # Users
     client = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -32,7 +31,6 @@ class Booking(BaseModel):
         verbose_name=_("Service provider"),
     )
 
-    # Service details
     service_type = models.ForeignKey(
         ServiceType, on_delete=models.PROTECT, verbose_name=_("Service type")
     )
@@ -41,7 +39,6 @@ class Booking(BaseModel):
         verbose_name=_("Description"), help_text=_("Describe what you need")
     )
 
-    # Dates and time
     start_date = models.DateField(verbose_name=_("Start date"))
     end_date = models.DateField(verbose_name=_("End date"))
     start_time = models.TimeField(null=True, blank=True, verbose_name=_("Start time"))
@@ -49,7 +46,6 @@ class Booking(BaseModel):
         null=True, blank=True, verbose_name=_("Duration (hours)")
     )
 
-    # Location
     location = models.CharField(
         max_length=255, blank=True, verbose_name=_("Meeting location")
     )
@@ -69,7 +65,6 @@ class Booking(BaseModel):
         verbose_name=_("Longitude"),
     )
 
-    # Pricing
     proposed_rate = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -87,7 +82,6 @@ class Booking(BaseModel):
     )
     currency = models.CharField(max_length=3, default="USD", verbose_name=_("Currency"))
 
-    # Status
     status = models.CharField(
         max_length=20,
         choices=BookingStatus.choices,
@@ -95,7 +89,6 @@ class Booking(BaseModel):
         verbose_name=_("Status"),
     )
 
-    # Response from provider
     provider_response = models.TextField(
         blank=True, verbose_name=_("Provider response")
     )
@@ -108,7 +101,6 @@ class Booking(BaseModel):
         verbose_name=_("Counter offer rate"),
     )
 
-    # Important dates
     responded_at = models.DateTimeField(
         null=True, blank=True, verbose_name=_("Responded at")
     )
@@ -133,7 +125,6 @@ class Booking(BaseModel):
         blank=True, verbose_name=_("Cancellation reason")
     )
 
-    # Additional
     special_requirements = models.TextField(
         blank=True, verbose_name=_("Special requirements")
     )
@@ -169,7 +160,6 @@ class Booking(BaseModel):
 
 
 class BookingMessage(BaseModel):
-    """Messages related to specific bookings"""
 
     booking = models.ForeignKey(
         Booking,

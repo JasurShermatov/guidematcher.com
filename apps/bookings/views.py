@@ -15,7 +15,6 @@ from apps.bookings.serializers import (
 )
 from apps.common.permissions import (
     IsClient,
-    IsCustomer,
     IsBookingParticipant,
     IsOwnerOrReadOnly,
 )
@@ -89,7 +88,6 @@ class BookingViewSet(viewsets.ModelViewSet):
         return BookingSerializer
 
     def get_permissions(self):
-        """Return appropriate permissions depending on action"""
         if self.action == "create":
             return [IsClient()]
         elif self.action in [
@@ -106,10 +104,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def perform_create(self, serializer):
-        """Automatically assign client as request user on creation"""
         serializer.save(client=self.request.user)
-
-    # ──────────────────────────── Custom Actions ──────────────────────────── #
 
     @action(detail=True, methods=["post"])
     @extend_schema(
@@ -279,9 +274,6 @@ class BookingViewSet(viewsets.ModelViewSet):
         return Response(BookingSerializer(booking).data)
 
 
-# ──────────────────────────── BookingMessageViewSet ──────────────────────────── #
-
-
 @extend_schema_view(
     list=extend_schema(
         summary="List Booking Messages",
@@ -308,16 +300,11 @@ class BookingViewSet(viewsets.ModelViewSet):
 )
 @extend_schema(tags=["booking"])
 class BookingMessageViewSet(viewsets.ModelViewSet):
-    """
-    Chat/messages inside a booking.
-    Allows participants to list and create messages.
-    """
 
     serializer_class = BookingMessageSerializer
     permission_classes = [IsBookingParticipant]
 
     def get_queryset(self):
-        """Return all messages for the given booking_id"""
         return (
             BookingMessage.objects.filter(booking_id=self.kwargs["booking_pk"])
             .select_related("sender")
@@ -332,5 +319,4 @@ class BookingMessageViewSet(viewsets.ModelViewSet):
         )
 
     def perform_create(self, serializer):
-        """Automatically assign sender and booking_id on message creation"""
         serializer.save(sender=self.request.user, booking_id=self.kwargs["booking_pk"])

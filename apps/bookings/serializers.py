@@ -7,7 +7,6 @@ from apps.profiles.serializers import CustomerProfileShortSerializer
 from apps.common.serializers import ServiceTypeSerializer
 
 
-# ─────────── BaseBookingSerializer (umumiy maydonlar) ───────────
 class BaseBookingSerializer(serializers.ModelSerializer):
     status_display = serializers.CharField(source="get_status_display", read_only=True)
 
@@ -32,13 +31,11 @@ class BaseBookingSerializer(serializers.ModelSerializer):
         )
 
 
-# ─────────── BookingShort (Dispute yoki list uchun) ───────────
 class BookingShortSerializer(BaseBookingSerializer):
     class Meta(BaseBookingSerializer.Meta):
         fields = BaseBookingSerializer.Meta.fields
 
 
-# ─────────── Booking (to‘liq) ───────────
 class BookingSerializer(BaseBookingSerializer):
     client = UserShortSerializer(read_only=True)
     customer = CustomerProfileShortSerializer(read_only=True)
@@ -81,7 +78,6 @@ class BookingSerializer(BaseBookingSerializer):
         )
 
 
-# ─────────── BookingCreate / Update ───────────
 class BookingCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
@@ -134,7 +130,6 @@ class BookingCreateSerializer(serializers.ModelSerializer):
         return data
 
 
-# ─────────── BookingMessage ───────────
 class BookingMessageSerializer(serializers.ModelSerializer):
     sender = UserShortSerializer(read_only=True)
 

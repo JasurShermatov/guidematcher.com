@@ -40,7 +40,7 @@ api_v1_patterns = [
     path("auth/", include("apps.users.urls")),  # 👤 Google auth, password reset
     path("common/", include("apps.common.urls")),  # 🌍 Countries, cities, services
     path("bookings/", include("apps.bookings.urls")),  # 📦 Booking-related endpoints
-    path("api/v1/chat/", include("apps.chat.urls")),  # 💬 Chat and messaging
+    path("chat/", include("apps.chat.urls")),  # 💬 Chat and messaging
     path("reviews/", include("apps.reviews.urls")),  # ⭐ Review & rating
     path(
         "notifications/", include("apps.notifications.urls")

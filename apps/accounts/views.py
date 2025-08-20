@@ -32,7 +32,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
 
-        # 🔑 Profile ID aniqlash (lazy import)
         profile_id = None
         if user.role == "Client":
             from apps.clients.models import ClientProfile

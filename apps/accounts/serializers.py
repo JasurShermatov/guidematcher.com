@@ -47,7 +47,6 @@ class RequestVerificationCodeSerializer(serializers.Serializer):
     def create(self, validated_data):
         email = validated_data["email"]
 
-        # Invalidate previous codes
         EmailVerification.objects.filter(email=email, is_used=False).update(
             is_used=True
         )
@@ -67,7 +66,6 @@ class RequestVerificationCodeSerializer(serializers.Serializer):
             email, code, expires_in_seconds=DEFAULT_EXPIRE_SECONDS
         )
 
-        # Increment rate limit counter
         cache_key = f"verification_request:{email}"
         request_count = cache.get(cache_key, 0) + 1
         cache.set(cache_key, request_count, timeout=15 * 60)  # 15 minutes
@@ -182,7 +180,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 "user_id": user.id,
                 "email": user.email,
                 "role": user.role,
-                # Profile ID hozircha None, view’da to‘ldiriladi
                 "profile_id": None,
             }
         )
@@ -209,22 +206,18 @@ class PasswordResetRequestSerializer(serializers.Serializer):
     def create(self, validated_data):
         email = validated_data["email"]
 
-        # ✅ Rate limiting counter oshirish
         cache_key = f"password_reset_request:{email}"
         request_count = cache.get(cache_key, 0) + 1
         cache.set(cache_key, request_count, timeout=30 * 60)  # 30 minutes
 
-        # ✅ User.DoesNotExist handle qilish
         try:
             user = User.objects.get(email=email, is_active=True)
             create_and_send_password_reset_code(user)
             logger.info(f"Password reset code sent to {email}")
         except User.DoesNotExist:
-            # Security: user mavjudligini oshkor qilmaymiz
             logger.info(f"Password reset attempted for non-existent email: {email}")
-            pass  # Silent fail
+            pass
 
-        # ✅ Har doim bir xil response (security best practice)
         return {
             "message": "If an account exists with this email, a password reset code has been sent.",
             "detail": "Please check your email for the verification code.",
@@ -252,7 +245,6 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         email = attrs["email"].lower().strip()
         code = attrs["code"]
 
-        # ✅ Rate limiting for code verification
         cache_key = f"password_reset_verify:{email}"
         attempt_count = cache.get(cache_key, 0)
 
@@ -265,10 +257,8 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         try:
             user = validate_password_reset_code(email, code)
             attrs["user"] = user
-            # Clear rate limit on success
             cache.delete(cache_key)
         except ValueError as e:
-            # Increment failed attempts
             cache.set(cache_key, attempt_count + 1, timeout=15 * 60)
             raise serializers.ValidationError({"code": str(e)})
 

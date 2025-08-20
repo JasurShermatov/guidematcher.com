@@ -30,6 +30,7 @@ class RateLimiter:
     """
 
     def __init__(self, max_messages: int = 30, time_window: int = 60):
+
         self._message_times: Dict[str, List[float]] = defaultdict(list)
         self._max_messages = max_messages
         self._time_window = time_window
@@ -487,9 +488,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     @database_sync_to_async
     def _check_room_access(self, user_id: str, room_id: str) -> bool:
-        """Room access tekshirish"""
+        """
+        User ID orqali room access tekshirish
+        """
         return ChatRoom.objects.filter(
-            id=room_id, participants__id=user_id, is_active=True
+            Q(id=room_id) & Q(participants__id=user_id) & Q(is_active=True)
         ).exists()
 
     @database_sync_to_async

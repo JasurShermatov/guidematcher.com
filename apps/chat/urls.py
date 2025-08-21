@@ -1,50 +1,42 @@
-# apps/chat/urls.py
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
-from rest_framework_nested.routers import NestedDefaultRouter
-from apps.chat.views import (
-    ChatRoomViewSet,
-    MessageViewSet,
-    MessageReadListView,
-    TypingStatusView,
-    ActiveTypersView,
-    # BookingChatViewSet -> agar views.py da yozilmagan bo‘lsa, import qilmang!
-)
+# urls.py
+from django.urls import path
+from . import views
 
-# ==================== MAIN ROUTER ====================
-router = DefaultRouter()
-router.register(r"rooms", ChatRoomViewSet, basename="chat-room")
-
-# Agar BookingChatViewSet mavjud bo‘lsa, ochamiz:
-# router.register(r"booking-chats", BookingChatViewSet, basename="booking-chat")
-
-# ==================== NESTED ROUTERS ====================
-rooms_router = NestedDefaultRouter(router, r"rooms", lookup="room")
-rooms_router.register(r"messages", MessageViewSet, basename="room-messages")
-
-# ==================== APP CONFIG ====================
 app_name = "chat"
 
-# ==================== URL PATTERNS ====================
 urlpatterns = [
-    # Asosiy routerlar
-    path("", include(router.urls)),
-    path("", include(rooms_router.urls)),
-    # Xabarlarni o‘qilgan qilib belgilash (read receipts)
+    # Conversation endpoints
     path(
-        "rooms/<uuid:room_pk>/messages/<uuid:message_pk>/read-receipts/",
-        MessageReadListView.as_view(),
-        name="message-read-receipts",
-    ),
-    # Typing status
-    path(
-        "rooms/<uuid:room_pk>/typing/",
-        TypingStatusView.as_view(),
-        name="typing-status",
+        "conversations/",
+        views.ConversationListCreateView.as_view(),
+        name="conversation-list-create",
     ),
     path(
-        "rooms/<uuid:room_pk>/typing/active/",
-        ActiveTypersView.as_view(),
-        name="active-typers",
+        "conversations/<int:pk>/",
+        views.ConversationDetailView.as_view(),
+        name="conversation-detail",
     ),
+    # Message endpoints
+    path(
+        "conversations/<int:conversation_id>/messages/",
+        views.MessageListView.as_view(),
+        name="message-list",
+    ),
+    path("messages/send/", views.MessageCreateView.as_view(), name="message-create"),
+    path(
+        "messages/<int:message_id>/action/", views.message_action, name="message-action"
+    ),
+    # Message status endpoints
+    path(
+        "conversations/<int:conversation_id>/mark-read/",
+        views.mark_messages_read,
+        name="mark-messages-read",
+    ),
+    path("unread-count/", views.unread_count, name="unread-count"),
+    # User blocking endpoints
+    path("block/", views.block_user, name="block-user"),
+    path("unblock/<int:user_id>/", views.unblock_user, name="unblock-user"),
+    path("blocked/", views.BlockedUserListView.as_view(), name="blocked-users"),
+    # Utility endpoints
+    path("users/search/", views.user_search, name="user-search"),
 ]

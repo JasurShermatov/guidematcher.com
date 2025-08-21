@@ -52,7 +52,7 @@ api_v1_patterns = [
 # ─── Root URL patterns ─────────────────────────────────────────
 urlpatterns = [
     # Admin
-    path("admin/", admin.site.urls),
+    path("api/admin/", admin.site.urls),
     # JWT tokens
     path("api/v1/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/v1/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),

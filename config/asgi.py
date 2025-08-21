@@ -1,19 +1,19 @@
 import os
-import django
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
-from channels.security.websocket import AllowedHostsOriginValidator
-from apps.chat.routing import websocket_urlpatterns
+
+# Devda Origin validatorni vaqtincha olib turamiz (Postman muammosi bo‘lsa)
+# from channels.security.websocket import AllowedHostsOriginValidator
+from apps.chat import routing as chat_routing
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-django.setup()
+
+django_asgi_app = get_asgi_application()
 
 application = ProtocolTypeRouter(
     {
-        "http": get_asgi_application(),
-        "websocket": AllowedHostsOriginValidator(
-            AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
-        ),
+        "http": django_asgi_app,
+        "websocket": AuthMiddlewareStack(URLRouter(chat_routing.websocket_urlpatterns)),
     }
 )

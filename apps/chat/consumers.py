@@ -1,27 +1,19 @@
 # apps/chat/consumers.py
 import json
 from urllib.parse import parse_qs
-from channels.generic.websocket import AsyncWebsocketConsumer
-from channels.db import database_sync_to_async
-from django.contrib.auth.models import AnonymousUser
-from django.utils import timezone
-from rest_framework_simplejwt.tokens import AccessToken
-from django.db import models
-from django.conf import settings
-import jwt
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
-from apps.users.models import User
-from .models import Conversation, Message, BlockedUser
-from .serializers import MessageListSerializer
+import jwt
+from channels.db import database_sync_to_async
+from channels.generic.websocket import AsyncWebsocketConsumer
+from django.db import models
+from django.utils import timezone
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
 
         try:
-            # Decode JWT
-            user = await self.get_user("d6b25498-b3f2-4023-b0c7-07c903260ee9")
+            user = self.get_user_from_token()
             if not user:
                 await self.close(code=4003)  # Invalid user
                 return
@@ -37,7 +29,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_user(self, user_id):
+        from apps.users.models import User
+
         try:
+
             return User.objects.get(id=user_id)
         except User.DoesNotExist:
             return None
@@ -234,6 +229,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_user_from_token(self):
+        from apps.users.models import User
+
         try:
             query_string = self.scope.get("query_string", b"").decode()
             params = parse_qs(query_string)
@@ -244,6 +241,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             if not token:
                 return None
+            from rest_framework_simplejwt.tokens import AccessToken
 
             access_token = AccessToken(token)
             user_id = access_token["user_id"]
@@ -259,6 +257,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_conversation(self):
+        from .models import Conversation
+
         try:
             return Conversation.objects.get(id=self.conversation_id)
         except Conversation.DoesNotExist:
@@ -274,6 +274,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def users_are_blocked(self, user1, user2):
+        from .models import BlockedUser
+
         return BlockedUser.objects.filter(
             models.Q(blocker=user1, blocked=user2)
             | models.Q(blocker=user2, blocked=user1)
@@ -281,6 +283,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def create_message(self, content):
+        from .models import Message
+
         message = Message.objects.create(
             conversation=self.conversation, sender=self.user, content=content
         )
@@ -298,12 +302,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Create a fake request for serializer context
         request = HttpRequest()
         request.user = self.user
+        from .serializers import MessageListSerializer
 
         serializer = MessageListSerializer(message, context={"request": request})
         return serializer.data
 
     @database_sync_to_async
     def mark_message_read(self, message_id):
+        from .models import Message
+
         try:
             message = Message.objects.get(id=message_id, conversation=self.conversation)
             # Only mark as read if user is not the sender
@@ -315,6 +322,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def perform_message_action(self, message_id, action):
+        from .models import Message
+
         try:
             message = Message.objects.get(
                 id=message_id, conversation=self.conversation, sender=self.user
@@ -333,6 +342,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_message_data(self, message_id):
+        from .models import Message
+
         try:
             message = Message.objects.get(id=message_id)
 
@@ -340,6 +351,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             request = HttpRequest()
             request.user = self.user
+            from .serializers import MessageListSerializer
 
             serializer = MessageListSerializer(message, context={"request": request})
             return serializer.data

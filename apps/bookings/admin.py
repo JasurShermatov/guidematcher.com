@@ -1,190 +1,100 @@
-from django.contrib import admin, messages
-from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
-from rangefilter.filters import DateRangeFilter
-
-from .models import Booking, BookingMessage
-
-
-class BookingMessageInline(admin.TabularInline):
-    model = BookingMessage
-    extra = 0
-    fields = ("created_at", "sender", "message", "is_system_message")
-    readonly_fields = fields
-    ordering = ("created_at",)
-    verbose_name_plural = _("Booking messages (read only)")
-    can_delete = False
-    show_change_link = False
+from django.contrib import admin
+from apps.bookings.models import Booking
+from django.utils.html import format_html
 
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
     list_display = (
         "id",
+        "client_name",
+        "customer_name",
         "title",
-        "client",
-        "get_customer_name",
         "service_type",
         "start_date",
         "end_date",
-        "rate_type",
-        "currency",
-        "status",
-        "proposed_rate",
+        "status_badge",
+        "number_of_people",
         "created_at",
     )
-    list_filter = (
-        "status",
-        "rate_type",
-        "service_type",
-        "currency",
-        ("start_date", DateRangeFilter),
-        ("created_at", DateRangeFilter),
-    )
+    list_filter = ("status", "service_type", "start_date", "end_date")
     search_fields = (
         "title",
-        "description",
-        "client__first_name",
-        "client__last_name",
-        "client__email",
-        "customer__user__first_name",
-        "customer__user__last_name",
-        "customer__user__email",
-        "location",
-        "location_details",
+        "client_profile__user__first_name",
+        "client_profile__user__last_name",
+        "customer_profile__user__first_name",
+        "customer_profile__user__last_name",
     )
-    autocomplete_fields = ["client", "customer", "service_type", "cancelled_by"]
-    readonly_fields = (
-        "created_at",
-        "updated_at",
-        "responded_at",
-        "accepted_at",
-        "completed_at",
-        "cancelled_at",
-    )
-    inlines = [BookingMessageInline]
+    readonly_fields = ("conversation", "booked_days_display")
     ordering = ("-created_at",)
 
     fieldsets = (
         (
-            _("Basic Info"),
-            {"fields": ("title", "description", "service_type", "client", "customer")},
-        ),
-        (
-            _("Schedule"),
+            "Basic info",
             {
                 "fields": (
-                    ("start_date", "end_date"),
-                    ("start_time", "duration_hours"),
-                    "number_of_people",
+                    "title",
+                    "description",
+                    "service_type",
+                    "status",
                     "special_requirements",
                 )
             },
         ),
         (
-            _("Location"),
-            {
-                "classes": ("collapse",),
-                "fields": (("location", "location_details"), ("latitude", "longitude")),
-            },
+            "Client / Customer",
+            {"fields": ("client_profile", "customer_profile", "conversation")},
         ),
         (
-            _("Pricing"),
+            "Schedule",
             {
                 "fields": (
-                    ("proposed_rate", "counter_offer_rate"),
-                    ("rate_type", "currency"),
+                    "start_date",
+                    "end_date",
+                    "start_time",
+                    "duration_hours",
+                    "number_of_people",
+                    "booked_days_display",
                 )
             },
         ),
         (
-            _("Status & Response"),
-            {
-                "fields": (
-                    "status",
-                    "provider_response",
-                    "responded_at",
-                    "accepted_at",
-                    "completed_at",
-                )
-            },
+            "Location",
+            {"fields": ("location", "location_details", "latitude", "longitude")},
         ),
-        (
-            _("Cancellation"),
-            {"fields": ("cancelled_at", "cancelled_by", "cancellation_reason")},
-        ),
-        (
-            _("System Meta"),
-            {"classes": ("collapse",), "fields": ("created_at", "updated_at")},
-        ),
+        ("Payment", {"fields": ("proposed_rate", "rate_type", "currency")}),
     )
 
-    actions = [
-        "mark_as_accepted",
-        "mark_as_rejected",
-        "mark_as_completed",
-        "mark_as_cancelled",
-    ]
-
-    @admin.display(description=_("Customer"))
-    def get_customer_name(self, obj):
-        if obj.customer and obj.customer.user:
-            return f"{obj.customer.user.first_name} {obj.customer.user.last_name}"
-        return "-"
-
-    @admin.action(description=_("Mark selected bookings as Accepted"))
-    def mark_as_accepted(self, request, queryset):
-        updated = queryset.filter(status=Booking.BookingStatus.PENDING).update(
-            status=Booking.BookingStatus.ACCEPTED, accepted_at=timezone.now()
-        )
-        self.message_user(
-            request, _("%d booking(s) marked as accepted.") % updated, messages.SUCCESS
+    def client_name(self, obj):
+        return (
+            obj.client_profile.user.full_name if obj.client_profile else "Self-booking"
         )
 
-    @admin.action(description=_("Mark selected bookings as Rejected"))
-    def mark_as_rejected(self, request, queryset):
-        updated = queryset.filter(status=Booking.BookingStatus.PENDING).update(
-            status=Booking.BookingStatus.REJECTED, responded_at=timezone.now()
-        )
-        self.message_user(
-            request, _("%d booking(s) marked as rejected.") % updated, messages.WARNING
+    client_name.short_description = "Client"
+
+    def customer_name(self, obj):
+        return obj.customer_profile.user.full_name
+
+    customer_name.short_description = "Customer"
+
+    def status_badge(self, obj):
+        colors = {
+            "pending": "orange",
+            "accepted": "green",
+            "cancelled": "red",
+            "completed": "blue",
+            "expired": "gray",
+        }
+        color = colors.get(obj.status, "black")
+        return format_html(
+            '<span style="color: {};"><strong>{}</strong></span>',
+            color,
+            obj.get_status_display(),
         )
 
-    @admin.action(description=_("Mark selected bookings as Completed"))
-    def mark_as_completed(self, request, queryset):
-        updated = queryset.filter(status=Booking.BookingStatus.ACCEPTED).update(
-            status=Booking.BookingStatus.COMPLETED, completed_at=timezone.now()
-        )
-        self.message_user(
-            request, _("%d booking(s) marked as completed.") % updated, messages.SUCCESS
-        )
+    status_badge.short_description = "Status"
 
-    @admin.action(description=_("Mark selected bookings as Cancelled"))
-    def mark_as_cancelled(self, request, queryset):
-        updated = queryset.filter(
-            status__in=[Booking.BookingStatus.PENDING, Booking.BookingStatus.ACCEPTED]
-        ).update(status=Booking.BookingStatus.CANCELLED, cancelled_at=timezone.now())
-        self.message_user(
-            request, _("%d booking(s) marked as cancelled.") % updated, messages.ERROR
-        )
+    def booked_days_display(self, obj):
+        return ", ".join([str(day) for day in obj.booked_days])
 
-
-@admin.register(BookingMessage)
-class BookingMessageAdmin(admin.ModelAdmin):
-    list_display = ("id", "booking", "sender", "created_at", "is_system_message")
-    list_filter = (
-        "is_system_message",
-        ("created_at", DateRangeFilter),
-        "sender",
-        "booking",
-    )
-    search_fields = (
-        "message",
-        "sender__first_name",
-        "sender__last_name",
-        "sender__email",
-        "booking__title",
-    )
-    readonly_fields = ("created_at", "updated_at")
-    autocomplete_fields = ["booking", "sender"]
-    ordering = ("-created_at",)
+    booked_days_display.short_description = "Booked Days"

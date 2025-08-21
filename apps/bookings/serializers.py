@@ -1,10 +1,72 @@
+# apps/bookings/serializers.py
 from rest_framework import serializers
-from django.utils import timezone
 
-from apps.bookings.models import Booking, BookingMessage
-from apps.users.serializers import UserShortSerializer
-from apps.profiles.serializers import CustomerProfileShortSerializer
-from apps.common.serializers import ServiceTypeSerializer
+from apps.bookings.models import Booking
+from apps.profiles.models import CustomerProfile, ClientProfile
+from apps.users.models import User
+
+
+class UserSimpleSerializer(serializers.ModelSerializer):
+    """Simple user info for front-end display (avatar, name, email)"""
+
+    full_name = serializers.CharField(read_only=True)
+    email = serializers.EmailField()
+    avatar_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ["id", "full_name", "email", "avatar_url"]
+
+    def get_avatar_url(self, obj):
+        if hasattr(obj, "avatar") and obj.avatar:
+            return obj.avatar.url
+        return None
+
+
+class ClientProfileSerializer(serializers.ModelSerializer):
+    user = UserSimpleSerializer(read_only=True)
+
+    class Meta:
+        model = ClientProfile
+        fields = ["id", "user"]
+
+
+class CustomerProfileSerializer(serializers.ModelSerializer):
+    user = UserSimpleSerializer(read_only=True)
+
+    class Meta:
+        model = CustomerProfile
+        fields = [
+            "id",
+            "user",
+            "city",
+            "service_areas",
+            "is_available",
+            "average_rating",
+        ]
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    client_profile = serializers.PrimaryKeyRelatedField(
+        queryset=ClientProfile.objects.all(),
+        required=False,  # agar login qilgan user asosida avtomatik bo‘lsa
+    )
+    customer_profile = serializers.PrimaryKeyRelatedField(
+        queryset=CustomerProfile.objects.all()
+    )
+
+    class Meta:
+        model = Booking
+        fields = "__all__"
+        read_only_fields = ("id", "created_at", "updated_at", "conversation")
+
+    def create(self, validated_data):
+        # Agar client_profile yuborilmasa, login qilgan user ni qo‘shish
+        if "client_profile" not in validated_data:
+            validated_data["client_profile"] = self.context[
+                "request"
+            ].user.client_profile
+        return super().create(validated_data)
 
 
 class BaseBookingSerializer(serializers.ModelSerializer):
@@ -34,112 +96,3 @@ class BaseBookingSerializer(serializers.ModelSerializer):
 class BookingShortSerializer(BaseBookingSerializer):
     class Meta(BaseBookingSerializer.Meta):
         fields = BaseBookingSerializer.Meta.fields
-
-
-class BookingSerializer(BaseBookingSerializer):
-    client = UserShortSerializer(read_only=True)
-    customer = CustomerProfileShortSerializer(read_only=True)
-    service_type = ServiceTypeSerializer(read_only=True)
-    cancelled_by = UserShortSerializer(read_only=True)
-
-    class Meta(BaseBookingSerializer.Meta):
-        fields = BaseBookingSerializer.Meta.fields + (
-            "client",
-            "customer",
-            "service_type",
-            "description",
-            "start_time",
-            "duration_hours",
-            "location",
-            "location_details",
-            "latitude",
-            "longitude",
-            "proposed_rate",
-            "rate_type",
-            "currency",
-            "provider_response",
-            "counter_offer_rate",
-            "responded_at",
-            "accepted_at",
-            "completed_at",
-            "cancelled_at",
-            "cancelled_by",
-            "cancellation_reason",
-            "special_requirements",
-            "number_of_people",
-        )
-        read_only_fields = BaseBookingSerializer.Meta.read_only_fields + (
-            "client",
-            "responded_at",
-            "accepted_at",
-            "completed_at",
-            "cancelled_at",
-            "cancelled_by",
-        )
-
-
-class BookingCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Booking
-        exclude = (
-            "client",
-            "status",
-            "responded_at",
-            "accepted_at",
-            "completed_at",
-            "cancelled_at",
-            "cancelled_by",
-            "created_at",
-            "updated_at",
-        )
-
-    def validate(self, data):
-        start_date = data.get("start_date")
-        end_date = data.get("end_date")
-        duration_hours = data.get("duration_hours")
-        number_of_people = data.get("number_of_people")
-        proposed_rate = data.get("proposed_rate")
-
-        if start_date and start_date < timezone.now().date():
-            raise serializers.ValidationError(
-                {
-                    "start_date": "Boshlanish sanasi o‘tgan kundan oldin bo‘lishi mumkin emas."
-                }
-            )
-
-        if start_date and end_date and start_date > end_date:
-            raise serializers.ValidationError(
-                {"end_date": "Tugash sanasi boshlanish sanasidan keyin bo‘lishi shart."}
-            )
-
-        if duration_hours is not None and duration_hours <= 0:
-            raise serializers.ValidationError(
-                {"duration_hours": "Davomiylik 0 dan katta bo‘lishi shart."}
-            )
-
-        if number_of_people is not None and number_of_people < 1:
-            raise serializers.ValidationError(
-                {"number_of_people": "Odamlar soni kamida 1 bo‘lishi kerak."}
-            )
-
-        if proposed_rate is not None and proposed_rate <= 0:
-            raise serializers.ValidationError(
-                {"proposed_rate": "Taklif qilingan narx musbat bo‘lishi kerak."}
-            )
-
-        return data
-
-
-class BookingMessageSerializer(serializers.ModelSerializer):
-    sender = UserShortSerializer(read_only=True)
-
-    class Meta:
-        model = BookingMessage
-        fields = (
-            "id",
-            "booking",
-            "sender",
-            "message",
-            "is_system_message",
-            "created_at",
-        )

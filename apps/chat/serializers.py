@@ -1,4 +1,4 @@
-# serializers.py
+# apps/chat/serializers.py
 from rest_framework import serializers
 from django.db.models import Q
 from apps.users.models import User

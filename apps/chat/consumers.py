@@ -1,4 +1,4 @@
-# consumers.py
+# apps/chat/consumers.py
 import json
 from urllib.parse import parse_qs
 from channels.generic.websocket import AsyncWebsocketConsumer

@@ -73,8 +73,6 @@ LOCAL_APPS = [
     "apps.bookings",
     "apps.chat",
     "apps.reviews",
-    "apps.notifications",
-    "apps.disputes",
     "apps.accounts",
 ]
 

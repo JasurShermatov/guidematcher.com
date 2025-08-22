@@ -1,1613 +1,1923 @@
-import React, { useState, useEffect } from "react";
-// import { useTranslation } from "react-i18next";
-import { t } from "../utils/translationFallback"; // Translation fallback
+import React, { useState, useEffect } from 'react';
 import {
-    FiUser,
-    FiMail,
-    FiGlobe,
-    FiEdit3,
-    FiSave,
-    FiX,
-    FiCalendar,
-    FiDollarSign,
-    FiMapPin,
-    FiCamera,
-    FiLogOut,
-    FiFlag,
-    FiShield,
-    FiPlus,
-    FiTrash2,
-    FiCheck,
-    FiLoader,
-    FiStar,
-    FiBookOpen,
-    FiClock,
-    FiSettings,
-    FiImage,
-    FiFileText,
-    FiToggleLeft,
-    FiToggleRight,
-    FiAward,
-    FiTrendingUp
-} from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
-import {
-    getCustomerProfile,
-    updateCustomerProfile,
-    createCustomerProfile,
-    getMyPortfolio,
-    createPortfolioItem,
-    updatePortfolioItem,
-    deletePortfolioItem,
-    getMyAvailability,
-    createAvailability,
-    updateAvailability,
-    deleteAvailability,
-    getMyDocuments,
-    uploadDocument,
-    deleteDocument,
-    logoutUser,
-    getCurrentUserShort,
-    getLanguages,
-    getServiceTypes,
-    getCities
-} from "../api/api";
-import "./GuideAccount.css";
+    User,
+    MapPin,
+    Star,
+    Calendar,
+    DollarSign,
+    Camera,
+    Edit3,
+    Save,
+    X,
+    Plus,
+    Trash2,
+    Eye,
+    EyeOff,
+    Upload,
+    FileText,
+    Clock,
+    TrendingUp,
+    MessageSquare,
+    AlertCircle,
+    CheckCircle
+} from 'lucide-react';
+import * as api from '../api/api';
+import './GuideAccount.css';
 
-// Helper function to safely format numbers
-const safeToFixed = (value, decimals = 1) => {
-    if (value === null || value === undefined || value === '') {
-        return "0.0";
-    }
-    const num = Number(value);
-    if (isNaN(num)) {
-        return "0.0";
-    }
-    return num.toFixed(decimals);
-};
-
-const GuideAccount = ({ user, setIsAuthenticated, setUser }) => {
-    // const { t } = useTranslation(); // Commented out
-    const navigate = useNavigate();
-
-    // State management with localStorage persistence
-    const [profile, setProfile] = useState(null);
-    const [portfolio, setPortfolio] = useState([]);
-    const [availability, setAvailability] = useState([]);
-    const [documents, setDocuments] = useState([]);
-    const [isEditing, setIsEditing] = useState(() => {
-        // localStorage'dan editing holatini yuklash
-        return JSON.parse(localStorage.getItem("guideAccount_isEditing") || "false");
-    });
+const GuideAccount = () => {
+    // State management
+    const [currentUser, setCurrentUser] = useState(null);
+    const [customerProfile, setCustomerProfile] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
-    const [activeTab, setActiveTab] = useState(() => {
-        // localStorage'dan active tab'ni yuklash
-        return localStorage.getItem("guideAccount_activeTab") || "profile";
-    });
+    const [activeTab, setActiveTab] = useState('profile');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
-    // Reference data
+    // Form data states
+    const [profileData, setProfileData] = useState({});
+    const [portfolioItems, setPortfolioItems] = useState([]);
+    const [availabilities, setAvailabilities] = useState([]);
+    const [documents, setDocuments] = useState([]);
+    const [bookings, setBookings] = useState([]);
+    const [reviews, setReviews] = useState([]);
+    const [notifications, setNotifications] = useState([]);
+
+    // Common data states
+    const [countries, setCountries] = useState([]);
+    const [cities, setCities] = useState([]);
     const [languages, setLanguages] = useState([]);
     const [serviceTypes, setServiceTypes] = useState([]);
-    const [cities, setCities] = useState([]);
 
-    // Form data with localStorage persistence
-    const [formData, setFormData] = useState(() => {
-        // localStorage'dan form ma'lumotlarini yuklash
-        const savedFormData = localStorage.getItem("guideAccount_formData");
-        return savedFormData ? JSON.parse(savedFormData) : {
-            professional_bio: "",
-            years_of_experience: 0,
-            service_types: [],
-            city: null,
-            service_areas: "",
-            hourly_rate: "",
-            daily_rate: "",
-            currency: "USD",
-            languages: [],
-            is_available: true
-        };
-    });
+    // Modal states
+    const [showPortfolioModal, setShowPortfolioModal] = useState(false);
+    const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
+    const [showDocumentModal, setShowDocumentModal] = useState(false);
+    const [editingItem, setEditingItem] = useState(null);
 
-    // Portfolio form with localStorage persistence
-    const [portfolioForm, setPortfolioForm] = useState(() => {
-        const savedPortfolioForm = localStorage.getItem("guideAccount_portfolioForm");
-        return savedPortfolioForm ? JSON.parse(savedPortfolioForm) : {
-            title: "",
-            description: "",
-            image: null,
-            order: 0
-        };
-    });
-    const [editingPortfolio, setEditingPortfolio] = useState(() => {
-        const savedEditingPortfolio = localStorage.getItem("guideAccount_editingPortfolio");
-        return savedEditingPortfolio ? JSON.parse(savedEditingPortfolio) : null;
-    });
-
-    // Availability form with localStorage persistence
-    const [availabilityForm, setAvailabilityForm] = useState(() => {
-        const savedAvailabilityForm = localStorage.getItem("guideAccount_availabilityForm");
-        return savedAvailabilityForm ? JSON.parse(savedAvailabilityForm) : {
-            date: "",
-            is_available: true,
-            start_time: "",
-            end_time: "",
-            note: ""
-        };
-    });
-    const [editingAvailability, setEditingAvailability] = useState(() => {
-        const savedEditingAvailability = localStorage.getItem("guideAccount_editingAvailability");
-        return savedEditingAvailability ? JSON.parse(savedEditingAvailability) : null;
-    });
-
-    // Document upload form with localStorage persistence
-    const [documentForm, setDocumentForm] = useState(() => {
-        const savedDocumentForm = localStorage.getItem("guideAccount_documentForm");
-        return savedDocumentForm ? JSON.parse(savedDocumentForm) : {
-            document_type: "id_card",
-            file: null,
-            description: ""
-        };
-    });
-
-    // State'larni localStorage'ga saqlash
+    // Initialize data on component mount
     useEffect(() => {
-        localStorage.setItem("guideAccount_isEditing", JSON.stringify(isEditing));
-    }, [isEditing]);
-
-    useEffect(() => {
-        localStorage.setItem("guideAccount_activeTab", activeTab);
-    }, [activeTab]);
-
-    useEffect(() => {
-        localStorage.setItem("guideAccount_formData", JSON.stringify(formData));
-    }, [formData]);
-
-    useEffect(() => {
-        // Image faylini localStorage'ga saqlamaslik (faqat boshqa ma'lumotlarni saqlash)
-        const portfolioFormWithoutImage = { ...portfolioForm };
-        delete portfolioFormWithoutImage.image;
-        localStorage.setItem("guideAccount_portfolioForm", JSON.stringify(portfolioFormWithoutImage));
-    }, [portfolioForm]);
-
-    useEffect(() => {
-        localStorage.setItem("guideAccount_editingPortfolio", JSON.stringify(editingPortfolio));
-    }, [editingPortfolio]);
-
-    useEffect(() => {
-        localStorage.setItem("guideAccount_availabilityForm", JSON.stringify(availabilityForm));
-    }, [availabilityForm]);
-
-    useEffect(() => {
-        localStorage.setItem("guideAccount_editingAvailability", JSON.stringify(editingAvailability));
-    }, [editingAvailability]);
-
-    useEffect(() => {
-        // File faylini localStorage'ga saqlamaslik
-        const documentFormWithoutFile = { ...documentForm };
-        delete documentFormWithoutFile.file;
-        localStorage.setItem("guideAccount_documentForm", JSON.stringify(documentFormWithoutFile));
-    }, [documentForm]);
-
-    useEffect(() => {
-        console.log("GuideAccount component mounted for user:", user);
-        if (user) {
-            loadAllData();
-        }
-    }, [user]);
-
-    // Component unmount'da localStorage'ni tozalash (faqat logout holatida)
-    useEffect(() => {
-        return () => {
-            // Agar foydalanuvchi logout qilgan bo'lsa, localStorage'ni tozalash
-            const token = localStorage.getItem("access_token");
-            if (!token) {
-                clearLocalStorageState();
-            }
-        };
+        initializeData();
     }, []);
 
-    const clearLocalStorageState = () => {
-        localStorage.removeItem("guideAccount_isEditing");
-        localStorage.removeItem("guideAccount_activeTab");
-        localStorage.removeItem("guideAccount_formData");
-        localStorage.removeItem("guideAccount_portfolioForm");
-        localStorage.removeItem("guideAccount_editingPortfolio");
-        localStorage.removeItem("guideAccount_availabilityForm");
-        localStorage.removeItem("guideAccount_editingAvailability");
-        localStorage.removeItem("guideAccount_documentForm");
-    };
-
-    const loadAllData = async () => {
-        if (!user) {
-            console.log("No user data available for loading data");
-            setLoading(false);
-            return;
-        }
-
+    const initializeData = async () => {
         try {
             setLoading(true);
+            setError(''); // Clear any previous errors
+
+            // Check if we have a valid token
+            const token = localStorage.getItem("access_token");
+            if (!token) {
+                setError('Tizimga kirishingiz kerak');
+                return;
+            }
+
+            // Get current user info
+            const user = await api.getCurrentUser();
+            setCurrentUser(user);
+
+            // Load common data
             await Promise.all([
-                loadProfile(),
-                loadPortfolio(),
-                loadAvailability(),
-                loadDocuments(),
-                loadReferenceData()
+                loadCountries(),
+                loadLanguages(),
+                loadServiceTypes()
             ]);
-        } catch (error) {
-            console.error("Error loading data:", error);
-            setError(t("profile.errors.load_failed") + ": " + error.message);
+
+            // Load customer profile
+            await loadCustomerProfile();
+
+            // Load other data based on active tab
+            if (activeTab === 'portfolio') {
+                await loadPortfolio();
+            } else if (activeTab === 'availability') {
+                await loadAvailabilities();
+            } else if (activeTab === 'documents') {
+                await loadDocuments();
+            } else if (activeTab === 'bookings') {
+                await loadBookings();
+            } else if (activeTab === 'reviews') {
+                await loadReviews();
+            } else if (activeTab === 'notifications') {
+                await loadNotifications();
+            }
+
+        } catch (err) {
+            console.error('Error initializing data:', err);
+            setError('Ma\'lumotlarni yuklashda xatolik: ' + err.message);
         } finally {
             setLoading(false);
         }
     };
 
-    const loadProfile = async () => {
+    // Load functions
+    const loadCustomerProfile = async () => {
         try {
-            console.log("Loading customer profile...");
-            const profileData = await getCustomerProfile();
-            console.log("Customer profile loaded:", profileData);
-            setProfile(profileData);
+            const profile = await api.getCustomerProfile();
+            setCustomerProfile(profile);
+            setProfileData(profile || {});
 
-            // Agar editing holatida bo'lmasa, server ma'lumotlari bilan formData'ni yangilash
-            if (!isEditing) {
-                const newFormData = {
-                    professional_bio: profileData.professional_bio || "",
-                    years_of_experience: profileData.years_of_experience || 0,
-                    service_types: profileData.service_types || [],
-                    city: profileData.city || null,
-                    service_areas: profileData.service_areas || "",
-                    hourly_rate: profileData.hourly_rate || "",
-                    daily_rate: profileData.daily_rate || "",
-                    currency: profileData.currency || "USD",
-                    languages: profileData.languages || [],
-                    is_available: profileData.is_available !== undefined ? profileData.is_available : true
-                };
-                setFormData(newFormData);
+            // Load cities for selected country
+            if (profile?.user?.country) {
+                await loadCities(profile.user.country);
             }
-        } catch (error) {
-            console.error("Error loading customer profile:", error);
-            if (error.message.includes("Profile not found") || error.message.includes("404")) {
-                console.log("No profile found, user can create one");
-                setProfile(null);
+        } catch (err) {
+            console.error('Error loading customer profile:', err);
+            // If no profile exists or unauthorized, show create form
+            if (err.message.includes('404') || err.message.includes('not found') || err.message.includes('Unauthorized')) {
+                setCustomerProfile(null);
+                setProfileData({});
             } else {
-                throw error;
+                setError('Profil ma\'lumotlarini yuklashda xatolik: ' + err.message);
             }
+        }
+    };
+
+    const loadCountries = async () => {
+        try {
+            const data = await api.getCountries();
+            setCountries(data.results || data || []);
+        } catch (err) {
+            console.error('Error loading countries:', err);
+        }
+    };
+
+    const loadCities = async (countryId) => {
+        try {
+            const data = await api.getCities(countryId);
+            setCities(data.results || data || []);
+        } catch (err) {
+            console.error('Error loading cities:', err);
+        }
+    };
+
+    const loadLanguages = async () => {
+        try {
+            const data = await api.getLanguages();
+            setLanguages(data.results || data || []);
+        } catch (err) {
+            console.error('Error loading languages:', err);
+        }
+    };
+
+    const loadServiceTypes = async () => {
+        try {
+            const data = await api.getServiceTypes();
+            setServiceTypes(data.results || data || []);
+        } catch (err) {
+            console.error('Error loading service types:', err);
         }
     };
 
     const loadPortfolio = async () => {
         try {
-            console.log("Loading portfolio...");
-            const portfolioData = await getMyPortfolio();
-            console.log("Portfolio data loaded:", portfolioData);
-            setPortfolio(portfolioData?.results || portfolioData || []);
-        } catch (error) {
-            console.error("Failed to load portfolio:", error);
-            setPortfolio([]);
+            const data = await api.getMyPortfolio();
+            setPortfolioItems(data || []);
+        } catch (err) {
+            console.error('Error loading portfolio:', err);
         }
     };
 
-    const loadAvailability = async () => {
+    const loadAvailabilities = async () => {
         try {
-            console.log("Loading availability...");
-            const availabilityData = await getMyAvailability();
-            console.log("Availability data loaded:", availabilityData);
-            setAvailability(availabilityData?.results || availabilityData || []);
-        } catch (error) {
-            console.error("Failed to load availability:", error);
-            setAvailability([]);
+            const data = await api.getMyAvailability();
+            setAvailabilities(data || []);
+        } catch (err) {
+            console.error('Error loading availabilities:', err);
         }
     };
 
     const loadDocuments = async () => {
         try {
-            console.log("Loading documents...");
-            const documentsData = await getMyDocuments();
-            console.log("Documents data loaded:", documentsData);
-            setDocuments(documentsData?.results || documentsData || []);
-        } catch (error) {
-            console.error("Failed to load documents:", error);
-            setDocuments([]);
+            const data = await api.getMyDocuments();
+            setDocuments(data || []);
+        } catch (err) {
+            console.error('Error loading documents:', err);
         }
     };
 
-    const loadReferenceData = async () => {
+    const loadBookings = async () => {
         try {
-            console.log("Loading reference data...");
-            const [languagesData, serviceTypesData, citiesData] = await Promise.all([
-                getLanguages(),
-                getServiceTypes(),
-                getCities()
-            ]);
-            console.log("Reference data loaded:", { languagesData, serviceTypesData, citiesData });
-
-            setLanguages(languagesData?.results || languagesData || []);
-            setServiceTypes(serviceTypesData?.results || serviceTypesData || []);
-            setCities(citiesData?.results || citiesData || []);
-        } catch (error) {
-            console.error("Failed to load reference data:", error);
-            // Set empty arrays to prevent crashes
-            setLanguages([]);
-            setServiceTypes([]);
-            setCities([]);
+            const data = await api.getMyBookings();
+            setBookings(data.results || data || []);
+        } catch (err) {
+            console.error('Error loading bookings:', err);
         }
     };
 
-    const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-        clearMessages();
+    const loadReviews = async () => {
+        try {
+            const data = await api.getMyReviews();
+            setReviews(data.results || data || []);
+        } catch (err) {
+            console.error('Error loading reviews:', err);
+        }
     };
 
-    const handleServiceTypeChange = (serviceTypeId) => {
-        setFormData(prev => ({
-            ...prev,
-            service_types: prev.service_types.includes(serviceTypeId)
-                ? prev.service_types.filter(id => id !== serviceTypeId)
-                : [...prev.service_types, serviceTypeId]
-        }));
+    const loadNotifications = async () => {
+        try {
+            const data = await api.getNotifications();
+            setNotifications(data.results || data || []);
+        } catch (err) {
+            console.error('Error loading notifications:', err);
+        }
     };
 
-    const handleLanguageChange = (languageId) => {
-        setFormData(prev => ({
-            ...prev,
-            languages: prev.languages.includes(languageId)
-                ? prev.languages.filter(id => id !== languageId)
-                : [...prev.languages, languageId]
-        }));
-    };
-
-    const clearMessages = () => {
-        setError("");
-        setSuccess("");
-    };
-
-    const handleSaveProfile = async () => {
+    // Profile management functions
+    const handleProfileSave = async () => {
         try {
             setSaving(true);
-            clearMessages();
+            setError('');
+            setSuccess('');
 
-            // Basic validation
-            if (!formData.professional_bio.trim()) {
-                setError(t("profile.validation.bio_required"));
-                return;
-            }
-
-            let savedProfile;
-            if (profile) {
-                savedProfile = await updateCustomerProfile(formData);
+            if (customerProfile) {
+                // Update existing profile
+                await api.updateCustomerProfile(profileData);
+                setSuccess('Profil muvaffaqiyatli yangilandi!');
             } else {
-                savedProfile = await createCustomerProfile(formData);
+                // Create new profile
+                await api.createCustomerProfile(profileData);
+                setSuccess('Profil muvaffaqiyatli yaratildi!');
             }
 
-            setProfile(savedProfile);
+            await loadCustomerProfile();
             setIsEditing(false);
-            setSuccess(t("profile.success.saved"));
-
-            // localStorage'dan editing state'ni tozalash
-            localStorage.removeItem("guideAccount_isEditing");
-            localStorage.removeItem("guideAccount_formData");
-
-            // Refresh user data
-            const updatedUser = await getCurrentUserShort();
-            setUser(updatedUser);
-        } catch (error) {
-            setError(error.message || t("profile.errors.save_failed"));
+        } catch (err) {
+            console.error('Error saving profile:', err);
+            setError(err.message || 'Profilni saqlashda xatolik yuz berdi');
         } finally {
             setSaving(false);
         }
     };
 
-    const handleCancelEdit = () => {
-        if (profile) {
-            setFormData({
-                professional_bio: profile.professional_bio || "",
-                years_of_experience: profile.years_of_experience || 0,
-                service_types: profile.service_types || [],
-                city: profile.city || null,
-                service_areas: profile.service_areas || "",
-                hourly_rate: profile.hourly_rate || "",
-                daily_rate: profile.daily_rate || "",
-                currency: profile.currency || "USD",
-                languages: profile.languages || [],
-                is_available: profile.is_available !== undefined ? profile.is_available : true
-            });
-        }
-        setIsEditing(false);
-        clearMessages();
-
-        // localStorage'dan editing state'ni tozalash
-        localStorage.removeItem("guideAccount_isEditing");
-        localStorage.removeItem("guideAccount_formData");
-    };
-
-    const handleEdit = () => {
-        setIsEditing(true);
-        clearMessages();
-    };
-
-    // Portfolio management
-    const handlePortfolioSubmit = async (e) => {
-        e.preventDefault();
+    // Portfolio management functions
+    const handlePortfolioSave = async (portfolioData) => {
         try {
             setSaving(true);
-            clearMessages();
+            setError('');
 
-            const formDataToSend = new FormData();
-            formDataToSend.append('title', portfolioForm.title);
-            formDataToSend.append('description', portfolioForm.description);
-            formDataToSend.append('order', portfolioForm.order);
-
-            if (portfolioForm.image) {
-                formDataToSend.append('image', portfolioForm.image);
-            }
-
-            if (editingPortfolio) {
-                await updatePortfolioItem(editingPortfolio.id, formDataToSend);
-                setSuccess("Portfolio item updated successfully");
+            if (editingItem) {
+                await api.updatePortfolioItem(editingItem.id, portfolioData);
+                setSuccess('Portfolio elementi yangilandi!');
             } else {
-                await createPortfolioItem(formDataToSend);
-                setSuccess("Portfolio item created successfully");
+                await api.createPortfolioItem(portfolioData);
+                setSuccess('Portfolio elementi qo\'shildi!');
             }
-
-            // Form'ni tozalash va localStorage'ni yangilash
-            setPortfolioForm({ title: "", description: "", image: null, order: 0 });
-            setEditingPortfolio(null);
-            localStorage.removeItem("guideAccount_portfolioForm");
-            localStorage.removeItem("guideAccount_editingPortfolio");
 
             await loadPortfolio();
-        } catch (error) {
-            setError(error.message || "Failed to save portfolio item");
+            setShowPortfolioModal(false);
+            setEditingItem(null);
+        } catch (err) {
+            console.error('Error saving portfolio item:', err);
+            setError(err.message || 'Portfolio elementini saqlashda xatolik');
         } finally {
             setSaving(false);
         }
     };
 
-    const handleDeletePortfolio = async (id) => {
-        if (window.confirm("Are you sure you want to delete this item?")) {
-            try {
-                await deletePortfolioItem(id);
-                setSuccess("Portfolio item deleted successfully");
-                await loadPortfolio();
-            } catch (error) {
-                setError(error.message || "Failed to delete portfolio item");
-            }
+    const handlePortfolioDelete = async (id) => {
+        if (!window.confirm('Bu portfolio elementini o\'chirishni xohlaysizmi?')) return;
+
+        try {
+            setSaving(true);
+            await api.deletePortfolioItem(id);
+            setSuccess('Portfolio elementi o\'chirildi!');
+            await loadPortfolio();
+        } catch (err) {
+            console.error('Error deleting portfolio item:', err);
+            setError(err.message || 'Portfolio elementini o\'chirishda xatolik');
+        } finally {
+            setSaving(false);
         }
     };
 
-    const handleEditPortfolio = (item) => {
-        setEditingPortfolio(item);
-        setPortfolioForm({
-            title: item.title,
-            description: item.description,
-            image: null,
-            order: item.order
-        });
-    };
-
-    const handleCancelPortfolioEdit = () => {
-        setEditingPortfolio(null);
-        setPortfolioForm({ title: "", description: "", image: null, order: 0 });
-        localStorage.removeItem("guideAccount_portfolioForm");
-        localStorage.removeItem("guideAccount_editingPortfolio");
-    };
-
-    // Availability management
-    const handleAvailabilitySubmit = async (e) => {
-        e.preventDefault();
+    // Availability management functions
+    const handleAvailabilitySave = async (availabilityData) => {
         try {
             setSaving(true);
-            clearMessages();
+            setError('');
 
-            if (editingAvailability) {
-                await updateAvailability(editingAvailability.id, availabilityForm);
-                setSuccess("Availability updated successfully");
+            if (editingItem) {
+                await api.updateAvailability(editingItem.id, availabilityData);
+                setSuccess('Mavjudlik yangilandi!');
             } else {
-                await createAvailability(availabilityForm);
-                setSuccess("Availability added successfully");
+                await api.createAvailability(availabilityData);
+                setSuccess('Mavjudlik qo\'shildi!');
             }
 
-            // Form'ni tozalash va localStorage'ni yangilash
-            setAvailabilityForm({
-                date: "",
-                is_available: true,
-                start_time: "",
-                end_time: "",
-                note: ""
-            });
-            setEditingAvailability(null);
-            localStorage.removeItem("guideAccount_availabilityForm");
-            localStorage.removeItem("guideAccount_editingAvailability");
-
-            await loadAvailability();
-        } catch (error) {
-            setError(error.message || "Failed to save availability");
+            await loadAvailabilities();
+            setShowAvailabilityModal(false);
+            setEditingItem(null);
+        } catch (err) {
+            console.error('Error saving availability:', err);
+            setError(err.message || 'Mavjudlikni saqlashda xatolik');
         } finally {
             setSaving(false);
         }
     };
 
-    const handleDeleteAvailability = async (id) => {
-        if (window.confirm(t("availability.confirm_delete"))) {
-            try {
-                await deleteAvailability(id);
-                setSuccess(t("availability.success.deleted"));
-                await loadAvailability();
-            } catch (error) {
-                setError(error.message || t("availability.errors.delete_failed"));
-            }
-        }
-    };
+    const handleAvailabilityDelete = async (id) => {
+        if (!window.confirm('Bu mavjudlikni o\'chirishni xohlaysizmi?')) return;
 
-    const handleEditAvailability = (item) => {
-        setEditingAvailability(item);
-        setAvailabilityForm({
-            date: item.date,
-            is_available: item.is_available,
-            start_time: item.start_time || "",
-            end_time: item.end_time || "",
-            note: item.note || ""
-        });
-    };
-
-    const handleCancelAvailabilityEdit = () => {
-        setEditingAvailability(null);
-        setAvailabilityForm({
-            date: "",
-            is_available: true,
-            start_time: "",
-            end_time: "",
-            note: ""
-        });
-        localStorage.removeItem("guideAccount_availabilityForm");
-        localStorage.removeItem("guideAccount_editingAvailability");
-    };
-
-    // Document management
-    const handleDocumentSubmit = async (e) => {
-        e.preventDefault();
         try {
             setSaving(true);
-            clearMessages();
-
-            const formDataToSend = new FormData();
-            formDataToSend.append('document_type', documentForm.document_type);
-            formDataToSend.append('description', documentForm.description);
-            if (documentForm.file) {
-                formDataToSend.append('file', documentForm.file);
-            }
-
-            await uploadDocument(formDataToSend);
-            setSuccess("Document uploaded successfully");
-
-            // Form'ni tozalash va localStorage'ni yangilash
-            setDocumentForm({
-                document_type: "id_card",
-                file: null,
-                description: ""
-            });
-            localStorage.removeItem("guideAccount_documentForm");
-
-            await loadDocuments();
-        } catch (error) {
-            setError(error.message || "Failed to upload document");
+            await api.deleteAvailability(id);
+            setSuccess('Mavjudlik o\'chirildi!');
+            await loadAvailabilities();
+        } catch (err) {
+            console.error('Error deleting availability:', err);
+            setError(err.message || 'Mavjudlikni o\'chirishda xatolik');
         } finally {
             setSaving(false);
         }
     };
 
-    const handleDeleteDocument = async (id) => {
-        if (window.confirm(t("documents.confirm_delete"))) {
-            try {
-                await deleteDocument(id);
-                setSuccess(t("documents.success.deleted"));
-                await loadDocuments();
-            } catch (error) {
-                setError(error.message || t("documents.errors.delete_failed"));
-            }
-        }
-    };
-
-    const handleLogout = async () => {
+    // Document management functions
+    const handleDocumentUpload = async (documentData) => {
         try {
-            await logoutUser();
-        } catch (error) {
-            console.error("Logout error:", error);
+            setSaving(true);
+            setError('');
+
+            await api.uploadDocument(documentData);
+            setSuccess('Hujjat yuklandi!');
+            await loadDocuments();
+            setShowDocumentModal(false);
+        } catch (err) {
+            console.error('Error uploading document:', err);
+            setError(err.message || 'Hujjat yuklashda xatolik');
         } finally {
-            // Har qanday holatda ham foydalanuvchini tizimdan chiqarish
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("refresh_token");
-            localStorage.removeItem("user_data");
-            clearLocalStorageState();
-            setIsAuthenticated(false);
-            setUser(null);
-            navigate("/");
+            setSaving(false);
         }
     };
 
+    const handleDocumentDelete = async (id) => {
+        if (!window.confirm('Bu hujjatni o\'chirishni xohlaysizmi?')) return;
+
+        try {
+            setSaving(true);
+            await api.deleteDocument(id);
+            setSuccess('Hujjat o\'chirildi!');
+            await loadDocuments();
+        } catch (err) {
+            console.error('Error deleting document:', err);
+            setError(err.message || 'Hujjatni o\'chirishda xatolik');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    // Tab change handler
+    const handleTabChange = async (tab) => {
+        setActiveTab(tab);
+        setError('');
+        setSuccess('');
+
+        // Load data for the selected tab
+        if (tab === 'portfolio') {
+            await loadPortfolio();
+        } else if (tab === 'availability') {
+            await loadAvailabilities();
+        } else if (tab === 'documents') {
+            await loadDocuments();
+        } else if (tab === 'bookings') {
+            await loadBookings();
+        } else if (tab === 'reviews') {
+            await loadReviews();
+        } else if (tab === 'notifications') {
+            await loadNotifications();
+        }
+    };
+
+    // Utility functions
     const formatDate = (dateString) => {
-        if (!dateString) return "";
-        const date = new Date(dateString);
-        return date.toLocaleDateString();
+        return new Date(dateString).toLocaleDateString('uz-UZ');
     };
 
-    const getVerificationStatusBadge = (status) => {
-        const statusConfig = {
-            verified: { class: "verified", icon: FiCheck, text: t("profile.verification.verified") },
-            pending: { class: "pending", icon: FiClock, text: t("profile.verification.pending") },
-            rejected: { class: "rejected", icon: FiX, text: t("profile.verification.rejected") }
-        };
-
-        const config = statusConfig[status] || statusConfig.pending;
-        const Icon = config.icon;
-
-        return (
-            <span className={`verification-badge ${config.class}`}>
-                <Icon />
-                {config.text}
-            </span>
-        );
+    const formatCurrency = (amount, currency = 'USD') => {
+        return new Intl.NumberFormat('uz-UZ', {
+            style: 'currency',
+            currency: currency
+        }).format(amount);
     };
 
+    const renderStars = (rating) => {
+        return Array.from({ length: 5 }, (_, i) => (
+            <Star
+                key={i}
+                className={`guide-account-w-4 guide-account-h-4 ${i < rating ? 'guide-account-fill-yellow-400 guide-account-text-yellow-400' : 'guide-account-text-gray-300'}`}
+            />
+        ));
+    };
+
+    // Main render function
     if (loading) {
         return (
-            <div className="account-container">
-                <div className="account-loading">
-                    <FiLoader className="loading-spinner" />
-                    <p>{t("profile.loading")}</p>
+            <div className="guide-account-min-h-screen guide-account-bg-gray-50 guide-account-flex guide-account-items-center guide-account-justify-center">
+                <div className="guide-account-text-center">
+                    <div className="guide-account-animate-spin guide-account-rounded-full guide-account-h-12 guide-account-w-12 guide-account-border-b-2 guide-account-border-blue-600 guide-account-mx-auto"></div>
+                    <p className="guide-account-mt-4 guide-account-text-gray-600">Ma'lumotlar yuklanmoqda...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="account-container">
-            <div className="account-header">
-                <div className="account-header-content">
-                    <div className="account-avatar-section">
-                        <div className="account-avatar">
-                            {user?.avatar ? (
-                                <img src={user.avatar} alt="Avatar" />
-                            ) : (
-                                <FiUser />
-                            )}
-                            <button className="avatar-edit-btn">
-                                <FiCamera />
-                            </button>
-                        </div>
-                        <div className="account-user-info">
-                            <h1>{user?.full_name || `${user?.first_name} ${user?.last_name}`}</h1>
-                            <p className="user-role">
-                                <FiShield />
-                                {user?.role ? (
-                                    user.role === 'customer' ? 'Guide' :
-                                        user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase()
-                                ) : "Guide"}
-                            </p>
-                            <p className="user-email">
-                                <FiMail />
-                                {user?.email}
-                            </p>
-                            {user?.country && (
-                                <p className="user-location">
-                                    <FiMapPin />
-                                    {user.country}
-                                </p>
-                            )}
-                            {profile && (
-                                <div className="user-stats">
-                                    <div className="stat">
-                                        <FiStar />
-                                        <span>{safeToFixed(profile.average_rating, 1)}</span>
-                                    </div>
-                                    <div className="stat">
-                                        <FiBookOpen />
-                                        <span>{profile.total_bookings || 0} {t("profile.stats.bookings")}</span>
-                                    </div>
-                                    {getVerificationStatusBadge(profile.verification_status)}
+        <div className="guide-account-min-h-screen guide-account-bg-gray-50">
+            {/* Header */}
+            <div className="guide-account-bg-white guide-account-shadow-sm guide-account-border-b">
+                <div className="guide-account-max-w-7xl guide-account-mx-auto guide-account-px-4 guide-account-sm:px-6 guide-account-lg:px-8">
+                    <div className="guide-account-flex guide-account-justify-between guide-account-items-center guide-account-py-6">
+                        <div className="guide-account-flex guide-account-items-center guide-account-space-x-4">
+                            <div className="guide-account-relative">
+                                <div className="guide-account-w-16 guide-account-h-16 guide-account-bg-blue-600 guide-account-rounded-full guide-account-flex guide-account-items-center guide-account-justify-center guide-account-text-white guide-account-text-xl guide-account-font-bold">
+                                    {currentUser?.avatar ? (
+                                        <img
+                                            src={currentUser.avatar}
+                                            alt="Avatar"
+                                            className="guide-account-w-16 guide-account-h-16 guide-account-rounded-full guide-account-object-cover"
+                                        />
+                                    ) : (
+                                        currentUser?.full_name?.charAt(0) || 'G'
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                    </div>
-                    <div className="account-actions">
-                        {activeTab === "profile" && !isEditing ? (
-                            <button
-                                className="btn btn-primary"
-                                onClick={handleEdit}
-                            >
-                                <FiEdit3 />
-                                {t("profile.actions.edit")}
-                            </button>
-                        ) : activeTab === "profile" && isEditing ? (
-                            <div className="edit-actions">
-                                <button
-                                    className="btn btn-success"
-                                    onClick={handleSaveProfile}
-                                    disabled={saving}
-                                >
-                                    {saving ? <FiLoader className="btn-spinner" /> : <FiSave />}
-                                    {t("profile.actions.save")}
-                                </button>
-                                <button
-                                    className="btn btn-outline"
-                                    onClick={handleCancelEdit}
-                                    disabled={saving}
-                                >
-                                    <FiX />
-                                    {t("profile.actions.cancel")}
+                                <button className="guide-account-absolute guide-account--bottom-1 guide-account--right-1 guide-account-bg-blue-600 guide-account-rounded-full guide-account-p-1 guide-account-text-white guide-account-hover:bg-blue-700">
+                                    <Camera className="guide-account-w-3 guide-account-h-3" />
                                 </button>
                             </div>
-                        ) : null}
-                        <button
-                            className="btn btn-danger"
-                            onClick={handleLogout}
-                        >
-                            <FiLogOut />
-                            {t("profile.actions.logout")}
-                        </button>
+                            <div>
+                                <h1 className="guide-account-text-2xl guide-account-font-bold guide-account-text-gray-900">
+                                    {customerProfile?.full_name || currentUser?.full_name || 'Guide Account'}
+                                </h1>
+                                <p className="guide-account-text-gray-600">
+                                    {customerProfile?.professional_bio ?
+                                        customerProfile.professional_bio.substring(0, 100) + '...' :
+                                        'Professional Guide'
+                                    }
+                                </p>
+                                <div className="guide-account-flex guide-account-items-center guide-account-mt-1 guide-account-space-x-4">
+                                    {customerProfile?.average_rating && customerProfile.average_rating > 0 && (
+                                        <div className="guide-account-flex guide-account-items-center guide-account-space-x-1">
+                                            {renderStars(Math.round(customerProfile.average_rating))}
+                                            <span className="guide-account-text-sm guide-account-text-gray-600">
+                        ({Number(customerProfile.average_rating).toFixed(1)})
+                      </span>
+                                        </div>
+                                    )}
+                                    {customerProfile?.is_verified && (
+                                        <div className="guide-account-flex guide-account-items-center guide-account-space-x-1 guide-account-text-green-600">
+                                            <CheckCircle className="guide-account-w-4 guide-account-h-4" />
+                                            <span className="guide-account-text-sm">Verified</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="guide-account-flex guide-account-items-center guide-account-space-x-3">
+                            {customerProfile?.is_available ? (
+                                <span className="guide-account-inline-flex guide-account-items-center guide-account-px-3 guide-account-py-1 guide-account-rounded-full guide-account-text-sm guide-account-font-medium guide-account-bg-green-100 guide-account-text-green-800">
+                  <div className="guide-account-w-2 guide-account-h-2 guide-account-bg-green-400 guide-account-rounded-full guide-account-mr-2"></div>
+                  Available
+                </span>
+                            ) : (
+                                <span className="guide-account-inline-flex guide-account-items-center guide-account-px-3 guide-account-py-1 guide-account-rounded-full guide-account-text-sm guide-account-font-medium guide-account-bg-red-100 guide-account-text-red-800">
+                  <div className="guide-account-w-2 guide-account-h-2 guide-account-bg-red-400 guide-account-rounded-full guide-account-mr-2"></div>
+                  Unavailable
+                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
 
+            {/* Error/Success Messages */}
             {error && (
-                <div className="alert alert-error">
-                    <span>{error}</span>
+                <div className="guide-account-max-w-7xl guide-account-mx-auto guide-account-px-4 guide-account-sm:px-6 guide-account-lg:px-8 guide-account-mt-4">
+                    <div className="guide-account-bg-red-50 guide-account-border guide-account-border-red-200 guide-account-text-red-700 guide-account-px-4 guide-account-py-3 guide-account-rounded-md guide-account-flex guide-account-items-center">
+                        <AlertCircle className="guide-account-w-5 guide-account-h-5 guide-account-mr-2" />
+                        {error}
+                    </div>
                 </div>
             )}
 
             {success && (
-                <div className="alert alert-success">
-                    <span>{success}</span>
+                <div className="guide-account-max-w-7xl guide-account-mx-auto guide-account-px-4 guide-account-sm:px-6 guide-account-lg:px-8 guide-account-mt-4">
+                    <div className="guide-account-bg-green-50 guide-account-border guide-account-border-green-200 guide-account-text-green-700 guide-account-px-4 guide-account-py-3 guide-account-rounded-md guide-account-flex guide-account-items-center">
+                        <CheckCircle className="guide-account-w-5 guide-account-h-5 guide-account-mr-2" />
+                        {success}
+                    </div>
                 </div>
             )}
 
-            {/* Tabs Navigation */}
-            <div className="account-tabs">
+            {/* Navigation Tabs */}
+            <div className="guide-account-bg-white guide-account-border-b">
+                <div className="guide-account-max-w-7xl guide-account-mx-auto guide-account-px-4 guide-account-sm:px-6 guide-account-lg:px-8">
+                    <nav className="guide-account-flex guide-account-space-x-8">
+                        {[
+                            { id: 'profile', label: 'Profile', icon: User },
+                            { id: 'portfolio', label: 'Portfolio', icon: Camera },
+                            { id: 'availability', label: 'Availability', icon: Calendar },
+                            { id: 'documents', label: 'Documents', icon: FileText },
+                            { id: 'bookings', label: 'Bookings', icon: Calendar },
+                            { id: 'reviews', label: 'Reviews', icon: Star },
+                            { id: 'notifications', label: 'Notifications', icon: MessageSquare }
+                        ].map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => handleTabChange(tab.id)}
+                                className={`guide-account-py-4 guide-account-px-1 guide-account-border-b-2 guide-account-font-medium guide-account-text-sm guide-account-flex guide-account-items-center guide-account-space-x-2 ${
+                                    activeTab === tab.id
+                                        ? 'guide-account-border-blue-500 guide-account-text-blue-600'
+                                        : 'guide-account-border-transparent guide-account-text-gray-500 guide-account-hover:text-gray-700 guide-account-hover:border-gray-300'
+                                }`}
+                            >
+                                <tab.icon className="guide-account-w-4 guide-account-h-4" />
+                                <span>{tab.label}</span>
+                            </button>
+                        ))}
+                    </nav>
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="guide-account-max-w-7xl guide-account-mx-auto guide-account-px-4 guide-account-sm:px-6 guide-account-lg:px-8 guide-account-py-8">
+                {activeTab === 'profile' && (
+                    <ProfileSection
+                        customerProfile={customerProfile}
+                        profileData={profileData}
+                        setProfileData={setProfileData}
+                        isEditing={isEditing}
+                        setIsEditing={setIsEditing}
+                        saving={saving}
+                        onSave={handleProfileSave}
+                        countries={countries}
+                        cities={cities}
+                        languages={languages}
+                        serviceTypes={serviceTypes}
+                        onCountryChange={loadCities}
+                    />
+                )}
+
+                {activeTab === 'portfolio' && (
+                    <PortfolioSection
+                        portfolioItems={portfolioItems}
+                        onAdd={() => {
+                            setEditingItem(null);
+                            setShowPortfolioModal(true);
+                        }}
+                        onEdit={(item) => {
+                            setEditingItem(item);
+                            setShowPortfolioModal(true);
+                        }}
+                        onDelete={handlePortfolioDelete}
+                        saving={saving}
+                    />
+                )}
+
+                {activeTab === 'availability' && (
+                    <AvailabilitySection
+                        availabilities={availabilities}
+                        onAdd={() => {
+                            setEditingItem(null);
+                            setShowAvailabilityModal(true);
+                        }}
+                        onEdit={(item) => {
+                            setEditingItem(item);
+                            setShowAvailabilityModal(true);
+                        }}
+                        onDelete={handleAvailabilityDelete}
+                        saving={saving}
+                    />
+                )}
+
+                {activeTab === 'documents' && (
+                    <DocumentsSection
+                        documents={documents}
+                        onAdd={() => setShowDocumentModal(true)}
+                        onDelete={handleDocumentDelete}
+                        saving={saving}
+                    />
+                )}
+
+                {activeTab === 'bookings' && (
+                    <BookingsSection
+                        bookings={bookings}
+                        onStatusChange={async (id, status) => {
+                            try {
+                                await api.updateBookingStatus(id, status);
+                                setSuccess('Booking holati yangilandi!');
+                                await loadBookings();
+                            } catch (err) {
+                                setError(err.message || 'Booking holatini yangilashda xatolik');
+                            }
+                        }}
+                    />
+                )}
+
+                {activeTab === 'reviews' && (
+                    <ReviewsSection
+                        reviews={reviews}
+                        customerProfile={customerProfile}
+                    />
+                )}
+
+                {activeTab === 'notifications' && (
+                    <NotificationsSection
+                        notifications={notifications}
+                        onMarkAsRead={async (id) => {
+                            try {
+                                await api.markNotificationAsRead(id);
+                                await loadNotifications();
+                            } catch (err) {
+                                setError('Bildirishmani belgilashda xatolik');
+                            }
+                        }}
+                        onMarkAllAsRead={async () => {
+                            try {
+                                await api.markAllNotificationsAsRead();
+                                await loadNotifications();
+                                setSuccess('Barcha bildirishmalar o\'qilgan deb belgilandi!');
+                            } catch (err) {
+                                setError('Bildirishmalarni belgilashda xatolik');
+                            }
+                        }}
+                    />
+                )}
+            </div>
+
+            {/* Modals */}
+            {showPortfolioModal && (
+                <PortfolioModal
+                    isOpen={showPortfolioModal}
+                    onClose={() => {
+                        setShowPortfolioModal(false);
+                        setEditingItem(null);
+                    }}
+                    onSave={handlePortfolioSave}
+                    editingItem={editingItem}
+                    saving={saving}
+                />
+            )}
+
+            {showAvailabilityModal && (
+                <AvailabilityModal
+                    isOpen={showAvailabilityModal}
+                    onClose={() => {
+                        setShowAvailabilityModal(false);
+                        setEditingItem(null);
+                    }}
+                    onSave={handleAvailabilitySave}
+                    editingItem={editingItem}
+                    saving={saving}
+                />
+            )}
+
+            {showDocumentModal && (
+                <DocumentModal
+                    isOpen={showDocumentModal}
+                    onClose={() => setShowDocumentModal(false)}
+                    onSave={handleDocumentUpload}
+                    saving={saving}
+                />
+            )}
+        </div>
+    );
+};
+
+// Profile Section Component
+const ProfileSection = ({
+                            customerProfile,
+                            profileData,
+                            setProfileData,
+                            isEditing,
+                            setIsEditing,
+                            saving,
+                            onSave,
+                            countries,
+                            cities,
+                            languages,
+                            serviceTypes,
+                            onCountryChange
+                        }) => {
+    const handleInputChange = (field, value) => {
+        setProfileData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleArrayChange = (field, values) => {
+        setProfileData(prev => ({
+            ...prev,
+            [field]: values
+        }));
+    };
+
+    const handleCountryChange = (countryId) => {
+        handleInputChange('country', countryId);
+        onCountryChange(countryId);
+    };
+
+    if (!customerProfile && !isEditing) {
+        return (
+            <div className="guide-account-bg-white guide-account-rounded-lg guide-account-shadow guide-account-p-6 guide-account-text-center">
+                <User className="guide-account-w-16 guide-account-h-16 guide-account-text-gray-400 guide-account-mx-auto guide-account-mb-4" />
+                <h3 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900 guide-account-mb-2">
+                    Customer profili mavjud emas
+                </h3>
+                <p className="guide-account-text-gray-600 guide-account-mb-6">
+                    Guide sifatida ishlash uchun customer profili yarating
+                </p>
                 <button
-                    className={`tab ${activeTab === "profile" ? "active" : ""}`}
-                    onClick={() => setActiveTab("profile")}
+                    onClick={() => setIsEditing(true)}
+                    className="guide-account-bg-blue-600 guide-account-text-white guide-account-px-6 guide-account-py-2 guide-account-rounded-md guide-account-hover:bg-blue-700 guide-account-transition-colors"
                 >
-                    <FiUser />
-                    {t("profile.tabs.profile")}
+                    Profil yaratish
                 </button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="guide-account-guide-account-card">
+            <div className="guide-account-guide-account-card-header">
+                <h2 className="guide-account-guide-account-card-title">Profile Information</h2>
+                {!isEditing ? (
+                    <button
+                        onClick={() => setIsEditing(true)}
+                        className="guide-account-guide-account-btn guide-account-guide-account-btn-text"
+                    >
+                        <Edit3 className="guide-account-guide-account-btn-icon" />
+                        <span>Edit</span>
+                    </button>
+                ) : (
+                    <div className="guide-account-guide-account-btn-group">
+                        <button
+                            onClick={onSave}
+                            disabled={saving}
+                            className="guide-account-guide-account-btn guide-account-guide-account-btn-primary"
+                        >
+                            <Save className="guide-account-guide-account-btn-icon" />
+                            <span>{saving ? 'Saving...' : 'Save'}</span>
+                        </button>
+                        <button
+                            onClick={() => setIsEditing(false)}
+                            className="guide-account-guide-account-btn guide-account-guide-account-btn-secondary"
+                        >
+                            <X className="guide-account-guide-account-btn-icon" />
+                            <span>Cancel</span>
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            <div className="guide-account-guide-account-card-content">
+                <div className="guide-account-guide-account-form-grid">
+                    {/* Professional Bio */}
+                    <div className="guide-account-guide-account-form-group guide-account-guide-account-form-group-full">
+                        <label className="guide-account-guide-account-form-label">
+                            Professional Bio
+                        </label>
+                        {isEditing ? (
+                            <textarea
+                                value={profileData.professional_bio || ''}
+                                onChange={(e) => handleInputChange('professional_bio', e.target.value)}
+                                rows={4}
+                                className="guide-account-guide-account-form-input guide-account-guide-account-form-textarea"
+                                placeholder="Tell clients about your experience and expertise..."
+                            />
+                        ) : (
+                            <p className="guide-account-guide-account-form-value">
+                                {customerProfile?.professional_bio || 'Bio mavjud emas'}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Years of Experience */}
+                    <div className="guide-account-guide-account-form-group">
+                        <label className="guide-account-guide-account-form-label">
+                            Years of Experience
+                        </label>
+                        {isEditing ? (
+                            <input
+                                type="number"
+                                value={profileData.years_of_experience || ''}
+                                onChange={(e) => handleInputChange('years_of_experience', parseInt(e.target.value))}
+                                className="guide-account-guide-account-form-input"
+                                placeholder="0"
+                                min="0"
+                            />
+                        ) : (
+                            <p className="guide-account-guide-account-form-value">
+                                {customerProfile?.years_of_experience || 0} years
+                            </p>
+                        )}
+                    </div>
+
+                    {/* City */}
+                    <div className="guide-account-guide-account-form-group">
+                        <label className="guide-account-guide-account-form-label">
+                            City
+                        </label>
+                        {isEditing ? (
+                            <select
+                                value={profileData.city || ''}
+                                onChange={(e) => handleInputChange('city', e.target.value)}
+                                className="guide-account-guide-account-form-input guide-account-guide-account-form-select"
+                            >
+                                <option value="">Select city</option>
+                                {cities.map(city => (
+                                    <option key={city.id} value={city.id}>
+                                        {city.name}
+                                    </option>
+                                ))}
+                            </select>
+                        ) : (
+                            <p className="guide-account-guide-account-form-value">
+                                {customerProfile?.city_name || 'City not set'}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Service Areas */}
+                    <div className="guide-account-guide-account-form-group">
+                        <label className="guide-account-guide-account-form-label">
+                            Service Areas
+                        </label>
+                        {isEditing ? (
+                            <input
+                                type="text"
+                                value={profileData.service_areas || ''}
+                                onChange={(e) => handleInputChange('service_areas', e.target.value)}
+                                className="guide-account-guide-account-form-input"
+                                placeholder="Tashkent, Samarkand, Bukhara..."
+                            />
+                        ) : (
+                            <p className="guide-account-guide-account-form-value">
+                                {customerProfile?.service_areas || 'Service areas not set'}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Hourly Rate */}
+                    <div className="guide-account-guide-account-form-group">
+                        <label className="guide-account-guide-account-form-label">
+                            Hourly Rate
+                        </label>
+                        {isEditing ? (
+                            <div className="guide-account-guide-account-form-input-group">
+                                <input
+                                    type="number"
+                                    value={profileData.hourly_rate || ''}
+                                    onChange={(e) => handleInputChange('hourly_rate', parseFloat(e.target.value))}
+                                    className="guide-account-guide-account-form-input guide-account-guide-account-form-input-flex"
+                                    placeholder="0.00"
+                                    min="0"
+                                    step="0.01"
+                                />
+                                <select
+                                    value={profileData.currency || 'USD'}
+                                    onChange={(e) => handleInputChange('currency', e.target.value)}
+                                    className="guide-account-guide-account-form-input guide-account-guide-account-form-select"
+                                >
+                                    <option value="USD">USD</option>
+                                    <option value="UZS">UZS</option>
+                                    <option value="EUR">EUR</option>
+                                </select>
+                            </div>
+                        ) : (
+                            <p className="guide-account-guide-account-form-value">
+                                {customerProfile?.hourly_rate ?
+                                    `${customerProfile.hourly_rate} ${customerProfile.currency || 'USD'}/hour` :
+                                    'Rate not set'
+                                }
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Service Types */}
+                    <div className="guide-account-guide-account-form-group guide-account-guide-account-form-group-full">
+                        <label className="guide-account-guide-account-form-label">
+                            Service Types
+                        </label>
+                        {isEditing ? (
+                            <div className="guide-account-guide-account-checkbox-grid">
+                                {serviceTypes.map(service => (
+                                    <label key={service.id} className="guide-account-guide-account-checkbox-item">
+                                        <input
+                                            type="checkbox"
+                                            checked={(profileData.service_types || []).includes(service.id)}
+                                            onChange={(e) => {
+                                                const currentServices = profileData.service_types || [];
+                                                if (e.target.checked) {
+                                                    handleArrayChange('service_types', [...currentServices, service.id]);
+                                                } else {
+                                                    handleArrayChange('service_types', currentServices.filter(id => id !== service.id));
+                                                }
+                                            }}
+                                            className="guide-account-guide-account-checkbox"
+                                        />
+                                        <span className="guide-account-guide-account-checkbox-label">{service.name}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="guide-account-guide-account-tags">
+                                {customerProfile?.service_types?.map(service => (
+                                    <span
+                                        key={service.id}
+                                        className="guide-account-guide-account-tag guide-account-guide-account-tag-blue"
+                                    >
+                                    {service.name}
+                                </span>
+                                )) || <span className="guide-account-guide-account-form-value-empty">No services selected</span>}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Languages */}
+                    <div className="guide-account-guide-account-form-group guide-account-guide-account-form-group-full">
+                        <label className="guide-account-guide-account-form-label">
+                            Languages
+                        </label>
+                        {isEditing ? (
+                            <div className="guide-account-guide-account-checkbox-grid guide-account-guide-account-checkbox-grid-wide">
+                                {languages.map(language => (
+                                    <label key={language.id} className="guide-account-guide-account-checkbox-item">
+                                        <input
+                                            type="checkbox"
+                                            checked={(profileData.languages || []).includes(language.id)}
+                                            onChange={(e) => {
+                                                const currentLanguages = profileData.languages || [];
+                                                if (e.target.checked) {
+                                                    handleArrayChange('languages', [...currentLanguages, language.id]);
+                                                } else {
+                                                    handleArrayChange('languages', currentLanguages.filter(id => id !== language.id));
+                                                }
+                                            }}
+                                            className="guide-account-guide-account-checkbox"
+                                        />
+                                        <span className="guide-account-guide-account-checkbox-label">{language.name}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="guide-account-guide-account-tags">
+                                {customerProfile?.languages?.map(language => (
+                                    <span
+                                        key={language.id}
+                                        className="guide-account-guide-account-tag guide-account-guide-account-tag-green"
+                                    >
+                                    {language.name}
+                                </span>
+                                )) || <span className="guide-account-guide-account-form-value-empty">No languages selected</span>}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Availability Status */}
+                    <div className="guide-account-guide-account-form-group">
+                        <label className="guide-account-guide-account-form-label">
+                            Availability Status
+                        </label>
+                        {isEditing ? (
+                            <label className="guide-account-guide-account-checkbox-item">
+                                <input
+                                    type="checkbox"
+                                    checked={profileData.is_available || false}
+                                    onChange={(e) => handleInputChange('is_available', e.target.checked)}
+                                    className="guide-account-guide-account-checkbox"
+                                />
+                                <span className="guide-account-guide-account-checkbox-label">Available for bookings</span>
+                            </label>
+                        ) : (
+                            <p className={`guide-account-guide-account-form-value guide-account-guide-account-form-value-status ${customerProfile?.is_available ? 'guide-account-guide-account-text-success' : 'guide-account-guide-account-text-danger'}`}>
+                                {customerProfile?.is_available ? 'Available' : 'Unavailable'}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Statistics */}
+                    {customerProfile && (
+                        <div className="guide-account-guide-account-form-group">
+                            <label className="guide-account-guide-account-form-label">
+                                Statistics
+                            </label>
+                            <div className="guide-account-guide-account-stats">
+                                <div className="guide-account-guide-account-stat-item">
+                                    <span className="guide-account-guide-account-stat-label">Total Bookings:</span>
+                                    <span className="guide-account-guide-account-stat-value">{customerProfile.total_bookings || 0}</span>
+                                </div>
+                                <div className="guide-account-guide-account-stat-item">
+                                    <span className="guide-account-guide-account-stat-label">Total Reviews:</span>
+                                    <span className="guide-account-guide-account-stat-value">{customerProfile.total_reviews || 0}</span>
+                                </div>
+                                <div className="guide-account-guide-account-stat-item">
+                                    <span className="guide-account-guide-account-stat-label">Average Rating:</span>
+                                    <span className="guide-account-guide-account-stat-value">
+                                    {customerProfile.average_rating && customerProfile.average_rating > 0 ?
+                                        `${Number(customerProfile.average_rating).toFixed(1)}/5` :
+                                        'No ratings yet'
+                                    }
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Portfolio Section Component
+const PortfolioSection = ({ portfolioItems, onAdd, onEdit, onDelete, saving }) => {
+    return (
+        <div className="guide-account-space-y-6">
+            <div className="guide-account-flex guide-account-justify-between guide-account-items-center">
+                <h2 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900">Portfolio</h2>
                 <button
-                    className={`tab ${activeTab === "portfolio" ? "active" : ""}`}
-                    onClick={() => setActiveTab("portfolio")}
+                    onClick={onAdd}
+                    className="guide-account-flex guide-account-items-center guide-account-space-x-2 guide-account-bg-blue-600 guide-account-text-white guide-account-px-4 guide-account-py-2 guide-account-rounded-md guide-account-hover:bg-blue-700"
                 >
-                    <FiImage />
-                    {t("profile.tabs.portfolio")}
-                </button>
-                <button
-                    className={`tab ${activeTab === "availability" ? "active" : ""}`}
-                    onClick={() => setActiveTab("availability")}
-                >
-                    <FiCalendar />
-                    {t("profile.tabs.availability")}
-                </button>
-                <button
-                    className={`tab ${activeTab === "documents" ? "active" : ""}`}
-                    onClick={() => setActiveTab("documents")}
-                >
-                    <FiFileText />
-                    {t("profile.tabs.documents")}
-                </button>
-                <button
-                    className={`tab ${activeTab === "stats" ? "active" : ""}`}
-                    onClick={() => setActiveTab("stats")}
-                >
-                    <FiTrendingUp />
-                    {t("profile.tabs.statistics")}
+                    <Plus className="guide-account-w-4 guide-account-h-4" />
+                    <span>Add Item</span>
                 </button>
             </div>
 
-            <div className="account-content">
-                {/* Profile Tab */}
-                {activeTab === "profile" && (
-                    <div className="account-sections">
-                        {!profile && !isEditing ? (
-                            <div className="no-profile">
-                                <div className="no-profile-content">
-                                    <FiUser className="no-profile-icon" />
-                                    <h3>{t("profile.no_profile")}</h3>
-                                    <p>{t("profile.no_profile_description")}</p>
-                                    <button
-                                        className="btn btn-primary"
-                                        onClick={handleEdit}
-                                    >
-                                        <FiPlus />
-                                        {t("profile.actions.create_profile")}
-                                    </button>
+            {portfolioItems.length === 0 ? (
+                <div className="guide-account-bg-white guide-account-rounded-lg guide-account-shadow guide-account-p-6 guide-account-text-center">
+                    <Camera className="guide-account-w-16 guide-account-h-16 guide-account-text-gray-400 guide-account-mx-auto guide-account-mb-4" />
+                    <h3 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900 guide-account-mb-2">
+                        No portfolio items yet
+                    </h3>
+                    <p className="guide-account-text-gray-600 guide-account-mb-6">
+                        Showcase your work by adding photos and descriptions
+                    </p>
+                    <button
+                        onClick={onAdd}
+                        className="guide-account-bg-blue-600 guide-account-text-white guide-account-px-6 guide-account-py-2 guide-account-rounded-md guide-account-hover:bg-blue-700"
+                    >
+                        Add First Item
+                    </button>
+                </div>
+            ) : (
+                <div className="guide-account-grid guide-account-grid-cols-1 guide-account-md:grid-cols-2 guide-account-lg:grid-cols-3 guide-account-gap-6">
+                    {portfolioItems.map((item) => (
+                        <div key={item.id} className="guide-account-bg-white guide-account-rounded-lg guide-account-shadow guide-account-overflow-hidden">
+                            {item.image && (
+                                <img
+                                    src={item.image}
+                                    alt={item.title}
+                                    className="guide-account-w-full guide-account-h-48 guide-account-object-cover"
+                                />
+                            )}
+                            <div className="guide-account-p-4">
+                                <h3 className="guide-account-font-medium guide-account-text-gray-900 guide-account-mb-2">{item.title}</h3>
+                                <p className="guide-account-text-gray-600 guide-account-text-sm guide-account-mb-4">
+                                    {item.description?.substring(0, 100)}
+                                    {item.description?.length > 100 && '...'}
+                                </p>
+                                <div className="guide-account-flex guide-account-justify-between guide-account-items-center">
+                  <span className="guide-account-text-xs guide-account-text-gray-500">
+                    {new Date(item.created_at).toLocaleDateString()}
+                  </span>
+                                    <div className="guide-account-flex guide-account-space-x-2">
+                                        <button
+                                            onClick={() => onEdit(item)}
+                                            className="guide-account-text-blue-600 guide-account-hover:text-blue-800"
+                                        >
+                                            <Edit3 className="guide-account-w-4 guide-account-h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => onDelete(item.id)}
+                                            disabled={saving}
+                                            className="guide-account-text-red-600 guide-account-hover:text-red-800 guide-account-disabled:opacity-50"
+                                        >
+                                            <Trash2 className="guide-account-w-4 guide-account-h-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        ) : (
-                            <>
-                                {/* Basic Information */}
-                                <div className="account-section">
-                                    <div className="section-header">
-                                        <h2>
-                                            <FiUser />
-                                            {t("profile.sections.basic_info")}
-                                        </h2>
-                                    </div>
-                                    <div className="section-content">
-                                        <div className="profile-fields">
-                                            <div className="field-group">
-                                                <label>
-                                                    <FiFileText />
-                                                    {t("profile.fields.professional_bio")}
-                                                </label>
-                                                {isEditing ? (
-                                                    <textarea
-                                                        name="professional_bio"
-                                                        value={formData.professional_bio}
-                                                        onChange={handleInputChange}
-                                                        placeholder={t("profile.placeholders.professional_bio")}
-                                                        className="form-textarea"
-                                                        rows="4"
-                                                    />
-                                                ) : (
-                                                    <p className="field-value">
-                                                        {profile?.professional_bio || t("profile.not_set")}
-                                                    </p>
-                                                )}
-                                            </div>
-
-                                            <div className="field-row">
-                                                <div className="field-group">
-                                                    <label>
-                                                        <FiClock />
-                                                        {t("profile.fields.years_experience")}
-                                                    </label>
-                                                    {isEditing ? (
-                                                        <input
-                                                            type="number"
-                                                            name="years_of_experience"
-                                                            value={formData.years_of_experience}
-                                                            onChange={handleInputChange}
-                                                            className="form-input"
-                                                            min="0"
-                                                        />
-                                                    ) : (
-                                                        <span className="field-value">
-                                                            {profile?.years_of_experience || 0} {t("profile.years")}
-                                                        </span>
-                                                    )}
-                                                </div>
-
-                                                <div className="field-group">
-                                                    <label>
-                                                        <FiMapPin />
-                                                        {t("profile.fields.city")}
-                                                    </label>
-                                                    {isEditing ? (
-                                                        <select
-                                                            name="city"
-                                                            value={formData.city || ""}
-                                                            onChange={handleInputChange}
-                                                            className="form-select"
-                                                        >
-                                                            <option value="">{t("profile.select_city")}</option>
-                                                            {cities.map(city => (
-                                                                <option key={city.id} value={city.id}>
-                                                                    {city.name}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    ) : (
-                                                        <span className="field-value">
-                                                            {profile?.city_name || t("profile.not_set")}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            <div className="field-group">
-                                                <label>
-                                                    <FiMapPin />
-                                                    {t("profile.fields.service_areas")}
-                                                </label>
-                                                {isEditing ? (
-                                                    <textarea
-                                                        name="service_areas"
-                                                        value={formData.service_areas}
-                                                        onChange={handleInputChange}
-                                                        placeholder={t("profile.placeholders.service_areas")}
-                                                        className="form-textarea"
-                                                        rows="2"
-                                                    />
-                                                ) : (
-                                                    <p className="field-value">
-                                                        {profile?.service_areas || t("profile.not_set")}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Services & Pricing */}
-                                <div className="account-section">
-                                    <div className="section-header">
-                                        <h2>
-                                            <FiDollarSign />
-                                            {t("profile.sections.services_pricing")}
-                                        </h2>
-                                    </div>
-                                    <div className="section-content">
-                                        <div className="profile-fields">
-                                            <div className="field-group">
-                                                <label>
-                                                    <FiSettings />
-                                                    {t("profile.fields.service_types")}
-                                                </label>
-                                                {isEditing ? (
-                                                    <div className="service-types-selector">
-                                                        {serviceTypes.map(serviceType => (
-                                                            <label key={serviceType.id} className="service-option">
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={formData.service_types.includes(serviceType.id)}
-                                                                    onChange={() => handleServiceTypeChange(serviceType.id)}
-                                                                />
-                                                                <span>{serviceType.name}</span>
-                                                            </label>
-                                                        ))}
-                                                    </div>
-                                                ) : (
-                                                    <div className="service-tags">
-                                                        {Array.isArray(profile?.service_types) && profile.service_types.length > 0 ? (
-                                                            profile.service_types.map(serviceId => {
-                                                                const service = serviceTypes.find(s => s.id === serviceId);
-                                                                return service ? (
-                                                                    <span key={serviceId} className="service-tag">
-                                                                        {service.name}
-                                                                    </span>
-                                                                ) : null;
-                                                            })
-                                                        ) : (
-                                                            <span className="field-value">{t("profile.not_set")}</span>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <div className="field-row">
-                                                <div className="field-group">
-                                                    <label>
-                                                        <FiDollarSign />
-                                                        {t("profile.fields.hourly_rate")}
-                                                    </label>
-                                                    {isEditing ? (
-                                                        <div className="price-input">
-                                                            <input
-                                                                type="number"
-                                                                name="hourly_rate"
-                                                                value={formData.hourly_rate}
-                                                                onChange={handleInputChange}
-                                                                className="form-input"
-                                                                min="0"
-                                                                step="0.01"
-                                                            />
-                                                            <span className="currency">{formData.currency}</span>
-                                                        </div>
-                                                    ) : (
-                                                        <span className="field-value">
-                                                            {profile?.hourly_rate
-                                                                ? `${profile.hourly_rate} ${profile.currency || 'USD'}`
-                                                                : t("profile.not_set")
-                                                            }
-                                                        </span>
-                                                    )}
-                                                </div>
-
-                                                <div className="field-group">
-                                                    <label>
-                                                        <FiDollarSign />
-                                                        {t("profile.fields.daily_rate")}
-                                                    </label>
-                                                    {isEditing ? (
-                                                        <div className="price-input">
-                                                            <input
-                                                                type="number"
-                                                                name="daily_rate"
-                                                                value={formData.daily_rate}
-                                                                onChange={handleInputChange}
-                                                                className="form-input"
-                                                                min="0"
-                                                                step="0.01"
-                                                            />
-                                                            <span className="currency">{formData.currency}</span>
-                                                        </div>
-                                                    ) : (
-                                                        <span className="field-value">
-                                                            {profile?.daily_rate
-                                                                ? `${profile.daily_rate} ${profile.currency || 'USD'}`
-                                                                : t("profile.not_set")
-                                                            }
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            <div className="field-group">
-                                                <label>
-                                                    <FiGlobe />
-                                                    {t("profile.fields.languages")}
-                                                </label>
-                                                {isEditing ? (
-                                                    <div className="languages-selector">
-                                                        {languages.map(language => (
-                                                            <label key={language.id} className="language-option">
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={formData.languages.includes(language.id)}
-                                                                    onChange={() => handleLanguageChange(language.id)}
-                                                                />
-                                                                <span>{language.name}</span>
-                                                            </label>
-                                                        ))}
-                                                    </div>
-                                                ) : (
-                                                    <div className="language-tags">
-                                                        {Array.isArray(profile?.languages) && profile.languages.length > 0 ? (
-                                                            profile.languages.map(langId => {
-                                                                const language = languages.find(l => l.id === langId);
-                                                                return language ? (
-                                                                    <span key={langId} className="language-tag">
-                                                                        {language.name}
-                                                                    </span>
-                                                                ) : null;
-                                                            })
-                                                        ) : (
-                                                            <span className="field-value">{t("profile.not_set")}</span>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <div className="field-group">
-                                                <label>
-                                                    <FiToggleRight />
-                                                    {t("profile.fields.availability_status")}
-                                                </label>
-                                                {isEditing ? (
-                                                    <label className="toggle-switch">
-                                                        <input
-                                                            type="checkbox"
-                                                            name="is_available"
-                                                            checked={formData.is_available}
-                                                            onChange={handleInputChange}
-                                                        />
-                                                        <span className="toggle-slider">
-                                                            {formData.is_available ? <FiToggleRight /> : <FiToggleLeft />}
-                                                        </span>
-                                                        <span className="toggle-label">
-                                                            {formData.is_available
-                                                                ? t("profile.available")
-                                                                : t("profile.unavailable")
-                                                            }
-                                                        </span>
-                                                    </label>
-                                                ) : (
-                                                    <span className={`availability-status ${profile?.is_available ? 'available' : 'unavailable'}`}>
-                                                        {profile?.is_available
-                                                            ? <FiCheck className="status-icon" />
-                                                            : <FiX className="status-icon" />
-                                                        }
-                                                        {profile?.is_available
-                                                            ? t("profile.available")
-                                                            : t("profile.unavailable")
-                                                        }
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                )}
-
-                {/* Portfolio Tab */}
-                {activeTab === "portfolio" && (
-                    <div className="portfolio-section">
-                        <div className="section-header">
-                            <h2>
-                                <FiImage />
-                                {t("profile.tabs.portfolio")}
-                            </h2>
-                            <button
-                                className="btn btn-primary"
-                                onClick={() => {
-                                    setEditingPortfolio(null);
-                                    setPortfolioForm({ title: "", description: "", image: null, order: 0 });
-                                    localStorage.removeItem("guideAccount_portfolioForm");
-                                    localStorage.removeItem("guideAccount_editingPortfolio");
-                                }}
-                            >
-                                <FiPlus />
-                                {t("portfolio.add_item")}
-                            </button>
                         </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
 
-                        {/* Portfolio Form */}
-                        <div className="portfolio-form">
-                            <form onSubmit={handlePortfolioSubmit}>
-                                <div className="form-row">
-                                    <div className="field-group">
-                                        <label>{t("portfolio.fields.title")}</label>
-                                        <input
-                                            type="text"
-                                            value={portfolioForm.title}
-                                            onChange={(e) => setPortfolioForm(prev => ({...prev, title: e.target.value}))}
-                                            className="form-input"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="field-group">
-                                        <label>{t("portfolio.fields.order")}</label>
-                                        <input
-                                            type="number"
-                                            value={portfolioForm.order}
-                                            onChange={(e) => setPortfolioForm(prev => ({...prev, order: parseInt(e.target.value) || 0}))}
-                                            className="form-input"
-                                            min="0"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="field-group">
-                                    <label>{t("portfolio.fields.description")}</label>
-                                    <textarea
-                                        value={portfolioForm.description}
-                                        onChange={(e) => setPortfolioForm(prev => ({...prev, description: e.target.value}))}
-                                        className="form-textarea"
-                                        rows="3"
-                                    />
-                                </div>
-                                <div className="field-group">
-                                    <label>{t("portfolio.fields.image")}</label>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => setPortfolioForm(prev => ({...prev, image: e.target.files[0]}))}
-                                        className="form-input"
-                                        required={!editingPortfolio}
-                                    />
-                                </div>
-                                <div className="form-actions">
-                                    <button type="submit" className="btn btn-success" disabled={saving}>
-                                        {saving ? <FiLoader className="btn-spinner" /> : <FiSave />}
-                                        {editingPortfolio ? t("portfolio.update") : t("portfolio.add")}
-                                    </button>
-                                    {editingPortfolio && (
+// Availability Section Component
+const AvailabilitySection = ({ availabilities, onAdd, onEdit, onDelete, saving }) => {
+    return (
+        <div className="guide-account-space-y-6">
+            <div className="guide-account-flex guide-account-justify-between guide-account-items-center">
+                <h2 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900">Availability</h2>
+                <button
+                    onClick={onAdd}
+                    className="guide-account-flex guide-account-items-center guide-account-space-x-2 guide-account-bg-blue-600 guide-account-text-white guide-account-px-4 guide-account-py-2 guide-account-rounded-md guide-account-hover:bg-blue-700"
+                >
+                    <Plus className="guide-account-w-4 guide-account-h-4" />
+                    <span>Add Availability</span>
+                </button>
+            </div>
+
+            {availabilities.length === 0 ? (
+                <div className="guide-account-bg-white guide-account-rounded-lg guide-account-shadow guide-account-p-6 guide-account-text-center">
+                    <Calendar className="guide-account-w-16 guide-account-h-16 guide-account-text-gray-400 guide-account-mx-auto guide-account-mb-4" />
+                    <h3 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900 guide-account-mb-2">
+                        No availability set
+                    </h3>
+                    <p className="guide-account-text-gray-600 guide-account-mb-6">
+                        Set your available dates and times for bookings
+                    </p>
+                    <button
+                        onClick={onAdd}
+                        className="guide-account-bg-blue-600 guide-account-text-white guide-account-px-6 guide-account-py-2 guide-account-rounded-md guide-account-hover:bg-blue-700"
+                    >
+                        Set Availability
+                    </button>
+                </div>
+            ) : (
+                <div className="guide-account-bg-white guide-account-rounded-lg guide-account-shadow guide-account-overflow-hidden">
+                    <table className="guide-account-min-w-full guide-account-divide-y guide-account-divide-gray-200">
+                        <thead className="guide-account-bg-gray-50">
+                        <tr>
+                            <th className="guide-account-px-6 guide-account-py-3 guide-account-text-left guide-account-text-xs guide-account-font-medium guide-account-text-gray-500 guide-account-uppercase guide-account-tracking-wider">
+                                Date
+                            </th>
+                            <th className="guide-account-px-6 guide-account-py-3 guide-account-text-left guide-account-text-xs guide-account-font-medium guide-account-text-gray-500 guide-account-uppercase guide-account-tracking-wider">
+                                Time
+                            </th>
+                            <th className="guide-account-px-6 guide-account-py-3 guide-account-text-left guide-account-text-xs guide-account-font-medium guide-account-text-gray-500 guide-account-uppercase guide-account-tracking-wider">
+                                Status
+                            </th>
+                            <th className="guide-account-px-6 guide-account-py-3 guide-account-text-left guide-account-text-xs guide-account-font-medium guide-account-text-gray-500 guide-account-uppercase guide-account-tracking-wider">
+                                Note
+                            </th>
+                            <th className="guide-account-px-6 guide-account-py-3 guide-account-text-left guide-account-text-xs guide-account-font-medium guide-account-text-gray-500 guide-account-uppercase guide-account-tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody className="guide-account-bg-white guide-account-divide-y guide-account-divide-gray-200">
+                        {availabilities.map((availability) => (
+                            <tr key={availability.id}>
+                                <td className="guide-account-px-6 guide-account-py-4 guide-account-whitespace-nowrap guide-account-text-sm guide-account-text-gray-900">
+                                    {new Date(availability.date).toLocaleDateString()}
+                                </td>
+                                <td className="guide-account-px-6 guide-account-py-4 guide-account-whitespace-nowrap guide-account-text-sm guide-account-text-gray-900">
+                                    {availability.start_time && availability.end_time
+                                        ? `${availability.start_time} - ${availability.end_time}`
+                                        : 'All day'
+                                    }
+                                </td>
+                                <td className="guide-account-px-6 guide-account-py-4 guide-account-whitespace-nowrap">
+                    <span className={`guide-account-inline-flex guide-account-items-center guide-account-px-3 guide-account-py-1 guide-account-rounded-full guide-account-text-sm guide-account-font-medium ${
+                        availability.is_available
+                            ? 'guide-account-bg-green-100 guide-account-text-green-800'
+                            : 'guide-account-bg-red-100 guide-account-text-red-800'
+                    }`}>
+                      {availability.is_available ? 'Available' : 'Unavailable'}
+                    </span>
+                                </td>
+                                <td className="guide-account-px-6 guide-account-py-4 guide-account-text-sm guide-account-text-gray-900">
+                                    {availability.note || '-'}
+                                </td>
+                                <td className="guide-account-px-6 guide-account-py-4 guide-account-whitespace-nowrap guide-account-text-sm guide-account-text-gray-500">
+                                    <div className="guide-account-flex guide-account-space-x-2">
                                         <button
-                                            type="button"
-                                            className="btn btn-outline"
-                                            onClick={handleCancelPortfolioEdit}
+                                            onClick={() => onEdit(availability)}
+                                            className="guide-account-text-blue-600 guide-account-hover:text-blue-800"
                                         >
-                                            <FiX />
-                                            {t("portfolio.cancel")}
-                                        </button>
-                                    )}
-                                </div>
-                            </form>
-                        </div>
-
-                        {/* Portfolio Items */}
-                        <div className="portfolio-grid">
-                            {portfolio.map(item => (
-                                <div key={item.id} className="portfolio-item">
-                                    <div className="portfolio-image">
-                                        <img src={item.image} alt={item.title} />
-                                    </div>
-                                    <div className="portfolio-content">
-                                        <h4>{item.title}</h4>
-                                        <p>{item.description}</p>
-                                        <div className="portfolio-actions">
-                                            <button
-                                                className="btn btn-outline btn-sm"
-                                                onClick={() => handleEditPortfolio(item)}
-                                            >
-                                                <FiEdit3 />
-                                            </button>
-                                            <button
-                                                className="btn btn-danger btn-sm"
-                                                onClick={() => handleDeletePortfolio(item.id)}
-                                            >
-                                                <FiTrash2 />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Availability Tab */}
-                {activeTab === "availability" && (
-                    <div className="availability-section">
-                        <div className="section-header">
-                            <h2>
-                                <FiCalendar />
-                                {t("profile.tabs.availability")}
-                            </h2>
-                        </div>
-
-                        {/* Availability Form */}
-                        <div className="availability-form">
-                            <form onSubmit={handleAvailabilitySubmit}>
-                                <div className="form-row">
-                                    <div className="field-group">
-                                        <label>{t("availability.fields.date")}</label>
-                                        <input
-                                            type="date"
-                                            value={availabilityForm.date}
-                                            onChange={(e) => setAvailabilityForm(prev => ({...prev, date: e.target.value}))}
-                                            className="form-input"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="field-group">
-                                        <label>{t("availability.fields.status")}</label>
-                                        <select
-                                            value={availabilityForm.is_available}
-                                            onChange={(e) => setAvailabilityForm(prev => ({...prev, is_available: e.target.value === 'true'}))}
-                                            className="form-select"
-                                        >
-                                            <option value="true">{t("availability.available")}</option>
-                                            <option value="false">{t("availability.unavailable")}</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                {availabilityForm.is_available && (
-                                    <div className="form-row">
-                                        <div className="field-group">
-                                            <label>{t("availability.fields.start_time")}</label>
-                                            <input
-                                                type="time"
-                                                value={availabilityForm.start_time}
-                                                onChange={(e) => setAvailabilityForm(prev => ({...prev, start_time: e.target.value}))}
-                                                className="form-input"
-                                            />
-                                        </div>
-                                        <div className="field-group">
-                                            <label>{t("availability.fields.end_time")}</label>
-                                            <input
-                                                type="time"
-                                                value={availabilityForm.end_time}
-                                                onChange={(e) => setAvailabilityForm(prev => ({...prev, end_time: e.target.value}))}
-                                                className="form-input"
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-                                <div className="field-group">
-                                    <label>{t("availability.fields.note")}</label>
-                                    <input
-                                        type="text"
-                                        value={availabilityForm.note}
-                                        onChange={(e) => setAvailabilityForm(prev => ({...prev, note: e.target.value}))}
-                                        className="form-input"
-                                        placeholder={t("availability.note_placeholder")}
-                                    />
-                                </div>
-                                <div className="form-actions">
-                                    <button type="submit" className="btn btn-success" disabled={saving}>
-                                        {saving ? <FiLoader className="btn-spinner" /> : <FiSave />}
-                                        {editingAvailability ? t("availability.update") : t("availability.add")}
-                                    </button>
-                                    {editingAvailability && (
-                                        <button
-                                            type="button"
-                                            className="btn btn-outline"
-                                            onClick={handleCancelAvailabilityEdit}
-                                        >
-                                            <FiX />
-                                            {t("availability.cancel")}
-                                        </button>
-                                    )}
-                                </div>
-                            </form>
-                        </div>
-
-                        {/* Availability List */}
-                        <div className="availability-list">
-                            {availability.map(item => (
-                                <div key={item.id} className="availability-item">
-                                    <div className="availability-date">
-                                        <FiCalendar />
-                                        <span>{formatDate(item.date)}</span>
-                                    </div>
-                                    <div className="availability-status">
-                                        {item.is_available ? (
-                                            <span className="status available">
-                                                <FiCheck />
-                                                {t("availability.available")}
-                                            </span>
-                                        ) : (
-                                            <span className="status unavailable">
-                                                <FiX />
-                                                {t("availability.unavailable")}
-                                            </span>
-                                        )}
-                                    </div>
-                                    {item.is_available && (item.start_time || item.end_time) && (
-                                        <div className="availability-time">
-                                            <FiClock />
-                                            <span>{item.start_time} - {item.end_time}</span>
-                                        </div>
-                                    )}
-                                    {item.note && (
-                                        <div className="availability-note">
-                                            <p>{item.note}</p>
-                                        </div>
-                                    )}
-                                    <div className="availability-actions">
-                                        <button
-                                            className="btn btn-outline btn-sm"
-                                            onClick={() => handleEditAvailability(item)}
-                                        >
-                                            <FiEdit3 />
+                                            <Edit3 className="guide-account-w-4 guide-account-h-4" />
                                         </button>
                                         <button
-                                            className="btn btn-danger btn-sm"
-                                            onClick={() => handleDeleteAvailability(item.id)}
+                                            onClick={() => onDelete(availability.id)}
+                                            disabled={saving}
+                                            className="guide-account-text-red-600 guide-account-hover:text-red-800 guide-account-disabled:opacity-50"
                                         >
-                                            <FiTrash2 />
+                                            <Trash2 className="guide-account-w-4 guide-account-h-4" />
                                         </button>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+        </div>
+    );
+};
 
-                {/* Documents Tab */}
-                {activeTab === "documents" && (
-                    <div className="documents-section">
-                        <div className="section-header">
-                            <h2>
-                                <FiFileText />
-                                {t("profile.tabs.documents")}
-                            </h2>
-                        </div>
+// Documents Section Component
+const DocumentsSection = ({ documents, onAdd, onDelete, saving }) => {
+    const getDocumentIcon = (type) => {
+        switch (type) {
+            case 'ID':
+                return <User className="guide-account-w-8 guide-account-h-8 guide-account-text-blue-600" />;
+            case 'LICENSE':
+                return <FileText className="guide-account-w-8 guide-account-h-8 guide-account-text-green-600" />;
+            case 'CERTIFICATE':
+                return <FileText className="guide-account-w-8 guide-account-h-8 guide-account-text-purple-600" />;
+            default:
+                return <FileText className="guide-account-w-8 guide-account-h-8 guide-account-text-gray-600" />;
+        }
+    };
 
-                        {/* Document Upload Form */}
-                        <div className="document-form">
-                            <form onSubmit={handleDocumentSubmit}>
-                                <div className="form-row">
-                                    <div className="field-group">
-                                        <label>{t("documents.fields.type")}</label>
-                                        <select
-                                            value={documentForm.document_type}
-                                            onChange={(e) => setDocumentForm(prev => ({...prev, document_type: e.target.value}))}
-                                            className="form-select"
-                                        >
-                                            <option value="id_card">{t("documents.types.id_card")}</option>
-                                            <option value="passport">{t("documents.types.passport")}</option>
-                                            <option value="license">{t("documents.types.license")}</option>
-                                            <option value="certificate">{t("documents.types.certificate")}</option>
-                                            <option value="other">{t("documents.types.other")}</option>
-                                        </select>
-                                    </div>
-                                    <div className="field-group">
-                                        <label>{t("documents.fields.file")}</label>
-                                        <input
-                                            type="file"
-                                            onChange={(e) => setDocumentForm(prev => ({...prev, file: e.target.files[0]}))}
-                                            className="form-input"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                <div className="field-group">
-                                    <label>{t("documents.fields.description")}</label>
-                                    <input
-                                        type="text"
-                                        value={documentForm.description}
-                                        onChange={(e) => setDocumentForm(prev => ({...prev, description: e.target.value}))}
-                                        className="form-input"
-                                        placeholder={t("documents.description_placeholder")}
-                                    />
-                                </div>
-                                <div className="form-actions">
-                                    <button type="submit" className="btn btn-success" disabled={saving}>
-                                        {saving ? <FiLoader className="btn-spinner" /> : <FiPlus />}
-                                        {t("documents.upload")}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+    const getStatusColor = (isVerified) => {
+        return isVerified ? 'guide-account-text-green-600' : 'guide-account-text-yellow-600';
+    };
 
-                        {/* Documents List */}
-                        <div className="documents-list">
-                            {documents.map(doc => (
-                                <div key={doc.id} className="document-item">
-                                    <div className="document-info">
-                                        <div className="document-type">
-                                            <FiFileText />
-                                            <span>{t(`documents.types.${doc.document_type}`)}</span>
-                                        </div>
-                                        <div className="document-description">
-                                            <p>{doc.description}</p>
-                                        </div>
-                                        <div className="document-status">
-                                            {doc.is_verified ? (
-                                                <span className="status verified">
-                                                    <FiCheck />
-                                                    {t("documents.verified")}
-                                                </span>
-                                            ) : (
-                                                <span className="status pending">
-                                                    <FiClock />
-                                                    {t("documents.pending")}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className="document-date">
-                                            <span>{formatDate(doc.created_at)}</span>
-                                        </div>
-                                    </div>
-                                    <div className="document-actions">
+    return (
+        <div className="guide-account-space-y-6">
+            <div className="guide-account-flex guide-account-justify-between guide-account-items-center">
+                <h2 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900">Verification Documents</h2>
+                <button
+                    onClick={onAdd}
+                    className="guide-account-flex guide-account-items-center guide-account-space-x-2 guide-account-bg-blue-600 guide-account-text-white guide-account-px-4 guide-account-py-2 guide-account-rounded-md guide-account-hover:bg-blue-700"
+                >
+                    <Upload className="guide-account-w-4 guide-account-h-4" />
+                    <span>Upload Document</span>
+                </button>
+            </div>
+
+            {documents.length === 0 ? (
+                <div className="guide-account-bg-white guide-account-rounded-lg guide-account-shadow guide-account-p-6 guide-account-text-center">
+                    <FileText className="guide-account-w-16 guide-account-h-16 guide-account-text-gray-400 guide-account-mx-auto guide-account-mb-4" />
+                    <h3 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900 guide-account-mb-2">
+                        No documents uploaded
+                    </h3>
+                    <p className="guide-account-text-gray-600 guide-account-mb-6">
+                        Upload verification documents to build trust with clients
+                    </p>
+                    <button
+                        onClick={onAdd}
+                        className="guide-account-bg-blue-600 guide-account-text-white guide-account-px-6 guide-account-py-2 guide-account-rounded-md guide-account-hover:bg-blue-700"
+                    >
+                        Upload First Document
+                    </button>
+                </div>
+            ) : (
+                <div className="guide-account-grid guide-account-grid-cols-1 guide-account-md:grid-cols-2 guide-account-lg:grid-cols-3 guide-account-gap-6">
+                    {documents.map((document) => (
+                        <div key={document.id} className="guide-account-bg-white guide-account-rounded-lg guide-account-shadow guide-account-p-6">
+                            <div className="guide-account-flex guide-account-items-center guide-account-justify-between guide-account-mb-4">
+                                {getDocumentIcon(document.document_type)}
+                                <span className={`guide-account-text-sm guide-account-font-medium ${getStatusColor(document.is_verified)}`}>
+                  {document.is_verified ? 'Verified' : 'Pending'}
+                </span>
+                            </div>
+                            <h3 className="guide-account-font-medium guide-account-text-gray-900 guide-account-mb-2">
+                                {document.document_type.replace('_', ' ')}
+                            </h3>
+                            <p className="guide-account-text-gray-600 guide-account-text-sm guide-account-mb-4">
+                                {document.description || 'No description provided'}
+                            </p>
+                            <div className="guide-account-flex guide-account-justify-between guide-account-items-center">
+                <span className="guide-account-text-xs guide-account-text-gray-500">
+                  {new Date(document.created_at).toLocaleDateString()}
+                </span>
+                                <div className="guide-account-flex guide-account-space-x-2">
+                                    {document.file && (
                                         <a
-                                            href={doc.file}
+                                            href={document.file}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="btn btn-outline btn-sm"
+                                            className="guide-account-text-blue-600 guide-account-hover:text-blue-800"
                                         >
-                                            <FiFileText />
-                                            {t("documents.view")}
+                                            <Eye className="guide-account-w-4 guide-account-h-4" />
                                         </a>
-                                        <button
-                                            className="btn btn-danger btn-sm"
-                                            onClick={() => handleDeleteDocument(doc.id)}
-                                        >
-                                            <FiTrash2 />
-                                        </button>
-                                    </div>
+                                    )}
+                                    <button
+                                        onClick={() => onDelete(document.id)}
+                                        disabled={saving}
+                                        className="guide-account-text-red-600 guide-account-hover:text-red-800 guide-account-disabled:opacity-50"
+                                    >
+                                        <Trash2 className="guide-account-w-4 guide-account-h-4" />
+                                    </button>
                                 </div>
-                            ))}
+                            </div>
                         </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Bookings Section Component
+const BookingsSection = ({ bookings, onStatusChange }) => {
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'PENDING':
+                return 'guide-account-bg-yellow-100 guide-account-text-yellow-800';
+            case 'ACCEPTED':
+                return 'guide-account-bg-green-100 guide-account-text-green-800';
+            case 'COMPLETED':
+                return 'guide-account-bg-blue-100 guide-account-text-blue-800';
+            case 'CANCELLED':
+                return 'guide-account-bg-red-100 guide-account-text-red-800';
+            default:
+                return 'guide-account-bg-gray-100 guide-account-text-gray-800';
+        }
+    };
+
+    return (
+        <div className="guide-account-space-y-6">
+            <h2 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900">My Bookings</h2>
+
+            {bookings.length === 0 ? (
+                <div className="guide-account-bg-white guide-account-rounded-lg guide-account-shadow guide-account-p-6 guide-account-text-center">
+                    <Calendar className="guide-account-w-16 guide-account-h-16 guide-account-text-gray-400 guide-account-mx-auto guide-account-mb-4" />
+                    <h3 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900 guide-account-mb-2">
+                        No bookings yet
+                    </h3>
+                    <p className="guide-account-text-gray-600">
+                        Your bookings will appear here once clients start booking your services
+                    </p>
+                </div>
+            ) : (
+                <div className="guide-account-bg-white guide-account-rounded-lg guide-account-shadow guide-account-overflow-hidden">
+                    <table className="guide-account-min-w-full guide-account-divide-y guide-account-divide-gray-200">
+                        <thead className="guide-account-bg-gray-50">
+                        <tr>
+                            <th className="guide-account-px-6 guide-account-py-3 guide-account-text-left guide-account-text-xs guide-account-font-medium guide-account-text-gray-500 guide-account-uppercase guide-account-tracking-wider">
+                                Client
+                            </th>
+                            <th className="guide-account-px-6 guide-account-py-3 guide-account-text-left guide-account-text-xs guide-account-font-medium guide-account-text-gray-500 guide-account-uppercase guide-account-tracking-wider">
+                                Date Range
+                            </th>
+                            <th className="guide-account-px-6 guide-account-py-3 guide-account-text-left guide-account-text-xs guide-account-font-medium guide-account-text-gray-500 guide-account-uppercase guide-account-tracking-wider">
+                                Status
+                            </th>
+                            <th className="guide-account-px-6 guide-account-py-3 guide-account-text-left guide-account-text-xs guide-account-font-medium guide-account-text-gray-500 guide-account-uppercase guide-account-tracking-wider">
+                                Amount
+                            </th>
+                            <th className="guide-account-px-6 guide-account-py-3 guide-account-text-left guide-account-text-xs guide-account-font-medium guide-account-text-gray-500 guide-account-uppercase guide-account-tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody className="guide-account-bg-white guide-account-divide-y guide-account-divide-gray-200">
+                        {bookings.map((booking) => (
+                            <tr key={booking.id}>
+                                <td className="guide-account-px-6 guide-account-py-4 guide-account-whitespace-nowrap">
+                                    <div className="guide-account-flex guide-account-items-center">
+                                        <div className="guide-account-w-10 guide-account-h-10 guide-account-bg-gray-300 guide-account-rounded-full guide-account-flex guide-account-items-center guide-account-justify-center">
+                                            {booking.client_profile?.user?.full_name?.charAt(0) || 'C'}
+                                        </div>
+                                        <div className="guide-account-ml-4">
+                                            <div className="guide-account-text-sm guide-account-font-medium guide-account-text-gray-900">
+                                                {booking.client_profile?.user?.full_name || 'Unknown Client'}
+                                            </div>
+                                            <div className="guide-account-text-sm guide-account-text-gray-500">
+                                                {booking.client_profile?.user?.email}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="guide-account-px-6 guide-account-py-4 guide-account-whitespace-nowrap guide-account-text-sm guide-account-text-gray-900">
+                                    {new Date(booking.start_date).toLocaleDateString()} -
+                                    {new Date(booking.end_date).toLocaleDateString()}
+                                </td>
+                                <td className="guide-account-px-6 guide-account-py-4 guide-account-whitespace-nowrap">
+                    <span className={`guide-account-inline-flex guide-account-items-center guide-account-px-3 guide-account-py-1 guide-account-rounded-full guide-account-text-sm guide-account-font-medium ${getStatusColor(booking.status)}`}>
+                      {booking.status}
+                    </span>
+                                </td>
+                                <td className="guide-account-px-6 guide-account-py-4 guide-account-whitespace-nowrap guide-account-text-sm guide-account-text-gray-900">
+                                    ${booking.total_amount || 0}
+                                </td>
+                                <td className="guide-account-px-6 guide-account-py-4 guide-account-whitespace-nowrap guide-account-text-sm guide-account-text-gray-500">
+                                    <div className="guide-account-flex guide-account-space-x-2">
+                                        {booking.status === 'PENDING' && (
+                                            <>
+                                                <button
+                                                    onClick={() => onStatusChange(booking.id, 'ACCEPTED')}
+                                                    className="guide-account-text-green-600 guide-account-hover:text-green-800"
+                                                >
+                                                    Accept
+                                                </button>
+                                                <button
+                                                    onClick={() => onStatusChange(booking.id, 'CANCELLED')}
+                                                    className="guide-account-text-red-600 guide-account-hover:text-red-800"
+                                                >
+                                                    Decline
+                                                </button>
+                                            </>
+                                        )}
+                                        {booking.status === 'ACCEPTED' && (
+                                            <button
+                                                onClick={() => onStatusChange(booking.id, 'COMPLETED')}
+                                                className="guide-account-text-blue-600 guide-account-hover:text-blue-800"
+                                            >
+                                                Mark Complete
+                                            </button>
+                                        )}
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Reviews Section Component
+const ReviewsSection = ({ reviews, customerProfile }) => {
+    const renderStars = (rating) => {
+        return Array.from({ length: 5 }, (_, i) => (
+            <Star
+                key={i}
+                className={`guide-account-w-4 guide-account-h-4 ${i < rating ? 'guide-account-fill-yellow-400 guide-account-text-yellow-400' : 'guide-account-text-gray-300'}`}
+            />
+        ));
+    };
+
+    return (
+        <div className="guide-account-space-y-6">
+            <div className="guide-account-flex guide-account-justify-between guide-account-items-center">
+                <h2 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900">Customer Reviews</h2>
+                {customerProfile && (
+                    <div className="guide-account-text-right">
+                        <div className="guide-account-flex guide-account-items-center guide-account-space-x-2">
+                            {renderStars(Math.round(customerProfile.average_rating || 0))}
+                            <span className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900">
+                {customerProfile.average_rating?.toFixed(1) || '0.0'}
+              </span>
+                        </div>
+                        <p className="guide-account-text-sm guide-account-text-gray-600">
+                            {customerProfile.total_reviews || 0} reviews
+                        </p>
                     </div>
                 )}
+            </div>
 
-                {/* Statistics Tab */}
-                {activeTab === "stats" && (
-                    <div className="stats-section">
-                        <div className="section-header">
-                            <h2>
-                                <FiTrendingUp />
-                                {t("profile.tabs.statistics")}
-                            </h2>
-                        </div>
-
-                        <div className="stats-grid">
-                            <div className="stat-card">
-                                <div className="stat-icon">
-                                    <FiBookOpen />
-                                </div>
-                                <div className="stat-content">
-                                    <h3>{profile?.total_bookings || 0}</h3>
-                                    <p>{t("profile.stats.total_bookings")}</p>
+            {reviews.length === 0 ? (
+                <div className="guide-account-bg-white guide-account-rounded-lg guide-account-shadow guide-account-p-6 guide-account-text-center">
+                    <Star className="guide-account-w-16 guide-account-h-16 guide-account-text-gray-400 guide-account-mx-auto guide-account-mb-4" />
+                    <h3 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900 guide-account-mb-2">
+                        No reviews yet
+                    </h3>
+                    <p className="guide-account-text-gray-600">
+                        Complete your first booking to start receiving reviews
+                    </p>
+                </div>
+            ) : (
+                <div className="guide-account-space-y-4">
+                    {reviews.map((review) => (
+                        <div key={review.id} className="guide-account-bg-white guide-account-rounded-lg guide-account-shadow guide-account-p-6">
+                            <div className="guide-account-flex guide-account-items-start guide-account-justify-between guide-account-mb-4">
+                                <div className="guide-account-flex guide-account-items-center guide-account-space-x-3">
+                                    <div className="guide-account-w-10 guide-account-h-10 guide-account-bg-gray-300 guide-account-rounded-full guide-account-flex guide-account-items-center guide-account-justify-center">
+                                        {review.client?.full_name?.charAt(0) || 'C'}
+                                    </div>
+                                    <div>
+                                        <h4 className="guide-account-font-medium guide-account-text-gray-900">
+                                            {review.client?.full_name || 'Anonymous Client'}
+                                        </h4>
+                                        <div className="guide-account-flex guide-account-items-center guide-account-space-x-1">
+                                            {renderStars(review.overall_rating)}
+                                            <span className="guide-account-text-sm guide-account-text-gray-600">
+                        {new Date(review.created_at).toLocaleDateString()}
+                      </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="stat-card">
-                                <div className="stat-icon">
-                                    <FiStar />
-                                </div>
-                                <div className="stat-content">
-                                    <h3>{safeToFixed(profile?.average_rating, 1)}</h3>
-                                    <p>{t("profile.stats.average_rating")}</p>
-                                </div>
-                            </div>
+                            {review.title && (
+                                <h5 className="guide-account-font-medium guide-account-text-gray-900 guide-account-mb-2">{review.title}</h5>
+                            )}
 
-                            <div className="stat-card">
-                                <div className="stat-icon">
-                                    <FiFileText />
-                                </div>
-                                <div className="stat-content">
-                                    <h3>{profile?.total_reviews || 0}</h3>
-                                    <p>{t("profile.stats.total_reviews")}</p>
-                                </div>
-                            </div>
+                            <p className="guide-account-text-gray-700 guide-account-mb-4">{review.comment}</p>
 
-                            <div className="stat-card">
-                                <div className="stat-icon">
-                                    <FiCalendar />
+                            <div className="guide-account-grid guide-account-grid-cols-2 guide-account-md:grid-cols-4 guide-account-gap-4 guide-account-text-sm">
+                                <div>
+                                    <span className="guide-account-text-gray-600">Communication:</span>
+                                    <div className="guide-account-flex guide-account-items-center guide-account-space-x-1">
+                                        {renderStars(review.communication_rating)}
+                                    </div>
                                 </div>
-                                <div className="stat-content">
-                                    <h3>{formatDate(user?.date_joined)}</h3>
-                                    <p>{t("profile.stats.member_since")}</p>
+                                <div>
+                                    <span className="guide-account-text-gray-600">Service:</span>
+                                    <div className="guide-account-flex guide-account-items-center guide-account-space-x-1">
+                                        {renderStars(review.service_rating)}
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div className="stat-card">
-                                <div className="stat-icon">
-                                    <FiShield />
+                                <div>
+                                    <span className="guide-account-text-gray-600">Punctuality:</span>
+                                    <div className="guide-account-flex guide-account-items-center guide-account-space-x-1">
+                                        {renderStars(review.punctuality_rating)}
+                                    </div>
                                 </div>
-                                <div className="stat-content">
-                                    <h3>{getVerificationStatusBadge(profile?.verification_status)}</h3>
-                                    <p>{t("profile.stats.verification_status")}</p>
-                                </div>
-                            </div>
-
-                            <div className="stat-card">
-                                <div className="stat-icon">
-                                    <FiClock />
-                                </div>
-                                <div className="stat-content">
-                                    <h3>{profile?.years_of_experience || 0}</h3>
-                                    <p>{t("profile.stats.years_experience")}</p>
+                                <div>
+                                    <span className="guide-account-text-gray-600">Value:</span>
+                                    <div className="guide-account-flex guide-account-items-center guide-account-space-x-1">
+                                        {renderStars(review.value_rating)}
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
 
-                        {/* Performance Metrics */}
-                        <div className="performance-section">
-                            <h3>{t("profile.stats.performance")}</h3>
-                            <div className="performance-grid">
-                                <div className="performance-item">
-                                    <div className="performance-bar">
-                                        <div className="performance-label">
-                                            {t("profile.stats.profile_completion")}
-                                        </div>
-                                        <div className="progress-bar">
-                                            <div
-                                                className="progress-fill"
-                                                style={{
-                                                    width: profile ? '85%' : '20%'
-                                                }}
-                                            ></div>
-                                        </div>
-                                        <div className="performance-value">
-                                            {profile ? '85%' : '20%'}
-                                        </div>
-                                    </div>
-                                </div>
+// Notifications Section Component
+const NotificationsSection = ({ notifications, onMarkAsRead, onMarkAllAsRead }) => {
+    return (
+        <div className="guide-account-space-y-6">
+            <div className="guide-account-flex guide-account-justify-between guide-account-items-center">
+                <h2 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900">Notifications</h2>
+                {notifications.some(n => !n.is_read) && (
+                    <button
+                        onClick={onMarkAllAsRead}
+                        className="guide-account-text-blue-600 guide-account-hover:text-blue-800 guide-account-text-sm"
+                    >
+                        Mark all as read
+                    </button>
+                )}
+            </div>
 
-                                <div className="performance-item">
-                                    <div className="performance-bar">
-                                        <div className="performance-label">
-                                            {t("profile.stats.response_rate")}
-                                        </div>
-                                        <div className="progress-bar">
-                                            <div
-                                                className="progress-fill"
-                                                style={{ width: "92%" }}
-                                            ></div>
-                                        </div>
-                                        <div className="performance-value">92%</div>
-                                    </div>
+            {notifications.length === 0 ? (
+                <div className="guide-account-bg-white guide-account-rounded-lg guide-account-shadow guide-account-p-6 guide-account-text-center">
+                    <MessageSquare className="guide-account-w-16 guide-account-h-16 guide-account-text-gray-400 guide-account-mx-auto guide-account-mb-4" />
+                    <h3 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900 guide-account-mb-2">
+                        No notifications
+                    </h3>
+                    <p className="guide-account-text-gray-600">
+                        You'll receive notifications about bookings, messages, and more
+                    </p>
+                </div>
+            ) : (
+                <div className="guide-account-space-y-3">
+                    {notifications.map((notification) => (
+                        <div
+                            key={notification.id}
+                            className={`guide-account-bg-white guide-account-rounded-lg guide-account-shadow guide-account-p-4 guide-account-border-l-4 ${
+                                notification.is_read ? 'guide-account-border-gray-300' : 'guide-account-border-blue-500'
+                            }`}
+                        >
+                            <div className="guide-account-flex guide-account-items-start guide-account-justify-between">
+                                <div className="guide-account-flex-1">
+                                    <h4 className={`guide-account-font-medium ${
+                                        notification.is_read ? 'guide-account-text-gray-700' : 'guide-account-text-gray-900'
+                                    }`}>
+                                        {notification.title}
+                                    </h4>
+                                    <p className={`guide-account-mt-1 guide-account-text-sm ${
+                                        notification.is_read ? 'guide-account-text-gray-500' : 'guide-account-text-gray-700'
+                                    }`}>
+                                        {notification.message}
+                                    </p>
+                                    <p className="guide-account-mt-2 guide-account-text-xs guide-account-text-gray-500">
+                                        {new Date(notification.created_at).toLocaleString()}
+                                    </p>
                                 </div>
-
-                                <div className="performance-item">
-                                    <div className="performance-bar">
-                                        <div className="performance-label">
-                                            {t("profile.stats.availability_rate")}
-                                        </div>
-                                        <div className="progress-bar">
-                                            <div
-                                                className="progress-fill"
-                                                style={{ width: "78%" }}
-                                            ></div>
-                                        </div>
-                                        <div className="performance-value">78%</div>
-                                    </div>
-                                </div>
+                                {!notification.is_read && (
+                                    <button
+                                        onClick={() => onMarkAsRead(notification.id)}
+                                        className="guide-account-ml-4 guide-account-text-blue-600 guide-account-hover:text-blue-800 guide-account-text-sm"
+                                    >
+                                        Mark as read
+                                    </button>
+                                )}
                             </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Portfolio Modal Component
+const PortfolioModal = ({ isOpen, onClose, onSave, editingItem, saving }) => {
+    const [formData, setFormData] = useState({
+        title: '',
+        description: '',
+        image: null,
+        order: 0
+    });
+
+    useEffect(() => {
+        if (editingItem) {
+            setFormData({
+                title: editingItem.title || '',
+                description: editingItem.description || '',
+                image: null,
+                order: editingItem.order || 0
+            });
+        } else {
+            setFormData({
+                title: '',
+                description: '',
+                image: null,
+                order: 0
+            });
+        }
+    }, [editingItem, isOpen]);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSave(formData);
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="guide-account-fixed guide-account-inset-0 guide-account-bg-black guide-account-bg-opacity-50 guide-account-flex guide-account-items-center guide-account-justify-center guide-account-z-50">
+            <div className="guide-account-bg-white guide-account-rounded-lg guide-account-p-6 guide-account-w-full guide-account-max-w-md">
+                <h3 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900 guide-account-mb-4">
+                    {editingItem ? 'Edit Portfolio Item' : 'Add Portfolio Item'}
+                </h3>
+
+                <form onSubmit={handleSubmit} className="guide-account-space-y-4">
+                    <div>
+                        <label className="guide-account-block guide-account-text-sm guide-account-font-medium guide-account-text-gray-700 guide-account-mb-2">
+                            Title
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.title}
+                            onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                            className="guide-account-w-full guide-account-border guide-account-border-gray-300 guide-account-rounded-md guide-account-px-3 guide-account-py-2 guide-account-focus:outline-none guide-account-focus:ring-2 guide-account-focus:ring-blue-500"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="guide-account-block guide-account-text-sm guide-account-font-medium guide-account-text-gray-700 guide-account-mb-2">
+                            Description
+                        </label>
+                        <textarea
+                            value={formData.description}
+                            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                            rows={3}
+                            className="guide-account-w-full guide-account-border guide-account-border-gray-300 guide-account-rounded-md guide-account-px-3 guide-account-py-2 guide-account-focus:outline-none guide-account-focus:ring-2 guide-account-focus:ring-blue-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="guide-account-block guide-account-text-sm guide-account-font-medium guide-account-text-gray-700 guide-account-mb-2">
+                            Image
+                        </label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.files[0] }))}
+                            className="guide-account-w-full guide-account-border guide-account-border-gray-300 guide-account-rounded-md guide-account-px-3 guide-account-py-2 guide-account-focus:outline-none guide-account-focus:ring-2 guide-account-focus:ring-blue-500"
+                        />
+                    </div>
+
+                    <div className="guide-account-flex guide-account-justify-end guide-account-space-x-3">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="guide-account-px-4 guide-account-py-2 guide-account-text-gray-700 guide-account-bg-gray-200 guide-account-rounded-md guide-account-hover:bg-gray-300"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={saving}
+                            className="guide-account-px-4 guide-account-py-2 guide-account-bg-blue-600 guide-account-text-white guide-account-rounded-md guide-account-hover:bg-blue-700 guide-account-disabled:opacity-50"
+                        >
+                            {saving ? 'Saving...' : 'Save'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+// Availability Modal Component
+const AvailabilityModal = ({ isOpen, onClose, onSave, editingItem, saving }) => {
+    const [formData, setFormData] = useState({
+        date: '',
+        is_available: true,
+        start_time: '',
+        end_time: '',
+        note: ''
+    });
+
+    useEffect(() => {
+        if (editingItem) {
+            setFormData({
+                date: editingItem.date || '',
+                is_available: editingItem.is_available ?? true,
+                start_time: editingItem.start_time || '',
+                end_time: editingItem.end_time || '',
+                note: editingItem.note || ''
+            });
+        } else {
+            setFormData({
+                date: '',
+                is_available: true,
+                start_time: '',
+                end_time: '',
+                note: ''
+            });
+        }
+    }, [editingItem, isOpen]);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSave(formData);
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="guide-account-fixed guide-account-inset-0 guide-account-bg-black guide-account-bg-opacity-50 guide-account-flex guide-account-items-center guide-account-justify-center guide-account-z-50">
+            <div className="guide-account-bg-white guide-account-rounded-lg guide-account-p-6 guide-account-w-full guide-account-max-w-md">
+                <h3 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900 guide-account-mb-4">
+                    {editingItem ? 'Edit Availability' : 'Add Availability'}
+                </h3>
+
+                <form onSubmit={handleSubmit} className="guide-account-space-y-4">
+                    <div>
+                        <label className="guide-account-block guide-account-text-sm guide-account-font-medium guide-account-text-gray-700 guide-account-mb-2">
+                            Date
+                        </label>
+                        <input
+                            type="date"
+                            value={formData.date}
+                            onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+                            className="guide-account-w-full guide-account-border guide-account-border-gray-300 guide-account-rounded-md guide-account-px-3 guide-account-py-2 guide-account-focus:outline-none guide-account-focus:ring-2 guide-account-focus:ring-blue-500"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="guide-account-flex guide-account-items-center guide-account-space-x-3">
+                            <input
+                                type="checkbox"
+                                checked={formData.is_available}
+                                onChange={(e) => setFormData(prev => ({ ...prev, is_available: e.target.checked }))}
+                                className="guide-account-rounded guide-account-border-gray-300 guide-account-text-blue-600 guide-account-focus:ring-blue-500"
+                            />
+                            <span className="guide-account-text-sm guide-account-text-gray-700">Available on this date</span>
+                        </label>
+                    </div>
+
+                    <div className="guide-account-grid guide-account-grid-cols-2 guide-account-gap-4">
+                        <div>
+                            <label className="guide-account-block guide-account-text-sm guide-account-font-medium guide-account-text-gray-700 guide-account-mb-2">
+                                Start Time
+                            </label>
+                            <input
+                                type="time"
+                                value={formData.start_time}
+                                onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
+                                className="guide-account-w-full guide-account-border guide-account-border-gray-300 guide-account-rounded-md guide-account-px-3 guide-account-py-2 guide-account-focus:outline-none guide-account-focus:ring-2 guide-account-focus:ring-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="guide-account-block guide-account-text-sm guide-account-font-medium guide-account-text-gray-700 guide-account-mb-2">
+                                End Time
+                            </label>
+                            <input
+                                type="time"
+                                value={formData.end_time}
+                                onChange={(e) => setFormData(prev => ({ ...prev, end_time: e.target.value }))}
+                                className="guide-account-w-full guide-account-border guide-account-border-gray-300 guide-account-rounded-md guide-account-px-3 guide-account-py-2 guide-account-focus:outline-none guide-account-focus:ring-2 guide-account-focus:ring-blue-500"
+                            />
                         </div>
                     </div>
-                )}
+
+                    <div>
+                        <label className="guide-account-block guide-account-text-sm guide-account-font-medium guide-account-text-gray-700 guide-account-mb-2">
+                            Note
+                        </label>
+                        <textarea
+                            value={formData.note}
+                            onChange={(e) => setFormData(prev => ({ ...prev, note: e.target.value }))}
+                            rows={2}
+                            className="guide-account-w-full guide-account-border guide-account-border-gray-300 guide-account-rounded-md guide-account-px-3 guide-account-py-2 guide-account-focus:outline-none guide-account-focus:ring-2 guide-account-focus:ring-blue-500"
+                            placeholder="Optional note about availability"
+                        />
+                    </div>
+
+                    <div className="guide-account-flex guide-account-justify-end guide-account-space-x-3">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="guide-account-px-4 guide-account-py-2 guide-account-text-gray-700 guide-account-bg-gray-200 guide-account-rounded-md guide-account-hover:bg-gray-300"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={saving}
+                            className="guide-account-px-4 guide-account-py-2 guide-account-bg-blue-600 guide-account-text-white guide-account-rounded-md guide-account-hover:bg-blue-700 guide-account-disabled:opacity-50"
+                        >
+                            {saving ? 'Saving...' : 'Save'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+// Document Modal Component
+const DocumentModal = ({ isOpen, onClose, onSave, saving }) => {
+    const [formData, setFormData] = useState({
+        document_type: 'ID',
+        file: null,
+        description: ''
+    });
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!formData.file) {
+            alert('Please select a file to upload');
+            return;
+        }
+        onSave(formData);
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="guide-account-fixed guide-account-inset-0 guide-account-bg-black guide-account-bg-opacity-50 guide-account-flex guide-account-items-center guide-account-justify-center guide-account-z-50">
+            <div className="guide-account-bg-white guide-account-rounded-lg guide-account-p-6 guide-account-w-full guide-account-max-w-md">
+                <h3 className="guide-account-text-lg guide-account-font-medium guide-account-text-gray-900 guide-account-mb-4">
+                    Upload Verification Document
+                </h3>
+
+                <form onSubmit={handleSubmit} className="guide-account-space-y-4">
+                    <div>
+                        <label className="guide-account-block guide-account-text-sm guide-account-font-medium guide-account-text-gray-700 guide-account-mb-2">
+                            Document Type
+                        </label>
+                        <select
+                            value={formData.document_type}
+                            onChange={(e) => setFormData(prev => ({ ...prev, document_type: e.target.value }))}
+                            className="guide-account-w-full guide-account-border guide-account-border-gray-300 guide-account-rounded-md guide-account-px-3 guide-account-py-2 guide-account-focus:outline-none guide-account-focus:ring-2 guide-account-focus:ring-blue-500"
+                        >
+                            <option value="ID">ID Document</option>
+                            <option value="LICENSE">License</option>
+                            <option value="CERTIFICATE">Certificate</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="guide-account-block guide-account-text-sm guide-account-font-medium guide-account-text-gray-700 guide-account-mb-2">
+                            File
+                        </label>
+                        <input
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => setFormData(prev => ({ ...prev, file: e.target.files[0] }))}
+                            className="guide-account-w-full guide-account-border guide-account-border-gray-300 guide-account-rounded-md guide-account-px-3 guide-account-py-2 guide-account-focus:outline-none guide-account-focus:ring-2 guide-account-focus:ring-blue-500"
+                            required
+                        />
+                        <p className="guide-account-text-xs guide-account-text-gray-500 guide-account-mt-1">
+                            Supported formats: PDF, JPG, PNG (Max 25MB)
+                        </p>
+                    </div>
+
+                    <div>
+                        <label className="guide-account-block guide-account-text-sm guide-account-font-medium guide-account-text-gray-700 guide-account-mb-2">
+                            Description
+                        </label>
+                        <textarea
+                            value={formData.description}
+                            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                            rows={3}
+                            className="guide-account-w-full guide-account-border guide-account-border-gray-300 guide-account-rounded-md guide-account-px-3 guide-account-py-2 guide-account-focus:outline-none guide-account-focus:ring-2 guide-account-focus:ring-blue-500"
+                            placeholder="Optional description of the document"
+                        />
+                    </div>
+
+                    <div className="guide-account-flex guide-account-justify-end guide-account-space-x-3">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="guide-account-px-4 guide-account-py-2 guide-account-text-gray-700 guide-account-bg-gray-200 guide-account-rounded-md guide-account-hover:bg-gray-300"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={saving}
+                            className="guide-account-px-4 guide-account-py-2 guide-account-bg-blue-600 guide-account-text-white guide-account-rounded-md guide-account-hover:bg-blue-700 guide-account-disabled:opacity-50"
+                        >
+                            {saving ? 'Uploading...' : 'Upload'}
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     );

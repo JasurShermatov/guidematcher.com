@@ -10,7 +10,7 @@ import GuideAccount from "./account/GuideAccount";
 import FindGuide from "./menues/FindGuide";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import DebugHelper from "./components/common/DebugHelper";
-import { getCurrentUserShort } from "./api/api";
+import { getCurrentUser } from "./api/api"; // Updated import
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -33,12 +33,14 @@ function App() {
         const token = localStorage.getItem("access_token");
 
         if (token) {
+            let savedUserData = null;
+            let previousRole = null;
+
             try {
                 console.log("Checking authentication...");
 
                 // Avval localStorage'dan user ma'lumotlarini yuklash
-                const savedUserData = localStorage.getItem("user_data");
-                let previousRole = null;
+                savedUserData = localStorage.getItem("user_data");
                 if (savedUserData) {
                     try {
                         const parsedUser = JSON.parse(savedUserData);
@@ -49,23 +51,25 @@ function App() {
                     } catch (e) {
                         console.error("Error parsing saved user data:", e);
                         localStorage.removeItem("user_data");
+                        savedUserData = null;
                     }
                 }
 
-                // Server'dan fresh ma'lumotlarni olish
-                const userData = await getCurrentUserShort();
+                // Server'dan fresh ma'lumotlarni olish - getCurrentUser ishlatamiz
+                const userData = await getCurrentUser();
                 console.log("Fresh user data from server:", userData);
 
                 // User ma'lumotlarini normalize qilish
                 const normalizedUser = {
                     id: userData.id,
-                    role: userData.role || previousRole || "Client",
+                    role: userData.role || previousRole || "Client", // Backend'dan kelayotgan role
                     username: userData.username || userData.full_name || `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || "User",
                     email: userData.email,
                     first_name: userData.first_name || "",
                     last_name: userData.last_name || "",
                     full_name: userData.full_name || `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || "",
                     country: userData.country?.name || userData.country || "",
+                    country_name: userData.country_name || userData.country?.name || "",
                     city: userData.city || "",
                     avatar: userData.avatar || null,
                     profile_id: userData.profile_id || null,
@@ -81,12 +85,30 @@ function App() {
                 // Fresh ma'lumotlarni localStorage'ga saqlash (useEffect orqali avtomatik saqlanadi)
             } catch (error) {
                 console.error("Failed to fetch user:", error);
-                // Noto'g'ri tokenlarni tozalash
-                localStorage.removeItem("access_token");
-                localStorage.removeItem("refresh_token");
-                localStorage.removeItem("user_data");
-                setIsAuthenticated(false);
-                setUser(null);
+                // Agar server'dan ma'lumot olib bo'lmasa, lekin localStorage'da bor bo'lsa, uni ishlatish
+                if (savedUserData && previousRole) {
+                    console.log("Using cached user data due to server error");
+                    try {
+                        const parsedUser = JSON.parse(savedUserData);
+                        setIsAuthenticated(true);
+                        setUser(parsedUser);
+                    } catch (parseError) {
+                        console.error("Error parsing cached user data:", parseError);
+                        // Noto'g'ri tokenlarni tozalash
+                        localStorage.removeItem("access_token");
+                        localStorage.removeItem("refresh_token");
+                        localStorage.removeItem("user_data");
+                        setIsAuthenticated(false);
+                        setUser(null);
+                    }
+                } else {
+                    // Noto'g'ri tokenlarni tozalash
+                    localStorage.removeItem("access_token");
+                    localStorage.removeItem("refresh_token");
+                    localStorage.removeItem("user_data");
+                    setIsAuthenticated(false);
+                    setUser(null);
+                }
             }
         } else {
             setIsAuthenticated(false);
@@ -142,8 +164,8 @@ function App() {
         // Role ga qarab to'g'ri component'ni qaytarish
         const userRole = user.role?.toLowerCase();
 
-        // Customer va Guide rollarini aniqroq aniqlash
-        if (userRole === "customer" || userRole === "guide") {
+        // Customer (Guide) role uchun GuideAccount
+        if (userRole === "customer") {
             console.log("Rendering GuideAccount for role:", userRole);
             return (
                 <GuideAccount
@@ -152,7 +174,9 @@ function App() {
                     setUser={setUser}
                 />
             );
-        } else if (userRole === "client" || userRole === "user" || !userRole) {
+        }
+        // Client role uchun UserAccount
+        else if (userRole === "client") {
             console.log("Rendering UserAccount for role:", userRole);
             return (
                 <UserAccount
@@ -161,8 +185,9 @@ function App() {
                     setUser={setUser}
                 />
             );
-        } else {
-            // Default case - Client sifatida qaraymiz
+        }
+        // Default case - Client sifatida qaraymiz
+        else {
             console.log("Unknown role, defaulting to UserAccount:", user.role);
             return (
                 <UserAccount

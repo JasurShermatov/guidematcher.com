@@ -5,7 +5,7 @@ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/"
 const api = axios.create({
     baseURL: API_URL,
     headers: { "Content-Type": "application/json" },
-    withCredentials: false, // CORS uchun false
+    withCredentials: false,
 });
 
 // Tokenni avtomatik qo'shish
@@ -66,7 +66,6 @@ api.interceptors.response.use(
             }
         }
 
-        // Xabar extract qilish
         let errorMessage = "Unknown error occurred";
 
         if (error.response?.data) {
@@ -185,19 +184,13 @@ export const getCurrentUserShort = () => {
 };
 
 export const getCustomerProfileByUserId = (userId) =>
-    api.get(`auth/profiles/customers/${userId}/`).then((r) => r.data);
+    api.get(`profiles/customers/${userId}/`).then((r) => r.data);
 
-// ─── Client Profile APIs ───────────────────────────────────────────
-// ✅ O'ZGARTIRILDI: `my/` emas, barcha profillar orasidan topish
+// ─── Profile APIs ──────────────────────────────────────────────────
+// Client Profile APIs
 export const getClientProfile = () => {
-    console.log("Fetching client profiles list to find current user...");
-    return api.get("profiles/clients/").then((r) => {
-        const profiles = r.data?.results || r.data || [];
-        // Joriy foydalanuvchining tokendagi user bilan solishtirish
-        // Eslatma: bu yerda `user.id` `UserAccount` komponentidan keladi
-        // Shu sababli, `getClientProfile` faqat `profiles/clients/` qaytarguncha ishlaydi
-        return profiles.length > 0 ? profiles[0] : null;
-    });
+    console.log("Getting client profile...");
+    return api.get("profiles/clients/my/").then((r) => r.data);
 };
 
 export const createClientProfile = (payload) => {
@@ -207,8 +200,6 @@ export const createClientProfile = (payload) => {
 
 export const updateClientProfile = (payload) => {
     console.log("Updating client profile:", payload);
-    // Agar `my/` bo'lmasa, `PUT/PATCH` bevosita `profiles/clients/{id}/` ga qilinadi
-    // Lekin hozircha `my/`ni ishlatmaymiz, shuning uchun `update` ham `list`dan `id` oladi
     return api.patch("profiles/clients/my/", payload).then((r) => r.data);
 };
 
@@ -218,14 +209,10 @@ export const getClientProfileById = (userId) =>
 export const getClientProfiles = (params = {}) =>
     api.get("profiles/clients/", { params }).then((r) => r.data);
 
-// ─── Customer Profile APIs ─────────────────────────────────────────
-// ✅ Xuddi shunday `my/` emas, `GET /profiles/customers/` dan topish
+// Customer Profile APIs
 export const getCustomerProfile = () => {
-    console.log("Fetching customer profiles list...");
-    return api.get("profiles/customers/").then((r) => {
-        const profiles = r.data?.results || r.data || [];
-        return profiles.length > 0 ? profiles[0] : null;
-    });
+    console.log("Getting customer profile...");
+    return api.get("profiles/customers/my/").then((r) => r.data);
 };
 
 export const createCustomerProfile = (payload) => {
@@ -260,14 +247,26 @@ export const getPortfolioById = (id) =>
 
 export const createPortfolioItem = (payload) => {
     console.log("Creating portfolio item...");
-    return api.post("profiles/portfolios/", payload, {
+    const formData = new FormData();
+    Object.keys(payload).forEach(key => {
+        if (payload[key] !== null && payload[key] !== undefined) {
+            formData.append(key, payload[key]);
+        }
+    });
+    return api.post("profiles/portfolios/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
     }).then((r) => r.data);
 };
 
 export const updatePortfolioItem = (id, payload) => {
     console.log("Updating portfolio item:", id);
-    return api.patch(`profiles/portfolios/${id}/`, payload, {
+    const formData = new FormData();
+    Object.keys(payload).forEach(key => {
+        if (payload[key] !== null && payload[key] !== undefined) {
+            formData.append(key, payload[key]);
+        }
+    });
+    return api.patch(`profiles/portfolios/${id}/`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
     }).then((r) => r.data);
 };
@@ -318,14 +317,26 @@ export const getDocumentById = (id) =>
 
 export const uploadDocument = (payload) => {
     console.log("Uploading document...");
-    return api.post("profiles/verifications/", payload, {
+    const formData = new FormData();
+    Object.keys(payload).forEach(key => {
+        if (payload[key] !== null && payload[key] !== undefined) {
+            formData.append(key, payload[key]);
+        }
+    });
+    return api.post("profiles/verifications/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
     }).then((r) => r.data);
 };
 
 export const updateDocument = (id, payload) => {
     console.log("Updating document:", id);
-    return api.patch(`profiles/verifications/${id}/`, payload, {
+    const formData = new FormData();
+    Object.keys(payload).forEach(key => {
+        if (payload[key] !== null && payload[key] !== undefined) {
+            formData.append(key, payload[key]);
+        }
+    });
+    return api.patch(`profiles/verifications/${id}/`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
     }).then((r) => r.data);
 };
@@ -373,14 +384,19 @@ export const getLanguageById = (id) =>
     api.get(`common/languages/${id}/`).then((r) => r.data);
 
 // ─── Booking APIs ──────────────────────────────────────────────────
+export const getMyBookings = (status = null) => {
+    const params = status ? { status } : {};
+    return api.get("bookings/", { params }).then((r) => r.data);
+};
+
 export const getGuideBookings = (status = null) => {
     const params = status ? { status } : {};
-    return api.get("bookings/guide/", { params }).then((r) => r.data);
+    return api.get("bookings/", { params }).then((r) => r.data);
 };
 
 export const getClientBookings = (status = null) => {
     const params = status ? { status } : {};
-    return api.get("bookings/client/", { params }).then((r) => r.data);
+    return api.get("bookings/", { params }).then((r) => r.data);
 };
 
 export const createBooking = (payload) =>
@@ -395,46 +411,58 @@ export const getBookingById = (id) =>
 export const cancelBooking = (id, reason = "") =>
     api.patch(`bookings/${id}/`, { status: "cancelled", cancellation_reason: reason }).then((r) => r.data);
 
+export const acceptBooking = (id) =>
+    api.post(`bookings/${id}/accept/`).then((r) => r.data);
+
 export const getBookings = (params = {}) =>
     api.get("bookings/", { params }).then((r) => r.data);
 
 // ─── Reviews APIs ──────────────────────────────────────────────────
+export const getMyReviews = () =>
+    api.get("reviews/reviews/").then((r) => r.data);
+
 export const getGuideReviews = () =>
-    api.get("reviews/guide/").then((r) => r.data);
+    api.get("reviews/reviews/").then((r) => r.data);
 
 export const getClientReviews = () =>
-    api.get("reviews/client/").then((r) => r.data);
+    api.get("reviews/reviews/").then((r) => r.data);
 
 export const createReview = (payload) =>
-    api.post("reviews/", payload).then((r) => r.data);
+    api.post("reviews/reviews/", payload).then((r) => r.data);
 
 export const updateReview = (id, payload) =>
-    api.patch(`reviews/${id}/`, payload).then((r) => r.data);
+    api.patch(`reviews/reviews/${id}/`, payload).then((r) => r.data);
 
 export const deleteReview = (id) =>
-    api.delete(`reviews/${id}/`).then((r) => r.data);
+    api.delete(`reviews/reviews/${id}/`).then((r) => r.data);
 
 export const getGuideStats = () =>
-    api.get("reviews/guide/stats/").then((r) => r.data);
+    api.get("reviews/reviews/stats/").then((r) => r.data);
 
 export const getReviews = (params = {}) =>
-    api.get("reviews/", { params }).then((r) => r.data);
+    api.get("reviews/reviews/", { params }).then((r) => r.data);
 
 export const getReviewById = (id) =>
-    api.get(`reviews/${id}/`).then((r) => r.data);
+    api.get(`reviews/reviews/${id}/`).then((r) => r.data);
+
+export const markReviewHelpful = (id) =>
+    api.post(`reviews/reviews/${id}/helpful/`).then((r) => r.data);
 
 // ─── Chat APIs ─────────────────────────────────────────────────────
+export const getConversations = () =>
+    api.get("chat/conversations/").then((r) => r.data);
+
 export const getGuideChats = () =>
     api.get("chat/conversations/").then((r) => r.data);
 
 export const getClientChats = () =>
     api.get("chat/conversations/").then((r) => r.data);
 
-export const getChatMessages = (conversationId) =>
-    api.get(`chat/conversations/${conversationId}/messages/`).then((r) => r.data);
+export const getChatMessages = (conversationId, params = {}) =>
+    api.get(`chat/conversations/${conversationId}/messages/`, { params }).then((r) => r.data);
 
-export const sendMessage = (conversationId, payload) =>
-    api.post(`chat/conversations/${conversationId}/messages/`, payload).then((r) => r.data);
+export const sendMessage = (payload) =>
+    api.post("chat/messages/send/", payload).then((r) => r.data);
 
 export const markMessagesAsRead = (conversationId) =>
     api.post(`chat/conversations/${conversationId}/mark-read/`).then((r) => r.data);
@@ -451,21 +479,91 @@ export const updateConversation = (id, payload) =>
 export const deleteConversation = (id) =>
     api.delete(`chat/conversations/${id}/`).then((r) => r.data);
 
+export const blockUser = (payload) =>
+    api.post("chat/block/", payload).then((r) => r.data);
+
+export const unblockUser = (userId) =>
+    api.delete(`chat/unblock/${userId}/`).then((r) => r.data);
+
+export const getBlockedUsers = () =>
+    api.get("chat/blocked/").then((r) => r.data);
+
+export const getUnreadCount = () =>
+    api.get("chat/unread-count/").then((r) => r.data);
+
+export const searchUsers = (query) =>
+    api.get("chat/users/search/", { params: { q: query } }).then((r) => r.data);
+
+export const messageAction = (messageId, action) =>
+    api.post(`chat/messages/${messageId}/action/`, { action }).then((r) => r.data);
+
 // ─── Notification APIs ─────────────────────────────────────────────
-export const getNotifications = () =>
-    api.get("notifications/").then((r) => r.data);
+export const getNotifications = (params = {}) =>
+    api.get("notifications/list/", { params }).then((r) => r.data);
 
 export const markNotificationAsRead = (id) =>
-    api.patch(`notifications/${id}/`, { is_read: true }).then((r) => r.data);
+    api.post(`notifications/list/${id}/mark_read/`).then((r) => r.data);
 
 export const markAllNotificationsAsRead = () =>
-    api.post("notifications/mark-all-read/").then((r) => r.data);
+    api.post("notifications/list/mark_all_read/").then((r) => r.data);
 
 export const deleteNotification = (id) =>
-    api.delete(`notifications/${id}/`).then((r) => r.data);
+    api.delete(`notifications/list/${id}/`).then((r) => r.data);
 
 export const getUnreadNotificationsCount = () =>
-    api.get("notifications/unread-count/").then((r) => r.data);
+    api.get("notifications/list/unread_count/").then((r) => r.data);
+
+export const getNotificationSettings = () =>
+    api.get("notifications/settings/").then((r) => r.data);
+
+export const updateNotificationSettings = (payload) =>
+    api.patch("notifications/settings/", payload).then((r) => r.data);
+
+export const getNotificationTypes = () =>
+    api.get("notifications/types/").then((r) => r.data);
+
+// ─── Disputes APIs ─────────────────────────────────────────────────
+export const getDisputes = (params = {}) =>
+    api.get("disputes/disputes/", { params }).then((r) => r.data);
+
+export const getDisputeById = (id) =>
+    api.get(`disputes/disputes/${id}/`).then((r) => r.data);
+
+export const createDispute = (payload) =>
+    api.post("disputes/disputes/", payload).then((r) => r.data);
+
+export const updateDispute = (id, payload) =>
+    api.patch(`disputes/disputes/${id}/`, payload).then((r) => r.data);
+
+export const getDisputeActions = (disputeId) =>
+    api.get(`disputes/disputes/${disputeId}/actions/`).then((r) => r.data);
+
+export const assignDispute = (disputeId, adminId) =>
+    api.post(`disputes/disputes/${disputeId}/assign/`, { admin_id: adminId }).then((r) => r.data);
+
+export const changeDisputeStatus = (disputeId, status) =>
+    api.post(`disputes/disputes/${disputeId}/change_status/`, { status }).then((r) => r.data);
+
+export const getDisputeEvidence = (disputeId) =>
+    api.get(`disputes/disputes/${disputeId}/evidence/`).then((r) => r.data);
+
+export const uploadDisputeEvidence = (disputeId, payload) => {
+    const formData = new FormData();
+    Object.keys(payload).forEach(key => {
+        if (payload[key] !== null && payload[key] !== undefined) {
+            formData.append(key, payload[key]);
+        }
+    });
+    return api.post(`disputes/disputes/${disputeId}/evidence/`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    }).then((r) => r.data);
+};
+
+export const getDisputeMessages = (disputeId) =>
+    api.get(`disputes/disputes/${disputeId}/messages/`).then((r) => r.data);
+
+export const sendDisputeMessage = (disputeId, payload) =>
+    api.post(`disputes/disputes/${disputeId}/messages/`, payload).then((r) => r.data);
 
 // ─── File Upload Helpers ───────────────────────────────────────────
 export const uploadFile = (file, path = "general") => {

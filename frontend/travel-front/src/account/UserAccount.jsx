@@ -1,843 +1,560 @@
-// src/account/UserAccount.jsx
-
-import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect } from "react";
+import { t } from "../utils/translationFallback";
 import {
     FiUser,
     FiMail,
-    FiLogOut,
-    FiSettings,
-    FiX,
-    FiCheck,
-    FiUsers,
-    FiCalendar,
-    FiStar,
     FiGlobe,
-    FiDollarSign,
-    FiTrash2,
-    FiMenu,
-    FiEdit,
-    FiHeart,
-    FiClock,
+    FiEdit3,
+    FiSave,
+    FiX,
+    FiCalendar,
     FiPhone,
     FiMessageCircle,
+    FiCamera,
+    FiLogOut,
     FiMapPin,
-    FiFilter,
-    FiEye,
-    FiAlertCircle,
-    FiSave,
-    FiWifi,
-    FiWifiOff,
-    FiRefreshCw
-} from 'react-icons/fi';
-import UserChatWidget from './ChatWidgets';
-import './UserAccount.css';
-import { logoutUser } from '../api/api';
-import api from '../api/api';
+    FiFlag,
+    FiHeart,
+    FiSettings,
+    FiShield,
+    FiPlus,
+    FiTrash2,
+    FiCheck,
+    FiLoader
+} from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import {
+    getClientProfile,
+    updateClientProfile,
+    createClientProfile,
+    logoutUser,
+    getCurrentUserShort,
+    getLanguages,
+    getCountries
+} from "../api/api";
+import "./UserAccount.css";
 
-const UserAccount = ({ user, setUser, setIsAuthenticated }) => {
-    const { t } = useTranslation();
-    const location = useLocation();
+// Helper function to safely format numbers
+const safeToFixed = (value, decimals = 1) => {
+    if (value === null || value === undefined || value === '') {
+        return "0.0";
+    }
+    const num = Number(value);
+    if (isNaN(num)) {
+        return "0.0";
+    }
+    return num.toFixed(decimals);
+};
+
+const UserAccount = ({ user, setIsAuthenticated, setUser }) => {
     const navigate = useNavigate();
 
-    const [isChatOpen, setIsChatOpen] = useState(false);
-    const [isSettingsOpen, setIsSettingsOpen] = useState(location.state?.openSettings || false);
-    const [settingsError, setSettingsError] = useState('');
-    const [settingsSuccess, setSettingsSuccess] = useState('');
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('profile');
+    // State management
+    const [profile, setProfile] = useState(null);
+    const [isEditing, setIsEditing] = useState(() => {
+        return JSON.parse(localStorage.getItem("userAccount_isEditing") || "false");
+    });
     const [loading, setLoading] = useState(true);
-    const [updating, setUpdating] = useState(false);
-    const [backendConnected, setBackendConnected] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    const [languages, setLanguages] = useState([]);
+    const [countries, setCountries] = useState([]);
 
-    const [settingsForm, setSettingsForm] = useState({
-        first_name: '',
-        last_name: '',
-        email: '',
-        role: 'Client',
-        country: ''
+    // Form data
+    const [formData, setFormData] = useState(() => {
+        const savedFormData = localStorage.getItem("userAccount_formData");
+        return savedFormData ? JSON.parse(savedFormData) : {
+            date_of_birth: "",
+            preferred_contact: "chat",
+            languages: []
+        };
     });
 
-    const [originalData, setOriginalData] = useState({});
-    const [guides] = useState([]);
-    const [bookings] = useState([]);
-    const [chatMessages] = useState({});
-    const [filter, setFilter] = useState({
-        name: '',
-        minRating: '',
-        language: '',
-        maxPrice: '',
-        location: ''
+    // User data state
+    const [userData, setUserData] = useState({
+        first_name: user?.first_name || "",
+        last_name: user?.last_name || "",
+        email: user?.email || "",
+        country: user?.country || "",
+        bio: user?.bio || "",
+        avatar: user?.avatar || null
     });
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [bookingDate, setBookingDate] = useState('');
-    const [travelers, setTravelers] = useState({ adults: 1, children: 0 });
-    const [showBookingSummary, setShowBookingSummary] = useState(null);
-    const [dataLoaded, setDataLoaded] = useState(false);
 
-    const fetchUserFromAccounts = useCallback(async () => {
-        try {
-            console.log(t('user.console.fetching_user_data'));
-            const token = localStorage.getItem('access_token');
+    // Save to localStorage
+    useEffect(() => {
+        localStorage.setItem("userAccount_isEditing", JSON.stringify(isEditing));
+    }, [isEditing]);
+
+    useEffect(() => {
+        localStorage.setItem("userAccount_formData", JSON.stringify(formData));
+    }, [formData]);
+
+    useEffect(() => {
+        console.log("UserAccount component mounted for user:", user);
+        loadProfile();
+        loadInitialData();
+    }, [user]);
+
+    // Cleanup localStorage on logout
+    useEffect(() => {
+        return () => {
+            const token = localStorage.getItem("access_token");
             if (!token) {
-                throw new Error(t('user.errors.no_access_token'));
+                localStorage.removeItem("userAccount_isEditing");
+                localStorage.removeItem("userAccount_formData");
             }
+        };
+    }, []);
 
-            const response = await api.post('accounts/refresh/', {
-                refresh: localStorage.getItem('refresh_token')
-            });
-
-            console.log(t('user.console.accounts_api_response'), response.data);
-
-            const savedUserData = localStorage.getItem('user_data');
-            if (savedUserData) {
-                const userData = JSON.parse(savedUserData);
-                console.log(t('user.console.retrieved_user_data'), userData);
-                return userData;
-            }
-
-            throw new Error(t('user.errors.user_data_not_found'));
-        } catch (error) {
-            console.error(t('user.console.error_fetching_user'), error);
-            throw error;
-        }
-    }, [t]);
-
-    const fetchUserData = useCallback(async () => {
-        if (dataLoaded) {
+    const loadProfile = async () => {
+        if (!user?.id) {
+            console.log("No user ID available");
+            setLoading(false);
             return;
         }
 
         try {
             setLoading(true);
-            setSettingsError('');
-            setBackendConnected(false);
+            console.log("Fetching client profiles list...");
+            const profileData = await getClientProfile(); // Uses GET /profiles/clients/ + filter in api.js
 
-            console.log(t('user.console.attempting_fetch_user_data'));
+            if (profileData) {
+                console.log("Client profile found:", profileData);
+                setProfile(profileData);
 
-            const savedUserData = localStorage.getItem('user_data');
-            let userData;
-
-            if (savedUserData) {
-                userData = JSON.parse(savedUserData);
-                console.log(t('user.console.using_saved_user_data'), userData);
-                setBackendConnected(true);
+                if (!isEditing) {
+                    setFormData({
+                        date_of_birth: profileData.date_of_birth || "",
+                        preferred_contact: profileData.preferred_contact || "chat",
+                        languages: Array.isArray(profileData.languages) ? profileData.languages : []
+                    });
+                }
             } else {
-                userData = await fetchUserFromAccounts();
-                setBackendConnected(true);
+                console.log("No profile found, user can create one");
+                setProfile(null);
+                setFormData({
+                    date_of_birth: "",
+                    preferred_contact: "chat",
+                    languages: []
+                });
             }
-
-            const userInfo = {
-                id: userData.id,
-                first_name: userData.first_name || '',
-                last_name: userData.last_name || '',
-                email: userData.email || '',
-                role: userData.role || 'Client',
-                country: userData.country || ''
-            };
-
-            setUser(prevUser => ({
-                ...prevUser,
-                ...userInfo
-            }));
-
-            const formData = {
-                first_name: userInfo.first_name,
-                last_name: userInfo.last_name,
-                email: userInfo.email,
-                role: userInfo.role,
-                country: userInfo.country
-            };
-
-            setSettingsForm(formData);
-            setOriginalData(formData);
-            setDataLoaded(true);
-
-            console.log(t('user.console.user_data_loaded'), userInfo);
         } catch (error) {
-            console.error(t('user.console.failed_fetch_user_data'), error);
-            setBackendConnected(false);
-
-            if (user && user.email) {
-                console.log(t('user.console.using_fallback_user_data'), user);
-
-                const fallbackData = {
-                    first_name: user.first_name || '',
-                    last_name: user.last_name || '',
-                    email: user.email || '',
-                    role: user.role || 'Client',
-                    country: user.country || ''
-                };
-
-                setSettingsForm(fallbackData);
-                setOriginalData(fallbackData);
-                setDataLoaded(true);
-                setSettingsError(t('user.errors.backend_not_connected_fallback'));
-            } else {
-                setSettingsError(t('user.errors.backend_and_user_data_missing'));
-            }
+            console.error("Error loading client profile:", error);
+            // Even if error, treat as no profile
+            setProfile(null);
+            setFormData({
+                date_of_birth: "",
+                preferred_contact: "chat",
+                languages: []
+            });
         } finally {
             setLoading(false);
         }
-    }, [dataLoaded, setUser, user, fetchUserFromAccounts, t]);
+    };
 
-    const updateUserProfileViaAccounts = async (payload) => {
+    const loadInitialData = async () => {
         try {
-            console.log(t('user.console.attempting_update_profile'));
+            console.log("Loading initial data...");
+            const [languagesData, countriesData] = await Promise.all([
+                getLanguages(),
+                getCountries()
+            ]);
 
-            const currentUserData = JSON.parse(localStorage.getItem('user_data') || '{}');
-            const updatedUserData = {
-                ...currentUserData,
-                ...payload
-            };
-
-            localStorage.setItem('user_data', JSON.stringify(updatedUserData));
-
-            console.log(t('user.console.profile_updated_localstorage'), updatedUserData);
-            return updatedUserData;
+            setLanguages(languagesData?.results || languagesData || []);
+            setCountries(countriesData?.results || countriesData || []);
         } catch (error) {
-            console.error(t('user.console.error_updating_profile'), error);
-            throw new Error(t('user.errors.no_profile_update_endpoint'));
+            console.error("Failed to load initial data:", error);
+            setLanguages([]);
+            setCountries([]);
         }
     };
 
-    const retryConnection = useCallback(async () => {
-        setDataLoaded(false);
-        await fetchUserData();
-    }, [fetchUserData]);
-
-    useEffect(() => {
-        fetchUserData();
-    }, [fetchUserData]);
-
-    const handleSettingsChange = (e) => {
+    const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setSettingsForm(prev => ({ ...prev, [name]: value }));
-        setSettingsError('');
-        setSettingsSuccess('');
+        setFormData(prev => ({ ...prev, [name]: value }));
+        clearMessages();
     };
 
-    const handleSettingsSubmit = async (e) => {
-        e.preventDefault();
-        const { first_name, last_name, email, role, country } = settingsForm;
+    const handleUserDataChange = (e) => {
+        const { name, value } = e.target;
+        setUserData(prev => ({ ...prev, [name]: value }));
+        clearMessages();
+    };
 
-        if (!first_name.trim() || !last_name.trim() || !email.trim()) {
-            setSettingsError(t('user.validation.required_fields'));
-            return;
-        }
+    const handleLanguageChange = (languageId) => {
+        setFormData(prev => ({
+            ...prev,
+            languages: prev.languages.includes(languageId)
+                ? prev.languages.filter(id => id !== languageId)
+                : [...prev.languages, languageId]
+        }));
+    };
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email.trim())) {
-            setSettingsError(t('user.validation.invalid_email'));
-            return;
-        }
+    const clearMessages = () => {
+        setError("");
+        setSuccess("");
+    };
 
+    const handleSave = async () => {
         try {
-            setUpdating(true);
-            setSettingsError('');
-            setSettingsSuccess('');
+            setSaving(true);
+            clearMessages();
 
-            const payload = {
-                first_name: first_name.trim(),
-                last_name: last_name.trim(),
-                email: email.trim().toLowerCase(),
-                role: role,
-                country: country.trim()
-            };
+            if (!formData.preferred_contact) {
+                setError(t("profile.validation.required_fields"));
+                return;
+            }
 
-            console.log(t('user.console.updating_profile_payload'), payload);
+            let savedProfile;
+            if (profile) {
+                savedProfile = await updateClientProfile(formData);
+            } else {
+                savedProfile = await createClientProfile({
+                    ...formData,
+                    user: user.id  // muhim: backendga user ID ni uzatish
+                });
+            }
 
-            const updatedData = await updateUserProfileViaAccounts(payload);
-            console.log(t('user.console.profile_update_response'), updatedData);
+            setProfile(savedProfile);
+            setIsEditing(false);
+            setSuccess(t("profile.success.saved"));
 
-            const userInfo = {
-                id: updatedData.id,
-                first_name: updatedData.first_name,
-                last_name: updatedData.last_name,
-                email: updatedData.email,
-                role: updatedData.role,
-                country: updatedData.country
-            };
+            localStorage.removeItem("userAccount_isEditing");
+            localStorage.removeItem("userAccount_formData");
 
-            setUser(prevUser => ({
-                ...prevUser,
-                ...userInfo
-            }));
-
-            const newFormData = {
-                first_name: userInfo.first_name,
-                last_name: userInfo.last_name,
-                email: userInfo.email,
-                role: userInfo.role,
-                country: userInfo.country
-            };
-
-            setSettingsForm(newFormData);
-            setOriginalData(newFormData);
-
-            setSettingsSuccess(t('user.success.profile_updated'));
-
-            setTimeout(() => {
-                setIsSettingsOpen(false);
-                setSettingsSuccess('');
-            }, 1500);
+            const updatedUser = await getCurrentUserShort();
+            setUser(updatedUser);
         } catch (error) {
-            console.error(t('user.console.profile_update_error'), error);
-            setSettingsError(error.message || t('user.errors.profile_update_failed'));
+            setError(error.message || t("profile.errors.save_failed"));
         } finally {
-            setUpdating(false);
+            setSaving(false);
         }
+    };
+
+    const handleCancel = () => {
+        if (profile) {
+            setFormData({
+                date_of_birth: profile.date_of_birth || "",
+                preferred_contact: profile.preferred_contact || "chat",
+                languages: profile.languages || []
+            });
+        }
+        setIsEditing(false);
+        clearMessages();
+        localStorage.removeItem("userAccount_isEditing");
+        localStorage.removeItem("userAccount_formData");
+    };
+
+    const handleEdit = () => {
+        setIsEditing(true);
+        clearMessages();
     };
 
     const handleLogout = async () => {
-        if (window.confirm(t('user.confirm_logout'))) {
-            try {
-                await logoutUser();
-                console.log(t('user.console.logout_success'));
-            } catch (error) {
-                console.error(t('user.console.logout_error'), error);
-            } finally {
-                setIsAuthenticated(false);
-                setUser(null);
-                localStorage.removeItem('access_token');
-                localStorage.removeItem('refresh_token');
-                localStorage.removeItem('user_data');
-                navigate('/');
-            }
+        try {
+            await logoutUser();
+        } catch (error) {
+            console.error("Logout error:", error);
+        } finally {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("user_data");
+            localStorage.removeItem("userAccount_isEditing");
+            localStorage.removeItem("userAccount_formData");
+            setIsAuthenticated(false);
+            setUser(null);
+            navigate("/");
         }
     };
 
-    const handleResetForm = () => {
-        setSettingsForm(originalData);
-        setSettingsError('');
-        setSettingsSuccess('');
+    const formatDate = (dateString) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return date.toLocaleDateString();
     };
-
-    const hasChanges = () => {
-        return JSON.stringify(settingsForm) !== JSON.stringify(originalData);
-    };
-
-    const handleFilterChange = (e) => {
-        setFilter({ ...filter, [e.target.name]: e.target.value });
-    };
-
-    const handleTravelersChange = (e) => {
-        setTravelers({ ...travelers, [e.target.name]: Math.max(0, parseInt(e.target.value) || 0) });
-    };
-
-    const handleBookGuide = () => {
-        alert(t('user.alerts.booking_api_unavailable'));
-    };
-
-    const handleCancelBooking = () => {
-        alert(t('user.alerts.cancel_booking_api_unavailable'));
-    };
-
-    const toggleChatWidget = () => {
-        alert(t('user.alerts.chat_api_unavailable'));
-    };
-
-    const APINotConnected = ({ message, icon: Icon = FiAlertCircle }) => (
-        <div className="user-account-api-error">
-            <Icon size={32} />
-            <h3>{t('user.api_not_connected.title')}</h3>
-            <p>{message}</p>
-            <div className="user-account-api-error-badge">
-                <FiAlertCircle size={16} />
-                <span>{t('user.api_not_connected.soon_available')}</span>
-            </div>
-        </div>
-    );
-
-    const BackendStatus = () => (
-        <div className={`user-account-backend-status ${backendConnected ? 'connected' : 'disconnected'}`}>
-            {backendConnected ? (
-                <>
-                    <FiWifi size={16} />
-                    <span>{t('user.backend_status.connected')}</span>
-                </>
-            ) : (
-                <>
-                    <FiWifiOff size={16} />
-                    <span>{t('user.backend_status.disconnected')}</span>
-                    <button
-                        className="user-account-retry-btn"
-                        onClick={retryConnection}
-                        title={t('user.actions.retry_connection')}
-                    >
-                        <FiRefreshCw size={14} />
-                    </button>
-                </>
-            )}
-        </div>
-    );
 
     if (loading) {
         return (
-            <div className="user-account">
-                <div className="user-account-loading">
-                    <div className="user-account-spinner"></div>
-                    <p>{t('user.loading.data')}</p>
+            <div className="account-container">
+                <div className="account-loading">
+                    <FiLoader className="loading-spinner" />
+                    <p>{t("profile.loading")}</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="user-account">
-            <BackendStatus />
-
-            <button
-                className="user-account-mobile-menu-btn"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                aria-label={t('user.actions.menu')}
-            >
-                <FiMenu size={24} />
-            </button>
-
-            <div className="user-account-container">
-                <aside className={`user-account-sidebar ${isMobileMenuOpen ? 'user-account-sidebar-open' : ''}`}>
-                    <div className="user-account-sidebar-header">
-                        <div className="user-account-avatar-container">
-                            <div className="user-account-avatar-placeholder">
-                                <FiUser size={40} />
-                            </div>
+        <div className="account-container">
+            <div className="account-header">
+                <div className="account-header-content">
+                    <div className="account-avatar-section">
+                        <div className="account-avatar">
+                            {userData.avatar ? (
+                                <img src={userData.avatar} alt="Avatar" />
+                            ) : (
+                                <FiUser />
+                            )}
+                            <button className="avatar-edit-btn">
+                                <FiCamera />
+                            </button>
                         </div>
-                        <h3 className="user-account-sidebar-name">
-                            {user?.first_name ? `${user.first_name} ${user.last_name}` : t('user.profile.user')}
-                        </h3>
-                        <p className="user-account-sidebar-role">{user?.role || t('user.profile.client')}</p>
+                        <div className="account-user-info">
+                            <h1>{user?.full_name || `${user?.first_name} ${user?.last_name}`}</h1>
+                            <p className="user-role">
+                                <FiShield />
+                                {user?.role ? (
+                                    user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase()
+                                ) : "Client"}
+                            </p>
+                            <p className="user-email">
+                                <FiMail />
+                                {user?.email}
+                            </p>
+                            {user?.country && (
+                                <p className="user-location">
+                                    <FiMapPin />
+                                    {user.country}
+                                </p>
+                            )}
+                        </div>
                     </div>
-
-                    <nav className="user-account-sidebar-nav">
-                        <button
-                            className={`user-account-nav-item ${activeTab === 'profile' ? 'user-account-nav-item-active' : ''}`}
-                            onClick={() => {
-                                setActiveTab('profile');
-                                setIsMobileMenuOpen(false);
-                            }}
-                        >
-                            <FiUser size={20} />
-                            <span>{t('user.tabs.profile')}</span>
-                            {backendConnected && <span className="user-account-nav-status">✓</span>}
-                        </button>
-
-                        <button
-                            className={`user-account-nav-item ${activeTab === 'bookings' ? 'user-account-nav-item-active' : ''}`}
-                            onClick={() => {
-                                setActiveTab('bookings');
-                                setIsMobileMenuOpen(false);
-                            }}
-                        >
-                            <FiCalendar size={20} />
-                            <span>{t('user.tabs.bookings')}</span>
-                            <span className="user-account-nav-badge">{t('user.api_not_connected.badge')}</span>
-                        </button>
-
-                        <button
-                            className={`user-account-nav-item ${activeTab === 'guides' ? 'user-account-nav-item-active' : ''}`}
-                            onClick={() => {
-                                setActiveTab('guides');
-                                setIsMobileMenuOpen(false);
-                            }}
-                        >
-                            <FiUsers size={20} />
-                            <span>{t('user.tabs.guides')}</span>
-                            <span className="user-account-nav-badge">{t('user.api_not_connected.badge')}</span>
-                        </button>
-
-                        <button
-                            className="user-account-nav-item"
-                            onClick={() => setIsSettingsOpen(true)}
-                        >
-                            <FiSettings size={20} />
-                            <span>{t('user.modals.settings')}</span>
-                            {backendConnected && <span className="user-account-nav-status">✓</span>}
-                        </button>
-
-                        <button
-                            className="user-account-nav-item user-account-nav-logout"
-                            onClick={handleLogout}
-                        >
-                            <FiLogOut size={20} />
-                            <span>{t('user.actions.logout')}</span>
-                        </button>
-                    </nav>
-                </aside>
-
-                <main className="user-account-main">
-                    {activeTab === 'profile' && (
-                        <div className="user-account-content">
-                            <div className="user-account-content-header">
-                                <h1 className="user-account-title">{t('user.profile.title')}</h1>
-                                <p className="user-account-subtitle">{t('user.profile.subtitle')}</p>
-                                {settingsError && (
-                                    <div className="user-account-warning-alert">
-                                        <FiAlertCircle />
-                                        <div className="user-account-warning-alert-content">
-                                            <div className="user-account-warning-alert-title">{t('user.alerts.warning')}</div>
-                                            <p className="user-account-warning-alert-text">{settingsError}</p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="user-account-profile-section">
-                                <div className="user-account-profile-card">
-                                    <div className="user-account-profile-header">
-                                        <div className="user-account-avatar-container">
-                                            <div className="user-account-avatar-placeholder user-account-profile-avatar-large">
-                                                <FiUser size={50} />
-                                            </div>
-                                        </div>
-                                        <div className="user-account-profile-info">
-                                            <h2 className="user-account-profile-name">
-                                                {user?.first_name ? `${user.first_name} ${user.last_name}` : t('user.profile.user')}
-                                            </h2>
-                                            <p className="user-account-profile-role">{user?.role || t('user.profile.client')}</p>
-                                            <div className="user-account-profile-status">
-                                                <span className={`user-account-status-indicator ${backendConnected ? 'user-account-status-online' : 'user-account-status-offline'}`}></span>
-                                                {backendConnected ? t('user.backend_status.connected') : t('user.backend_status.disconnected')}
-                                            </div>
-                                        </div>
-                                        <button
-                                            className="user-account-edit-btn"
-                                            onClick={() => setIsSettingsOpen(true)}
-                                            aria-label={t('user.actions.edit_profile')}
-                                        >
-                                            <FiEdit size={18} />
-                                        </button>
-                                    </div>
-
-                                    <div className="user-account-profile-details">
-                                        <div className="user-account-detail-item">
-                                            <div className="user-account-detail-icon">
-                                                <FiMail />
-                                            </div>
-                                            <div className="user-account-detail-content">
-                                                <span className="user-account-detail-label">{t('user.profile.email')}</span>
-                                                <span className="user-account-detail-value">{user?.email || t('user.profile.no_email')}</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="user-account-detail-item">
-                                            <div className="user-account-detail-icon">
-                                                <FiUser />
-                                            </div>
-                                            <div className="user-account-detail-content">
-                                                <span className="user-account-detail-label">{t('user.profile.first_name')}</span>
-                                                <span className="user-account-detail-value">{user?.first_name || t('user.profile.no_first_name')}</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="user-account-detail-item">
-                                            <div className="user-account-detail-icon">
-                                                <FiUser />
-                                            </div>
-                                            <div className="user-account-detail-content">
-                                                <span className="user-account-detail-label">{t('user.profile.last_name')}</span>
-                                                <span className="user-account-detail-value">{user?.last_name || t('user.profile.no_last_name')}</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="user-account-detail-item">
-                                            <div className="user-account-detail-icon">
-                                                <FiStar />
-                                            </div>
-                                            <div className="user-account-detail-content">
-                                                <span className="user-account-detail-label">{t('user.profile.role')}</span>
-                                                <span className="user-account-detail-value">{user?.role || t('user.profile.client')}</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="user-account-detail-item">
-                                            <div className="user-account-detail-icon">
-                                                <FiGlobe />
-                                            </div>
-                                            <div className="user-account-detail-content">
-                                                <span className="user-account-detail-label">{t('user.profile.country')}</span>
-                                                <span className="user-account-detail-value">{user?.country || t('user.profile.no_country')}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="user-account-stats-grid">
-                                    <div className="user-account-stat-card">
-                                        <div className="user-account-stat-icon">
-                                            <FiCalendar />
-                                        </div>
-                                        <div className="user-account-stat-content">
-                                            <span className="user-account-stat-number">0</span>
-                                            <span className="user-account-stat-label">{t('user.stats.total_bookings')}</span>
-                                            <small className="user-account-api-notice">{t('user.api_not_connected.badge')}</small>
-                                        </div>
-                                    </div>
-
-                                    <div className="user-account-stat-card">
-                                        <div className="user-account-stat-icon">
-                                            <FiUsers />
-                                        </div>
-                                        <div className="user-account-stat-content">
-                                            <span className="user-account-stat-number">0</span>
-                                            <span className="user-account-stat-label">{t('user.stats.active_chats')}</span>
-                                            <small className="user-account-api-notice">{t('user.api_not_connected.badge')}</small>
-                                        </div>
-                                    </div>
-
-                                    <div className="user-account-stat-card">
-                                        <div className="user-account-stat-icon">
-                                            <FiCheck />
-                                        </div>
-                                        <div className="user-account-stat-content">
-                                            <span className="user-account-stat-number">{backendConnected ? '✓' : '△'}</span>
-                                            <span className="user-account-stat-label">{t('user.stats.accounts_api')}</span>
-                                            <small className={`user-account-api-notice ${backendConnected ? 'connected' : ''}`}>
-                                                {backendConnected ? t('user.backend_status.connected') : t('user.backend_status.disconnected')}
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'bookings' && (
-                        <div className="user-account-content">
-                            <div className="user-account-content-header">
-                                <h1 className="user-account-title">{t('user.bookings.title')}</h1>
-                                <p className="user-account-subtitle">{t('user.bookings.subtitle')}</p>
-                            </div>
-
-                            <APINotConnected
-                                message={t('user.api_not_connected.bookings')}
-                                icon={FiCalendar}
-                            />
-                        </div>
-                    )}
-
-                    {activeTab === 'guides' && (
-                        <div className="user-account-content">
-                            <div className="user-account-content-header">
-                                <h1 className="user-account-title">{t('user.guides.title')}</h1>
-                                <p className="user-account-subtitle">{t('user.guides.subtitle')}</p>
-                            </div>
-
-                            <APINotConnected
-                                message={t('user.api_not_connected.guides')}
-                                icon={FiUsers}
-                            />
-
-                            <div className="user-account-search-section user-account-disabled">
-                                <div className="user-account-search-form">
-                                    <div className="user-account-form-group">
-                                        <label>{t('user.guides.travel_date')}</label>
-                                        <input
-                                            type="date"
-                                            value={bookingDate}
-                                            onChange={(e) => setBookingDate(e.target.value)}
-                                            className="user-account-input"
-                                            disabled
-                                        />
-                                    </div>
-
-                                    <div className="user-account-form-group">
-                                        <label>{t('user.guides.travelers_count')}</label>
-                                        <div className="user-account-travelers-inputs">
-                                            <input
-                                                type="number"
-                                                name="adults"
-                                                value={travelers.adults}
-                                                onChange={handleTravelersChange}
-                                                placeholder={t('user.guides.adults')}
-                                                className="user-account-input"
-                                                disabled
-                                            />
-                                            <input
-                                                type="number"
-                                                name="children"
-                                                value={travelers.children}
-                                                onChange={handleTravelersChange}
-                                                placeholder={t('user.guides.children')}
-                                                className="user-account-input"
-                                                disabled
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        className="user-account-btn user-account-btn-outline"
-                                        disabled
-                                    >
-                                        <FiFilter /> {t('user.actions.filters')}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </main>
-
-                {isSettingsOpen && (
-                    <div className="user-account-modal-overlay" onClick={() => setIsSettingsOpen(false)}>
-                        <div className="user-account-modal" onClick={e => e.stopPropagation()}>
-                            <div className="user-account-modal-header">
-                                <h3>{t('user.modals.settings')}</h3>
-                                <div className="user-account-modal-header-status">
-                                    {backendConnected ? (
-                                        <span className="user-account-connection-status connected">
-                                            <FiWifi size={16} /> {t('user.backend_status.connected')}
-                                        </span>
-                                    ) : (
-                                        <span className="user-account-connection-status disconnected">
-                                            <FiWifiOff size={16} /> {t('user.backend_status.disconnected')}
-                                        </span>
-                                    )}
-                                </div>
-                                <button onClick={() => setIsSettingsOpen(false)} aria-label={t('user.actions.close')}>
-                                    <FiX size={24} />
+                    <div className="account-actions">
+                        {!isEditing ? (
+                            <button
+                                className="btn btn-primary"
+                                onClick={handleEdit}
+                            >
+                                <FiEdit3 />
+                                {t("profile.actions.edit")}
+                            </button>
+                        ) : (
+                            <div className="edit-actions">
+                                <button
+                                    className="btn btn-success"
+                                    onClick={handleSave}
+                                    disabled={saving}
+                                >
+                                    {saving ? <FiLoader className="btn-spinner" /> : <FiSave />}
+                                    {t("profile.actions.save")}
+                                </button>
+                                <button
+                                    className="btn btn-outline"
+                                    onClick={handleCancel}
+                                    disabled={saving}
+                                >
+                                    <FiX />
+                                    {t("profile.actions.cancel")}
                                 </button>
                             </div>
-                            <div className="user-account-modal-content">
-                                {settingsError && (
-                                    <div className="user-account-error-message">
-                                        <FiAlertCircle size={16} />
-                                        {settingsError}
-                                    </div>
-                                )}
-                                {settingsSuccess && (
-                                    <div className="user-account-success-message">
-                                        <FiCheck size={16} />
-                                        {settingsSuccess}
-                                    </div>
-                                )}
-                                <form onSubmit={handleSettingsSubmit}>
-                                    <div className="user-account-form-row">
-                                        <div className="user-account-form-group">
-                                            <label htmlFor="first_name">{t('user.form.first_name')} *</label>
+                        )}
+                        <button
+                            className="btn btn-danger"
+                            onClick={handleLogout}
+                        >
+                            <FiLogOut />
+                            {t("profile.actions.logout")}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {error && (
+                <div className="alert alert-error">
+                    <span>{error}</span>
+                </div>
+            )}
+
+            {success && (
+                <div className="alert alert-success">
+                    <span>{success}</span>
+                </div>
+            )}
+
+            <div className="account-content">
+                <div className="account-sections">
+                    {/* Personal Information Section */}
+                    <div className="account-section">
+                        <div className="section-header">
+                            <h2>
+                                <FiUser />
+                                {t("profile.sections.personal_info")}
+                            </h2>
+                        </div>
+                        <div className="section-content">
+                            {!profile && !isEditing ? (
+                                <div className="no-profile">
+                                    <p>{t("profile.no_profile")}</p>
+                                    <button
+                                        className="btn btn-primary"
+                                        onClick={handleEdit}
+                                    >
+                                        <FiPlus />
+                                        {t("profile.actions.create_profile")}
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="profile-fields">
+                                    <div className="field-group">
+                                        <label>
+                                            <FiCalendar />
+                                            {t("profile.fields.date_of_birth")}
+                                        </label>
+                                        {isEditing ? (
                                             <input
-                                                type="text"
-                                                id="first_name"
-                                                name="first_name"
-                                                value={settingsForm.first_name}
-                                                onChange={handleSettingsChange}
-                                                placeholder={t('user.form.first_name_placeholder')}
-                                                className="user-account-input"
-                                                required
-                                                maxLength={50}
-                                                disabled={updating}
+                                                type="date"
+                                                name="date_of_birth"
+                                                value={formData.date_of_birth}
+                                                onChange={handleInputChange}
+                                                className="form-input"
                                             />
-                                        </div>
-                                        <div className="user-account-form-group">
-                                            <label htmlFor="last_name">{t('user.form.last_name')} *</label>
-                                            <input
-                                                type="text"
-                                                id="last_name"
-                                                name="last_name"
-                                                value={settingsForm.last_name}
-                                                onChange={handleSettingsChange}
-                                                placeholder={t('user.form.last_name_placeholder')}
-                                                className="user-account-input"
-                                                required
-                                                maxLength={50}
-                                                disabled={updating}
-                                            />
-                                        </div>
+                                        ) : (
+                                            <span className="field-value">
+                                                {profile?.date_of_birth
+                                                    ? formatDate(profile.date_of_birth)
+                                                    : t("profile.not_set")
+                                                }
+                                            </span>
+                                        )}
                                     </div>
 
-                                    <div className="user-account-form-group">
-                                        <label htmlFor="email">{t('user.form.email')} *</label>
-                                        <input
-                                            type="email"
-                                            id="email"
-                                            name="email"
-                                            value={settingsForm.email}
-                                            onChange={handleSettingsChange}
-                                            placeholder={t('user.form.email_placeholder')}
-                                            className="user-account-input"
-                                            required
-                                            disabled={updating}
-                                        />
-                                    </div>
-
-                                    <div className="user-account-form-row">
-                                        <div className="user-account-form-group">
-                                            <label htmlFor="role">{t('user.form.role')}</label>
+                                    <div className="field-group">
+                                        <label>
+                                            <FiMessageCircle />
+                                            {t("profile.fields.preferred_contact")}
+                                        </label>
+                                        {isEditing ? (
                                             <select
-                                                id="role"
-                                                name="role"
-                                                value={settingsForm.role}
-                                                onChange={handleSettingsChange}
-                                                className="user-account-select"
-                                                disabled={updating}
+                                                name="preferred_contact"
+                                                value={formData.preferred_contact}
+                                                onChange={handleInputChange}
+                                                className="form-select"
                                             >
-                                                <option value="Client">{t('user.form.client')}</option>
-                                                <option value="Customer">{t('user.form.customer')}</option>
+                                                <option value="email">{t("profile.contact_methods.email")}</option>
+                                                <option value="phone">{t("profile.contact_methods.phone")}</option>
+                                                <option value="chat">{t("profile.contact_methods.chat")}</option>
                                             </select>
-                                        </div>
-                                        <div className="user-account-form-group">
-                                            <label htmlFor="country">{t('user.form.country')}</label>
-                                            <input
-                                                type="text"
-                                                id="country"
-                                                name="country"
-                                                value={settingsForm.country}
-                                                onChange={handleSettingsChange}
-                                                placeholder={t('user.form.country_placeholder')}
-                                                className="user-account-input"
-                                                maxLength={100}
-                                                disabled={updating}
-                                            />
-                                        </div>
+                                        ) : (
+                                            <span className="field-value">
+                                                {t(`profile.contact_methods.${profile?.preferred_contact || 'chat'}`)}
+                                            </span>
+                                        )}
                                     </div>
 
-                                    <div className="user-account-info-alert">
-                                        <FiAlertCircle />
-                                        <div className="user-account-info-alert-content">
-                                            <div className="user-account-info-alert-title">{t('user.alerts.info')}</div>
-                                            <p className="user-account-info-alert-text">{t('user.alerts.localstorage_notice')}</p>
-                                        </div>
+                                    <div className="field-group">
+                                        <label>
+                                            <FiGlobe />
+                                            {t("profile.fields.languages")}
+                                        </label>
+                                        {isEditing ? (
+                                            <div className="languages-selector">
+                                                {languages.map(language => (
+                                                    <label key={language.id} className="language-option">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={formData.languages.includes(language.id)}
+                                                            onChange={() => handleLanguageChange(language.id)}
+                                                        />
+                                                        <span>{language.name}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="language-tags">
+                                                {Array.isArray(profile?.languages) && profile.languages.length > 0 ? (
+                                                    profile.languages.map(langId => {
+                                                        const language = languages.find(l => l.id === langId);
+                                                        return language ? (
+                                                            <span key={langId} className="language-tag">
+                                                                {language.name}
+                                                            </span>
+                                                        ) : null;
+                                                    })
+                                                ) : (
+                                                    <span className="field-value">{t("profile.not_set")}</span>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
-                                    <div className="user-account-form-actions">
-                                        <button
-                                            type="button"
-                                            className="user-account-btn user-account-btn-outline"
-                                            onClick={handleResetForm}
-                                            disabled={!hasChanges()}
-                                        >
-                                            <FiX /> {t('user.actions.cancel')}
-                                        </button>
-
-                                        <button
-                                            type="submit"
-                                            className="user-account-btn user-account-btn-primary"
-                                            disabled={updating || !hasChanges()}
-                                        >
-                                            {updating ? (
-                                                <>
-                                                    <div className="user-account-btn-spinner"></div>
-                                                    {t('user.actions.saving')}
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <FiSave /> {t('user.actions.save_localstorage')}
-                                                </>
-                                            )}
-                                        </button>
+                    {/* Account Statistics */}
+                    <div className="account-section">
+                        <div className="section-header">
+                            <h2>
+                                <FiSettings />
+                                {t("profile.sections.account_stats")}
+                            </h2>
+                        </div>
+                        <div className="section-content">
+                            <div className="stats-grid">
+                                <div className="stat-item">
+                                    <div className="stat-icon">
+                                        <FiCalendar />
                                     </div>
-                                </form>
+                                    <div className="stat-info">
+                                        <span className="stat-label">{t("profile.stats.member_since")}</span>
+                                        <span className="stat-value">
+                                            {formatDate(user?.date_joined)}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="stat-item">
+                                    <div className="stat-icon">
+                                        <FiShield />
+                                    </div>
+                                    <div className="stat-info">
+                                        <span className="stat-label">{t("profile.stats.verification")}</span>
+                                        <span className={`stat-value ${user?.is_verified ? 'verified' : 'unverified'}`}>
+                                            {user?.is_verified ? t("profile.verified") : t("profile.unverified")}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="stat-item">
+                                    <div className="stat-icon">
+                                        <FiFlag />
+                                    </div>
+                                    <div className="stat-info">
+                                        <span className="stat-label">{t("profile.stats.country")}</span>
+                                        <span className="stat-value">
+                                            {user?.country || t("profile.not_set")}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                )}
 
-                {settingsSuccess && !isSettingsOpen && (
-                    <div className="user-account-notification">
-                        <FiCheck size={20} />
-                        <span>{settingsSuccess}</span>
+                    {/* Profile Completion */}
+                    <div className="account-section">
+                        <div className="section-header">
+                            <h2>
+                                <FiCheck />
+                                {t("profile.sections.completion")}
+                            </h2>
+                        </div>
+                        <div className="section-content">
+                            <div className="completion-info">
+                                <div className="completion-bar">
+                                    <div
+                                        className="completion-fill"
+                                        style={{ width: profile ? '80%' : '20%' }}
+                                    ></div>
+                                </div>
+                                <p className="completion-text">
+                                    {profile
+                                        ? t("profile.completion.good")
+                                        : t("profile.completion.incomplete")
+                                    }
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                )}
+                </div>
             </div>
         </div>
     );

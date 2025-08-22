@@ -4,7 +4,6 @@ from django.dispatch import receiver
 from django.db import transaction
 from apps.users.models import User
 from apps.profiles.models import ClientProfile, CustomerProfile
-from apps.notifications.models import UserNotificationSettings
 
 
 @receiver(post_save, sender=User)

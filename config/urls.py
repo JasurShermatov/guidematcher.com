@@ -42,10 +42,6 @@ api_v1_patterns = [
     path("bookings/", include("apps.bookings.urls")),  # 📦 Booking-related endpoints
     path("chat/", include("apps.chat.urls")),  # 💬 Chat and messaging
     path("reviews/", include("apps.reviews.urls")),  # ⭐ Review & rating
-    path(
-        "notifications/", include("apps.notifications.urls")
-    ),  # 🔔 Notification center
-    path("disputes/", include("apps.disputes.urls")),  # ⚖️ Dispute resolution
     path("profiles/", include("apps.profiles.urls")),  # 🧑 Public profiles
 ]
 

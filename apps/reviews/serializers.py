@@ -1,11 +1,86 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from django.db import transaction
-from apps.reviews.models import Review, ReviewResponse, ReviewHelpful
+
+from apps.profiles.models import CustomerProfile
+from apps.reviews.models import ReviewResponse, ReviewReaction
+from apps.users.models import User
+from .models import Review
+
+
+class UserShortSerializer(serializers.ModelSerializer):
+    """Minimal foydalanuvchi ma'lumotlari (frontend uchun yetarli)."""
+
+    class Meta:
+        model = User
+        fields = ["id", "first_name", "last_name"]
+
+
+class CustomerShortSerializer(serializers.ModelSerializer):
+    # modelda yo‘q bo‘lgani uchun explicit tarzda ta’riflaymiz
+    business_name = serializers.CharField(source="user.full_name", read_only=True)
+
+    class Meta:
+        model = CustomerProfile
+        fields = ["id", "business_name", "average_rating", "total_reviews"]
+
+
+class ReviewReactionSerializer(serializers.ModelSerializer):
+    """
+    Review ostidagi LIKE / DISLIKE reaksiyalar.
+    Frontend hover/bosganda izohlarni chiqarishi uchun `comment` ham yuboriladi.
+    """
+
+    user = UserShortSerializer(read_only=True)
+
+    class Meta:
+        model = ReviewReaction
+        fields = ["id", "reaction_type", "comment", "created_at", "user"]
+        read_only_fields = ["id", "created_at", "user"]
+
+    def validate(self, attrs):
+        """
+        DISLIKE bo‘lsa — comment majburiy.
+        LIKE bo‘lsa — comment optional.
+        """
+        if attrs.get(
+            "reaction_type"
+        ) == ReviewReaction.ReactionType.DISLIKE and not attrs.get("comment"):
+            raise serializers.ValidationError(
+                {"comment": _("Comment is required when reaction is 'dislike'.")}
+            )
+        return attrs
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            validated_data["user"] = request.user
+        return super().create(validated_data)
+
+
+class ReviewResponseSerializer(serializers.ModelSerializer):
+    """Review ga provider tomonidan berilgan javob."""
+
+    class Meta:
+        model = ReviewResponse
+        fields = ["id", "response_text", "is_published", "created_at", "updated_at"]
+        read_only_fields = ["id", "created_at", "updated_at"]
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    client = serializers.SerializerMethodField()
-    customer = serializers.SerializerMethodField()
+    """
+    Full review serializer with nested relations:
+    - Client info
+    - Customer short info
+    - Reaction counts
+    - List of reactions (for hover in frontend)
+    - Provider response
+    """
+
+    client = UserShortSerializer(read_only=True)
+    customer = CustomerShortSerializer(read_only=True)
+
+    reactions = ReviewReactionSerializer(many=True, read_only=True)
+    response = ReviewResponseSerializer(read_only=True)
 
     class Meta:
         model = Review
@@ -23,97 +98,54 @@ class ReviewSerializer(serializers.ModelSerializer):
             "comment",
             "is_published",
             "is_featured",
-            "helpful_count",
             "created_at",
             "updated_at",
+            # Denormalized counters
+            "like_count",
+            "dislike_count",
+            # Nested
+            "reactions",
+            "response",
         ]
-        read_only_fields = (
+        read_only_fields = [
             "id",
-            "helpful_count",
             "created_at",
             "updated_at",
-        )
-
-    def get_client(self, obj):
-        return {
-            "id": obj.client.id,
-            "full_name": obj.client.get_full_name(),
-        }
-
-    def get_customer(self, obj):
-        return {
-            "id": obj.customer.id,
-            "full_name": obj.customer.user.get_full_name(),
-        }
+            "client",
+            "customer",
+            "like_count",
+            "dislike_count",
+            "reactions",
+            "response",
+        ]
 
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
+    """
+    Review yaratish uchun serializer.
+    Client va Customer backend’da avtomatik set qilinadi (request.user va booking’dan).
+    """
+
     class Meta:
         model = Review
-        exclude = (
-            "client",
-            "helpful_count",
-            "moderated_by",
-            "moderated_at",
-            "moderation_note",
-        )
-
-    def validate(self, attrs):
-        booking = attrs["booking"]
-        user = self.context["request"].user
-        if booking.client != user:
-            raise serializers.ValidationError("Bu bron sizga tegishli emas.")
-        if hasattr(booking, "review"):
-            raise serializers.ValidationError("Bu bron uchun review allaqachon mavjud.")
-        if booking.status != booking.BookingStatus.COMPLETED:
-            raise serializers.ValidationError(
-                "Review faqat yakunlangan bron uchun yoziladi."
-            )
-        return attrs
-
-    @transaction.atomic
-    def create(self, validated_data):
-        validated_data["client"] = self.context["request"].user
-        return super().create(validated_data)
-
-
-class ReviewResponseSerializer(serializers.ModelSerializer):
-    customer = serializers.SerializerMethodField()
-
-    class Meta:
-        model = ReviewResponse
         fields = [
-            "id",
-            "review",
-            "customer",
-            "response_text",
-            "is_published",
-            "created_at",
-            "updated_at",
+            "overall_rating",
+            "communication_rating",
+            "service_rating",
+            "punctuality_rating",
+            "value_rating",
+            "title",
+            "comment",
         ]
-        read_only_fields = ("id", "created_at", "updated_at")
-
-    def get_customer(self, obj):
-        return {
-            "id": obj.review.customer.id,
-            "full_name": obj.review.customer.user.get_full_name(),
-        }
-
-
-class ReviewHelpfulSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
-
-    class Meta:
-        model = ReviewHelpful
-        fields = ("id", "review", "user", "created_at")
-        read_only_fields = ("id", "user", "created_at")
 
     def create(self, validated_data):
-        validated_data["user"] = self.context["request"].user
-        return super().create(validated_data)
+        request = self.context.get("request")
+        booking = self.context.get("booking")  # view’dan keladi
+        if not booking:
+            raise serializers.ValidationError({"booking": _("Booking is required.")})
 
-    def get_user(self, obj):
-        return {
-            "id": obj.user.id,
-            "full_name": obj.user.get_full_name(),
-        }
+        validated_data["booking"] = booking
+        validated_data["client"] = request.user
+        validated_data["customer"] = booking.customer  # booking orqali provider
+
+        return super().create(validated_data)

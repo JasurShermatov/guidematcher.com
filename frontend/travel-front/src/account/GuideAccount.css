@@ -1,1936 +1,963 @@
-/* Interactive Elements */
-.guide-account-interactive-element {
-    transition: all 0.2s ease-in-out;
-    cursor: pointer;
+/* GuideAccount Component Styles */
+
+/* Container and Layout */
+.guide-account-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    min-height: 100vh;
 }
 
-.guide-account-interactive-element:hover {
-    transform: scale(1.02);
-}
-
-.guide-account-interactive-element:active {
-    transform: scale(0.98);
-}
-
-/* Dropdown Menus */
-.guide-account-dropdown {
+/* Header Styles */
+.guide-account-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 35px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
     position: relative;
-    display: inline-block;
+    overflow: hidden;
 }
 
-.guide-account-dropdown-content {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    min-width: 200px;
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.375rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.2s ease-in-out;
-}
-
-.guide-account-dropdown.active .guide-account-dropdown-content {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-.guide-account-dropdown-item {
-    padding: 0.75rem 1rem;
-    color: #374151;
-    text-decoration: none;
-    display: block;
-    transition: background-color 0.15s ease-in-out;
-}
-
-.guide-account-dropdown-item:hover {
-    background-color: #f3f4f6;
-    color: #111827;
-}
-
-/* Tooltips */
-.guide-account-tooltip {
-    position: relative;
-    display: inline-block;
-}
-
-.guide-account-tooltip::before {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #111827;
-    color: #ffffff;
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.25rem;
-    font-size: 0.75rem;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease-in-out;
-    z-index: 1000;
-}
-
-.guide-account-tooltip::after {
+.guide-account-header::before {
     content: '';
     position: absolute;
-    bottom: 115%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 5px solid transparent;
-    border-top-color: #111827;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease-in-out;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(50px, -50px);
 }
 
-.guide-account-tooltip:hover::before,
-.guide-account-tooltip:hover::after {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* File Upload Drag & Drop */
-.guide-account-file-upload {
-    border: 2px dashed #d1d5db;
-    border-radius: 0.5rem;
-    padding: 2rem;
-    text-align: center;
-    background-color: #f9fafb;
-    transition: all 0.2s ease-in-out;
-    cursor: pointer;
-}
-
-.guide-account-file-upload:hover {
-    border-color: #3b82f6;
-    background-color: #eff6ff;
-}
-
-.guide-account-file-upload.dragging {
-    border-color: #2563eb;
-    background-color: #dbeafe;
-    transform: scale(1.02);
-}
-
-.guide-account-file-upload-icon {
-    width: 3rem;
-    height: 3rem;
-    color: #9ca3af;
-    margin: 0 auto 1rem;
-}
-
-.guide-account-file-upload-text {
-    color: #6b7280;
-    font-size: 0.875rem;
-    margin-bottom: 0.5rem;
-}
-
-.guide-account-file-upload-subtext {
-    color: #9ca3af;
-    font-size: 0.75rem;
-}
-
-/* Image Gallery */
-.guide-account-image-gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.guide-account-image-item {
+.guide-account-title {
+    margin: 0 0 10px 0;
+    font-size: 2.8rem;
+    font-weight: 700;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     position: relative;
-    aspect-ratio: 1;
-    border-radius: 0.5rem;
-    overflow: hidden;
-    background-color: #f3f4f6;
+    z-index: 1;
+}
+
+.guide-account-user-info {
+    margin-top: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+.guide-account-welcome {
+    font-size: 1.3rem;
+    opacity: 0.95;
+    font-weight: 500;
+}
+
+/* Loading Styles */
+.guide-account-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    color: #6c757d;
+}
+
+.guide-account-spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #667eea;
+    border-radius: 50%;
+    animation: guideAccountSpin 1s linear infinite;
+    margin-bottom: 25px;
+}
+
+@keyframes guideAccountSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Error Styles */
+.guide-account-error {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    color: white;
+    padding: 18px 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(238, 90, 82, 0.3);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.guide-account-error p {
+    margin: 0;
+    font-weight: 500;
+}
+
+.guide-account-error-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.8rem;
     cursor: pointer;
-    transition: transform 0.2s ease-in-out;
+    padding: 0;
+    line-height: 1;
+    font-weight: bold;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
 }
 
-.guide-account-image-item:hover {
-    transform: scale(1.05);
+.guide-account-error-close:hover {
+    opacity: 1;
 }
 
-.guide-account-image-item img {
+/* Navigation Styles */
+.guide-account-navigation {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 30px;
+    background: white;
+    padding: 8px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.guide-account-navigation::-webkit-scrollbar {
+    display: none;
+}
+
+.guide-account-nav-btn {
+    padding: 14px 24px;
+    border: none;
+    background: transparent;
+    color: #6c757d;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    font-size: 0.95rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.guide-account-nav-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.5s;
 }
 
-.guide-account-image-overlay {
+.guide-account-nav-btn:hover::before {
+    left: 100%;
+}
+
+.guide-account-nav-btn:hover {
+    background-color: #f8f9fa;
+    color: #495057;
+    transform: translateY(-2px);
+}
+
+.guide-account-nav-active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Content Area */
+.guide-account-content {
+    background: white;
+    border-radius: 16px;
+    padding: 35px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    min-height: 600px;
+    position: relative;
+}
+
+/* Dashboard Styles */
+.guide-account-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.guide-account-stat-card {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #f0f2f5;
+    position: relative;
+    overflow: hidden;
+}
+
+.guide-account-stat-card::before {
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
-    display: flex;
-    align-items: flex-end;
-    padding: 1rem;
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.guide-account-image-item:hover .guide-account-image-overlay {
-    opacity: 1;
+.guide-account-stat-card:nth-child(1)::before {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.guide-account-image-title {
-    color: #ffffff;
-    font-weight: 500;
-    font-size: 0.875rem;
+.guide-account-stat-card:nth-child(2)::before {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
 
-/* Calendar Component */
-.guide-account-calendar {
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    overflow: hidden;
+.guide-account-stat-card:nth-child(3)::before {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
 }
 
-.guide-account-calendar-header {
-    background-color: #f9fafb;
-    padding: 1rem;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.guide-account-calendar-nav {
-    background: none;
-    border: none;
-    color: #6b7280;
-    font-size: 1.125rem;
-    cursor: pointer;
-    padding: 0.25rem;
-    border-radius: 0.25rem;
-    transition: color 0.15s ease-in-out;
-}
-
-.guide-account-calendar-nav:hover {
-    color: #374151;
-    background-color: #e5e7eb;
-}
-
-.guide-account-calendar-title {
-    font-weight: 600;
-    color: #111827;
-}
-
-.guide-account-calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-}
-
-.guide-account-calendar-day-header {
-    padding: 0.75rem 0.5rem;
-    text-align: center;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #6b7280;
-    background-color: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.guide-account-calendar-day {
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.875rem;
-    border-right: 1px solid #f3f4f6;
-    border-bottom: 1px solid #f3f4f6;
-    cursor: pointer;
-    transition: background-color 0.15s ease-in-out;
-    position: relative;
-}
-
-.guide-account-calendar-day:hover {
-    background-color: #f3f4f6;
-}
-
-.guide-account-calendar-day.today {
-    background-color: #dbeafe;
-    color: #1d4ed8;
-    font-weight: 600;
-}
-
-.guide-account-calendar-day.selected {
-    background-color: #2563eb;
-    color: #ffffff;
-}
-
-.guide-account-calendar-day.available::after {
-    content: '';
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 6px;
-    height: 6px;
-    background-color: #10b981;
-    border-radius: 50%;
-}
-
-.guide-account-calendar-day.booked::after {
-    content: '';
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 6px;
-    height: 6px;
-    background-color: #ef4444;
-    border-radius: 50%;
-}
-
-/* Rating Component */
-.guide-account-rating {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-.guide-account-rating-star {
-    width: 1rem;
-    height: 1rem;
-    cursor: pointer;
-    transition: transform 0.1s ease-in-out;
-}
-
-.guide-account-rating-star:hover {
-    transform: scale(1.1);
-}
-
-.guide-account-rating-star.filled {
-    color: #fbbf24;
-    fill: currentColor;
-}
-
-.guide-account-rating-star.empty {
-    color: #d1d5db;
-    fill: currentColor;
-}
-
-.guide-account-rating-value {
-    margin-left: 0.5rem;
-    font-size: 0.875rem;
-    color: #6b7280;
-}
-
-/* Search and Filter */
-.guide-account-search-container {
-    position: relative;
-    margin-bottom: 1.5rem;
-}
-
-.guide-account-search-input {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    background-color: #ffffff;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-.guide-account-search-input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.guide-account-search-icon {
-    position: absolute;
-    left: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 1rem;
-    height: 1rem;
-    color: #9ca3af;
-}
-
-.guide-account-filter-buttons {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-}
-
-.guide-account-filter-button {
-    padding: 0.5rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    background-color: #ffffff;
-    color: #374151;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.15s ease-in-out;
-}
-
-.guide-account-filter-button:hover {
-    background-color: #f3f4f6;
-}
-
-.guide-account-filter-button.active {
-    background-color: #2563eb;
-    color: #ffffff;
-    border-color: #2563eb;
-}
-
-/* Pagination */
-.guide-account-pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
-}
-
-.guide-account-pagination-button {
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    background-color: #ffffff;
-    color: #374151;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.15s ease-in-out;
-    min-width: 2.5rem;
-    text-align: center;
-}
-
-.guide-account-pagination-button:hover:not(:disabled) {
-    background-color: #f3f4f6;
-}
-
-.guide-account-pagination-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.guide-account-pagination-button.active {
-    background-color: #2563eb;
-    color: #ffffff;
-    border-color: #2563eb;
-}
-
-/* Loading States */
-.guide-account-skeleton {
-    background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
-    background-size: 200% 100%;
-    animation: guide-account-skeleton-loading 1.5s infinite;
-}
-
-@keyframes guide-account-skeleton-loading {
-    0% {
-        background-position: 200% 0;
-    }
-    100% {
-        background-position: -200% 0;
-    }
-}
-
-.guide-account-skeleton-text {
-    height: 1rem;
-    border-radius: 0.25rem;
-    margin-bottom: 0.5rem;
-}
-
-.guide-account-skeleton-text.short {
-    width: 60%;
-}
-
-.guide-account-skeleton-text.medium {
-    width: 80%;
-}
-
-.guide-account-skeleton-text.long {
-    width: 100%;
-}
-
-.guide-account-skeleton-avatar {
-    width: 3rem;
-    height: 3rem;
-    border-radius: 50%;
-}
-
-.guide-account-skeleton-image {
-    width: 100%;
-    height: 12rem;
-    border-radius: 0.5rem;
-}
-
-/* Alert Components */
-.guide-account-alert {
-    padding: 1rem;
-    border-radius: 0.5rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-}
-
-.guide-account-alert-success {
-    background-color: #dcfce7;
-    border: 1px solid #bbf7d0;
-    color: #166534;
-}
-
-.guide-account-alert-error {
-    background-color: #fee2e2;
-    border: 1px solid #fecaca;
-    color: #991b1b;
-}
-
-.guide-account-alert-warning {
-    background-color: #fef3c7;
-    border: 1px solid #fde68a;
-    color: #92400e;
-}
-
-.guide-account-alert-info {
-    background-color: #dbeafe;
-    border: 1px solid #bfdbfe;
-    color: #1e40af;
-}
-
-.guide-account-alert-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    flex-shrink: 0;
-    margin-top: 0.125rem;
-}
-
-.guide-account-alert-content {
-    flex: 1;
-}
-
-.guide-account-alert-title {
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-}
-
-.guide-account-alert-message {
-    font-size: 0.875rem;
-    line-height: 1.5;
-}
-
-/* Accordion/Collapsible */
-.guide-account-accordion {
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    overflow: hidden;
-}
-
-.guide-account-accordion-item {
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.guide-account-accordion-item:last-child {
-    border-bottom: none;
-}
-
-.guide-account-accordion-header {
-    width: 100%;
-    padding: 1rem;
-    background-color: #f9fafb;
-    border: none;
-    text-align: left;
-    font-weight: 500;
-    color: #111827;
-    cursor: pointer;
-    transition: background-color 0.15s ease-in-out;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.guide-account-accordion-header:hover {
-    background-color: #f3f4f6;
-}
-
-.guide-account-accordion-icon {
-    width: 1rem;
-    height: 1rem;
-    transform: rotate(0deg);
-    transition: transform 0.2s ease-in-out;
-}
-
-.guide-account-accordion-item.expanded .guide-account-accordion-icon {
-    transform: rotate(180deg);
-}
-
-.guide-account-accordion-content {
-    padding: 1rem;
-    background-color: #ffffff;
-    display: none;
-}
-
-.guide-account-accordion-item.expanded .guide-account-accordion-content {
-    display: block;
-    animation: guide-account-accordion-expand 0.2s ease-out;
-}
-
-@keyframes guide-account-accordion-expand {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Breadcrumb */
-.guide-account-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.875rem;
-}
-
-.guide-account-breadcrumb-item {
-    color: #6b7280;
-    text-decoration: none;
-    transition: color 0.15s ease-in-out;
-}
-
-.guide-account-breadcrumb-item:hover {
-    color: #374151;
-}
-
-.guide-account-breadcrumb-item.current {
-    color: #111827;
-    font-weight: 500;
-}
-
-.guide-account-breadcrumb-separator {
-    color: #9ca3af;
-    font-size: 0.75rem;
-}
-
-/* Stats Cards */
-.guide-account-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.guide-account-stat-card {
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    text-align: center;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+.guide-account-stat-card:nth-child(4)::before {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
 }
 
 .guide-account-stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 }
 
-.guide-account-stat-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    margin: 0 auto 1rem;
-    color: #3b82f6;
+.guide-account-stat-title {
+    margin: 0 0 15px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .guide-account-stat-value {
-    font-size: 2rem;
+    margin: 0;
+    font-size: 2.8rem;
     font-weight: 700;
-    color: #111827;
-    margin-bottom: 0.25rem;
+    color: #2c3e50;
 }
 
-.guide-account-stat-label {
-    font-size: 0.875rem;
-    color: #6b7280;
+/* Section Titles */
+.guide-account-section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0 0 30px 0;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #667eea;
+    display: inline-block;
+    position: relative;
+}
+
+.guide-account-section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 50%;
+    height: 3px;
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+/* Form Styles */
+.guide-account-form {
+    max-width: 800px;
+}
+
+.guide-account-form-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 25px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
+}
+
+.guide-account-form-group {
+    margin-bottom: 25px;
+}
+
+.guide-account-form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.guide-account-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #495057;
+    font-size: 1rem;
+}
+
+.guide-account-input,
+.guide-account-select,
+.guide-account-textarea,
+.guide-account-file-input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    background: white;
+}
+
+.guide-account-input:focus,
+.guide-account-select:focus,
+.guide-account-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+}
+
+.guide-account-textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+}
+
+.guide-account-file-input {
+    padding: 12px;
+    cursor: pointer;
+}
+
+.guide-account-checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    background: #f8f9fa;
+}
+
+.guide-account-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
     font-weight: 500;
 }
 
-.guide-account-stat-change {
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
+.guide-account-checkbox-label:hover {
+    background-color: #e9ecef;
+    transform: translateX(5px);
 }
 
-.guide-account-stat-change.positive {
-    color: #059669;
+.guide-account-checkbox {
+    margin: 0;
+    width: 18px;
+    height: 18px;
+    accent-color: #667eea;
 }
 
-.guide-account-stat-change.negative {
-    color: #dc2626;
+.guide-account-form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 35px;
+    padding-top: 25px;
+    border-top: 1px solid #e9ecef;
 }
 
-/* Media Queries for Responsive Design */
-@media (max-width: 640px) {
-    .guide-account-guide-account-form-grid {
+/* Buttons */
+.guide-account-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    min-width: 120px;
+    position: relative;
+    overflow: hidden;
+}
+
+.guide-account-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.guide-account-btn:hover::before {
+    left: 100%;
+}
+
+.guide-account-btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+}
+
+.guide-account-btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+.guide-account-btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+}
+
+.guide-account-btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-3px);
+}
+
+.guide-account-btn-accept {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.guide-account-btn-accept:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+}
+
+.guide-account-btn-cancel {
+    background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+.guide-account-btn-cancel:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+}
+
+.guide-account-btn-small {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    min-width: 80px;
+}
+
+.guide-account-btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+}
+
+/* Recent Bookings */
+.guide-account-recent-bookings {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.guide-account-booking-card,
+.guide-account-booking-item {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+    border-left: 5px solid #667eea;
+    position: relative;
+}
+
+.guide-account-booking-card:hover,
+.guide-account-booking-item:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+}
+
+.guide-account-booking-info {
+    flex: 1;
+}
+
+.guide-account-booking-title {
+    margin: 0 0 10px 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.guide-account-booking-date,
+.guide-account-booking-dates {
+    margin: 0 0 12px 0;
+    color: #6c757d;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.guide-account-booking-description {
+    margin: 0 0 15px 0;
+    color: #495057;
+    line-height: 1.6;
+}
+
+/* Status Badges */
+.guide-account-booking-status {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    letter-spacing: 0.5px;
+}
+
+.guide-account-status-pending {
+    background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+    color: #856404;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+}
+
+.guide-account-status-confirmed,
+.guide-account-status-accepted {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.guide-account-status-completed {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.guide-account-status-cancelled {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+.guide-account-booking-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Profile View */
+.guide-account-profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.guide-account-profile-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.guide-account-profile-field {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 25px;
+    border-radius: 12px;
+    border-left: 5px solid #667eea;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.guide-account-profile-label {
+    font-weight: 700;
+    color: #495057;
+    margin-bottom: 12px;
+    display: block;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.guide-account-profile-value {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.2rem;
+    line-height: 1.5;
+}
+
+/* Bookings List */
+.guide-account-bookings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Portfolio Styles */
+.guide-account-portfolio-header,
+.guide-account-availability-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.guide-account-portfolio-form,
+.guide-account-availability-form {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 30px;
+    border-radius: 16px;
+    margin-bottom: 35px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.guide-account-portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+.guide-account-portfolio-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.guide-account-portfolio-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.guide-account-portfolio-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.guide-account-portfolio-content {
+    padding: 25px;
+}
+
+.guide-account-portfolio-title {
+    margin: 0 0 12px 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.guide-account-portfolio-description {
+    margin: 0 0 20px 0;
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+.guide-account-portfolio-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Availability Styles */
+.guide-account-availability-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.guide-account-availability-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border-left: 5px solid #28a745;
+}
+
+.guide-account-availability-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.guide-account-availability-info {
+    margin-bottom: 20px;
+}
+
+.guide-account-availability-date {
+    margin: 0 0 8px 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.guide-account-availability-time {
+    margin: 0 0 8px 0;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.guide-account-availability-note {
+    margin: 0 0 12px 0;
+    color: #495057;
+    font-style: italic;
+}
+
+.guide-account-availability-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.guide-account-available {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+}
+
+.guide-account-unavailable {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+}
+
+.guide-account-availability-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Reviews */
+.guide-account-reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.guide-account-review-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 30px;
+    border-left: 5px solid #ffc107;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.guide-account-review-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.guide-account-review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.guide-account-review-rating {
+    color: #ffc107;
+    font-size: 1.5rem;
+    text-shadow: 0 1px 3px rgba(255, 193, 7, 0.3);
+}
+
+.guide-account-review-date {
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.guide-account-review-title {
+    margin: 0 0 15px 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.guide-account-review-comment {
+    margin: 0 0 20px 0;
+    color: #495057;
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+.guide-account-review-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.guide-account-review-detail {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    color: #1976d2;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid #e1f5fe;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .guide-account-container {
+        padding: 15px;
+    }
+
+    .guide-account-content {
+        padding: 25px;
+    }
+
+    .guide-account-stats {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .guide-account-portfolio-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .guide-account-title {
+        font-size: 2.2rem;
+    }
+
+    .guide-account-navigation {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .guide-account-nav-btn {
+        text-align: center;
+        padding: 12px 20px;
+    }
+
+    .guide-account-stats {
         grid-template-columns: 1fr;
     }
 
-    .guide-account-guide-account-checkbox-grid {
+    .guide-account-booking-card,
+    .guide-account-booking-item {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .guide-account-booking-actions {
+        align-self: stretch;
+        justify-content: center;
+    }
+
+    .guide-account-form-row {
         grid-template-columns: 1fr;
     }
 
-    .guide-account-guide-account-checkbox-grid-wide {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .guide-account-guide-account-btn-group {
+    .guide-account-form-actions {
         flex-direction: column;
     }
 
-    .guide-account-filter-buttons {
+    .guide-account-profile-header,
+    .guide-account-portfolio-header,
+    .guide-account-availability-header {
         flex-direction: column;
+        align-items: stretch;
     }
 
-    .guide-account-pagination {
-        flex-wrap: wrap;
-        justify-content: flex-start;
+    .guide-account-portfolio-grid {
+        grid-template-columns: 1fr;
     }
 
-    .guide-account-stats-grid {
+    .guide-account-availability-list {
+        grid-template-columns: 1fr;
+    }
+
+    .guide-account-review-details {
         grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 480px) {
-    .guide-account-guide-account-card-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
+    .guide-account-header {
+        padding: 25px 20px;
     }
 
-    .guide-account-modal-content {
-        margin: 1rem;
-        max-width: calc(100% - 2rem);
+    .guide-account-title {
+        font-size: 2rem;
     }
 
-    .guide-account-image-gallery {
-        grid-template-columns: repeat(2, 1fr);
+    .guide-account-welcome {
+        font-size: 1.1rem;
     }
 
-    .guide-account-calendar-day {
-        font-size: 0.75rem;
-    }
-}
-
-/* Print Styles */
-@media print {
-    .guide-account-guide-account-btn,
-    .guide-account-modal-overlay,
-    .guide-account-dropdown,
-    .guide-account-tooltip {
-        display: none !important;
+    .guide-account-content {
+        padding: 20px;
     }
 
-    .guide-account-guide-account-card {
-        box-shadow: none;
-        border: 1px solid #000;
+    .guide-account-booking-card,
+    .guide-account-booking-item,
+    .guide-account-review-item,
+    .guide-account-availability-item {
+        padding: 20px;
     }
 
-    .guide-account-bg-gray-50,
-    .guide-account-bg-blue-600 {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-    }
-}
-
-/* Dark Mode Support (if needed) */
-@media (prefers-color-scheme: dark) {
-    .guide-account-dark-mode .guide-account-bg-white {
-        background-color: #1f2937;
+    .guide-account-portfolio-content {
+        padding: 20px;
     }
 
-    .guide-account-dark-mode .guide-account-text-gray-900 {
-        color: #f9fafb;
+    .guide-account-checkbox-group {
+        grid-template-columns: 1fr;
     }
 
-    .guide-account-dark-mode .guide-account-text-gray-600 {
-        color: #d1d5db;
+    .guide-account-form-actions {
+        gap: 10px;
     }
 
-    .guide-account-dark-mode .guide-account-border-gray-300 {
-        border-color: #4b5563;
+    .guide-account-btn {
+        padding: 12px 20px;
+    }
+
+    .guide-account-portfolio-form,
+    .guide-account-availability-form {
+        padding: 20px;
     }
 }
 
-/* Accessibility Improvements */
-.guide-account-focus-visible:focus-visible {
-    outline: 2px solid #2563eb;
-    outline-offset: 2px;
-}
-
-.guide-account-sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-/* High Contrast Mode */
-@media (prefers-contrast) {
-    .guide-account-guide-account-btn-primary {
-        border: 2px solid #000000;
-    }
-
-    .guide-account-guide-account-form-input:focus {
-        border: 2px solid #000000;
-        box-shadow: none;
-    }
-}
-
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-}
-
-/* Custom Properties for Easy Theming */
-:root {
-    --guide-account-primary-color: #2563eb;
-    --guide-account-primary-hover: #1d4ed8;
-    --guide-account-success-color: #059669;
-    --guide-account-error-color: #dc2626;
-    --guide-account-warning-color: #d97706;
-    --guide-account-gray-50: #f9fafb;
-    --guide-account-gray-100: #f3f4f6;
-    --guide-account-gray-200: #e5e7eb;
-    --guide-account-gray-300: #d1d5db;
-    --guide-account-gray-400: #9ca3af;
-    --guide-account-gray-500: #6b7280;
-    --guide-account-gray-600: #4b5563;
-    --guide-account-gray-700: #374151;
-    --guide-account-gray-800: #1f2937;
-    --guide-account-gray-900: #111827;
-    --guide-account-border-radius: 0.375rem;
-    --guide-account-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --guide-account-transition: all 0.15s ease-in-out;
-}
-
-/*GuideAccount.css - Complete styling for Guide Account component *!*/
-
-/* Base Reset and Typography */
-.guide-account-min-h-screen {
-    min-height: 100vh;
-}
-
-.guide-account-bg-gray-50 {
-    background-color: #f9fafb;
-}
-
-.guide-account-bg-white {
-    background-color: #ffffff;
-}
-
-.guide-account-text-gray-900 {
-    color: #111827;
-}
-
-.guide-account-text-gray-700 {
-    color: #374151;
-}
-
-.guide-account-text-gray-600 {
-    color: #4b5563;
-}
-
-.guide-account-text-gray-500 {
-    color: #6b7280;
-}
-
-.guide-account-text-gray-400 {
-    color: #9ca3af;
-}
-
-.guide-account-text-gray-300 {
-    color: #d1d5db;
-}
-
-.guide-account-text-blue-600 {
-    color: #2563eb;
-}
-
-.guide-account-text-blue-800 {
-    color: #1e40af;
-}
-
-.guide-account-text-green-600 {
-    color: #059669;
-}
-
-.guide-account-text-green-800 {
-    color: #065f46;
-}
-
-.guide-account-text-red-600 {
-    color: #dc2626;
-}
-
-.guide-account-text-red-800 {
-    color: #991b1b;
-}
-
-.guide-account-text-yellow-400 {
-    color: #fbbf24;
-}
-
-.guide-account-text-yellow-600 {
-    color: #d97706;
-}
-
-.guide-account-text-yellow-800 {
-    color: #92400e;
-}
-
-.guide-account-text-purple-600 {
-    color: #9333ea;
-}
-
-/* Background Colors */
-.guide-account-bg-blue-600 {
-    background-color: #2563eb;
-}
-
-.guide-account-bg-blue-700 {
-    background-color: #1d4ed8;
-}
-
-.guide-account-bg-green-100 {
-    background-color: #dcfce7;
-}
-
-.guide-account-bg-green-400 {
-    background-color: #4ade80;
-}
-
-.guide-account-bg-red-100 {
-    background-color: #fee2e2;
-}
-
-.guide-account-bg-red-400 {
-    background-color: #f87171;
-}
-
-.guide-account-bg-red-50 {
-    background-color: #fef2f2;
-}
-
-.guide-account-bg-green-50 {
-    background-color: #f0fdf4;
-}
-
-.guide-account-bg-yellow-100 {
-    background-color: #fef3c7;
-}
-
-.guide-account-bg-blue-100 {
-    background-color: #dbeafe;
-}
-
-.guide-account-bg-gray-50 {
-    background-color: #f9fafb;
-}
-
-.guide-account-bg-gray-200 {
-    background-color: #e5e7eb;
-}
-
-.guide-account-bg-gray-300 {
-    background-color: #d1d5db;
-}
-
-/* Layout and Flexbox */
-.guide-account-flex {
-    display: flex;
-}
-
-.guide-account-grid {
-    display: grid;
-}
-
-.guide-account-block {
-    display: block;
-}
-
-.guide-account-inline-flex {
-    display: inline-flex;
-}
-
-.guide-account-items-center {
-    align-items: center;
-}
-
-.guide-account-items-start {
-    align-items: flex-start;
-}
-
-.guide-account-justify-center {
-    justify-content: center;
-}
-
-.guide-account-justify-between {
-    justify-content: space-between;
-}
-
-.guide-account-justify-end {
-    justify-content: flex-end;
-}
-
-.guide-account-flex-1 {
-    flex: 1 1 0%;
-}
-
-/* Grid Layout */
-.guide-account-grid-cols-1 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-}
-
-.guide-account-grid-cols-2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.guide-account-grid-cols-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.guide-account-grid-cols-4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-/* Responsive Grid */
-@media (min-width: 768px) {
-    .guide-account-md\:grid-cols-2 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .guide-account-md\:grid-cols-4 {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-}
-
-@media (min-width: 1024px) {
-    .guide-account-lg\:grid-cols-3 {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .guide-account-lg\:px-8 {
-        padding-left: 2rem;
-        padding-right: 2rem;
-    }
-}
-
-/* Spacing */
-.guide-account-space-x-1 > :not([hidden]) ~ :not([hidden]) {
-    margin-left: 0.25rem;
-}
-
-.guide-account-space-x-2 > :not([hidden]) ~ :not([hidden]) {
-    margin-left: 0.5rem;
-}
-
-.guide-account-space-x-3 > :not([hidden]) ~ :not([hidden]) {
-    margin-left: 0.75rem;
-}
-
-.guide-account-space-x-4 > :not([hidden]) ~ :not([hidden]) {
-    margin-left: 1rem;
-}
-
-.guide-account-space-x-8 > :not([hidden]) ~ :not([hidden]) {
-    margin-left: 2rem;
-}
-
-.guide-account-space-y-3 > :not([hidden]) ~ :not([hidden]) {
-    margin-top: 0.75rem;
-}
-
-.guide-account-space-y-4 > :not([hidden]) ~ :not([hidden]) {
-    margin-top: 1rem;
-}
-
-.guide-account-space-y-6 > :not([hidden]) ~ :not([hidden]) {
-    margin-top: 1.5rem;
-}
-
-.guide-account-gap-4 {
-    gap: 1rem;
-}
-
-.guide-account-gap-6 {
-    gap: 1.5rem;
-}
-
-/* Padding */
-.guide-account-p-1 {
-    padding: 0.25rem;
-}
-
-.guide-account-p-4 {
-    padding: 1rem;
-}
-
-.guide-account-p-6 {
-    padding: 1.5rem;
-}
-
-.guide-account-px-3 {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-}
-
-.guide-account-px-4 {
-    padding-left: 1rem;
-    padding-right: 1rem;
-}
-
-.guide-account-px-6 {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-}
-
-.guide-account-py-1 {
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
-}
-
-.guide-account-py-2 {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-}
-
-.guide-account-py-3 {
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-}
-
-.guide-account-py-4 {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-}
-
-.guide-account-py-6 {
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
-}
-
-.guide-account-py-8 {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-}
-
-/* Margin */
-.guide-account-mb-2 {
-    margin-bottom: 0.5rem;
-}
-
-.guide-account-mb-4 {
-    margin-bottom: 1rem;
-}
-
-.guide-account-mb-6 {
-    margin-bottom: 1.5rem;
-}
-
-.guide-account-mt-1 {
-    margin-top: 0.25rem;
-}
-
-.guide-account-mt-2 {
-    margin-top: 0.5rem;
-}
-
-.guide-account-mt-4 {
-    margin-top: 1rem;
-}
-
-.guide-account-ml-4 {
-    margin-left: 1rem;
-}
-
-.guide-account-mr-2 {
-    margin-right: 0.5rem;
-}
-
-.guide-account-mx-auto {
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Width and Height */
-.guide-account-w-2 {
-    width: 0.5rem;
-}
-
-.guide-account-w-3 {
-    width: 0.75rem;
-}
-
-.guide-account-w-4 {
-    width: 1rem;
-}
-
-.guide-account-w-5 {
-    width: 1.25rem;
-}
-
-.guide-account-w-8 {
-    width: 2rem;
-}
-
-.guide-account-w-10 {
-    width: 2.5rem;
-}
-
-.guide-account-w-12 {
-    width: 3rem;
-}
-
-.guide-account-w-16 {
-    width: 4rem;
-}
-
-.guide-account-w-full {
-    width: 100%;
-}
-
-.guide-account-h-2 {
-    height: 0.5rem;
-}
-
-.guide-account-h-3 {
-    height: 0.75rem;
-}
-
-.guide-account-h-4 {
-    height: 1rem;
-}
-
-.guide-account-h-5 {
-    height: 1.25rem;
-}
-
-.guide-account-h-8 {
-    height: 2rem;
-}
-
-.guide-account-h-10 {
-    height: 2.5rem;
-}
-
-.guide-account-h-12 {
-    height: 3rem;
-}
-
-.guide-account-h-16 {
-    height: 4rem;
-}
-
-.guide-account-h-48 {
-    height: 12rem;
-}
-
-.guide-account-min-w-full {
-    min-width: 100%;
-}
-
-.guide-account-max-w-md {
-    max-width: 28rem;
-}
-
-.guide-account-max-w-7xl {
-    max-width: 80rem;
-}
-
-/* Positioning */
-.guide-account-relative {
-    position: relative;
-}
-
-.guide-account-absolute {
-    position: absolute;
-}
-
-.guide-account-fixed {
-    position: fixed;
-}
-
-.guide-account-inset-0 {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-}
-
-.guide-account--bottom-1 {
-    bottom: -0.25rem;
-}
-
-.guide-account--right-1 {
-    right: -0.25rem;
-}
-
-/* Z-Index */
-.guide-account-z-50 {
-    z-index: 50;
-}
-
-/* Typography */
-.guide-account-text-xs {
-    font-size: 0.75rem;
-    line-height: 1rem;
-}
-
-.guide-account-text-sm {
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-}
-
-.guide-account-text-lg {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
-}
-
-.guide-account-text-xl {
-    font-size: 1.25rem;
-    line-height: 1.75rem;
-}
-
-.guide-account-text-2xl {
-    font-size: 1.5rem;
-    line-height: 2rem;
-}
-
-.guide-account-font-medium {
-    font-weight: 500;
-}
-
-.guide-account-font-bold {
-    font-weight: 700;
-}
-
-.guide-account-text-center {
-    text-align: center;
-}
-
-.guide-account-text-left {
-    text-align: left;
-}
-
-.guide-account-text-right {
-    text-align: right;
-}
-
-.guide-account-uppercase {
-    text-transform: uppercase;
-}
-
-.guide-account-tracking-wider {
-    letter-spacing: 0.05em;
-}
-
-/* Border and Border Radius */
-.guide-account-border {
-    border-width: 1px;
-}
-
-.guide-account-border-b {
-    border-bottom-width: 1px;
-}
-
-.guide-account-border-b-2 {
-    border-bottom-width: 2px;
-}
-
-.guide-account-border-l-4 {
-    border-left-width: 4px;
-}
-
-.guide-account-border-gray-200 {
-    border-color: #e5e7eb;
-}
-
-.guide-account-border-gray-300 {
-    border-color: #d1d5db;
-}
-
-.guide-account-border-red-200 {
-    border-color: #fecaca;
-}
-
-.guide-account-border-green-200 {
-    border-color: #bbf7d0;
-}
-
-.guide-account-border-blue-500 {
-    border-color: #3b82f6;
-}
-
-.guide-account-border-transparent {
-    border-color: transparent;
-}
-
-.guide-account-rounded {
-    border-radius: 0.25rem;
-}
-
-.guide-account-rounded-md {
-    border-radius: 0.375rem;
-}
-
-.guide-account-rounded-lg {
-    border-radius: 0.5rem;
-}
-
-.guide-account-rounded-full {
-    border-radius: 9999px;
-}
-
-/* Shadow */
-.guide-account-shadow {
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-}
-
-.guide-account-shadow-sm {
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-/* Divide */
-.guide-account-divide-y > :not([hidden]) ~ :not([hidden]) {
-    border-top-width: 1px;
-}
-
-.guide-account-divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
-    border-color: #e5e7eb;
-}
-
-/* Overflow */
-.guide-account-overflow-hidden {
-    overflow: hidden;
-}
-
-/* Object Fit */
-.guide-account-object-cover {
-    object-fit: cover;
-}
-
-/* Whitespace */
-.guide-account-whitespace-nowrap {
-    white-space: nowrap;
-}
-
-/* Colors for Star Icons */
-.guide-account-fill-yellow-400 {
-    fill: #fbbf24;
-}
-
-/* Specific Component Styles */
-
-/* Animation */
-.guide-account-animate-spin {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Transition */
-.guide-account-transition-colors {
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-}
-
-/* Hover States */
-.guide-account-hover\:bg-blue-700:hover {
-    background-color: #1d4ed8;
-}
-
-.guide-account-hover\:bg-gray-300:hover {
-    background-color: #d1d5db;
-}
-
-.guide-account-hover\:text-blue-800:hover {
-    color: #1e40af;
-}
-
-.guide-account-hover\:text-red-800:hover {
-    color: #991b1b;
-}
-
-.guide-account-hover\:text-green-800:hover {
-    color: #065f46;
-}
-
-.guide-account-hover\:text-gray-700:hover {
-    color: #374151;
-}
-
-.guide-account-hover\:border-gray-300:hover {
-    border-color: #d1d5db;
-}
-
-/* Focus States */
-.guide-account-focus\:outline-none:focus {
-    outline: 2px solid transparent;
-    outline-offset: 2px;
-}
-
-.guide-account-focus\:ring-2:focus {
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
-}
-
-.guide-account-focus\:ring-blue-500:focus {
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
-}
-
-/* Disabled States */
-.guide-account-disabled\:opacity-50:disabled {
-    opacity: 0.5;
-}
-
-/* Custom Form Styles */
-.guide-account-guide-account-card {
-    background-color: #ffffff;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-}
-
-.guide-account-guide-account-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.guide-account-guide-account-card-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #111827;
-}
-
-.guide-account-guide-account-card-content {
-    padding: 1.5rem;
-}
-
-.guide-account-guide-account-form-grid {
-    display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-    gap: 1.5rem;
-}
-
-@media (min-width: 768px) {
-    .guide-account-guide-account-form-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-.guide-account-guide-account-form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.guide-account-guide-account-form-group-full {
-    grid-column: 1 / -1;
-}
-
-.guide-account-guide-account-form-label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 0.5rem;
-}
-
-.guide-account-guide-account-form-input {
-    width: 100%;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    padding: 0.75rem;
-    font-size: 0.875rem;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-.guide-account-guide-account-form-input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.guide-account-guide-account-form-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-.guide-account-guide-account-form-select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-}
-
-.guide-account-guide-account-form-input-group {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.guide-account-guide-account-form-input-flex {
-    flex: 1;
-}
-
-.guide-account-guide-account-form-value {
-    color: #374151;
-    font-size: 0.875rem;
-    padding: 0.75rem 0;
-}
-
-.guide-account-guide-account-form-value-empty {
-    color: #9ca3af;
-    font-style: italic;
-}
-
-.guide-account-guide-account-form-value-status {
-    font-weight: 500;
-}
-
-.guide-account-guide-account-text-success {
-    color: #059669;
-}
-
-.guide-account-guide-account-text-danger {
-    color: #dc2626;
-}
-
-/* Button Styles */
-.guide-account-guide-account-btn {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.15s ease-in-out;
-    cursor: pointer;
-    border: none;
-    text-decoration: none;
-}
-
-.guide-account-guide-account-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.guide-account-guide-account-btn-primary {
-    background-color: #2563eb;
-    color: #ffffff;
-}
-
-.guide-account-guide-account-btn-primary:hover:not(:disabled) {
-    background-color: #1d4ed8;
-}
-
-.guide-account-guide-account-btn-secondary {
-    background-color: #e5e7eb;
-    color: #374151;
-}
-
-.guide-account-guide-account-btn-secondary:hover:not(:disabled) {
-    background-color: #d1d5db;
-}
-
-.guide-account-guide-account-btn-text {
-    background-color: transparent;
-    color: #2563eb;
-}
-
-.guide-account-guide-account-btn-text:hover:not(:disabled) {
-    background-color: #f3f4f6;
-}
-
-.guide-account-guide-account-btn-icon {
-    width: 1rem;
-    height: 1rem;
-    margin-right: 0.5rem;
-}
-
-.guide-account-guide-account-btn-group {
-    display: flex;
-    gap: 0.5rem;
-}
-
-/* Checkbox Styles */
-.guide-account-guide-account-checkbox-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-}
-
-.guide-account-guide-account-checkbox-grid-wide {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-@media (min-width: 768px) {
-    .guide-account-guide-account-checkbox-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .guide-account-guide-account-checkbox-grid-wide {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-}
-
-.guide-account-guide-account-checkbox-item {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.guide-account-guide-account-checkbox {
-    width: 1rem;
-    height: 1rem;
-    margin-right: 0.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.25rem;
-    background-color: #ffffff;
-    cursor: pointer;
-}
-
-.guide-account-guide-account-checkbox:checked {
-    background-color: #2563eb;
-    border-color: #2563eb;
-}
-
-.guide-account-guide-account-checkbox-label {
-    font-size: 0.875rem;
-    color: #374151;
-    cursor: pointer;
-}
-
-/* Tags */
-.guide-account-guide-account-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.guide-account-guide-account-tag {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 500;
-}
-
-.guide-account-guide-account-tag-blue {
-    background-color: #dbeafe;
-    color: #1e40af;
-}
-
-.guide-account-guide-account-tag-green {
-    background-color: #dcfce7;
-    color: #166534;
-}
-
-/* Statistics */
-.guide-account-guide-account-stats {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.guide-account-guide-account-stat-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.guide-account-guide-account-stat-label {
-    font-size: 0.875rem;
-    color: #6b7280;
-}
-
-.guide-account-guide-account-stat-value {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #111827;
-}
-
-/* Responsive Utilities */
-@media (min-width: 640px) {
-    .guide-account-sm\:px-6 {
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
-    }
-}
-
-/* Modal Overlay */
-.guide-account-bg-opacity-50 {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-/* Loading Animation Enhancement */
-.guide-account-animate-spin {
-    animation: guide-account-spin 1s linear infinite;
-}
-
-@keyframes guide-account-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Custom Scrollbar for Modals */
-.guide-account-modal-content {
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.guide-account-modal-content::-webkit-scrollbar {
+/* Custom Scrollbar */
+.guide-account-checkbox-group::-webkit-scrollbar {
     width: 6px;
-}
-
-.guide-account-modal-content::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-}
-
-.guide-account-modal-content::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
-}
-
-.guide-account-modal-content::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-/* Table Enhancements */
-.guide-account-table-container {
-    overflow-x: auto;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-/* Card Hover Effects */
-.guide-account-card-hover {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.guide-account-card-hover:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-/* Status Indicators */
-.guide-account-status-indicator {
-    position: relative;
-    display: inline-block;
-}
-
-.guide-account-status-indicator::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 0.75rem;
-    height: 0.75rem;
-    border-radius: 50%;
-    border: 2px solid #ffffff;
-}
-
-.guide-account-status-online::before {
-    background-color: #10b981;
-}
-
-.guide-account-status-offline::before {
-    background-color: #ef4444;
-}
-
-/* Form Validation Styles */
-.guide-account-form-error {
-    border-color: #ef4444;
-    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
-}
-
-.guide-account-form-success {
-    border-color: #10b981;
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
-}
-
-.guide-account-error-message {
-    color: #ef4444;
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
-}
-
-.guide-account-success-message {
-    color: #10b981;
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
-}
-
-/* Progress Bars */
-.guide-account-progress-bar {
-    width: 100%;
-    height: 0.5rem;
-    background-color: #e5e7eb;
-    border-radius: 0.25rem;
-    overflow: hidden;
-}
-
-.guide-account-progress-fill {
-    height: 100%;
-    background-color: #2563eb;
-    transition: width 0.3s ease-in-out;
-}
-
-/* Notification Badges */
-.guide-account-notification-badge {
-    position: absolute;
-    top: -0.25rem;
-    right: -0.25rem;
-    min-width: 1.25rem;
-    height: 1.25rem;
-    background-color: #ef4444;
-    color: #ffffff;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border-radius: 0.625rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }

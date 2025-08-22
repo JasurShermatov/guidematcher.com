@@ -1,96 +1,570 @@
-import React, { useState } from 'react';
-import { FiMessageCircle, FiX, FiSend } from 'react-icons/fi';
-import './ChatWidgets.css';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+    getConversations,
+    getChatMessages,
+    sendMessage,
+    markMessagesAsRead,
+    createConversation,
+    getUnreadCount,
+    searchUsers,
+    blockUser,
+    unblockUser,
+    getBlockedUsers,
+    messageAction,
+    getCurrentUser
+} from '../api/api';
 
-const ChatWidgets = ({ user, role, guides, requests, chatMessages, setChatMessages, onClose, selectedClient }) => {
-  const [activeChatId, setActiveChatId] = useState(selectedClient || null);
-  const [newMessage, setNewMessage] = useState('');
+const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'client' }) => {
+    const [currentUser, setCurrentUser] = useState(null);
+    const [conversations, setConversations] = useState([]);
+    const [activeConversation, setActiveConversation] = useState(null);
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [showUserSearch, setShowUserSearch] = useState(false);
+    const [showBlockedUsers, setShowBlockedUsers] = useState(false);
+    const [blockedUsers, setBlockedUsers] = useState([]);
+    const [chatView, setChatView] = useState('conversations'); // 'conversations', 'chat', 'search', 'blocked'
 
-  const getChatPartner = (chat) => {
-    if (role === 'Client') {
-      const guide = guides.find(g => g.id === chat.guideId);
-      return { id: guide?.id, name: guide?.name || 'Unknown Guide', image: guide?.image };
-    } else {
-      const request = requests.find(r => r.clientId === chat.clientId);
-      return { id: request?.clientId, name: request?.clientName || 'Unknown Client', image: request?.clientPhoto };
-    }
-  };
+    const messagesEndRef = useRef(null);
+    const searchTimeoutRef = useRef(null);
 
-  const handleSendMessage = (chatId) => {
-    if (!newMessage.trim()) return;
-    const updatedMessages = chatMessages.map(chat => 
-      chat[role === 'Client' ? 'guideId' : 'clientId'] === chatId
-        ? {
-            ...chat,
-            messages: [
-              ...chat.messages,
-              {
-                id: `msg_${Date.now()}`,
-                sender: role,
-                text: newMessage,
-                timestamp: new Date().toISOString(),
-                status: 'sent'
-              }
-            ],
-            unreadCount: role === 'Client' ? chat.unreadCount : chat.unreadCount + 1
-          }
-        : chat
-    );
-    setChatMessages(updatedMessages);
-    setNewMessage('');
-  };
+    useEffect(() => {
+        if (isOpen) {
+            initializeChat();
+        }
+    }, [isOpen]);
 
-  return (
-    <div className="chat-widget">
-      <div className="chat-widget-header">
-        <h3>Chat</h3>
-        <button onClick={onClose}><FiX size={20} /></button>
-      </div>
-      <div className="chat-widget-body">
-        <div className="chat-widget-contacts">
-          {chatMessages.map(chat => {
-            const partner = getChatPartner(chat);
-            return (
-              <div
-                key={partner.id}
-                className={`chat-contact ${activeChatId === partner.id ? 'active' : ''}`}
-                onClick={() => setActiveChatId(partner.id)}
-              >
-                <img src={partner.image} alt={partner.name} className="chat-contact-avatar" />
-                <div>
-                  <span>{partner.name}</span>
-                  <small>{chat.lastMessage}</small>
-                  {chat.unreadCount > 0 && <span className="chat-unread-count">{chat.unreadCount}</span>}
+    useEffect(() => {
+        if (selectedUserId && isOpen) {
+            startConversationWithUser(selectedUserId);
+        }
+    }, [selectedUserId, isOpen]);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const initializeChat = async () => {
+        try {
+            setLoading(true);
+
+            // Load current user
+            const userData = await getCurrentUser();
+            setCurrentUser(userData);
+
+            // Load conversations and unread count
+            await Promise.all([
+                loadConversations(),
+                loadUnreadCount()
+            ]);
+
+        } catch (err) {
+            console.error('Error initializing chat:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const loadConversations = async () => {
+        try {
+            const data = await getConversations();
+            setConversations(data.results || data);
+        } catch (err) {
+            console.error('Error loading conversations:', err);
+        }
+    };
+
+    const loadMessages = async (conversationId) => {
+        try {
+            const data = await getChatMessages(conversationId);
+            setMessages(data.results || data);
+
+            // Mark messages as read
+            await markMessagesAsRead(conversationId);
+            loadUnreadCount();
+        } catch (err) {
+            console.error('Error loading messages:', err);
+        }
+    };
+
+    const loadUnreadCount = async () => {
+        try {
+            const data = await getUnreadCount();
+            setUnreadCount(data.total_unread || 0);
+        } catch (err) {
+            console.error('Error loading unread count:', err);
+        }
+    };
+
+    const loadBlockedUsers = async () => {
+        try {
+            const data = await getBlockedUsers();
+            setBlockedUsers(data.results || data);
+        } catch (err) {
+            console.error('Error loading blocked users:', err);
+        }
+    };
+
+    const handleSendMessage = async (e) => {
+        e.preventDefault();
+        if (!newMessage.trim() || !activeConversation) return;
+
+        try {
+            const messageData = {
+                conversation: activeConversation.id,
+                content: newMessage.trim()
+            };
+
+            const sentMessage = await sendMessage(messageData);
+            setMessages(prev => [sentMessage, ...prev]);
+            setNewMessage('');
+
+            // Update conversation list
+            loadConversations();
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleConversationSelect = async (conversation) => {
+        setActiveConversation(conversation);
+        setChatView('chat');
+        await loadMessages(conversation.id);
+    };
+
+    const handleUserSearch = async (query) => {
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        searchTimeoutRef.current = setTimeout(async () => {
+            if (query.length >= 2) {
+                try {
+                    const data = await searchUsers(query);
+                    setSearchResults(data.results || []);
+                } catch (err) {
+                    console.error('Error searching users:', err);
+                }
+            } else {
+                setSearchResults([]);
+            }
+        }, 300);
+    };
+
+    const startConversationWithUser = async (userEmail) => {
+        try {
+            const conversationData = await createConversation({
+                user_email: userEmail,
+                message: ''
+            });
+
+            // Find or add the conversation to the list
+            const existingConv = conversations.find(c => c.id === conversationData.id);
+            if (!existingConv) {
+                setConversations(prev => [conversationData, ...prev]);
+            }
+
+            setActiveConversation(conversationData);
+            setChatView('chat');
+            await loadMessages(conversationData.id);
+
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleBlockUser = async (userEmail) => {
+        try {
+            await blockUser({ user_email: userEmail });
+            setError('User blocked successfully');
+            loadConversations();
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleUnblockUser = async (userId) => {
+        try {
+            await unblockUser(userId);
+            loadBlockedUsers();
+            setError('User unblocked successfully');
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleMessageAction = async (messageId, action) => {
+        try {
+            await messageAction(messageId, action);
+            // Reload messages to reflect changes
+            if (activeConversation) {
+                await loadMessages(activeConversation.id);
+            }
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const formatTime = (dateString) => {
+        return new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString();
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="chat-widgets-container">
+            <div className="chat-widgets-overlay" onClick={onClose}></div>
+
+            <div className="chat-widgets-main">
+                <div className="chat-widgets-header">
+                    <h3 className="chat-widgets-title">
+                        {chatView === 'conversations' && 'Messages'}
+                        {chatView === 'chat' && activeConversation && activeConversation.other_user?.full_name}
+                        {chatView === 'search' && 'Find Users'}
+                        {chatView === 'blocked' && 'Blocked Users'}
+                    </h3>
+
+                    <div className="chat-widgets-header-actions">
+                        {chatView !== 'conversations' && (
+                            <button
+                                className="chat-widgets-back-btn"
+                                onClick={() => {
+                                    setChatView('conversations');
+                                    setActiveConversation(null);
+                                    setShowUserSearch(false);
+                                    setShowBlockedUsers(false);
+                                }}
+                            >
+                                ← Back
+                            </button>
+                        )}
+
+                        {chatView === 'conversations' && (
+                            <>
+                                <button
+                                    className="chat-widgets-action-btn"
+                                    onClick={() => {
+                                        setChatView('search');
+                                        setShowUserSearch(true);
+                                    }}
+                                >
+                                    + New
+                                </button>
+                                <button
+                                    className="chat-widgets-action-btn"
+                                    onClick={() => {
+                                        setChatView('blocked');
+                                        setShowBlockedUsers(true);
+                                        loadBlockedUsers();
+                                    }}
+                                >
+                                    Blocked
+                                </button>
+                            </>
+                        )}
+
+                        <button className="chat-widgets-close-btn" onClick={onClose}>×</button>
+                    </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-        {activeChatId && (
-          <div className="chat-widget-messages">
-            {chatMessages.find(chat => chat[role === 'Client' ? 'guideId' : 'clientId'] === activeChatId)?.messages.map(msg => (
-              <div
-                key={msg.id}
-                className={`chat-message ${msg.sender === role ? 'sent' : 'received'}`}
-              >
-                <p>{msg.text}</p>
-                <small>{new Date(msg.timestamp).toLocaleTimeString('uz-UZ')}</small>
-              </div>
-            ))}
-            <div className="chat-input">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={e => setNewMessage(e.target.value)}
-                placeholder="Xabar yozing..."
-              />
-              <button onClick={() => handleSendMessage(activeChatId)}><FiSend /></button>
+
+                {error && (
+                    <div className="chat-widgets-error">
+                        <p>{error}</p>
+                        <button onClick={() => setError(null)} className="chat-widgets-error-close">×</button>
+                    </div>
+                )}
+
+                <div className="chat-widgets-content">
+                    {/* Conversations List View */}
+                    {chatView === 'conversations' && (
+                        <div className="chat-widgets-conversations">
+                            {loading ? (
+                                <div className="chat-widgets-loading">Loading conversations...</div>
+                            ) : conversations.length === 0 ? (
+                                <div className="chat-widgets-empty">
+                                    <p>No conversations yet</p>
+                                    <button
+                                        className="chat-widgets-btn chat-widgets-btn-primary"
+                                        onClick={() => {
+                                            setChatView('search');
+                                            setShowUserSearch(true);
+                                        }}
+                                    >
+                                        Start a conversation
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="chat-widgets-conversations-list">
+                                    {conversations.map(conversation => (
+                                        <div
+                                            key={conversation.id}
+                                            className="chat-widgets-conversation-item"
+                                            onClick={() => handleConversationSelect(conversation)}
+                                        >
+                                            <div className="chat-widgets-conversation-avatar">
+                                                {conversation.other_user?.avatar ? (
+                                                    <img
+                                                        src={conversation.other_user.avatar}
+                                                        alt={conversation.other_user.full_name}
+                                                        className="chat-widgets-avatar-image"
+                                                    />
+                                                ) : (
+                                                    <div className="chat-widgets-avatar-placeholder">
+                                                        {conversation.other_user?.full_name?.charAt(0) || 'U'}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="chat-widgets-conversation-info">
+                                                <div className="chat-widgets-conversation-header">
+                                                    <h4 className="chat-widgets-conversation-name">
+                                                        {conversation.other_user?.full_name || 'Unknown User'}
+                                                    </h4>
+                                                    <span className="chat-widgets-conversation-time">
+                            {formatTime(conversation.updated_at)}
+                          </span>
+                                                </div>
+
+                                                <div className="chat-widgets-conversation-preview">
+                                                    <p className="chat-widgets-last-message">
+                                                        {conversation.last_message?.content || 'No messages yet'}
+                                                    </p>
+                                                    {conversation.unread_count > 0 && (
+                                                        <span className="chat-widgets-unread-badge">
+                              {conversation.unread_count}
+                            </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Chat Messages View */}
+                    {chatView === 'chat' && activeConversation && (
+                        <div className="chat-widgets-chat">
+                            <div className="chat-widgets-messages">
+                                <div className="chat-widgets-messages-list">
+                                    {messages.map(message => (
+                                        <div
+                                            key={message.id}
+                                            className={`chat-widgets-message ${message.is_mine ? 'chat-widgets-message-mine' : 'chat-widgets-message-other'}`}
+                                        >
+                                            <div className="chat-widgets-message-content">
+                                                {message.delete_status !== 'visible' ? (
+                                                    <span className="chat-widgets-message-deleted">
+                            {message.delete_status === 'deleted_sender' ? 'You deleted this message' : 'This message was deleted'}
+                          </span>
+                                                ) : (
+                                                    <p className="chat-widgets-message-text">{message.content}</p>
+                                                )}
+
+                                                <div className="chat-widgets-message-meta">
+                          <span className="chat-widgets-message-time">
+                            {formatTime(message.created_at)}
+                          </span>
+                                                    {message.is_mine && (
+                                                        <div className="chat-widgets-message-actions">
+                                                            {message.delete_status === 'visible' && (
+                                                                <>
+                                                                    <button
+                                                                        className="chat-widgets-message-action"
+                                                                        onClick={() => handleMessageAction(message.id, 'delete_sender')}
+                                                                    >
+                                                                        Delete for me
+                                                                    </button>
+                                                                    <button
+                                                                        className="chat-widgets-message-action"
+                                                                        onClick={() => handleMessageAction(message.id, 'delete_both')}
+                                                                    >
+                                                                        Delete for everyone
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                            {message.can_recover && (
+                                                                <button
+                                                                    className="chat-widgets-message-action"
+                                                                    onClick={() => handleMessageAction(message.id, 'recover')}
+                                                                >
+                                                                    Recover
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <div ref={messagesEndRef} />
+                                </div>
+                            </div>
+
+                            <form onSubmit={handleSendMessage} className="chat-widgets-input-form">
+                                <div className="chat-widgets-input-container">
+                                    <input
+                                        type="text"
+                                        className="chat-widgets-input"
+                                        placeholder="Type a message..."
+                                        value={newMessage}
+                                        onChange={(e) => setNewMessage(e.target.value)}
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="chat-widgets-send-btn"
+                                        disabled={!newMessage.trim()}
+                                    >
+                                        Send
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div className="chat-widgets-chat-actions">
+                                <button
+                                    className="chat-widgets-action-btn chat-widgets-block-btn"
+                                    onClick={() => {
+                                        if (activeConversation?.other_user?.email) {
+                                            handleBlockUser(activeConversation.other_user.email);
+                                        }
+                                    }}
+                                >
+                                    Block User
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* User Search View */}
+                    {chatView === 'search' && (
+                        <div className="chat-widgets-search">
+                            <div className="chat-widgets-search-input">
+                                <input
+                                    type="text"
+                                    className="chat-widgets-input"
+                                    placeholder="Search users by name or email..."
+                                    value={searchQuery}
+                                    onChange={(e) => {
+                                        setSearchQuery(e.target.value);
+                                        handleUserSearch(e.target.value);
+                                    }}
+                                />
+                            </div>
+
+                            <div className="chat-widgets-search-results">
+                                {searchQuery.length < 2 ? (
+                                    <p className="chat-widgets-search-hint">Enter at least 2 characters to search</p>
+                                ) : searchResults.length === 0 ? (
+                                    <p className="chat-widgets-no-results">No users found</p>
+                                ) : (
+                                    <div className="chat-widgets-users-list">
+                                        {searchResults.map(user => (
+                                            <div
+                                                key={user.id}
+                                                className="chat-widgets-user-item"
+                                                onClick={() => startConversationWithUser(user.email)}
+                                            >
+                                                <div className="chat-widgets-user-avatar">
+                                                    {user.avatar_url ? (
+                                                        <img
+                                                            src={user.avatar_url}
+                                                            alt={user.full_name}
+                                                            className="chat-widgets-avatar-image"
+                                                        />
+                                                    ) : (
+                                                        <div className="chat-widgets-avatar-placeholder">
+                                                            {user.full_name?.charAt(0) || 'U'}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="chat-widgets-user-info">
+                                                    <h4 className="chat-widgets-user-name">{user.full_name}</h4>
+                                                    <p className="chat-widgets-user-email">{user.email}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Blocked Users View */}
+                    {chatView === 'blocked' && (
+                        <div className="chat-widgets-blocked">
+                            {blockedUsers.length === 0 ? (
+                                <p className="chat-widgets-no-blocked">No blocked users</p>
+                            ) : (
+                                <div className="chat-widgets-blocked-list">
+                                    {blockedUsers.map(blockedUser => (
+                                        <div key={blockedUser.id} className="chat-widgets-blocked-item">
+                                            <div className="chat-widgets-blocked-user-info">
+                                                <div className="chat-widgets-user-avatar">
+                                                    {blockedUser.blocked_user?.avatar_url ? (
+                                                        <img
+                                                            src={blockedUser.blocked_user.avatar_url}
+                                                            alt={blockedUser.blocked_user.full_name}
+                                                            className="chat-widgets-avatar-image"
+                                                        />
+                                                    ) : (
+                                                        <div className="chat-widgets-avatar-placeholder">
+                                                            {blockedUser.blocked_user?.full_name?.charAt(0) || 'U'}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="chat-widgets-user-info">
+                                                    <h4 className="chat-widgets-user-name">
+                                                        {blockedUser.blocked_user?.full_name}
+                                                    </h4>
+                                                    <p className="chat-widgets-user-email">
+                                                        {blockedUser.blocked_user?.email}
+                                                    </p>
+                                                    <span className="chat-widgets-blocked-date">
+                            Blocked on {formatDate(blockedUser.created_at)}
+                          </span>
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                className="chat-widgets-btn chat-widgets-btn-unblock"
+                                                onClick={() => handleUnblockUser(blockedUser.blocked_user.id)}
+                                            >
+                                                Unblock
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* Unread Count Badge */}
+                {unreadCount > 0 && chatView === 'conversations' && (
+                    <div className="chat-widgets-unread-total">
+                        Total unread: {unreadCount}
+                    </div>
+                )}
             </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+        </div>
+    );
 };
 
 export default ChatWidgets;

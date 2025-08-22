@@ -225,11 +225,6 @@ export const updateCustomerProfile = (payload) => {
     return api.patch("profiles/customers/my/", payload).then((r) => r.data);
 };
 
-export const updateUserProfile = (payload) => {
-    console.log("Updating user profile:", payload);
-    return api.patch("profiles/customers/my/", payload).then((r) => r.data);
-};
-
 export const getCustomerProfiles = (params = {}) =>
     api.get("profiles/customers/", { params }).then((r) => r.data);
 
@@ -386,58 +381,59 @@ export const getLanguageById = (id) =>
 // ─── Booking APIs ──────────────────────────────────────────────────
 export const getMyBookings = (status = null) => {
     const params = status ? { status } : {};
-    return api.get("bookings/", { params }).then((r) => r.data);
+    console.log("Getting my bookings...", params);
+    return api.get("bookings/bookings/", { params }).then((r) => r.data);
 };
 
-export const getGuideBookings = (status = null) => {
-    const params = status ? { status } : {};
-    return api.get("bookings/", { params }).then((r) => r.data);
+export const createBooking = (payload) => {
+    console.log("Creating booking:", payload);
+    return api.post("bookings/bookings/", payload).then((r) => r.data);
 };
 
-export const getClientBookings = (status = null) => {
-    const params = status ? { status } : {};
-    return api.get("bookings/", { params }).then((r) => r.data);
+export const updateBookingStatus = (id, status, data = {}) => {
+    console.log("Updating booking status:", id, status);
+    return api.patch(`bookings/bookings/${id}/`, { status, ...data }).then((r) => r.data);
 };
-
-export const createBooking = (payload) =>
-    api.post("bookings/", payload).then((r) => r.data);
-
-export const updateBookingStatus = (id, status, data = {}) =>
-    api.patch(`bookings/${id}/`, { status, ...data }).then((r) => r.data);
 
 export const getBookingById = (id) =>
-    api.get(`bookings/${id}/`).then((r) => r.data);
+    api.get(`bookings/bookings/${id}/`).then((r) => r.data);
 
-export const cancelBooking = (id, reason = "") =>
-    api.patch(`bookings/${id}/`, { status: "cancelled", cancellation_reason: reason }).then((r) => r.data);
+export const cancelBooking = (id, reason = "") => {
+    console.log("Canceling booking:", id, reason);
+    return api.patch(`bookings/bookings/${id}/`, {
+        status: "cancelled",
+        cancellation_reason: reason
+    }).then((r) => r.data);
+};
 
-export const acceptBooking = (id) =>
-    api.post(`bookings/${id}/accept/`).then((r) => r.data);
+export const acceptBooking = (id) => {
+    console.log("Accepting booking:", id);
+    return api.post(`bookings/bookings/${id}/accept/`).then((r) => r.data);
+};
 
 export const getBookings = (params = {}) =>
-    api.get("bookings/", { params }).then((r) => r.data);
+    api.get("bookings/bookings/", { params }).then((r) => r.data);
 
 // ─── Reviews APIs ──────────────────────────────────────────────────
-export const getMyReviews = () =>
-    api.get("reviews/reviews/").then((r) => r.data);
+export const getMyReviews = () => {
+    console.log("Getting my reviews...");
+    return api.get("reviews/my/").then((r) => r.data);
+};
 
-export const getGuideReviews = () =>
-    api.get("reviews/reviews/").then((r) => r.data);
+export const createReview = (payload) => {
+    console.log("Creating review:", payload);
+    return api.post("reviews/reviews/", payload).then((r) => r.data);
+};
 
-export const getClientReviews = () =>
-    api.get("reviews/reviews/").then((r) => r.data);
+export const updateReview = (id, payload) => {
+    console.log("Updating review:", id);
+    return api.patch(`reviews/reviews/${id}/`, payload).then((r) => r.data);
+};
 
-export const createReview = (payload) =>
-    api.post("reviews/reviews/", payload).then((r) => r.data);
-
-export const updateReview = (id, payload) =>
-    api.patch(`reviews/reviews/${id}/`, payload).then((r) => r.data);
-
-export const deleteReview = (id) =>
-    api.delete(`reviews/reviews/${id}/`).then((r) => r.data);
-
-export const getGuideStats = () =>
-    api.get("reviews/reviews/stats/").then((r) => r.data);
+export const deleteReview = (id) => {
+    console.log("Deleting review:", id);
+    return api.delete(`reviews/reviews/${id}/`).then((r) => r.data);
+};
 
 export const getReviews = (params = {}) =>
     api.get("reviews/reviews/", { params }).then((r) => r.data);
@@ -445,45 +441,65 @@ export const getReviews = (params = {}) =>
 export const getReviewById = (id) =>
     api.get(`reviews/reviews/${id}/`).then((r) => r.data);
 
-export const markReviewHelpful = (id) =>
-    api.post(`reviews/reviews/${id}/helpful/`).then((r) => r.data);
+export const reactToReview = (id, reactionType, comment = "") => {
+    console.log("Reacting to review:", id, reactionType);
+    return api.post(`reviews/reviews/${id}/react/`, {
+        reaction_type: reactionType,
+        comment: comment
+    }).then((r) => r.data);
+};
+
+export const removeReactionFromReview = (id) => {
+    console.log("Removing reaction from review:", id);
+    return api.delete(`reviews/reviews/${id}/react/`).then((r) => r.data);
+};
+
+export const getReviewReactions = (id, type = null) => {
+    const params = type ? { type } : {};
+    return api.get(`reviews/reviews/${id}/reactions/`, { params }).then((r) => r.data);
+};
+
+export const getReviewSummary = (id) =>
+    api.get(`reviews/reviews/${id}/reactions/summary/`).then((r) => r.data);
 
 // ─── Chat APIs ─────────────────────────────────────────────────────
-export const getConversations = () =>
-    api.get("chat/conversations/").then((r) => r.data);
+export const getConversations = () => {
+    console.log("Getting conversations...");
+    return api.get("chat/conversations/").then((r) => r.data);
+};
 
-export const getGuideChats = () =>
-    api.get("chat/conversations/").then((r) => r.data);
+export const getChatMessages = (conversationId, params = {}) => {
+    console.log("Getting chat messages for conversation:", conversationId);
+    return api.get(`chat/conversations/${conversationId}/messages/`, { params }).then((r) => r.data);
+};
 
-export const getClientChats = () =>
-    api.get("chat/conversations/").then((r) => r.data);
+export const sendMessage = (payload) => {
+    console.log("Sending message:", payload);
+    return api.post("chat/messages/send/", payload).then((r) => r.data);
+};
 
-export const getChatMessages = (conversationId, params = {}) =>
-    api.get(`chat/conversations/${conversationId}/messages/`, { params }).then((r) => r.data);
+export const markMessagesAsRead = (conversationId) => {
+    console.log("Marking messages as read:", conversationId);
+    return api.post(`chat/conversations/${conversationId}/mark-read/`).then((r) => r.data);
+};
 
-export const sendMessage = (payload) =>
-    api.post("chat/messages/send/", payload).then((r) => r.data);
-
-export const markMessagesAsRead = (conversationId) =>
-    api.post(`chat/conversations/${conversationId}/mark-read/`).then((r) => r.data);
-
-export const createConversation = (payload) =>
-    api.post("chat/conversations/", payload).then((r) => r.data);
+export const createConversation = (payload) => {
+    console.log("Creating conversation:", payload);
+    return api.post("chat/conversations/", payload).then((r) => r.data);
+};
 
 export const getConversationById = (id) =>
     api.get(`chat/conversations/${id}/`).then((r) => r.data);
 
-export const updateConversation = (id, payload) =>
-    api.patch(`chat/conversations/${id}/`, payload).then((r) => r.data);
+export const blockUser = (payload) => {
+    console.log("Blocking user:", payload);
+    return api.post("chat/block/", payload).then((r) => r.data);
+};
 
-export const deleteConversation = (id) =>
-    api.delete(`chat/conversations/${id}/`).then((r) => r.data);
-
-export const blockUser = (payload) =>
-    api.post("chat/block/", payload).then((r) => r.data);
-
-export const unblockUser = (userId) =>
-    api.delete(`chat/unblock/${userId}/`).then((r) => r.data);
+export const unblockUser = (userId) => {
+    console.log("Unblocking user:", userId);
+    return api.delete(`chat/unblock/${userId}/`).then((r) => r.data);
+};
 
 export const getBlockedUsers = () =>
     api.get("chat/blocked/").then((r) => r.data);
@@ -491,79 +507,15 @@ export const getBlockedUsers = () =>
 export const getUnreadCount = () =>
     api.get("chat/unread-count/").then((r) => r.data);
 
-export const searchUsers = (query) =>
-    api.get("chat/users/search/", { params: { q: query } }).then((r) => r.data);
-
-export const messageAction = (messageId, action) =>
-    api.post(`chat/messages/${messageId}/action/`, { action }).then((r) => r.data);
-
-// ─── Notification APIs ─────────────────────────────────────────────
-export const getNotifications = (params = {}) =>
-    api.get("notifications/list/", { params }).then((r) => r.data);
-
-export const markNotificationAsRead = (id) =>
-    api.post(`notifications/list/${id}/mark_read/`).then((r) => r.data);
-
-export const markAllNotificationsAsRead = () =>
-    api.post("notifications/list/mark_all_read/").then((r) => r.data);
-
-export const deleteNotification = (id) =>
-    api.delete(`notifications/list/${id}/`).then((r) => r.data);
-
-export const getUnreadNotificationsCount = () =>
-    api.get("notifications/list/unread_count/").then((r) => r.data);
-
-export const getNotificationSettings = () =>
-    api.get("notifications/settings/").then((r) => r.data);
-
-export const updateNotificationSettings = (payload) =>
-    api.patch("notifications/settings/", payload).then((r) => r.data);
-
-export const getNotificationTypes = () =>
-    api.get("notifications/types/").then((r) => r.data);
-
-// ─── Disputes APIs ─────────────────────────────────────────────────
-export const getDisputes = (params = {}) =>
-    api.get("disputes/disputes/", { params }).then((r) => r.data);
-
-export const getDisputeById = (id) =>
-    api.get(`disputes/disputes/${id}/`).then((r) => r.data);
-
-export const createDispute = (payload) =>
-    api.post("disputes/disputes/", payload).then((r) => r.data);
-
-export const updateDispute = (id, payload) =>
-    api.patch(`disputes/disputes/${id}/`, payload).then((r) => r.data);
-
-export const getDisputeActions = (disputeId) =>
-    api.get(`disputes/disputes/${disputeId}/actions/`).then((r) => r.data);
-
-export const assignDispute = (disputeId, adminId) =>
-    api.post(`disputes/disputes/${disputeId}/assign/`, { admin_id: adminId }).then((r) => r.data);
-
-export const changeDisputeStatus = (disputeId, status) =>
-    api.post(`disputes/disputes/${disputeId}/change_status/`, { status }).then((r) => r.data);
-
-export const getDisputeEvidence = (disputeId) =>
-    api.get(`disputes/disputes/${disputeId}/evidence/`).then((r) => r.data);
-
-export const uploadDisputeEvidence = (disputeId, payload) => {
-    const formData = new FormData();
-    Object.keys(payload).forEach(key => {
-        if (payload[key] !== null && payload[key] !== undefined) {
-            formData.append(key, payload[key]);
-        }
-    });
-    return api.post(`disputes/disputes/${disputeId}/evidence/`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-    }).then((r) => r.data);
+export const searchUsers = (query) => {
+    console.log("Searching users:", query);
+    return api.get("chat/users/search/", { params: { q: query } }).then((r) => r.data);
 };
 
-export const getDisputeMessages = (disputeId) =>
-    api.get(`disputes/disputes/${disputeId}/messages/`).then((r) => r.data);
-
-export const sendDisputeMessage = (disputeId, payload) =>
-    api.post(`disputes/disputes/${disputeId}/messages/`, payload).then((r) => r.data);
+export const messageAction = (messageId, action) => {
+    console.log("Message action:", messageId, action);
+    return api.post(`chat/messages/${messageId}/action/`, { action }).then((r) => r.data);
+};
 
 // ─── File Upload Helpers ───────────────────────────────────────────
 export const uploadFile = (file, path = "general") => {

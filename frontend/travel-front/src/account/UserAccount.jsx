@@ -1,50 +1,74 @@
 import React, { useState, useEffect } from 'react';
 import {
-    User,
-    MapPin,
-    Star,
-    Calendar,
-    MessageSquare,
-    Camera,
-    Edit3,
-    Save,
-    X,
-    Clock,
-    CheckCircle,
-    AlertCircle,
-    Eye,
-    TrendingUp,
-    Heart,
-    CreditCard,
-    Settings,
-    Bell
-} from 'lucide-react';
-import * as api from '../api/api';
-import './UserAccount.css'
+    getClientProfile,
+    createClientProfile,
+    updateClientProfile,
+    getMyBookings,
+    createBooking,
+    cancelBooking,
+    getCustomerProfiles,
+    getMyReviews,
+    createReview,
+    getLanguages,
+    getCurrentUser,
+    getServiceTypes
+} from '../api/api';
+import './UserAccount.css';
 
 const UserAccount = () => {
-    // State management
     const [currentUser, setCurrentUser] = useState(null);
-    const [clientProfile, setClientProfile] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const [activeTab, setActiveTab] = useState('profile');
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
-
-    // Form data states
-    const [profileData, setProfileData] = useState({});
+    const [profile, setProfile] = useState(null);
     const [bookings, setBookings] = useState([]);
     const [reviews, setReviews] = useState([]);
-    const [notifications, setNotifications] = useState([]);
-    const [conversations, setConversations] = useState([]);
-
-    // Common data states
-    const [countries, setCountries] = useState([]);
+    const [guides, setGuides] = useState([]);
     const [languages, setLanguages] = useState([]);
+    const [serviceTypes, setServiceTypes] = useState([]);
+    const [activeTab, setActiveTab] = useState('dashboard');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [showProfileForm, setShowProfileForm] = useState(false);
+    const [showBookingForm, setShowBookingForm] = useState(false);
+    const [showReviewForm, setShowReviewForm] = useState(false);
+    const [selectedGuide, setSelectedGuide] = useState(null);
+    const [selectedBookingForReview, setSelectedBookingForReview] = useState(null);
+    const [guidesFilter, setGuidesFilter] = useState({
+        search: '',
+        service_type: '',
+        city: '',
+        min_rating: '',
+        is_available: true
+    });
 
-    // Initialize data on component mount
+    // Profile form state
+    const [profileForm, setProfileForm] = useState({
+        date_of_birth: '',
+        preferred_contact: 'email',
+        languages: []
+    });
+
+    // Booking form state
+    const [bookingForm, setBookingForm] = useState({
+        title: '',
+        description: '',
+        start_date: '',
+        end_date: '',
+        special_requirements: '',
+        budget: '',
+        customer_profile: ''
+    });
+
+    // Review form state
+    const [reviewForm, setReviewForm] = useState({
+        overall_rating: 5,
+        communication_rating: 5,
+        service_rating: 5,
+        punctuality_rating: 5,
+        value_rating: 5,
+        title: '',
+        comment: '',
+        booking_id: ''
+    });
+
     useEffect(() => {
         initializeData();
     }, []);
@@ -53,76 +77,50 @@ const UserAccount = () => {
         try {
             setLoading(true);
 
-            // Get current user info
-            const user = await api.getCurrentUser();
-            setCurrentUser(user);
+            // Load current user
+            const userData = await getCurrentUser();
+            setCurrentUser(userData);
 
             // Load common data
-            await Promise.all([
-                loadCountries(),
-                loadLanguages()
+            const [languagesData, serviceTypesData] = await Promise.all([
+                getLanguages(),
+                getServiceTypes()
             ]);
 
-            // Load client profile
-            await loadClientProfile();
+            setLanguages(languagesData.results || languagesData);
+            setServiceTypes(serviceTypesData.results || serviceTypesData);
 
-            // Load other data based on active tab
-            if (activeTab === 'bookings') {
-                await loadBookings();
-            } else if (activeTab === 'reviews') {
-                await loadReviews();
-            } else if (activeTab === 'messages') {
-                await loadConversations();
-            } else if (activeTab === 'notifications') {
-                await loadNotifications();
+            // Try to load profile
+            try {
+                const profileData = await getClientProfile();
+                setProfile(profileData);
+                setProfileForm({
+                    date_of_birth: profileData.date_of_birth || '',
+                    preferred_contact: profileData.preferred_contact || 'email',
+                    languages: profileData.languages || []
+                });
+            } catch (profileError) {
+                console.log('No profile found, user needs to create one');
+                setShowProfileForm(true);
             }
+
+            // Load other data
+            loadBookings();
+            loadReviews();
+            loadGuides();
 
         } catch (err) {
             console.error('Error initializing data:', err);
-            setError('Ma\'lumotlarni yuklashda xatolik yuz berdi');
+            setError(err.message);
         } finally {
             setLoading(false);
         }
     };
 
-    // Load functions
-    const loadClientProfile = async () => {
-        try {
-            const profile = await api.getClientProfile();
-            setClientProfile(profile);
-            setProfileData(profile || {});
-        } catch (err) {
-            console.error('Error loading client profile:', err);
-            // If no profile exists, show create form
-            if (err.message.includes('404') || err.message.includes('not found')) {
-                setClientProfile(null);
-                setProfileData({});
-            }
-        }
-    };
-
-    const loadCountries = async () => {
-        try {
-            const data = await api.getCountries();
-            setCountries(data.results || data || []);
-        } catch (err) {
-            console.error('Error loading countries:', err);
-        }
-    };
-
-    const loadLanguages = async () => {
-        try {
-            const data = await api.getLanguages();
-            setLanguages(data.results || data || []);
-        } catch (err) {
-            console.error('Error loading languages:', err);
-        }
-    };
-
     const loadBookings = async () => {
         try {
-            const data = await api.getClientBookings();
-            setBookings(data.results || data || []);
+            const data = await getMyBookings();
+            setBookings(data.results || data);
         } catch (err) {
             console.error('Error loading bookings:', err);
         }
@@ -130,978 +128,738 @@ const UserAccount = () => {
 
     const loadReviews = async () => {
         try {
-            const data = await api.getClientReviews();
-            setReviews(data.results || data || []);
+            const data = await getMyReviews();
+            setReviews(data.results || data);
         } catch (err) {
             console.error('Error loading reviews:', err);
         }
     };
 
-    const loadConversations = async () => {
+    const loadGuides = async () => {
         try {
-            const data = await api.getClientChats();
-            setConversations(data.results || data || []);
+            const params = {};
+            if (guidesFilter.search) params.search = guidesFilter.search;
+            if (guidesFilter.service_type) params.service_types = guidesFilter.service_type;
+            if (guidesFilter.city) params.city = guidesFilter.city;
+            if (guidesFilter.min_rating) params.average_rating__gte = guidesFilter.min_rating;
+            if (guidesFilter.is_available) params.is_available = guidesFilter.is_available;
+
+            const data = await getCustomerProfiles(params);
+            setGuides(data.results || data);
         } catch (err) {
-            console.error('Error loading conversations:', err);
+            console.error('Error loading guides:', err);
         }
     };
 
-    const loadNotifications = async () => {
+    const handleProfileSubmit = async (e) => {
+        e.preventDefault();
         try {
-            const data = await api.getNotifications();
-            setNotifications(data.results || data || []);
-        } catch (err) {
-            console.error('Error loading notifications:', err);
-        }
-    };
-
-    // Profile management functions
-    const handleProfileSave = async () => {
-        try {
-            setSaving(true);
-            setError('');
-            setSuccess('');
-
-            if (clientProfile) {
-                // Update existing profile
-                await api.updateClientProfile(profileData);
-                setSuccess('Profil muvaffaqiyatli yangilandi!');
+            let result;
+            if (profile) {
+                result = await updateClientProfile(profileForm);
             } else {
-                // Create new profile
-                await api.createClientProfile(profileData);
-                setSuccess('Profil muvaffaqiyatli yaratildi!');
+                result = await createClientProfile(profileForm);
             }
-
-            await loadClientProfile();
-            setIsEditing(false);
+            setProfile(result);
+            setShowProfileForm(false);
+            setError(null);
         } catch (err) {
-            console.error('Error saving profile:', err);
-            setError(err.message || 'Profilni saqlashda xatolik yuz berdi');
-        } finally {
-            setSaving(false);
+            setError(err.message);
         }
     };
 
-    // Booking management functions
-    const handleBookingCancel = async (bookingId, reason = '') => {
-        if (!window.confirm('Bu bookingni bekor qilishni xohlaysizmi?')) return;
-
+    const handleBookingSubmit = async (e) => {
+        e.preventDefault();
         try {
-            setSaving(true);
-            await api.cancelBooking(bookingId, reason);
-            setSuccess('Booking bekor qilindi!');
-            await loadBookings();
+            await createBooking({
+                ...bookingForm,
+                customer_profile: selectedGuide.id
+            });
+            loadBookings();
+            setShowBookingForm(false);
+            setSelectedGuide(null);
+            setBookingForm({
+                title: '',
+                description: '',
+                start_date: '',
+                end_date: '',
+                special_requirements: '',
+                budget: '',
+                customer_profile: ''
+            });
+            setError(null);
         } catch (err) {
-            console.error('Error canceling booking:', err);
-            setError(err.message || 'Bookingni bekor qilishda xatolik');
-        } finally {
-            setSaving(false);
+            setError(err.message);
         }
     };
 
-    // Review management functions
-    const handleReviewSubmit = async (bookingId, reviewData) => {
+    const handleReviewSubmit = async (e) => {
+        e.preventDefault();
         try {
-            setSaving(true);
-            await api.createReview({ ...reviewData, booking: bookingId });
-            setSuccess('Review muvaffaqiyatli yuborildi!');
-            await loadReviews();
-            await loadBookings();
+            await createReview({
+                ...reviewForm,
+                booking_id: selectedBookingForReview.id
+            });
+            loadReviews();
+            setShowReviewForm(false);
+            setSelectedBookingForReview(null);
+            setReviewForm({
+                overall_rating: 5,
+                communication_rating: 5,
+                service_rating: 5,
+                punctuality_rating: 5,
+                value_rating: 5,
+                title: '',
+                comment: '',
+                booking_id: ''
+            });
+            setError(null);
         } catch (err) {
-            console.error('Error submitting review:', err);
-            setError(err.message || 'Review yuborishda xatolik');
-        } finally {
-            setSaving(false);
+            setError(err.message);
         }
     };
 
-    // Tab change handler
-    const handleTabChange = async (tab) => {
-        setActiveTab(tab);
-        setError('');
-        setSuccess('');
-
-        // Load data for the selected tab
-        if (tab === 'bookings') {
-            await loadBookings();
-        } else if (tab === 'reviews') {
-            await loadReviews();
-        } else if (tab === 'messages') {
-            await loadConversations();
-        } else if (tab === 'notifications') {
-            await loadNotifications();
+    const handleCancelBooking = async (bookingId) => {
+        try {
+            await cancelBooking(bookingId, 'Client cancelled the booking');
+            loadBookings();
+        } catch (err) {
+            setError(err.message);
         }
     };
 
-    // Utility functions
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('uz-UZ');
+    const handleBookGuide = (guide) => {
+        setSelectedGuide(guide);
+        setShowBookingForm(true);
     };
 
-    const formatCurrency = (amount, currency = 'USD') => {
-        return new Intl.NumberFormat('uz-UZ', {
-            style: 'currency',
-            currency: currency
-        }).format(amount);
+    const handleWriteReview = (booking) => {
+        setSelectedBookingForReview(booking);
+        setShowReviewForm(true);
     };
 
-    const renderStars = (rating) => {
-        return Array.from({ length: 5 }, (_, i) => (
-            <Star
-                key={i}
-                className={`user-account-w-4 user-account-h-4 ${i < rating ? 'user-account-fill-yellow-400 user-account-text-yellow-400' : 'user-account-text-gray-300'}`}
-            />
-        ));
+    const handleFilterChange = (key, value) => {
+        setGuidesFilter({ ...guidesFilter, [key]: value });
     };
 
-    // Main render function
+    useEffect(() => {
+        loadGuides();
+    }, [guidesFilter]);
+
     if (loading) {
         return (
-            <div className="user-account-min-h-screen user-account-bg-gray-50 user-account-flex user-account-items-center user-account-justify-center">
-                <div className="user-account-text-center">
-                    <div className="user-account-animate-spin user-account-rounded-full user-account-h-12 user-account-w-12 user-account-border-b-2 user-account-border-blue-600 user-account-mx-auto"></div>
-                    <p className="user-account-mt-4 user-account-text-gray-600">Ma'lumotlar yuklanmoqda...</p>
-                </div>
+            <div className="user-account-loading">
+                <div className="user-account-spinner"></div>
+                <p>Loading...</p>
             </div>
         );
     }
 
     return (
-        <div className="user-account-min-h-screen user-account-bg-gray-50">
-            {/* Header */}
-            <div className="user-account-bg-white user-account-shadow-sm user-account-border-b">
-                <div className="user-account-max-w-7xl user-account-mx-auto user-account-px-4 user-account-sm:px-6 user-account-lg:px-8">
-                    <div className="user-account-flex user-account-justify-between user-account-items-center user-account-py-6">
-                        <div className="user-account-flex user-account-items-center user-account-space-x-4">
-                            <div className="user-account-relative">
-                                <div className="user-account-w-16 user-account-h-16 user-account-bg-blue-600 user-account-rounded-full user-account-flex user-account-items-center user-account-justify-center user-account-text-white user-account-text-xl user-account-font-bold">
-                                    {currentUser?.avatar ? (
-                                        <img
-                                            src={currentUser.avatar}
-                                            alt="Avatar"
-                                            className="user-account-w-16 user-account-h-16 user-account-rounded-full user-account-object-cover"
-                                        />
-                                    ) : (
-                                        currentUser?.full_name?.charAt(0) || 'C'
-                                    )}
-                                </div>
-                                <button className="user-account-absolute user-account--bottom-1 user-account--right-1 user-account-bg-blue-600 user-account-rounded-full user-account-p-1 user-account-text-white user-account-hover:bg-blue-700">
-                                    <Camera className="user-account-w-3 user-account-h-3" />
-                                </button>
-                            </div>
-                            <div>
-                                <h1 className="user-account-text-2xl user-account-font-bold user-account-text-gray-900">
-                                    {currentUser?.full_name || 'Client Account'}
-                                </h1>
-                                <p className="user-account-text-gray-600">{currentUser?.email}</p>
-                                <div className="user-account-flex user-account-items-center user-account-mt-1 user-account-space-x-4">
-                                    <div className="user-account-flex user-account-items-center user-account-space-x-1 user-account-text-sm user-account-text-gray-600">
-                                        <MapPin className="user-account-w-4 user-account-h-4" />
-                                        <span>{currentUser?.country_name || 'Location not set'}</span>
-                                    </div>
-                                    <div className="user-account-flex user-account-items-center user-account-space-x-1 user-account-text-green-600">
-                                        <CheckCircle className="user-account-w-4 user-account-h-4" />
-                                        <span className="user-account-text-sm">Verified Client</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <div className="user-account-container">
+            <div className="user-account-header">
+                <h1 className="user-account-title">My Account</h1>
+                {currentUser && (
+                    <div className="user-account-user-info">
+                        <span className="user-account-welcome">Welcome, {currentUser.full_name}</span>
                     </div>
-                </div>
+                )}
             </div>
 
-            {/* Error/Success Messages */}
             {error && (
-                <div className="user-account-max-w-7xl user-account-mx-auto user-account-px-4 user-account-sm:px-6 user-account-lg:px-8 user-account-mt-4">
-                    <div className="user-account-bg-red-50 user-account-border user-account-border-red-200 user-account-text-red-700 user-account-px-4 user-account-py-3 user-account-rounded-md user-account-flex user-account-items-center">
-                        <AlertCircle className="user-account-w-5 user-account-h-5 user-account-mr-2" />
-                        {error}
-                    </div>
+                <div className="user-account-error">
+                    <p>{error}</p>
+                    <button onClick={() => setError(null)} className="user-account-error-close">×</button>
                 </div>
             )}
 
-            {success && (
-                <div className="user-account-max-w-7xl user-account-mx-auto user-account-px-4 user-account-sm:px-6 user-account-lg:px-8 user-account-mt-4">
-                    <div className="user-account-bg-green-50 user-account-border user-account-border-green-200 user-account-text-green-700 user-account-px-4 user-account-py-3 user-account-rounded-md user-account-flex user-account-items-center">
-                        <CheckCircle className="user-account-w-5 user-account-h-5 user-account-mr-2" />
-                        {success}
-                    </div>
-                </div>
-            )}
-
-            {/* Navigation Tabs */}
-            <div className="user-account-bg-white user-account-border-b">
-                <div className="user-account-max-w-7xl user-account-mx-auto user-account-px-4 user-account-sm:px-6 user-account-lg:px-8">
-                    <nav className="user-account-flex user-account-space-x-8">
-                        {[
-                            { id: 'profile', label: 'Profile', icon: User },
-                            { id: 'bookings', label: 'My Bookings', icon: Calendar },
-                            { id: 'reviews', label: 'My Reviews', icon: Star },
-                            { id: 'messages', label: 'Messages', icon: MessageSquare },
-                            { id: 'notifications', label: 'Notifications', icon: Bell }
-                        ].map((tab) => (
-                            <button
-                                key={tab.id}
-                                onClick={() => handleTabChange(tab.id)}
-                                className={`user-account-py-4 user-account-px-1 user-account-border-b-2 user-account-font-medium user-account-text-sm user-account-flex user-account-items-center user-account-space-x-2 ${
-                                    activeTab === tab.id
-                                        ? 'user-account-border-blue-500 user-account-text-blue-600'
-                                        : 'user-account-border-transparent user-account-text-gray-500 user-account-hover:text-gray-700 user-account-hover:border-gray-300'
-                                }`}
-                            >
-                                <tab.icon className="user-account-w-4 user-account-h-4" />
-                                <span>{tab.label}</span>
-                            </button>
-                        ))}
-                    </nav>
-                </div>
-            </div>
-
-            {/* Main Content */}
-            <div className="user-account-max-w-7xl user-account-mx-auto user-account-px-4 user-account-sm:px-6 user-account-lg:px-8 user-account-py-8">
-                {activeTab === 'profile' && (
-                    <ClientProfileSection
-                        clientProfile={clientProfile}
-                        profileData={profileData}
-                        setProfileData={setProfileData}
-                        isEditing={isEditing}
-                        setIsEditing={setIsEditing}
-                        saving={saving}
-                        onSave={handleProfileSave}
-                        countries={countries}
-                        languages={languages}
-                    />
-                )}
-
-                {activeTab === 'bookings' && (
-                    <BookingsSection
-                        bookings={bookings}
-                        onCancel={handleBookingCancel}
-                        onReview={handleReviewSubmit}
-                        saving={saving}
-                    />
-                )}
-
-                {activeTab === 'reviews' && (
-                    <ReviewsSection
-                        reviews={reviews}
-                        onEdit={async (id, reviewData) => {
-                            try {
-                                await api.updateReview(id, reviewData);
-                                setSuccess('Review yangilandi!');
-                                await loadReviews();
-                            } catch (err) {
-                                setError('Review yangilashda xatolik');
-                            }
-                        }}
-                    />
-                )}
-
-                {activeTab === 'messages' && (
-                    <MessagesSection
-                        conversations={conversations}
-                        onMarkAsRead={async (conversationId) => {
-                            try {
-                                await api.markMessagesAsRead(conversationId);
-                                await loadConversations();
-                            } catch (err) {
-                                setError('Xabarlarni belgilashda xatolik');
-                            }
-                        }}
-                    />
-                )}
-
-                {activeTab === 'notifications' && (
-                    <NotificationsSection
-                        notifications={notifications}
-                        onMarkAsRead={async (id) => {
-                            try {
-                                await api.markNotificationAsRead(id);
-                                await loadNotifications();
-                            } catch (err) {
-                                setError('Bildirishmani belgilashda xatolik');
-                            }
-                        }}
-                        onMarkAllAsRead={async () => {
-                            try {
-                                await api.markAllNotificationsAsRead();
-                                await loadNotifications();
-                                setSuccess('Barcha bildirishmalar o\'qilgan deb belgilandi!');
-                            } catch (err) {
-                                setError('Bildirishmalarni belgilashda xatolik');
-                            }
-                        }}
-                    />
-                )}
-            </div>
-        </div>
-    );
-};
-
-// Client Profile Section Component
-const ClientProfileSection = ({
-                                  clientProfile,
-                                  profileData,
-                                  setProfileData,
-                                  isEditing,
-                                  setIsEditing,
-                                  saving,
-                                  onSave,
-                                  countries,
-                                  languages
-                              }) => {
-    const handleInputChange = (field, value) => {
-        setProfileData(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
-
-    const handleArrayChange = (field, values) => {
-        setProfileData(prev => ({
-            ...prev,
-            [field]: values
-        }));
-    };
-
-    if (!clientProfile && !isEditing) {
-        return (
-            <div className="user-account-bg-white user-account-rounded-lg user-account-shadow user-account-p-6 user-account-text-center">
-                <User className="user-account-w-16 user-account-h-16 user-account-text-gray-400 user-account-mx-auto user-account-mb-4" />
-                <h3 className="user-account-text-lg user-account-font-medium user-account-text-gray-900 user-account-mb-2">
-                    Client profili mavjud emas
-                </h3>
-                <p className="user-account-text-gray-600 user-account-mb-6">
-                    To'liq imkoniyatlardan foydalanish uchun client profili yarating
-                </p>
+            <div className="user-account-navigation">
                 <button
-                    onClick={() => setIsEditing(true)}
-                    className="user-account-bg-blue-600 user-account-text-white user-account-px-6 user-account-py-2 user-account-rounded-md user-account-hover:bg-blue-700 user-account-transition-colors"
+                    className={`user-account-nav-btn ${activeTab === 'dashboard' ? 'user-account-nav-active' : ''}`}
+                    onClick={() => setActiveTab('dashboard')}
                 >
-                    Profil yaratish
+                    Dashboard
+                </button>
+                <button
+                    className={`user-account-nav-btn ${activeTab === 'profile' ? 'user-account-nav-active' : ''}`}
+                    onClick={() => setActiveTab('profile')}
+                >
+                    Profile
+                </button>
+                <button
+                    className={`user-account-nav-btn ${activeTab === 'guides' ? 'user-account-nav-active' : ''}`}
+                    onClick={() => setActiveTab('guides')}
+                >
+                    Find Guides
+                </button>
+                <button
+                    className={`user-account-nav-btn ${activeTab === 'bookings' ? 'user-account-nav-active' : ''}`}
+                    onClick={() => setActiveTab('bookings')}
+                >
+                    My Bookings
+                </button>
+                <button
+                    className={`user-account-nav-btn ${activeTab === 'reviews' ? 'user-account-nav-active' : ''}`}
+                    onClick={() => setActiveTab('reviews')}
+                >
+                    My Reviews
                 </button>
             </div>
-        );
-    }
 
-    return (
-        <div className="user-account-space-y-6">
-            {/* Profile Information */}
-            <div className="user-account-bg-white user-account-rounded-lg user-account-shadow">
-                <div className="user-account-px-6 user-account-py-4 user-account-border-b user-account-border-gray-200 user-account-flex user-account-justify-between user-account-items-center">
-                    <h2 className="user-account-text-lg user-account-font-medium user-account-text-gray-900">Profile Information</h2>
-                    {!isEditing ? (
-                        <button
-                            onClick={() => setIsEditing(true)}
-                            className="user-account-flex user-account-items-center user-account-space-x-2 user-account-text-blue-600 user-account-hover:text-blue-800"
-                        >
-                            <Edit3 className="user-account-w-4 user-account-h-4" />
-                            <span>Edit</span>
-                        </button>
-                    ) : (
-                        <div className="user-account-flex user-account-space-x-2">
-                            <button
-                                onClick={onSave}
-                                disabled={saving}
-                                className="user-account-flex user-account-items-center user-account-space-x-2 user-account-bg-blue-600 user-account-text-white user-account-px-4 user-account-py-2 user-account-rounded-md user-account-hover:bg-blue-700 user-account-disabled:opacity-50"
-                            >
-                                <Save className="user-account-w-4 user-account-h-4" />
-                                <span>{saving ? 'Saving...' : 'Save'}</span>
-                            </button>
-                            <button
-                                onClick={() => setIsEditing(false)}
-                                className="user-account-flex user-account-items-center user-account-space-x-2 user-account-bg-gray-300 user-account-text-gray-700 user-account-px-4 user-account-py-2 user-account-rounded-md user-account-hover:bg-gray-400"
-                            >
-                                <X className="user-account-w-4 user-account-h-4" />
-                                <span>Cancel</span>
-                            </button>
-                        </div>
-                    )}
-                </div>
-
-                <div className="user-account-p-6">
-                    <div className="user-account-grid user-account-grid-cols-1 user-account-md:grid-cols-2 user-account-gap-6">
-                        {/* Date of Birth */}
-                        <div>
-                            <label className="user-account-block user-account-text-sm user-account-font-medium user-account-text-gray-700 user-account-mb-2">
-                                Date of Birth
-                            </label>
-                            {isEditing ? (
-                                <input
-                                    type="date"
-                                    value={profileData.date_of_birth || ''}
-                                    onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
-                                    className="user-account-w-full user-account-border user-account-border-gray-300 user-account-rounded-md user-account-px-3 user-account-py-2 user-account-focus:outline-none user-account-focus:ring-2 user-account-focus:ring-blue-500"
-                                />
-                            ) : (
-                                <p className="user-account-text-gray-900">
-                                    {clientProfile?.date_of_birth ?
-                                        new Date(clientProfile.date_of_birth).toLocaleDateString() :
-                                        'Date of birth not set'
-                                    }
+            <div className="user-account-content">
+                {activeTab === 'dashboard' && (
+                    <div className="user-account-dashboard">
+                        <div className="user-account-stats">
+                            <div className="user-account-stat-card">
+                                <h3 className="user-account-stat-title">Total Bookings</h3>
+                                <p className="user-account-stat-value">{bookings.length}</p>
+                            </div>
+                            <div className="user-account-stat-card">
+                                <h3 className="user-account-stat-title">Active Bookings</h3>
+                                <p className="user-account-stat-value">
+                                    {bookings.filter(b => b.status === 'confirmed' || b.status === 'accepted').length}
                                 </p>
-                            )}
-                        </div>
-
-                        {/* Preferred Contact */}
-                        <div>
-                            <label className="user-account-block user-account-text-sm user-account-font-medium user-account-text-gray-700 user-account-mb-2">
-                                Preferred Contact Method
-                            </label>
-                            {isEditing ? (
-                                <select
-                                    value={profileData.preferred_contact || 'EMAIL'}
-                                    onChange={(e) => handleInputChange('preferred_contact', e.target.value)}
-                                    className="user-account-w-full user-account-border user-account-border-gray-300 user-account-rounded-md user-account-px-3 user-account-py-2 user-account-focus:outline-none user-account-focus:ring-2 user-account-focus:ring-blue-500"
-                                >
-                                    <option value="EMAIL">Email</option>
-                                    <option value="PHONE">Phone</option>
-                                    <option value="WHATSAPP">WhatsApp</option>
-                                    <option value="TELEGRAM">Telegram</option>
-                                </select>
-                            ) : (
-                                <p className="user-account-text-gray-900">
-                                    {clientProfile?.preferred_contact || 'Email'}
+                            </div>
+                            <div className="user-account-stat-card">
+                                <h3 className="user-account-stat-title">Completed Trips</h3>
+                                <p className="user-account-stat-value">
+                                    {bookings.filter(b => b.status === 'completed').length}
                                 </p>
-                            )}
+                            </div>
+                            <div className="user-account-stat-card">
+                                <h3 className="user-account-stat-title">Reviews Written</h3>
+                                <p className="user-account-stat-value">{reviews.length}</p>
+                            </div>
                         </div>
 
-                        {/* Languages */}
-                        <div className="user-account-md:col-span-2">
-                            <label className="user-account-block user-account-text-sm user-account-font-medium user-account-text-gray-700 user-account-mb-2">
-                                Languages
-                            </label>
-                            {isEditing ? (
-                                <div className="user-account-grid user-account-grid-cols-2 user-account-md:grid-cols-4 user-account-gap-2">
-                                    {languages.map(language => (
-                                        <label key={language.id} className="user-account-flex user-account-items-center user-account-space-x-2">
-                                            <input
-                                                type="checkbox"
-                                                checked={(profileData.languages || []).includes(language.id)}
-                                                onChange={(e) => {
-                                                    const currentLanguages = profileData.languages || [];
-                                                    if (e.target.checked) {
-                                                        handleArrayChange('languages', [...currentLanguages, language.id]);
-                                                    } else {
-                                                        handleArrayChange('languages', currentLanguages.filter(id => id !== language.id));
-                                                    }
-                                                }}
-                                                className="user-account-rounded user-account-border-gray-300 user-account-text-blue-600 user-account-focus:ring-blue-500"
-                                            />
-                                            <span className="user-account-text-sm user-account-text-gray-700">{language.name}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="user-account-flex user-account-flex-wrap user-account-gap-2">
-                                    {clientProfile?.languages?.map(language => (
-                                        <span
-                                            key={language.id}
-                                            className="user-account-inline-flex user-account-items-center user-account-px-3 user-account-py-1 user-account-rounded-full user-account-text-sm user-account-font-medium user-account-bg-blue-100 user-account-text-blue-800"
-                                        >
-                                            {language.name}
-                                        </span>
-                                    )) || <span className="user-account-text-gray-500">No languages selected</span>}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// Bookings Section Component
-const BookingsSection = ({ bookings, onCancel, onReview, saving }) => {
-    const [showReviewModal, setShowReviewModal] = useState(false);
-    const [reviewingBooking, setReviewingBooking] = useState(null);
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'PENDING':
-                return 'user-account-bg-yellow-100 user-account-text-yellow-800';
-            case 'ACCEPTED':
-                return 'user-account-bg-green-100 user-account-text-green-800';
-            case 'COMPLETED':
-                return 'user-account-bg-blue-100 user-account-text-blue-800';
-            case 'CANCELLED':
-                return 'user-account-bg-red-100 user-account-text-red-800';
-            default:
-                return 'user-account-bg-gray-100 user-account-text-gray-800';
-        }
-    };
-
-    const canCancel = (booking) => {
-        return booking.status === 'PENDING' || booking.status === 'ACCEPTED';
-    };
-
-    const canReview = (booking) => {
-        return booking.status === 'COMPLETED' && !booking.has_review;
-    };
-
-    return (
-        <div className="user-account-space-y-6">
-            <div className="user-account-flex user-account-justify-between user-account-items-center">
-                <h2 className="user-account-text-lg user-account-font-medium user-account-text-gray-900">My Bookings</h2>
-                <div className="user-account-flex user-account-space-x-2">
-                    <select className="user-account-border user-account-border-gray-300 user-account-rounded-md user-account-px-3 user-account-py-2 user-account-text-sm user-account-focus:outline-none user-account-focus:ring-2 user-account-focus:ring-blue-500">
-                        <option value="">All Bookings</option>
-                        <option value="PENDING">Pending</option>
-                        <option value="ACCEPTED">Accepted</option>
-                        <option value="COMPLETED">Completed</option>
-                        <option value="CANCELLED">Cancelled</option>
-                    </select>
-                </div>
-            </div>
-
-            {bookings.length === 0 ? (
-                <div className="user-account-bg-white user-account-rounded-lg user-account-shadow user-account-p-6 user-account-text-center">
-                    <Calendar className="user-account-w-16 user-account-h-16 user-account-text-gray-400 user-account-mx-auto user-account-mb-4" />
-                    <h3 className="user-account-text-lg user-account-font-medium user-account-text-gray-900 user-account-mb-2">
-                        No bookings yet
-                    </h3>
-                    <p className="user-account-text-gray-600 user-account-mb-6">
-                        Start exploring and book your first guide experience
-                    </p>
-                    <button className="user-account-bg-blue-600 user-account-text-white user-account-px-6 user-account-py-2 user-account-rounded-md user-account-hover:bg-blue-700">
-                        Browse Guides
-                    </button>
-                </div>
-            ) : (
-                <div className="user-account-space-y-4">
-                    {bookings.map((booking) => (
-                        <div key={booking.id} className="user-account-bg-white user-account-rounded-lg user-account-shadow user-account-p-6">
-                            <div className="user-account-flex user-account-items-start user-account-justify-between">
-                                <div className="user-account-flex-1">
-                                    <div className="user-account-flex user-account-items-center user-account-space-x-3 user-account-mb-3">
-                                        <div className="user-account-w-12 user-account-h-12 user-account-bg-gray-300 user-account-rounded-full user-account-flex user-account-items-center user-account-justify-center">
-                                            {booking.customer_profile?.user?.full_name?.charAt(0) || 'G'}
-                                        </div>
-                                        <div>
-                                            <h3 className="user-account-font-medium user-account-text-gray-900">
-                                                {booking.customer_profile?.user?.full_name || 'Guide Name'}
-                                            </h3>
-                                            <p className="user-account-text-sm user-account-text-gray-600">
-                                                {booking.customer_profile?.city_name || 'Location'}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="user-account-grid user-account-grid-cols-1 user-account-md:grid-cols-3 user-account-gap-4 user-account-mb-4">
-                                        <div>
-                                            <span className="user-account-text-sm user-account-text-gray-600">Date Range:</span>
-                                            <p className="user-account-font-medium">
+                        <div className="user-account-recent">
+                            <h3 className="user-account-section-title">Recent Bookings</h3>
+                            <div className="user-account-recent-bookings">
+                                {bookings.slice(0, 5).map(booking => (
+                                    <div key={booking.id} className="user-account-booking-card">
+                                        <div className="user-account-booking-info">
+                                            <h4 className="user-account-booking-title">{booking.title}</h4>
+                                            <p className="user-account-booking-date">
                                                 {new Date(booking.start_date).toLocaleDateString()} -
                                                 {new Date(booking.end_date).toLocaleDateString()}
                                             </p>
+                                            <span className={`user-account-booking-status user-account-status-${booking.status}`}>
+                        {booking.status}
+                      </span>
                                         </div>
-                                        <div>
-                                            <span className="user-account-text-sm user-account-text-gray-600">Duration:</span>
-                                            <p className="user-account-font-medium">{booking.duration_days || 1} days</p>
+                                        <div className="user-account-booking-actions">
+                                            {booking.status === 'pending' && (
+                                                <button
+                                                    className="user-account-btn user-account-btn-cancel"
+                                                    onClick={() => handleCancelBooking(booking.id)}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            )}
+                                            {booking.status === 'completed' && !reviews.find(r => r.booking === booking.id) && (
+                                                <button
+                                                    className="user-account-btn user-account-btn-primary"
+                                                    onClick={() => handleWriteReview(booking)}
+                                                >
+                                                    Write Review
+                                                </button>
+                                            )}
                                         </div>
-                                        <div>
-                                            <span className="user-account-text-sm user-account-text-gray-600">Total Amount:</span>
-                                            <p className="user-account-font-medium user-account-text-green-600">
-                                                ${booking.total_amount || 0}
-                                            </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'profile' && (
+                    <div className="user-account-profile">
+                        {!profile || showProfileForm ? (
+                            <div className="user-account-profile-form">
+                                <h3 className="user-account-section-title">
+                                    {profile ? 'Edit Profile' : 'Create Profile'}
+                                </h3>
+                                <form onSubmit={handleProfileSubmit} className="user-account-form">
+                                    <div className="user-account-form-group">
+                                        <label className="user-account-label">Date of Birth</label>
+                                        <input
+                                            type="date"
+                                            className="user-account-input"
+                                            value={profileForm.date_of_birth}
+                                            onChange={(e) => setProfileForm({...profileForm, date_of_birth: e.target.value})}
+                                        />
+                                    </div>
+
+                                    <div className="user-account-form-group">
+                                        <label className="user-account-label">Preferred Contact Method</label>
+                                        <select
+                                            className="user-account-select"
+                                            value={profileForm.preferred_contact}
+                                            onChange={(e) => setProfileForm({...profileForm, preferred_contact: e.target.value})}
+                                        >
+                                            <option value="email">Email</option>
+                                            <option value="phone">Phone</option>
+                                            <option value="chat">Chat</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="user-account-form-group">
+                                        <label className="user-account-label">Languages</label>
+                                        <div className="user-account-checkbox-group">
+                                            {languages.map(language => (
+                                                <label key={language.id} className="user-account-checkbox-label">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="user-account-checkbox"
+                                                        checked={profileForm.languages.includes(language.id)}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                setProfileForm({
+                                                                    ...profileForm,
+                                                                    languages: [...profileForm.languages, language.id]
+                                                                });
+                                                            } else {
+                                                                setProfileForm({
+                                                                    ...profileForm,
+                                                                    languages: profileForm.languages.filter(id => id !== language.id)
+                                                                });
+                                                            }
+                                                        }}
+                                                    />
+                                                    {language.name}
+                                                </label>
+                                            ))}
                                         </div>
                                     </div>
 
-                                    {booking.description && (
-                                        <div className="user-account-mb-4">
-                                            <span className="user-account-text-sm user-account-text-gray-600">Description:</span>
-                                            <p className="user-account-text-gray-900">{booking.description}</p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="user-account-ml-6 user-account-text-right">
-                                    <span className={`user-account-inline-flex user-account-items-center user-account-px-3 user-account-py-1 user-account-rounded-full user-account-text-sm user-account-font-medium ${getStatusColor(booking.status)}`}>
-                                        {booking.status}
-                                    </span>
-
-                                    <div className="user-account-mt-3 user-account-space-y-2">
-                                        {canCancel(booking) && (
+                                    <div className="user-account-form-actions">
+                                        <button type="submit" className="user-account-btn user-account-btn-primary">
+                                            {profile ? 'Update Profile' : 'Create Profile'}
+                                        </button>
+                                        {profile && (
                                             <button
-                                                onClick={() => onCancel(booking.id)}
-                                                disabled={saving}
-                                                className="user-account-block user-account-w-full user-account-text-red-600 user-account-hover:text-red-800 user-account-disabled:opacity-50 user-account-text-sm"
+                                                type="button"
+                                                className="user-account-btn user-account-btn-secondary"
+                                                onClick={() => setShowProfileForm(false)}
                                             >
-                                                Cancel Booking
+                                                Cancel
                                             </button>
                                         )}
+                                    </div>
+                                </form>
+                            </div>
+                        ) : (
+                            <div className="user-account-profile-view">
+                                <div className="user-account-profile-header">
+                                    <h3 className="user-account-section-title">Profile Information</h3>
+                                    <button
+                                        className="user-account-btn user-account-btn-primary"
+                                        onClick={() => setShowProfileForm(true)}
+                                    >
+                                        Edit Profile
+                                    </button>
+                                </div>
+                                <div className="user-account-profile-info">
+                                    <div className="user-account-profile-field">
+                                        <label className="user-account-profile-label">Date of Birth:</label>
+                                        <p className="user-account-profile-value">
+                                            {profile.date_of_birth ? new Date(profile.date_of_birth).toLocaleDateString() : 'Not set'}
+                                        </p>
+                                    </div>
+                                    <div className="user-account-profile-field">
+                                        <label className="user-account-profile-label">Preferred Contact:</label>
+                                        <p className="user-account-profile-value">{profile.preferred_contact}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
 
-                                        {canReview(booking) && (
+                {activeTab === 'guides' && (
+                    <div className="user-account-guides">
+                        <div className="user-account-guides-header">
+                            <h3 className="user-account-section-title">Find Guides</h3>
+                            <div className="user-account-guides-filters">
+                                <input
+                                    type="text"
+                                    className="user-account-filter-input"
+                                    placeholder="Search guides..."
+                                    value={guidesFilter.search}
+                                    onChange={(e) => handleFilterChange('search', e.target.value)}
+                                />
+                                <select
+                                    className="user-account-filter-select"
+                                    value={guidesFilter.service_type}
+                                    onChange={(e) => handleFilterChange('service_type', e.target.value)}
+                                >
+                                    <option value="">All Services</option>
+                                    {serviceTypes.map(service => (
+                                        <option key={service.id} value={service.id}>{service.name}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    className="user-account-filter-select"
+                                    value={guidesFilter.min_rating}
+                                    onChange={(e) => handleFilterChange('min_rating', e.target.value)}
+                                >
+                                    <option value="">Any Rating</option>
+                                    <option value="4">4+ Stars</option>
+                                    <option value="4.5">4.5+ Stars</option>
+                                    <option value="5">5 Stars</option>
+                                </select>
+                                <label className="user-account-filter-checkbox">
+                                    <input
+                                        type="checkbox"
+                                        checked={guidesFilter.is_available}
+                                        onChange={(e) => handleFilterChange('is_available', e.target.checked)}
+                                    />
+                                    Available only
+                                </label>
+                            </div>
+                        </div>
+
+                        <div className="user-account-guides-grid">
+                            {guides.map(guide => (
+                                <div key={guide.id} className="user-account-guide-card">
+                                    <div className="user-account-guide-avatar">
+                                        {guide.user?.avatar ? (
+                                            <img src={guide.user.avatar} alt={guide.user.full_name} />
+                                        ) : (
+                                            <div className="user-account-guide-avatar-placeholder">
+                                                {guide.user?.full_name?.charAt(0) || 'G'}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="user-account-guide-info">
+                                        <h4 className="user-account-guide-name">{guide.user?.full_name}</h4>
+                                        <p className="user-account-guide-bio">{guide.professional_bio}</p>
+                                        <div className="user-account-guide-details">
+                      <span className="user-account-guide-experience">
+                        {guide.years_of_experience} years experience
+                      </span>
+                                            <div className="user-account-guide-rating">
+                                                {'★'.repeat(Math.floor(guide.average_rating || 0))}
+                                                {'☆'.repeat(5 - Math.floor(guide.average_rating || 0))}
+                                                <span className="user-account-guide-rating-text">
+                          {guide.average_rating || 0}/5 ({guide.total_reviews || 0} reviews)
+                        </span>
+                                            </div>
+                                            <div className="user-account-guide-pricing">
+                                                {guide.hourly_rate && (
+                                                    <span className="user-account-guide-price">
+                            ${guide.hourly_rate}/hour
+                          </span>
+                                                )}
+                                                {guide.daily_rate && (
+                                                    <span className="user-account-guide-price">
+                            ${guide.daily_rate}/day
+                          </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="user-account-guide-actions">
                                             <button
-                                                onClick={() => {
-                                                    setReviewingBooking(booking);
-                                                    setShowReviewModal(true);
-                                                }}
-                                                className="user-account-block user-account-w-full user-account-text-blue-600 user-account-hover:text-blue-800 user-account-text-sm"
+                                                className="user-account-btn user-account-btn-primary"
+                                                onClick={() => handleBookGuide(guide)}
+                                                disabled={!guide.is_available}
+                                            >
+                                                {guide.is_available ? 'Book Now' : 'Unavailable'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'bookings' && (
+                    <div className="user-account-bookings">
+                        <h3 className="user-account-section-title">My Bookings</h3>
+                        <div className="user-account-bookings-list">
+                            {bookings.map(booking => (
+                                <div key={booking.id} className="user-account-booking-item">
+                                    <div className="user-account-booking-details">
+                                        <h4 className="user-account-booking-title">{booking.title}</h4>
+                                        <p className="user-account-booking-dates">
+                                            {new Date(booking.start_date).toLocaleDateString()} -
+                                            {new Date(booking.end_date).toLocaleDateString()}
+                                        </p>
+                                        <p className="user-account-booking-description">{booking.description}</p>
+                                        <span className={`user-account-booking-status user-account-status-${booking.status}`}>
+                      {booking.status}
+                    </span>
+                                    </div>
+                                    <div className="user-account-booking-actions">
+                                        {booking.status === 'pending' && (
+                                            <button
+                                                className="user-account-btn user-account-btn-cancel"
+                                                onClick={() => handleCancelBooking(booking.id)}
+                                            >
+                                                Cancel
+                                            </button>
+                                        )}
+                                        {booking.status === 'completed' && !reviews.find(r => r.booking === booking.id) && (
+                                            <button
+                                                className="user-account-btn user-account-btn-primary"
+                                                onClick={() => handleWriteReview(booking)}
                                             >
                                                 Write Review
                                             </button>
                                         )}
-
-                                        <button className="user-account-block user-account-w-full user-account-text-gray-600 user-account-hover:text-gray-800 user-account-text-sm">
-                                            View Details
-                                        </button>
                                     </div>
                                 </div>
-                            </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
-            )}
+                    </div>
+                )}
 
-            {/* Review Modal */}
-            {showReviewModal && reviewingBooking && (
-                <ReviewModal
-                    isOpen={showReviewModal}
-                    onClose={() => {
-                        setShowReviewModal(false);
-                        setReviewingBooking(null);
-                    }}
-                    booking={reviewingBooking}
-                    onSubmit={(reviewData) => {
-                        onReview(reviewingBooking.id, reviewData);
-                        setShowReviewModal(false);
-                        setReviewingBooking(null);
-                    }}
-                    saving={saving}
-                />
-            )}
-        </div>
-    );
-};
-
-// Reviews Section Component
-const ReviewsSection = ({ reviews, onEdit }) => {
-    const renderStars = (rating) => {
-        return Array.from({ length: 5 }, (_, i) => (
-            <Star
-                key={i}
-                className={`user-account-w-4 user-account-h-4 ${i < rating ? 'user-account-fill-yellow-400 user-account-text-yellow-400' : 'user-account-text-gray-300'}`}
-            />
-        ));
-    };
-
-    return (
-        <div className="user-account-space-y-6">
-            <h2 className="user-account-text-lg user-account-font-medium user-account-text-gray-900">My Reviews</h2>
-
-            {reviews.length === 0 ? (
-                <div className="user-account-bg-white user-account-rounded-lg user-account-shadow user-account-p-6 user-account-text-center">
-                    <Star className="user-account-w-16 user-account-h-16 user-account-text-gray-400 user-account-mx-auto user-account-mb-4" />
-                    <h3 className="user-account-text-lg user-account-font-medium user-account-text-gray-900 user-account-mb-2">
-                        No reviews written yet
-                    </h3>
-                    <p className="user-account-text-gray-600">
-                        Complete bookings and write reviews to help other travelers
-                    </p>
-                </div>
-            ) : (
-                <div className="user-account-space-y-4">
-                    {reviews.map((review) => (
-                        <div key={review.id} className="user-account-bg-white user-account-rounded-lg user-account-shadow user-account-p-6">
-                            <div className="user-account-flex user-account-items-start user-account-justify-between user-account-mb-4">
-                                <div className="user-account-flex user-account-items-center user-account-space-x-3">
-                                    <div className="user-account-w-10 user-account-h-10 user-account-bg-gray-300 user-account-rounded-full user-account-flex user-account-items-center user-account-justify-center">
-                                        {review.customer?.full_name?.charAt(0) || 'G'}
-                                    </div>
-                                    <div>
-                                        <h4 className="user-account-font-medium user-account-text-gray-900">
-                                            {review.customer?.full_name || 'Guide Name'}
-                                        </h4>
-                                        <div className="user-account-flex user-account-items-center user-account-space-x-1">
-                                            {renderStars(review.overall_rating)}
-                                            <span className="user-account-text-sm user-account-text-gray-600">
-                                                {new Date(review.created_at).toLocaleDateString()}
-                                            </span>
+                {activeTab === 'reviews' && (
+                    <div className="user-account-reviews">
+                        <h3 className="user-account-section-title">My Reviews</h3>
+                        <div className="user-account-reviews-list">
+                            {reviews.map(review => (
+                                <div key={review.id} className="user-account-review-item">
+                                    <div className="user-account-review-header">
+                                        <div className="user-account-review-rating">
+                                            {'★'.repeat(review.overall_rating)}{'☆'.repeat(5 - review.overall_rating)}
                                         </div>
+                                        <span className="user-account-review-date">
+                      {new Date(review.created_at).toLocaleDateString()}
+                    </span>
+                                    </div>
+                                    <h4 className="user-account-review-title">{review.title}</h4>
+                                    <p className="user-account-review-comment">{review.comment}</p>
+                                    <div className="user-account-review-details">
+                                        <span className="user-account-review-detail">Communication: {review.communication_rating}/5</span>
+                                        <span className="user-account-review-detail">Service: {review.service_rating}/5</span>
+                                        <span className="user-account-review-detail">Punctuality: {review.punctuality_rating}/5</span>
+                                        <span className="user-account-review-detail">Value: {review.value_rating}/5</span>
                                     </div>
                                 </div>
-                                <button
-                                    onClick={() => onEdit(review.id, review)}
-                                    className="user-account-text-blue-600 user-account-hover:text-blue-800 user-account-text-sm"
-                                >
-                                    Edit
-                                </button>
-                            </div>
-
-                            {review.title && (
-                                <h5 className="user-account-font-medium user-account-text-gray-900 user-account-mb-2">{review.title}</h5>
-                            )}
-
-                            <p className="user-account-text-gray-700 user-account-mb-4">{review.comment}</p>
-
-                            <div className="user-account-grid user-account-grid-cols-2 user-account-md:grid-cols-4 user-account-gap-4 user-account-text-sm">
-                                <div>
-                                    <span className="user-account-text-gray-600">Communication:</span>
-                                    <div className="user-account-flex user-account-items-center user-account-space-x-1">
-                                        {renderStars(review.communication_rating)}
-                                    </div>
-                                </div>
-                                <div>
-                                    <span className="user-account-text-gray-600">Service:</span>
-                                    <div className="user-account-flex user-account-items-center user-account-space-x-1">
-                                        {renderStars(review.service_rating)}
-                                    </div>
-                                </div>
-                                <div>
-                                    <span className="user-account-text-gray-600">Punctuality:</span>
-                                    <div className="user-account-flex user-account-items-center user-account-space-x-1">
-                                        {renderStars(review.punctuality_rating)}
-                                    </div>
-                                </div>
-                                <div>
-                                    <span className="user-account-text-gray-600">Value:</span>
-                                    <div className="user-account-flex user-account-items-center user-account-space-x-1">
-                                        {renderStars(review.value_rating)}
-                                    </div>
-                                </div>
-                            </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-};
-
-// Messages Section Component
-const MessagesSection = ({ conversations, onMarkAsRead }) => {
-    return (
-        <div className="user-account-space-y-6">
-            <h2 className="user-account-text-lg user-account-font-medium user-account-text-gray-900">Messages</h2>
-
-            {conversations.length === 0 ? (
-                <div className="user-account-bg-white user-account-rounded-lg user-account-shadow user-account-p-6 user-account-text-center">
-                    <MessageSquare className="user-account-w-16 user-account-h-16 user-account-text-gray-400 user-account-mx-auto user-account-mb-4" />
-                    <h3 className="user-account-text-lg user-account-font-medium user-account-text-gray-900 user-account-mb-2">
-                        No conversations yet
-                    </h3>
-                    <p className="user-account-text-gray-600">
-                        Start chatting with guides when you make bookings
-                    </p>
-                </div>
-            ) : (
-                <div className="user-account-bg-white user-account-rounded-lg user-account-shadow user-account-divide-y user-account-divide-gray-200">
-                    {conversations.map((conversation) => (
-                        <div key={conversation.id} className="user-account-p-4 user-account-hover:bg-gray-50 user-account-cursor-pointer">
-                            <div className="user-account-flex user-account-items-center user-account-space-x-3">
-                                <div className="user-account-w-10 user-account-h-10 user-account-bg-gray-300 user-account-rounded-full user-account-flex user-account-items-center user-account-justify-center">
-                                    {conversation.other_user?.full_name?.charAt(0) || 'G'}
-                                </div>
-                                <div className="user-account-flex-1 user-account-min-w-0">
-                                    <h4 className="user-account-font-medium user-account-text-gray-900 user-account-truncate">
-                                        {conversation.other_user?.full_name || 'Guide'}
-                                    </h4>
-                                    <p className="user-account-text-sm user-account-text-gray-600 user-account-truncate">
-                                        {conversation.last_message?.content || 'No messages yet'}
-                                    </p>
-                                </div>
-                                <div className="user-account-text-right">
-                                    <p className="user-account-text-xs user-account-text-gray-500">
-                                        {conversation.last_message?.created_at &&
-                                            new Date(conversation.last_message.created_at).toLocaleDateString()
-                                        }
-                                    </p>
-                                    {conversation.unread_count > 0 && (
-                                        <span className="user-account-inline-flex user-account-items-center user-account-justify-center user-account-w-5 user-account-h-5 user-account-bg-blue-600 user-account-text-white user-account-text-xs user-account-font-medium user-account-rounded-full">
-                                            {conversation.unread_count}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-};
-
-// Notifications Section Component
-const NotificationsSection = ({ notifications, onMarkAsRead, onMarkAllAsRead }) => {
-    return (
-        <div className="user-account-space-y-6">
-            <div className="user-account-flex user-account-justify-between user-account-items-center">
-                <h2 className="user-account-text-lg user-account-font-medium user-account-text-gray-900">Notifications</h2>
-                {notifications.some(n => !n.is_read) && (
-                    <button
-                        onClick={onMarkAllAsRead}
-                        className="user-account-text-blue-600 user-account-hover:text-blue-800 user-account-text-sm"
-                    >
-                        Mark all as read
-                    </button>
+                    </div>
                 )}
             </div>
 
-            {notifications.length === 0 ? (
-                <div className="user-account-bg-white user-account-rounded-lg user-account-shadow user-account-p-6 user-account-text-center">
-                    <Bell className="user-account-w-16 user-account-h-16 user-account-text-gray-400 user-account-mx-auto user-account-mb-4" />
-                    <h3 className="user-account-text-lg user-account-font-medium user-account-text-gray-900 user-account-mb-2">
-                        No notifications
-                    </h3>
-                    <p className="user-account-text-gray-600">
-                        You'll receive notifications about bookings, messages, and more
-                    </p>
-                </div>
-            ) : (
-                <div className="user-account-space-y-3">
-                    {notifications.map((notification) => (
-                        <div
-                            key={notification.id}
-                            className={`user-account-bg-white user-account-rounded-lg user-account-shadow user-account-p-4 user-account-border-l-4 ${
-                                notification.is_read ? 'user-account-border-gray-300' : 'user-account-border-blue-500'
-                            }`}
-                        >
-                            <div className="user-account-flex user-account-items-start user-account-justify-between">
-                                <div className="user-account-flex-1">
-                                    <h4 className={`user-account-font-medium ${
-                                        notification.is_read ? 'user-account-text-gray-700' : 'user-account-text-gray-900'
-                                    }`}>
-                                        {notification.title}
-                                    </h4>
-                                    <p className={`user-account-mt-1 user-account-text-sm ${
-                                        notification.is_read ? 'user-account-text-gray-500' : 'user-account-text-gray-700'
-                                    }`}>
-                                        {notification.message}
-                                    </p>
-                                    <p className="user-account-mt-2 user-account-text-xs user-account-text-gray-500">
-                                        {new Date(notification.created_at).toLocaleString()}
-                                    </p>
-                                </div>
-                                {!notification.is_read && (
-                                    <button
-                                        onClick={() => onMarkAsRead(notification.id)}
-                                        className="user-account-ml-4 user-account-text-blue-600 user-account-hover:text-blue-800 user-account-text-sm"
-                                    >
-                                        Mark as read
-                                    </button>
-                                )}
-                            </div>
+            {/* Booking Form Modal */}
+            {showBookingForm && (
+                <div className="user-account-modal">
+                    <div className="user-account-modal-content">
+                        <div className="user-account-modal-header">
+                            <h3 className="user-account-modal-title">Book Guide</h3>
+                            <button
+                                className="user-account-modal-close"
+                                onClick={() => {
+                                    setShowBookingForm(false);
+                                    setSelectedGuide(null);
+                                }}
+                            >
+                                ×
+                            </button>
                         </div>
-                    ))}
+                        <form onSubmit={handleBookingSubmit} className="user-account-form">
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">Title</label>
+                                <input
+                                    type="text"
+                                    className="user-account-input"
+                                    value={bookingForm.title}
+                                    onChange={(e) => setBookingForm({...bookingForm, title: e.target.value})}
+                                    required
+                                />
+                            </div>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">Description</label>
+                                <textarea
+                                    className="user-account-textarea"
+                                    value={bookingForm.description}
+                                    onChange={(e) => setBookingForm({...bookingForm, description: e.target.value})}
+                                    rows="3"
+                                />
+                            </div>
+                            <div className="user-account-form-row">
+                                <div className="user-account-form-group">
+                                    <label className="user-account-label">Start Date</label>
+                                    <input
+                                        type="date"
+                                        className="user-account-input"
+                                        value={bookingForm.start_date}
+                                        onChange={(e) => setBookingForm({...bookingForm, start_date: e.target.value})}
+                                        required
+                                    />
+                                </div>
+                                <div className="user-account-form-group">
+                                    <label className="user-account-label">End Date</label>
+                                    <input
+                                        type="date"
+                                        className="user-account-input"
+                                        value={bookingForm.end_date}
+                                        onChange={(e) => setBookingForm({...bookingForm, end_date: e.target.value})}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">Special Requirements</label>
+                                <textarea
+                                    className="user-account-textarea"
+                                    value={bookingForm.special_requirements}
+                                    onChange={(e) => setBookingForm({...bookingForm, special_requirements: e.target.value})}
+                                    rows="2"
+                                />
+                            </div>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">Budget</label>
+                                <input
+                                    type="number"
+                                    className="user-account-input"
+                                    value={bookingForm.budget}
+                                    onChange={(e) => setBookingForm({...bookingForm, budget: e.target.value})}
+                                    placeholder="0"
+                                    step="0.01"
+                                />
+                            </div>
+                            <div className="user-account-form-actions">
+                                <button type="submit" className="user-account-btn user-account-btn-primary">
+                                    Book Guide
+                                </button>
+                                <button
+                                    type="button"
+                                    className="user-account-btn user-account-btn-secondary"
+                                    onClick={() => {
+                                        setShowBookingForm(false);
+                                        setSelectedGuide(null);
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             )}
-        </div>
-    );
-};
 
-// Review Modal Component
-const ReviewModal = ({ isOpen, onClose, booking, onSubmit, saving }) => {
-    const [formData, setFormData] = useState({
-        overall_rating: 5,
-        communication_rating: 5,
-        service_rating: 5,
-        punctuality_rating: 5,
-        value_rating: 5,
-        title: '',
-        comment: ''
-    });
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onSubmit(formData);
-    };
-
-    const renderStarRating = (field, label) => {
-        return (
-            <div>
-                <label className="user-account-block user-account-text-sm user-account-font-medium user-account-text-gray-700 user-account-mb-2">
-                    {label}
-                </label>
-                <div className="user-account-flex user-account-space-x-1">
-                    {Array.from({ length: 5 }, (_, i) => (
-                        <button
-                            key={i}
-                            type="button"
-                            onClick={() => setFormData(prev => ({ ...prev, [field]: i + 1 }))}
-                            className="user-account-focus:outline-none"
-                        >
-                            <Star
-                                className={`user-account-w-6 user-account-h-6 ${
-                                    i < formData[field]
-                                        ? 'user-account-fill-yellow-400 user-account-text-yellow-400'
-                                        : 'user-account-text-gray-300 user-account-hover:text-yellow-400'
-                                }`}
-                            />
-                        </button>
-                    ))}
+            {/* Review Form Modal */}
+            {showReviewForm && (
+                <div className="user-account-modal">
+                    <div className="user-account-modal-content">
+                        <div className="user-account-modal-header">
+                            <h3 className="user-account-modal-title">Write Review</h3>
+                            <button
+                                className="user-account-modal-close"
+                                onClick={() => {
+                                    setShowReviewForm(false);
+                                    setSelectedBookingForReview(null);
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <form onSubmit={handleReviewSubmit} className="user-account-form">
+                            <div className="user-account-rating-group">
+                                <div className="user-account-form-group">
+                                    <label className="user-account-label">Overall Rating</label>
+                                    <select
+                                        className="user-account-select"
+                                        value={reviewForm.overall_rating}
+                                        onChange={(e) => setReviewForm({...reviewForm, overall_rating: parseInt(e.target.value)})}
+                                    >
+                                        {[1,2,3,4,5].map(num => (
+                                            <option key={num} value={num}>{num} Star{num > 1 ? 's' : ''}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="user-account-form-group">
+                                    <label className="user-account-label">Communication</label>
+                                    <select
+                                        className="user-account-select"
+                                        value={reviewForm.communication_rating}
+                                        onChange={(e) => setReviewForm({...reviewForm, communication_rating: parseInt(e.target.value)})}
+                                    >
+                                        {[1,2,3,4,5].map(num => (
+                                            <option key={num} value={num}>{num}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="user-account-form-group">
+                                    <label className="user-account-label">Service Quality</label>
+                                    <select
+                                        className="user-account-select"
+                                        value={reviewForm.service_rating}
+                                        onChange={(e) => setReviewForm({...reviewForm, service_rating: parseInt(e.target.value)})}
+                                    >
+                                        {[1,2,3,4,5].map(num => (
+                                            <option key={num} value={num}>{num}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="user-account-form-group">
+                                    <label className="user-account-label">Punctuality</label>
+                                    <select
+                                        className="user-account-select"
+                                        value={reviewForm.punctuality_rating}
+                                        onChange={(e) => setReviewForm({...reviewForm, punctuality_rating: parseInt(e.target.value)})}
+                                    >
+                                        {[1,2,3,4,5].map(num => (
+                                            <option key={num} value={num}>{num}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="user-account-form-group">
+                                    <label className="user-account-label">Value for Money</label>
+                                    <select
+                                        className="user-account-select"
+                                        value={reviewForm.value_rating}
+                                        onChange={(e) => setReviewForm({...reviewForm, value_rating: parseInt(e.target.value)})}
+                                    >
+                                        {[1,2,3,4,5].map(num => (
+                                            <option key={num} value={num}>{num}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">Title</label>
+                                <input
+                                    type="text"
+                                    className="user-account-input"
+                                    value={reviewForm.title}
+                                    onChange={(e) => setReviewForm({...reviewForm, title: e.target.value})}
+                                    required
+                                />
+                            </div>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">Comment</label>
+                                <textarea
+                                    className="user-account-textarea"
+                                    value={reviewForm.comment}
+                                    onChange={(e) => setReviewForm({...reviewForm, comment: e.target.value})}
+                                    rows="4"
+                                    required
+                                />
+                            </div>
+                            <div className="user-account-form-actions">
+                                <button type="submit" className="user-account-btn user-account-btn-primary">
+                                    Submit Review
+                                </button>
+                                <button
+                                    type="button"
+                                    className="user-account-btn user-account-btn-secondary"
+                                    onClick={() => {
+                                        setShowReviewForm(false);
+                                        setSelectedBookingForReview(null);
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
-        );
-    };
-
-    if (!isOpen) return null;
-
-    return (
-        <div className="user-account-fixed user-account-inset-0 user-account-bg-black user-account-bg-opacity-50 user-account-flex user-account-items-center user-account-justify-center user-account-z-50">
-            <div className="user-account-bg-white user-account-rounded-lg user-account-p-6 user-account-w-full user-account-max-w-2xl user-account-max-h-screen user-account-overflow-y-auto">
-                <h3 className="user-account-text-lg user-account-font-medium user-account-text-gray-900 user-account-mb-4">
-                    Write Review for {booking.customer_profile?.user?.full_name}
-                </h3>
-
-                <form onSubmit={handleSubmit} className="user-account-space-y-6">
-                    {/* Rating Fields */}
-                    <div className="user-account-grid user-account-grid-cols-1 user-account-md:grid-cols-2 user-account-gap-6">
-                        {renderStarRating('overall_rating', 'Overall Rating')}
-                        {renderStarRating('communication_rating', 'Communication')}
-                        {renderStarRating('service_rating', 'Service Quality')}
-                        {renderStarRating('punctuality_rating', 'Punctuality')}
-                        {renderStarRating('value_rating', 'Value for Money')}
-                    </div>
-
-                    {/* Title */}
-                    <div>
-                        <label className="user-account-block user-account-text-sm user-account-font-medium user-account-text-gray-700 user-account-mb-2">
-                            Review Title
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.title}
-                            onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                            className="user-account-w-full user-account-border user-account-border-gray-300 user-account-rounded-md user-account-px-3 user-account-py-2 user-account-focus:outline-none user-account-focus:ring-2 user-account-focus:ring-blue-500"
-                            placeholder="Brief summary of your experience"
-                        />
-                    </div>
-
-                    {/* Comment */}
-                    <div>
-                        <label className="user-account-block user-account-text-sm user-account-font-medium user-account-text-gray-700 user-account-mb-2">
-                            Detailed Review
-                        </label>
-                        <textarea
-                            value={formData.comment}
-                            onChange={(e) => setFormData(prev => ({ ...prev, comment: e.target.value }))}
-                            rows={4}
-                            className="user-account-w-full user-account-border user-account-border-gray-300 user-account-rounded-md user-account-px-3 user-account-py-2 user-account-focus:outline-none user-account-focus:ring-2 user-account-focus:ring-blue-500"
-                            placeholder="Share your experience with other travelers..."
-                            required
-                        />
-                    </div>
-
-                    <div className="user-account-flex user-account-justify-end user-account-space-x-3">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="user-account-px-4 user-account-py-2 user-account-text-gray-700 user-account-bg-gray-200 user-account-rounded-md user-account-hover:bg-gray-300"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={saving}
-                            className="user-account-px-4 user-account-py-2 user-account-bg-blue-600 user-account-text-white user-account-rounded-md user-account-hover:bg-blue-700 user-account-disabled:opacity-50"
-                        >
-                            {saving ? 'Submitting...' : 'Submit Review'}
-                        </button>
-                    </div>
-                </form>
-            </div>
+            )}
         </div>
     );
 };

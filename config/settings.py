@@ -45,6 +45,7 @@ AUTH_USER_MODEL = "users.User"
 # ╰──────────────────────────────────────────────────────────────╯
 DJANGO_APPS = [
     "jazzmin",
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -275,8 +276,7 @@ ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"  # <-- uncomment / qo‘sh
 
-# ... (pastroqda) ...
-# CHANNEL_LAYERS qo‘shamiz
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",

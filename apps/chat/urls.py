@@ -1,40 +1,42 @@
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
-from rest_framework_nested.routers import NestedDefaultRouter
-from apps.chat.views import (
-    ChatRoomViewSet,
-    MessageViewSet,
-    MessageReadListView,
-    TypingStatusView,
-    ActiveTypersView,
-)
+# urls.py
+from django.urls import path
+from . import views
 
-# Routers
-router = DefaultRouter()
-router.register(r"chats", ChatRoomViewSet, basename="chat-room")
+app_name = "chat"
 
-nested_router = NestedDefaultRouter(router, r"chats", lookup="room")
-nested_router.register(r"messages", MessageViewSet, basename="chat-message")
-
-# URL patterns
 urlpatterns = [
-    path("", include(router.urls)),
-    path("", include(nested_router.urls)),
-    # Read receipts
+    # Conversation endpoints
     path(
-        "chats/<uuid:room_pk>/messages/<uuid:message_pk>/read-receipts/",
-        MessageReadListView.as_view(),
-        name="message-read-receipts",
-    ),
-    # Typing status
-    path(
-        "chats/<uuid:room_pk>/typing/",
-        TypingStatusView.as_view(),
-        name="typing-status",
+        "conversations/",
+        views.ConversationListCreateView.as_view(),
+        name="conversation-list-create",
     ),
     path(
-        "chats/<uuid:room_pk>/typing/active/",
-        ActiveTypersView.as_view(),
-        name="active-typers",
+        "conversations/<int:pk>/",
+        views.ConversationDetailView.as_view(),
+        name="conversation-detail",
     ),
+    # Message endpoints
+    path(
+        "conversations/<int:conversation_id>/messages/",
+        views.MessageListView.as_view(),
+        name="message-list",
+    ),
+    path("messages/send/", views.MessageCreateView.as_view(), name="message-create"),
+    path(
+        "messages/<int:message_id>/action/", views.message_action, name="message-action"
+    ),
+    # Message status endpoints
+    path(
+        "conversations/<int:conversation_id>/mark-read/",
+        views.mark_messages_read,
+        name="mark-messages-read",
+    ),
+    path("unread-count/", views.unread_count, name="unread-count"),
+    # User blocking endpoints
+    path("block/", views.block_user, name="block-user"),
+    path("unblock/<int:user_id>/", views.unblock_user, name="unblock-user"),
+    path("blocked/", views.BlockedUserListView.as_view(), name="blocked-users"),
+    # Utility endpoints
+    path("users/search/", views.user_search, name="user-search"),
 ]

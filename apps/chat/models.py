@@ -1,323 +1,192 @@
-# apps/chat/models.py
+#  apps/chat/models.py
+from __future__ import annotations
+
 from django.db import models
-from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
-from apps.common.models import BaseModel
 from apps.users.models import User
+from django.utils import timezone
 
 
-class ChatRoom(BaseModel):
+class ConversationManager(models.Manager):
+    def get_user_conversations(self, user):
+        return self.filter(models.Q(user1=user) | models.Q(user2=user))
 
-    class RoomType(models.TextChoices):
-        DIRECT = "direct", _("Direct message")
-        BOOKING = "booking", _("Booking related")
-        SUPPORT = "support", _("Support chat")
+    def get_or_create_chat(self, user1, user2):
+        if user1.id > user2.id:
+            user1, user2 = user2, user1
 
-    room_type = models.CharField(
-        max_length=20,
-        choices=RoomType.choices,
-        default=RoomType.DIRECT,
-        verbose_name=_("Room type"),
-    )
-    participants = models.ManyToManyField(
-        User, related_name="chat_rooms", verbose_name=_("Participants")
-    )
-    is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
+        conversation, created = self.get_or_create(user1=user1, user2=user2)
+        return conversation, created
 
-    booking = models.ForeignKey(
-        "bookings.Booking",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="chat_room",
-        verbose_name=_("Related booking"),
-    )
+    def get_unread_count_for_user(self, user):
+        conversations = self.get_user_conversations(user)
+        total_unread = 0
 
-    last_message_at = models.DateTimeField(
-        null=True, blank=True, verbose_name=_("Last message time")
-    )
-    last_message_preview = models.CharField(
-        max_length=150, blank=True, verbose_name=_("Last message preview")
-    )
-    last_message_sender_id = models.UUIDField(
-        null=True, blank=True, verbose_name=_("Last message sender ID")
-    )
-    last_message_type = models.CharField(
-        max_length=20, blank=True, verbose_name=_("Last message type")
-    )
+        for conversation in conversations:
+            unread = (
+                Message.objects.filter(conversation=conversation)
+                .exclude(sender=user)
+                .exclude(
+                    models.Q(deleted_for="both")
+                    | (models.Q(deleted_for="sender") & models.Q(sender=user))
+                )
+                .filter(is_read=False)
+                .count()
+            )
+            total_unread += unread
 
-    total_messages = models.PositiveIntegerField(
-        default=0, verbose_name=_("Total messages count")
-    )
+        return total_unread
 
-    unread_counts = models.JSONField(
-        default=dict, blank=True, verbose_name=_("Unread counts per user")
-    )
 
-    last_activity_at = models.DateTimeField(
-        auto_now=True, verbose_name=_("Last activity")
+class MessageManager(models.Manager):
+    def visible_for_user(self, user):
+        return self.exclude(
+            models.Q(deleted_for="both")
+            | (models.Q(deleted_for="sender") & models.Q(sender=user))
+        )
+
+    def deleted_for_user(self, user):
+        return self.filter(sender=user).filter(
+            models.Q(deleted_for="sender") | models.Q(deleted_for="both")
+        )
+
+    def recoverable_for_user(self, user):
+        return self.deleted_for_user(user)
+
+    def unread_for_user_in_conversation(self, user, conversation):
+        return (
+            self.visible_for_user(user)
+            .filter(conversation=conversation)
+            .exclude(sender=user)
+            .filter(is_read=False)
+        )
+
+
+class Conversation(models.Model):
+    user1 = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="conversations_as_user1"
     )
+    user2 = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="conversations_as_user2"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    objects = ConversationManager()
 
     class Meta:
-        verbose_name = _("Chat room")
-        verbose_name_plural = _("Chat rooms")
-        ordering = ["-last_activity_at", "-updated_at"]  # Optimized ordering
-        indexes = [
-            models.Index(fields=["room_type", "is_active"]),
-            models.Index(fields=["last_activity_at"]),  # For chat list sorting
-            models.Index(fields=["is_active", "last_message_at"]),  # Composite index
-        ]
+        ordering = ["-updated_at"]
+        unique_together = ("user1", "user2")
 
     def __str__(self):
-        if self.room_type == self.RoomType.DIRECT:
-            users = list(self.participants.all()[:2])
-            if len(users) == 2:
-                return f"{users[0].get_full_name()} ↔ {users[1].get_full_name()}"
-        return f"ChatRoom {self.pk}"
+        return f"{self.user1.full_name} - {self.user2.full_name}"
 
-    def other_participant(self, user):
-        if self.room_type == self.RoomType.DIRECT:
-            return self.participants.exclude(id=user.id).first()
-        return None
+    def get_other_user(self, user):
+        """Get the other participant in the conversation"""
+        return self.user2 if user == self.user1 else self.user1
 
-    def get_unread_count(self, user):
-        return self.unread_counts.get(str(user.id), 0)
-
-    def increment_unread_count(self, user, save=True):
-        user_id = str(user.id)
-        self.unread_counts[user_id] = self.unread_counts.get(user_id, 0) + 1
-        if save:
-            self.save(update_fields=["unread_counts"])
-
-    def mark_as_read(self, user, save=True):
-        user_id = str(user.id)
-        if user_id in self.unread_counts:
-            self.unread_counts[user_id] = 0
-            if save:
-                self.save(update_fields=["unread_counts"])
-
-    def update_last_message(self, message, save=True):
-        self.last_message_at = message.created_at
-        self.last_message_sender_id = message.sender_id
-        self.last_message_type = message.message_type
-
-        if message.message_type == Message.MessageType.TEXT:
-            self.last_message_preview = (
-                message.text[:147] + "..." if len(message.text) > 150 else message.text
-            )
-        elif message.message_type == Message.MessageType.IMAGE:
-            self.last_message_preview = "📷 Image"
-        elif message.message_type == Message.MessageType.FILE:
-            self.last_message_preview = f"📎 {message.file_name or 'File'}"
-        elif message.message_type == Message.MessageType.AUDIO:
-            self.last_message_preview = "🎵 Audio"
-        elif message.message_type == Message.MessageType.VIDEO:
-            self.last_message_preview = "🎥 Video"
-        elif message.message_type == Message.MessageType.LOCATION:
-            self.last_message_preview = f"📍 {message.location_name or 'Location'}"
-        elif message.message_type == Message.MessageType.SYSTEM:
-            self.last_message_preview = "🔔 System message"
-        else:
-            self.last_message_preview = "Message"
-
-        self.total_messages += 1
-
-        if save:
-            self.save(
-                update_fields=[
-                    "last_message_at",
-                    "last_message_preview",
-                    "last_message_sender_id",
-                    "last_message_type",
-                    "total_messages",
-                ]
-            )
+    def has_user(self, user):
+        """Check if user is participant in conversation"""
+        return user == self.user1 or user == self.user2
 
 
-class Message(BaseModel):
+class Message(models.Model):
+    DELETE_CHOICES = [
+        ("none", "Not Deleted"),
+        ("sender", "Deleted by Sender"),
+        ("both", "Deleted by Both"),
+    ]
 
-    class MessageType(models.TextChoices):
-        TEXT = "text", _("Text")
-        IMAGE = "image", _("Image")
-        FILE = "file", _("File (doc/zip)")
-        AUDIO = "audio", _("Audio / voice")
-        VIDEO = "video", _("Video")
-        LOCATION = "location", _("Location")
-        SYSTEM = "system", _("System")
-
-    room = models.ForeignKey(
-        ChatRoom,
-        on_delete=models.CASCADE,
-        related_name="messages",
-        verbose_name=_("Chat room"),
+    conversation = models.ForeignKey(
+        Conversation, on_delete=models.CASCADE, related_name="messages"
     )
-    sender = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="sent_messages",
-        verbose_name=_("Sender"),
-    )
-    message_type = models.CharField(
-        max_length=20,
-        choices=MessageType.choices,
-        default=MessageType.TEXT,
-        verbose_name=_("Type"),
-    )
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    text = models.TextField(blank=True, verbose_name=_("Text"))
-    image = models.ImageField(
-        upload_to="chat/images/%Y/%m/", blank=True, null=True, verbose_name=_("Image")
+    # Delete status
+    deleted_for = models.CharField(
+        max_length=10, choices=DELETE_CHOICES, default="none"
     )
-    file = models.FileField(
-        upload_to="chat/files/%Y/%m/",
-        blank=True,
-        null=True,
-        verbose_name=_("File / media"),
-    )
-    file_name = models.CharField(max_length=255, blank=True)
-    file_size = models.PositiveIntegerField(null=True, blank=True)
-
-    latitude = models.DecimalField(
-        max_digits=9, decimal_places=6, null=True, blank=True
-    )
-    longitude = models.DecimalField(
-        max_digits=9, decimal_places=6, null=True, blank=True
-    )
-    location_name = models.CharField(max_length=255, blank=True)
-
-    is_edited = models.BooleanField(default=False)
-    edited_at = models.DateTimeField(null=True, blank=True)
-    is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
 
-    reply_to = models.ForeignKey(
-        "self",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="replies",
-        verbose_name=_("Reply to"),
-    )
+    # Read status - simple boolean since it's only 1-on-1
+    is_read = models.BooleanField(default=False)
+    read_at = models.DateTimeField(null=True, blank=True)
 
-    read_count = models.PositiveIntegerField(default=0, verbose_name=_("Read count"))
-
-    replies_count = models.PositiveIntegerField(
-        default=0, verbose_name=_("Replies count")
-    )
+    objects = MessageManager()
 
     class Meta:
-        verbose_name = _("Message")
-        verbose_name_plural = _("Messages")
-        ordering = ["created_at"]
-        indexes = [
-            models.Index(fields=["room", "created_at"]),
-            models.Index(fields=["sender", "created_at"]),
-            models.Index(fields=["room", "is_deleted", "created_at"]),  # For filtering
-            models.Index(fields=["reply_to", "created_at"]),  # For threaded messages
-        ]
+        ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.get_message_type_display()} ({self.pk})"
+        return f"Message from {self.sender.full_name}: {self.content[:50]}"
 
-    def increment_read_count(self, save=True):
+    def mark_as_read(self):
+        """Mark message as read"""
+        if not self.is_read:
+            self.is_read = True
+            self.read_at = timezone.now()
+            self.save(update_fields=["is_read", "read_at"])
 
-        self.read_count += 1
-        if save:
-            self.save(update_fields=["read_count"])
+    def delete_for_sender(self, user):
+        """Delete message for sender only"""
+        if user == self.sender:
+            self.deleted_for = "sender"
+            self.deleted_at = timezone.now()
+            self.save(update_fields=["deleted_for", "deleted_at"])
+            return True
+        return False
 
-    def increment_replies_count(self, save=True):
+    def delete_for_both(self, user):
+        """Delete message for both users (only sender can do this)"""
+        if user == self.sender:
+            self.deleted_for = "both"
+            self.deleted_at = timezone.now()
+            self.save(update_fields=["deleted_for", "deleted_at"])
+            return True
+        return False
 
-        if self.reply_to:
-            self.reply_to.replies_count += 1
-            if save:
-                self.reply_to.save(update_fields=["replies_count"])
+    def recover_message(self, user):
+        """Recover deleted message (only sender can recover their own deletions)"""
+        if user == self.sender and self.deleted_for in ["sender", "both"]:
+            self.deleted_for = "none"
+            self.deleted_at = None
+            self.save(update_fields=["deleted_for", "deleted_at"])
+            return True
+        return False
+
+    def can_be_recovered(self, user):
+        """Check if message can be recovered by user"""
+        return user == self.sender and self.deleted_for in ["sender", "both"]
+
+    def is_visible_for_user(self, user):
+        """Check if message is visible for a specific user"""
+        if self.deleted_for == "both":
+            return False
+        if self.deleted_for == "sender" and user == self.sender:
+            return False
+        return True
+
+    def get_delete_status_for_user(self, user):
+        """Get delete status information for user"""
+        return {
+            "is_deleted": self.deleted_for != "none",
+            "deleted_for": self.deleted_for,
+            "deleted_at": self.deleted_at,
+            "can_recover": self.can_be_recovered(user),
+            "is_visible": self.is_visible_for_user(user),
+        }
 
 
-class MessageRead(BaseModel):
-
-    message = models.ForeignKey(
-        Message,
-        on_delete=models.CASCADE,
-        related_name="read_receipts",
-        verbose_name=_("Message"),
+class BlockedUser(models.Model):
+    blocker = models.ForeignKey(User, on_delete=models.CASCADE, related_name="blocking")
+    blocked = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="blocked_by"
     )
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="read_messages",
-        verbose_name=_("User"),
-    )
-    read_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = [["message", "user"]]
-        indexes = [
-            models.Index(fields=["user", "read_at"]),
-            models.Index(fields=["message", "read_at"]),
-            models.Index(fields=["user", "message"]),  # For quick lookups
-        ]
-        verbose_name = _("Read receipt")
-        verbose_name_plural = _("Read receipts")
+        unique_together = ("blocker", "blocked")
 
     def __str__(self):
-        return f"{self.user} read message {self.message.pk}"
-
-
-class UserTypingStatus(models.Model):
-
-    room = models.ForeignKey(
-        ChatRoom, on_delete=models.CASCADE, related_name="typing_statuses"
-    )
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="typing_statuses"
-    )
-    is_typing = models.BooleanField(default=False)
-    last_typed_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = [["room", "user"]]
-        indexes = [
-            models.Index(fields=["room", "is_typing"]),  # For active typing users
-            models.Index(fields=["user", "last_typed_at"]),  # For cleanup
-        ]
-
-    def __str__(self):
-        return f"{self.user} – {'typing' if self.is_typing else 'idle'}"
-
-    @classmethod
-    def cleanup_old_typing_statuses(cls, minutes=5):
-        cutoff_time = timezone.now() - timezone.timedelta(minutes=minutes)
-        cls.objects.filter(is_typing=True, last_typed_at__lt=cutoff_time).update(
-            is_typing=False
-        )
-
-
-class ChatRoomManager(models.Manager):
-
-    def with_last_message(self):
-        return self.select_related().filter(is_active=True)
-
-    def for_user(self, user):
-        return self.filter(participants=user, is_active=True).prefetch_related(
-            "participants"
-        )
-
-    def unread_for_user(self, user):
-        """O'qilmagan xabarlari bor xonalarni topish"""
-        user_id = str(user.id)
-
-        # Xavfsiz PostgreSQL JSON query
-        return (
-            self.filter(participants=user, is_active=True)
-            .annotate(
-                user_unread=Cast(
-                    KeyTextTransform(user_id, "unread_counts"), IntegerField()
-                )
-            )
-            .filter(user_unread__gt=0)
-        )
-
-
-# Add custom manager to ChatRoom
-ChatRoom.add_to_class("objects", ChatRoomManager())
+        return f"{self.blocker.full_name} blocks {self.blocked.full_name}"

@@ -13,6 +13,7 @@ import {
     getCurrentUser,
     getServiceTypes
 } from '../api/api';
+import ChatWidgets from './ChatWidgets'; // YANGI: Chat widget import
 import './UserAccount.css';
 
 const UserAccount = () => {
@@ -31,6 +32,11 @@ const UserAccount = () => {
     const [showReviewForm, setShowReviewForm] = useState(false);
     const [selectedGuide, setSelectedGuide] = useState(null);
     const [selectedBookingForReview, setSelectedBookingForReview] = useState(null);
+
+    // YANGI: Chat states
+    const [showChat, setShowChat] = useState(false);
+    const [selectedUserForChat, setSelectedUserForChat] = useState(null);
+
     const [guidesFilter, setGuidesFilter] = useState({
         search: '',
         service_type: '',
@@ -170,11 +176,53 @@ const UserAccount = () => {
 
     const handleBookingSubmit = async (e) => {
         e.preventDefault();
+
+        // YANGI: Validation qo'shish
+        if (!bookingForm.start_date) {
+            setError('Start date is required');
+            return;
+        }
+
+        if (!bookingForm.end_date) {
+            setError('End date is required');
+            return;
+        }
+
+        if (!bookingForm.title.trim()) {
+            setError('Title is required');
+            return;
+        }
+
+        // Start date End date dan kichik bo'lishi kerak
+        if (new Date(bookingForm.start_date) > new Date(bookingForm.end_date)) {
+            setError('Start date must be before end date');
+            return;
+        }
+
+        // Bugungi sanadan oldingi sana bo'lmasligi kerak
+        const today = new Date().toISOString().split('T')[0];
+        if (bookingForm.start_date < today) {
+            setError('Start date cannot be in the past');
+            return;
+        }
+
         try {
-            await createBooking({
+            console.log('Creating booking with data:', {
                 ...bookingForm,
                 customer_profile: selectedGuide.id
             });
+
+            const bookingData = {
+                title: bookingForm.title.trim(),
+                description: bookingForm.description.trim(),
+                start_date: bookingForm.start_date,
+                end_date: bookingForm.end_date,
+                special_requirements: bookingForm.special_requirements.trim(),
+                budget: bookingForm.budget ? parseFloat(bookingForm.budget) : null,
+                customer_profile: selectedGuide.id
+            };
+
+            await createBooking(bookingData);
             loadBookings();
             setShowBookingForm(false);
             setSelectedGuide(null);
@@ -188,8 +236,13 @@ const UserAccount = () => {
                 customer_profile: ''
             });
             setError(null);
+
+            // Success message
+            alert('Booking created successfully!');
+
         } catch (err) {
-            setError(err.message);
+            console.error('Booking creation error:', err);
+            setError(err.message || 'Failed to create booking');
         }
     };
 
@@ -228,14 +281,45 @@ const UserAccount = () => {
         }
     };
 
+    // TO'G'RILANGAN: handleBookGuide funksiyasi default qiymatlar bilan
     const handleBookGuide = (guide) => {
         setSelectedGuide(guide);
+
+        // Default qiymatlar qo'yish
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const nextWeek = new Date(today);
+        nextWeek.setDate(nextWeek.getDate() + 7);
+
+        setBookingForm({
+            title: `Tour with ${guide.user?.full_name || 'Guide'}`,
+            description: '',
+            start_date: tomorrow.toISOString().split('T')[0], // Tomorrow
+            end_date: nextWeek.toISOString().split('T')[0],   // Next week
+            special_requirements: '',
+            budget: guide.daily_rate || guide.hourly_rate || '',
+            customer_profile: ''
+        });
+
         setShowBookingForm(true);
     };
 
     const handleWriteReview = (booking) => {
         setSelectedBookingForReview(booking);
         setShowReviewForm(true);
+    };
+
+    // YANGI: Chat functions
+    const handleChatWithUser = (user) => {
+        setSelectedUserForChat(user?.user?.email || user?.email);
+        setShowChat(true);
+    };
+
+    const handleCloseChat = () => {
+        setShowChat(false);
+        setSelectedUserForChat(null);
     };
 
     const handleFilterChange = (key, value) => {
@@ -262,6 +346,24 @@ const UserAccount = () => {
                 {currentUser && (
                     <div className="user-account-user-info">
                         <span className="user-account-welcome">Welcome, {currentUser.full_name}</span>
+                        {/* YANGI: Messages button */}
+                        <button
+                            className="user-account-chat-btn"
+                            onClick={() => setShowChat(true)}
+                            style={{
+                                marginLeft: '16px',
+                                padding: '8px 16px',
+                                backgroundColor: '#667eea',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                fontWeight: '500'
+                            }}
+                        >
+                            Messages
+                        </button>
                     </div>
                 )}
             </div>
@@ -362,6 +464,20 @@ const UserAccount = () => {
                                                     onClick={() => handleWriteReview(booking)}
                                                 >
                                                     Write Review
+                                                </button>
+                                            )}
+                                            {/* YANGI: Chat button */}
+                                            {booking.customer_profile?.user && (
+                                                <button
+                                                    className="user-account-btn user-account-btn-secondary"
+                                                    onClick={() => handleChatWithUser(booking.customer_profile)}
+                                                    style={{
+                                                        marginLeft: '8px',
+                                                        backgroundColor: '#6c757d',
+                                                        color: 'white'
+                                                    }}
+                                                >
+                                                    Chat
                                                 </button>
                                             )}
                                         </div>
@@ -566,6 +682,18 @@ const UserAccount = () => {
                                             >
                                                 {guide.is_available ? 'Book Now' : 'Unavailable'}
                                             </button>
+                                            {/* YANGI: Chat button */}
+                                            <button
+                                                className="user-account-btn user-account-btn-secondary"
+                                                onClick={() => handleChatWithUser(guide)}
+                                                style={{
+                                                    marginLeft: '8px',
+                                                    backgroundColor: '#6c757d',
+                                                    color: 'white'
+                                                }}
+                                            >
+                                                Chat
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -608,6 +736,20 @@ const UserAccount = () => {
                                                 Write Review
                                             </button>
                                         )}
+                                        {/* YANGI: Chat button */}
+                                        {booking.customer_profile?.user && (
+                                            <button
+                                                className="user-account-btn user-account-btn-secondary"
+                                                onClick={() => handleChatWithUser(booking.customer_profile)}
+                                                style={{
+                                                    marginLeft: '8px',
+                                                    backgroundColor: '#6c757d',
+                                                    color: 'white'
+                                                }}
+                                            >
+                                                Chat with Guide
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             ))}
@@ -644,17 +786,20 @@ const UserAccount = () => {
                 )}
             </div>
 
-            {/* Booking Form Modal */}
+            {/* TO'G'RILANGAN: Booking Form Modal */}
             {showBookingForm && (
                 <div className="user-account-modal">
                     <div className="user-account-modal-content">
                         <div className="user-account-modal-header">
-                            <h3 className="user-account-modal-title">Book Guide</h3>
+                            <h3 className="user-account-modal-title">
+                                Book Guide: {selectedGuide?.user?.full_name}
+                            </h3>
                             <button
                                 className="user-account-modal-close"
                                 onClick={() => {
                                     setShowBookingForm(false);
                                     setSelectedGuide(null);
+                                    setError(null);
                                 }}
                             >
                                 ×
@@ -662,15 +807,17 @@ const UserAccount = () => {
                         </div>
                         <form onSubmit={handleBookingSubmit} className="user-account-form">
                             <div className="user-account-form-group">
-                                <label className="user-account-label">Title</label>
+                                <label className="user-account-label">Title *</label>
                                 <input
                                     type="text"
                                     className="user-account-input"
                                     value={bookingForm.title}
                                     onChange={(e) => setBookingForm({...bookingForm, title: e.target.value})}
                                     required
+                                    placeholder="Enter booking title"
                                 />
                             </div>
+
                             <div className="user-account-form-group">
                                 <label className="user-account-label">Description</label>
                                 <textarea
@@ -678,30 +825,35 @@ const UserAccount = () => {
                                     value={bookingForm.description}
                                     onChange={(e) => setBookingForm({...bookingForm, description: e.target.value})}
                                     rows="3"
+                                    placeholder="Describe what kind of tour/service you need"
                                 />
                             </div>
+
                             <div className="user-account-form-row">
                                 <div className="user-account-form-group">
-                                    <label className="user-account-label">Start Date</label>
+                                    <label className="user-account-label">Start Date *</label>
                                     <input
                                         type="date"
                                         className="user-account-input"
                                         value={bookingForm.start_date}
                                         onChange={(e) => setBookingForm({...bookingForm, start_date: e.target.value})}
                                         required
+                                        min={new Date().toISOString().split('T')[0]}
                                     />
                                 </div>
                                 <div className="user-account-form-group">
-                                    <label className="user-account-label">End Date</label>
+                                    <label className="user-account-label">End Date *</label>
                                     <input
                                         type="date"
                                         className="user-account-input"
                                         value={bookingForm.end_date}
                                         onChange={(e) => setBookingForm({...bookingForm, end_date: e.target.value})}
                                         required
+                                        min={bookingForm.start_date || new Date().toISOString().split('T')[0]}
                                     />
                                 </div>
                             </div>
+
                             <div className="user-account-form-group">
                                 <label className="user-account-label">Special Requirements</label>
                                 <textarea
@@ -709,10 +861,12 @@ const UserAccount = () => {
                                     value={bookingForm.special_requirements}
                                     onChange={(e) => setBookingForm({...bookingForm, special_requirements: e.target.value})}
                                     rows="2"
+                                    placeholder="Any special requests or requirements"
                                 />
                             </div>
+
                             <div className="user-account-form-group">
-                                <label className="user-account-label">Budget</label>
+                                <label className="user-account-label">Budget (USD)</label>
                                 <input
                                     type="number"
                                     className="user-account-input"
@@ -720,10 +874,40 @@ const UserAccount = () => {
                                     onChange={(e) => setBookingForm({...bookingForm, budget: e.target.value})}
                                     placeholder="0"
                                     step="0.01"
+                                    min="0"
                                 />
+                                {selectedGuide?.daily_rate && (
+                                    <small style={{color: '#666', fontSize: '12px', display: 'block', marginTop: '4px'}}>
+                                        Guide's daily rate: ${selectedGuide.daily_rate}
+                                    </small>
+                                )}
+                                {selectedGuide?.hourly_rate && (
+                                    <small style={{color: '#666', fontSize: '12px', display: 'block', marginTop: '4px'}}>
+                                        Guide's hourly rate: ${selectedGuide.hourly_rate}
+                                    </small>
+                                )}
                             </div>
+
+                            {/* Error display in form */}
+                            {error && (
+                                <div style={{
+                                    background: '#f8d7da',
+                                    color: '#721c24',
+                                    padding: '8px 12px',
+                                    borderRadius: '4px',
+                                    marginBottom: '16px',
+                                    fontSize: '14px'
+                                }}>
+                                    {error}
+                                </div>
+                            )}
+
                             <div className="user-account-form-actions">
-                                <button type="submit" className="user-account-btn user-account-btn-primary">
+                                <button
+                                    type="submit"
+                                    className="user-account-btn user-account-btn-primary"
+                                    disabled={!bookingForm.title.trim() || !bookingForm.start_date || !bookingForm.end_date}
+                                >
                                     Book Guide
                                 </button>
                                 <button
@@ -732,6 +916,7 @@ const UserAccount = () => {
                                     onClick={() => {
                                         setShowBookingForm(false);
                                         setSelectedGuide(null);
+                                        setError(null);
                                     }}
                                 >
                                     Cancel
@@ -860,6 +1045,14 @@ const UserAccount = () => {
                     </div>
                 </div>
             )}
+
+            {/* YANGI: Chat Widget */}
+            <ChatWidgets
+                isOpen={showChat}
+                onClose={handleCloseChat}
+                selectedUserId={selectedUserForChat}
+                userRole="client"
+            />
         </div>
     );
 };

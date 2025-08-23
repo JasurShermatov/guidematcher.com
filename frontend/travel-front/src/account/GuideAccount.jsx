@@ -20,6 +20,7 @@ import {
     getCities,
     getCurrentUser
 } from '../api/api';
+import ChatWidgets from './ChatWidgets'; // YANGI: Chat widget import
 import './GuideAccount.css';
 
 const GuideAccount = () => {
@@ -40,6 +41,10 @@ const GuideAccount = () => {
     const [showAvailabilityForm, setShowAvailabilityForm] = useState(false);
     const [editingPortfolioItem, setEditingPortfolioItem] = useState(null);
     const [editingAvailability, setEditingAvailability] = useState(null);
+
+    // YANGI: Chat states
+    const [showChat, setShowChat] = useState(false);
+    const [selectedUserForChat, setSelectedUserForChat] = useState(null);
 
     // Profile form state
     const [profileForm, setProfileForm] = useState({
@@ -248,6 +253,19 @@ const GuideAccount = () => {
         }
     };
 
+    // YANGI: Chat functions
+    const handleChatWithClient = (booking) => {
+        if (booking.client?.user?.email) {
+            setSelectedUserForChat(booking.client.user.email);
+            setShowChat(true);
+        }
+    };
+
+    const handleCloseChat = () => {
+        setShowChat(false);
+        setSelectedUserForChat(null);
+    };
+
     if (loading) {
         return (
             <div className="guide-account-loading">
@@ -264,6 +282,24 @@ const GuideAccount = () => {
                 {currentUser && (
                     <div className="guide-account-user-info">
                         <span className="guide-account-welcome">Welcome, {currentUser.full_name}</span>
+                        {/* YANGI: Messages button */}
+                        <button
+                            className="guide-account-chat-btn"
+                            onClick={() => setShowChat(true)}
+                            style={{
+                                marginLeft: '16px',
+                                padding: '8px 16px',
+                                backgroundColor: '#667eea',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                fontWeight: '500'
+                            }}
+                        >
+                            Messages
+                        </button>
                     </div>
                 )}
             </div>
@@ -355,22 +391,38 @@ const GuideAccount = () => {
                         {booking.status}
                       </span>
                                         </div>
-                                        {booking.status === 'pending' && (
-                                            <div className="guide-account-booking-actions">
+                                        <div className="guide-account-booking-actions">
+                                            {booking.status === 'pending' && (
+                                                <>
+                                                    <button
+                                                        className="guide-account-btn guide-account-btn-accept"
+                                                        onClick={() => handleBookingAction(booking.id, 'accept')}
+                                                    >
+                                                        Accept
+                                                    </button>
+                                                    <button
+                                                        className="guide-account-btn guide-account-btn-cancel"
+                                                        onClick={() => handleBookingAction(booking.id, 'cancel')}
+                                                    >
+                                                        Decline
+                                                    </button>
+                                                </>
+                                            )}
+                                            {/* YANGI: Chat button */}
+                                            {booking.client && (
                                                 <button
-                                                    className="guide-account-btn guide-account-btn-accept"
-                                                    onClick={() => handleBookingAction(booking.id, 'accept')}
+                                                    className="guide-account-btn guide-account-btn-secondary"
+                                                    onClick={() => handleChatWithClient(booking)}
+                                                    style={{
+                                                        marginLeft: '8px',
+                                                        backgroundColor: '#6c757d',
+                                                        color: 'white'
+                                                    }}
                                                 >
-                                                    Accept
+                                                    Chat
                                                 </button>
-                                                <button
-                                                    className="guide-account-btn guide-account-btn-cancel"
-                                                    onClick={() => handleBookingAction(booking.id, 'cancel')}
-                                                >
-                                                    Decline
-                                                </button>
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -606,28 +658,45 @@ const GuideAccount = () => {
                       {booking.status}
                     </span>
                                     </div>
-                                    {booking.status === 'pending' && (
-                                        <div className="guide-account-booking-actions">
+                                    <div className="guide-account-booking-actions">
+                                        {booking.status === 'pending' && (
+                                            <>
+                                                <button
+                                                    className="guide-account-btn guide-account-btn-accept"
+                                                    onClick={() => handleBookingAction(booking.id, 'accept')}
+                                                >
+                                                    Accept
+                                                </button>
+                                                <button
+                                                    className="guide-account-btn guide-account-btn-cancel"
+                                                    onClick={() => handleBookingAction(booking.id, 'cancel')}
+                                                >
+                                                    Decline
+                                                </button>
+                                            </>
+                                        )}
+                                        {/* YANGI: Chat button */}
+                                        {booking.client && (
                                             <button
-                                                className="guide-account-btn guide-account-btn-accept"
-                                                onClick={() => handleBookingAction(booking.id, 'accept')}
+                                                className="guide-account-btn guide-account-btn-secondary"
+                                                onClick={() => handleChatWithClient(booking)}
+                                                style={{
+                                                    marginLeft: '8px',
+                                                    backgroundColor: '#6c757d',
+                                                    color: 'white'
+                                                }}
                                             >
-                                                Accept
+                                                Chat with Client
                                             </button>
-                                            <button
-                                                className="guide-account-btn guide-account-btn-cancel"
-                                                onClick={() => handleBookingAction(booking.id, 'cancel')}
-                                            >
-                                                Decline
-                                            </button>
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     </div>
                 )}
 
+                {/* Portfolio, Availability, Reviews sections remain unchanged */}
                 {activeTab === 'portfolio' && (
                     <div className="guide-account-portfolio">
                         <div className="guide-account-portfolio-header">
@@ -914,6 +983,14 @@ const GuideAccount = () => {
                     </div>
                 )}
             </div>
+
+            {/* YANGI: Chat Widget */}
+            <ChatWidgets
+                isOpen={showChat}
+                onClose={handleCloseChat}
+                selectedUserId={selectedUserForChat}
+                userRole="guide"
+            />
         </div>
     );
 };

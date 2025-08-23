@@ -13,6 +13,7 @@ import {
     messageAction,
     getCurrentUser
 } from '../api/api';
+import './ChatWidgets.css';
 
 const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'client' }) => {
     const [currentUser, setCurrentUser] = useState(null);
@@ -211,6 +212,62 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
         }
     };
 
+    // Oxirgi xabar preview uchun funksiya
+    const getLastMessagePreview = (lastMessage) => {
+        if (!lastMessage) {
+            return 'No messages yet';
+        }
+
+        // Agar delete_status mavjud bo'lmasa yoki 'visible' bo'lsa
+        if (!lastMessage.delete_status || lastMessage.delete_status === 'visible') {
+            return lastMessage.content || 'No messages yet';
+        }
+
+        // O'chirilgan xabarlar uchun
+        if (lastMessage.delete_status === 'deleted_sender' ||
+            lastMessage.delete_status === 'deleted_both' ||
+            lastMessage.delete_status === 'deleted_receiver') {
+            return 'Message was deleted';
+        }
+
+        return lastMessage.content || 'No messages yet';
+    };
+
+    // Message ko'rinishi uchun tekshirish funksiyasi
+    const getMessageDisplay = (message) => {
+        // Agar delete_status mavjud bo'lmasa yoki 'visible' bo'lsa, oddiy xabarni ko'rsatish
+        if (!message.delete_status || message.delete_status === 'visible') {
+            return {
+                isDeleted: false,
+                content: message.content,
+                deletedText: null
+            };
+        }
+
+        // O'chirilgan xabarlar uchun
+        let deletedText = 'This message was deleted';
+
+        if (message.delete_status === 'deleted_sender' && message.is_mine) {
+            deletedText = 'You deleted this message';
+        } else if (message.delete_status === 'deleted_both') {
+            deletedText = 'This message was deleted';
+        } else if (message.delete_status === 'deleted_receiver' && !message.is_mine) {
+            // Agar qabul qiluvchi o'chirgan bo'lsa va bu men emas bo'lsam
+            deletedText = 'This message was deleted';
+        }
+
+        return {
+            isDeleted: true,
+            content: null,
+            deletedText: deletedText
+        };
+    };
+
+    // Xabar actions ko'rsatish uchun tekshirish
+    const shouldShowMessageActions = (message) => {
+        return message.is_mine && (!message.delete_status || message.delete_status === 'visible');
+    };
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -335,18 +392,18 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                                         {conversation.other_user?.full_name || 'Unknown User'}
                                                     </h4>
                                                     <span className="chat-widgets-conversation-time">
-                            {formatTime(conversation.updated_at)}
-                          </span>
+                                                        {formatTime(conversation.updated_at)}
+                                                    </span>
                                                 </div>
 
                                                 <div className="chat-widgets-conversation-preview">
                                                     <p className="chat-widgets-last-message">
-                                                        {conversation.last_message?.content || 'No messages yet'}
+                                                        {getLastMessagePreview(conversation.last_message)}
                                                     </p>
                                                     {conversation.unread_count > 0 && (
                                                         <span className="chat-widgets-unread-badge">
-                              {conversation.unread_count}
-                            </span>
+                                                            {conversation.unread_count}
+                                                        </span>
                                                     )}
                                                 </div>
                                             </div>
@@ -357,61 +414,66 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                         </div>
                     )}
 
-                    {/* Chat Messages View */}
+                    {/* Chat Messages View - TO'G'IRLANGAN QISM */}
                     {chatView === 'chat' && activeConversation && (
                         <div className="chat-widgets-chat">
                             <div className="chat-widgets-messages">
                                 <div className="chat-widgets-messages-list">
-                                    {messages.map(message => (
-                                        <div
-                                            key={message.id}
-                                            className={`chat-widgets-message ${message.is_mine ? 'chat-widgets-message-mine' : 'chat-widgets-message-other'}`}
-                                        >
-                                            <div className="chat-widgets-message-content">
-                                                {message.delete_status !== 'visible' ? (
-                                                    <span className="chat-widgets-message-deleted">
-                            {message.delete_status === 'deleted_sender' ? 'You deleted this message' : 'This message was deleted'}
-                          </span>
-                                                ) : (
-                                                    <p className="chat-widgets-message-text">{message.content}</p>
-                                                )}
+                                    {messages.map(message => {
+                                        const messageDisplay = getMessageDisplay(message);
 
-                                                <div className="chat-widgets-message-meta">
-                          <span className="chat-widgets-message-time">
-                            {formatTime(message.created_at)}
-                          </span>
-                                                    {message.is_mine && (
-                                                        <div className="chat-widgets-message-actions">
-                                                            {message.delete_status === 'visible' && (
-                                                                <>
-                                                                    <button
-                                                                        className="chat-widgets-message-action"
-                                                                        onClick={() => handleMessageAction(message.id, 'delete_sender')}
-                                                                    >
-                                                                        Delete for me
-                                                                    </button>
-                                                                    <button
-                                                                        className="chat-widgets-message-action"
-                                                                        onClick={() => handleMessageAction(message.id, 'delete_both')}
-                                                                    >
-                                                                        Delete for everyone
-                                                                    </button>
-                                                                </>
-                                                            )}
-                                                            {message.can_recover && (
+                                        return (
+                                            <div
+                                                key={message.id}
+                                                className={`chat-widgets-message ${message.is_mine ? 'chat-widgets-message-mine' : 'chat-widgets-message-other'} ${messageDisplay.isDeleted ? 'chat-widgets-message-deleted' : ''}`}
+                                            >
+                                                <div className="chat-widgets-message-content">
+                                                    {messageDisplay.isDeleted ? (
+                                                        <span className="chat-widgets-message-deleted-text">
+                                                            <em>{messageDisplay.deletedText}</em>
+                                                        </span>
+                                                    ) : (
+                                                        <p className="chat-widgets-message-text">{messageDisplay.content}</p>
+                                                    )}
+
+                                                    <div className="chat-widgets-message-meta">
+                                                        <span className="chat-widgets-message-time">
+                                                            {formatTime(message.created_at)}
+                                                        </span>
+
+                                                        {shouldShowMessageActions(message) && (
+                                                            <div className="chat-widgets-message-actions">
                                                                 <button
                                                                     className="chat-widgets-message-action"
-                                                                    onClick={() => handleMessageAction(message.id, 'recover')}
+                                                                    onClick={() => handleMessageAction(message.id, 'delete_sender')}
+                                                                    title="Delete for me"
                                                                 >
-                                                                    Recover
+                                                                    🗑️
                                                                 </button>
-                                                            )}
-                                                        </div>
-                                                    )}
+                                                                <button
+                                                                    className="chat-widgets-message-action"
+                                                                    onClick={() => handleMessageAction(message.id, 'delete_both')}
+                                                                    title="Delete for everyone"
+                                                                >
+                                                                    🗑️🗑️
+                                                                </button>
+                                                            </div>
+                                                        )}
+
+                                                        {message.can_recover && message.is_mine && (
+                                                            <button
+                                                                className="chat-widgets-message-action chat-widgets-recover-btn"
+                                                                onClick={() => handleMessageAction(message.id, 'recover')}
+                                                                title="Recover message"
+                                                            >
+                                                                ↶ Recover
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                     <div ref={messagesEndRef} />
                                 </div>
                             </div>
@@ -537,8 +599,8 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                                         {blockedUser.blocked_user?.email}
                                                     </p>
                                                     <span className="chat-widgets-blocked-date">
-                            Blocked on {formatDate(blockedUser.created_at)}
-                          </span>
+                                                        Blocked on {formatDate(blockedUser.created_at)}
+                                                    </span>
                                                 </div>
                                             </div>
 

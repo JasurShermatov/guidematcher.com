@@ -126,11 +126,12 @@ class RegisterView(generics.CreateAPIView):
 class CustomTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
+        # response.data["refresh"] – bu yangi token, agar ROTATE_REFRESH_TOKENS=True bo'lsa
         return Response(
             {
                 "message": "Token refreshed successfully.",
                 "access_token": response.data["access"],
-                "refresh_token": request.data.get("refresh"),
+                "refresh_token": response.data.get("refresh", request.data.get("refresh")),
             },
             status=status.HTTP_200_OK,
         )

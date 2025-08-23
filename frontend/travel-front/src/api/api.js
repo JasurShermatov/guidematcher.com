@@ -8,6 +8,21 @@ const api = axios.create({
     withCredentials: false,
 });
 
+// Token refresh loop oldini olish uchun
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+    failedQueue = [];
+};
+
 // Tokenni avtomatik qo'shish
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("access_token");
@@ -23,7 +38,7 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// Token muddati tugasa, refresh qilish
+// Token muddati tugasa, refresh qilish (FIXED - infinite loop oldini olish)
 api.interceptors.response.use(
     (response) => {
         console.log(`API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
@@ -41,31 +56,94 @@ api.interceptors.response.use(
 
         const originalRequest = error.config;
 
+        // MUHIM: Agar token refresh endpoint bo'lsa, infinite loop oldini olish
+        if (originalRequest.url && originalRequest.url.includes('token/refresh/')) {
+            console.error('Refresh token failed, clearing tokens and redirecting to login');
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            // Avoid immediate redirect during testing
+            setTimeout(() => {
+                window.location.href = "/login";
+            }, 1000);
+            return Promise.reject(error);
+        }
+
         if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-            try {
-                const refreshToken = localStorage.getItem("refresh_token");
-                if (!refreshToken) {
-                    throw new Error("No refresh token available");
-                }
-
-                const refreshResponse = await api.post("token/refresh/", {
-                    refresh: refreshToken,
+            if (isRefreshing) {
+                // Agar refresh qilinayotgan bo'lsa, queuega qo'shish
+                return new Promise((resolve, reject) => {
+                    failedQueue.push({ resolve, reject });
+                }).then(token => {
+                    originalRequest.headers.Authorization = `Bearer ${token}`;
+                    return api(originalRequest);
+                }).catch(err => {
+                    return Promise.reject(err);
                 });
+            }
 
-                const newAccessToken = refreshResponse.data.access_token || refreshResponse.data.access;
-                localStorage.setItem("access_token", newAccessToken);
-                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                return api(originalRequest);
-            } catch (refreshError) {
-                console.error("Token refresh failed:", refreshError);
+            originalRequest._retry = true;
+            isRefreshing = true;
+
+            const refreshToken = localStorage.getItem("refresh_token");
+
+            if (!refreshToken) {
+                console.error("No refresh token available");
+                processQueue(new Error("No refresh token"), null);
                 localStorage.removeItem("access_token");
                 localStorage.removeItem("refresh_token");
-                window.location.href = "/login";
+                setTimeout(() => {
+                    window.location.href = "/login";
+                }, 1000);
+                return Promise.reject(new Error("No refresh token available"));
+            }
+
+            try {
+                // MUHIM: Refresh uchun alohida axios instance yaratish
+                const refreshResponse = await axios.post(`${API_URL}token/refresh/`, {
+                    refresh: refreshToken,
+                }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    timeout: 10000, // 10 second timeout
+                });
+
+                const newAccessToken = refreshResponse.data.access || refreshResponse.data.access_token;
+
+                if (!newAccessToken) {
+                    throw new Error("No access token received from refresh endpoint");
+                }
+
+                localStorage.setItem("access_token", newAccessToken);
+
+                // Queue'dagi barcha requestlarni yangi token bilan yuborish
+                processQueue(null, newAccessToken);
+
+                // Original requestni yangi token bilan qayta yuborish
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                return api(originalRequest);
+
+            } catch (refreshError) {
+                console.error("Token refresh failed:", refreshError);
+
+                // Queue'dagi barcha requestlarni error bilan reject qilish
+                processQueue(refreshError, null);
+
+                // Tokenlarni o'chirish va login sahifasiga yo'naltirish
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("refresh_token");
+
+                setTimeout(() => {
+                    window.location.href = "/login";
+                }, 1000);
+
                 return Promise.reject(refreshError);
+            } finally {
+                isRefreshing = false;
             }
         }
 
+        // Error message yaratish
         let errorMessage = "Unknown error occurred";
 
         if (error.response?.data) {
@@ -131,16 +209,24 @@ export const logoutUser = () => {
         });
 };
 
-export const refreshToken = () =>
-    api
-        .post("token/refresh/", {
-            refresh: localStorage.getItem("refresh_token"),
-        })
-        .then((r) => {
-            const newToken = r.data.access_token || r.data.access;
-            localStorage.setItem("access_token", newToken);
-            return r.data;
-        });
+// MUHIM: refreshToken funksiyasini alohida axios bilan qilish
+export const refreshToken = () => {
+    const refreshToken = localStorage.getItem("refresh_token");
+
+    // Direct axios call without interceptors
+    return axios.post(`${API_URL}token/refresh/`, {
+        refresh: refreshToken,
+    }, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+        timeout: 10000,
+    }).then((r) => {
+        const newToken = r.data.access_token || r.data.access;
+        localStorage.setItem("access_token", newToken);
+        return r.data;
+    });
+};
 
 export const requestPasswordReset = (data) =>
     api.post("accounts/forgot-password/", data).then((r) => r.data);

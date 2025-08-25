@@ -61,9 +61,10 @@ THIRD_PARTY_APPS = [
     "rangefilter",
     "corsheaders",
     "drf_spectacular",
-    "django_celery_results",  # Celery natijalarini DB'da saqlash
-    "channels",  # WebSocket fazasida yoqasiz
+    "django_celery_results",
+    "channels",
     "admin_tools_stats",
+    "django_countries",
 ]
 
 LOCAL_APPS = [

@@ -9,11 +9,14 @@ import {
     getCustomerProfiles,
     getMyReviews,
     createReview,
+    updateReview,
+    deleteReview,
     getLanguages,
     getCurrentUser,
-    getServiceTypes
+    getServiceTypes,
+    getCities
 } from '../api/api';
-import ChatWidgets from './ChatWidgets'; // YANGI: Chat widget import
+import ChatWidgets from './ChatWidgets';
 import './UserAccount.css';
 
 const UserAccount = () => {
@@ -24,6 +27,7 @@ const UserAccount = () => {
     const [guides, setGuides] = useState([]);
     const [languages, setLanguages] = useState([]);
     const [serviceTypes, setServiceTypes] = useState([]);
+    const [cities, setCities] = useState([]);
     const [activeTab, setActiveTab] = useState('dashboard');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -32,8 +36,9 @@ const UserAccount = () => {
     const [showReviewForm, setShowReviewForm] = useState(false);
     const [selectedGuide, setSelectedGuide] = useState(null);
     const [selectedBookingForReview, setSelectedBookingForReview] = useState(null);
+    const [editingReview, setEditingReview] = useState(null);
 
-    // YANGI: Chat states
+    // Chat states
     const [showChat, setShowChat] = useState(false);
     const [selectedUserForChat, setSelectedUserForChat] = useState(null);
 
@@ -63,14 +68,9 @@ const UserAccount = () => {
         customer_profile: ''
     });
 
-    // Review form state
+    // Review form state - Updated with backend fields
     const [reviewForm, setReviewForm] = useState({
-        overall_rating: 5,
-        communication_rating: 5,
-        service_rating: 5,
-        punctuality_rating: 5,
-        value_rating: 5,
-        title: '',
+        rating: 5,
         comment: '',
         booking_id: ''
     });
@@ -88,13 +88,15 @@ const UserAccount = () => {
             setCurrentUser(userData);
 
             // Load common data
-            const [languagesData, serviceTypesData] = await Promise.all([
+            const [languagesData, serviceTypesData, citiesData] = await Promise.all([
                 getLanguages(),
-                getServiceTypes()
+                getServiceTypes(),
+                getCities()
             ]);
 
             setLanguages(languagesData.results || languagesData);
             setServiceTypes(serviceTypesData.results || serviceTypesData);
+            setCities(citiesData.results || citiesData);
 
             // Try to load profile
             try {
@@ -177,7 +179,7 @@ const UserAccount = () => {
     const handleBookingSubmit = async (e) => {
         e.preventDefault();
 
-        // YANGI: Validation qo'shish
+        // Validation
         if (!bookingForm.start_date) {
             setError('Start date is required');
             return;
@@ -207,11 +209,6 @@ const UserAccount = () => {
         }
 
         try {
-            console.log('Creating booking with data:', {
-                ...bookingForm,
-                customer_profile: selectedGuide.id
-            });
-
             const bookingData = {
                 title: bookingForm.title.trim(),
                 description: bookingForm.description.trim(),
@@ -237,7 +234,6 @@ const UserAccount = () => {
             });
             setError(null);
 
-            // Success message
             alert('Booking created successfully!');
 
         } catch (err) {
@@ -248,27 +244,80 @@ const UserAccount = () => {
 
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
+
+        if (!reviewForm.comment.trim()) {
+            setError('Please provide a comment');
+            return;
+        }
+
         try {
-            await createReview({
-                ...reviewForm,
-                booking_id: selectedBookingForReview.id
-            });
+            const reviewData = {
+                rating: reviewForm.rating,
+                comment: reviewForm.comment.trim()
+            };
+
+            let queryParams = '';
+            if (selectedBookingForReview) {
+                queryParams = `?booking_id=${selectedBookingForReview.id}`;
+            }
+
+            const url = editingReview
+                ? `reviews/${editingReview.id}/`
+                : `reviews/${queryParams}`;
+
+            if (editingReview) {
+                await updateReview(editingReview.id, reviewData);
+            } else {
+                // Use the specific create review API with booking_id query param
+                const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1/'}reviews/reviews/${queryParams}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    },
+                    body: JSON.stringify(reviewData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to create review');
+                }
+            }
+
             loadReviews();
+            loadBookings(); // Reload bookings to update review status
             setShowReviewForm(false);
             setSelectedBookingForReview(null);
+            setEditingReview(null);
             setReviewForm({
-                overall_rating: 5,
-                communication_rating: 5,
-                service_rating: 5,
-                punctuality_rating: 5,
-                value_rating: 5,
-                title: '',
+                rating: 5,
                 comment: '',
                 booking_id: ''
             });
             setError(null);
+
+            alert(editingReview ? 'Review updated successfully!' : 'Review created successfully!');
+
         } catch (err) {
-            setError(err.message);
+            console.error('Review error:', err);
+            setError(err.message || 'Failed to save review');
+        }
+    };
+
+    const handleDeleteReview = async (reviewId) => {
+        if (!window.confirm('Are you sure you want to delete this review?')) {
+            return;
+        }
+
+        try {
+            await deleteReview(reviewId);
+            loadReviews();
+            loadBookings();
+            setError(null);
+            alert('Review deleted successfully!');
+        } catch (err) {
+            console.error('Delete review error:', err);
+            setError(err.message || 'Failed to delete review');
         }
     };
 
@@ -281,7 +330,6 @@ const UserAccount = () => {
         }
     };
 
-    // TO'G'RILANGAN: handleBookGuide funksiyasi default qiymatlar bilan
     const handleBookGuide = (guide) => {
         setSelectedGuide(guide);
 
@@ -296,8 +344,8 @@ const UserAccount = () => {
         setBookingForm({
             title: `Tour with ${guide.user?.full_name || 'Guide'}`,
             description: '',
-            start_date: tomorrow.toISOString().split('T')[0], // Tomorrow
-            end_date: nextWeek.toISOString().split('T')[0],   // Next week
+            start_date: tomorrow.toISOString().split('T')[0],
+            end_date: nextWeek.toISOString().split('T')[0],
             special_requirements: '',
             budget: guide.daily_rate || guide.hourly_rate || '',
             customer_profile: ''
@@ -308,10 +356,27 @@ const UserAccount = () => {
 
     const handleWriteReview = (booking) => {
         setSelectedBookingForReview(booking);
+        setEditingReview(null);
+        setReviewForm({
+            rating: 5,
+            comment: '',
+            booking_id: booking.id
+        });
         setShowReviewForm(true);
     };
 
-    // YANGI: Chat functions
+    const handleEditReview = (review) => {
+        setEditingReview(review);
+        setSelectedBookingForReview(null);
+        setReviewForm({
+            rating: review.rating || 5,
+            comment: review.comment || '',
+            booking_id: review.booking || ''
+        });
+        setShowReviewForm(true);
+    };
+
+    // Chat functions
     const handleChatWithUser = (user) => {
         setSelectedUserForChat(user?.user?.email || user?.email);
         setShowChat(true);
@@ -330,6 +395,25 @@ const UserAccount = () => {
         loadGuides();
     }, [guidesFilter]);
 
+    // Check if booking can be reviewed
+    const canReviewBooking = (booking) => {
+        return booking.status === 'completed' && !reviews.find(r => r.booking === booking.id);
+    };
+
+    // Get review for booking
+    const getReviewForBooking = (booking) => {
+        return reviews.find(r => r.booking === booking.id);
+    };
+
+    // Check if review can be edited (within 7 days)
+    const canEditReview = (review) => {
+        if (!review.created_at) return false;
+        const reviewDate = new Date(review.created_at);
+        const today = new Date();
+        const daysDiff = Math.floor((today - reviewDate) / (1000 * 60 * 60 * 24));
+        return daysDiff <= 7;
+    };
+
     if (loading) {
         return (
             <div className="user-account-loading">
@@ -346,7 +430,6 @@ const UserAccount = () => {
                 {currentUser && (
                     <div className="user-account-user-info">
                         <span className="user-account-welcome">Welcome, {currentUser.full_name}</span>
-                        {/* YANGI: Messages button */}
                         <button
                             className="user-account-chat-btn"
                             onClick={() => setShowChat(true)}
@@ -446,8 +529,8 @@ const UserAccount = () => {
                                                 {new Date(booking.end_date).toLocaleDateString()}
                                             </p>
                                             <span className={`user-account-booking-status user-account-status-${booking.status}`}>
-                        {booking.status}
-                      </span>
+                                                {booking.status}
+                                            </span>
                                         </div>
                                         <div className="user-account-booking-actions">
                                             {booking.status === 'pending' && (
@@ -458,7 +541,7 @@ const UserAccount = () => {
                                                     Cancel
                                                 </button>
                                             )}
-                                            {booking.status === 'completed' && !reviews.find(r => r.booking === booking.id) && (
+                                            {canReviewBooking(booking) && (
                                                 <button
                                                     className="user-account-btn user-account-btn-primary"
                                                     onClick={() => handleWriteReview(booking)}
@@ -466,7 +549,6 @@ const UserAccount = () => {
                                                     Write Review
                                                 </button>
                                             )}
-                                            {/* YANGI: Chat button */}
                                             {booking.customer_profile?.user && (
                                                 <button
                                                     className="user-account-btn user-account-btn-secondary"
@@ -616,6 +698,16 @@ const UserAccount = () => {
                                 </select>
                                 <select
                                     className="user-account-filter-select"
+                                    value={guidesFilter.city}
+                                    onChange={(e) => handleFilterChange('city', e.target.value)}
+                                >
+                                    <option value="">All Cities</option>
+                                    {cities.map(city => (
+                                        <option key={city.id} value={city.id}>{city.name}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    className="user-account-filter-select"
                                     value={guidesFilter.min_rating}
                                     onChange={(e) => handleFilterChange('min_rating', e.target.value)}
                                 >
@@ -651,26 +743,26 @@ const UserAccount = () => {
                                         <h4 className="user-account-guide-name">{guide.user?.full_name}</h4>
                                         <p className="user-account-guide-bio">{guide.professional_bio}</p>
                                         <div className="user-account-guide-details">
-                      <span className="user-account-guide-experience">
-                        {guide.years_of_experience} years experience
-                      </span>
+                                            <span className="user-account-guide-experience">
+                                                {guide.years_of_experience} years experience
+                                            </span>
                                             <div className="user-account-guide-rating">
                                                 {'★'.repeat(Math.floor(guide.average_rating || 0))}
                                                 {'☆'.repeat(5 - Math.floor(guide.average_rating || 0))}
                                                 <span className="user-account-guide-rating-text">
-                          {guide.average_rating || 0}/5 ({guide.total_reviews || 0} reviews)
-                        </span>
+                                                    {guide.average_rating || 0}/5 ({guide.total_reviews || 0} reviews)
+                                                </span>
                                             </div>
                                             <div className="user-account-guide-pricing">
                                                 {guide.hourly_rate && (
                                                     <span className="user-account-guide-price">
-                            ${guide.hourly_rate}/hour
-                          </span>
+                                                        ${guide.hourly_rate}/hour
+                                                    </span>
                                                 )}
                                                 {guide.daily_rate && (
                                                     <span className="user-account-guide-price">
-                            ${guide.daily_rate}/day
-                          </span>
+                                                        ${guide.daily_rate}/day
+                                                    </span>
                                                 )}
                                             </div>
                                         </div>
@@ -682,7 +774,6 @@ const UserAccount = () => {
                                             >
                                                 {guide.is_available ? 'Book Now' : 'Unavailable'}
                                             </button>
-                                            {/* YANGI: Chat button */}
                                             <button
                                                 className="user-account-btn user-account-btn-secondary"
                                                 onClick={() => handleChatWithUser(guide)}
@@ -706,87 +797,139 @@ const UserAccount = () => {
                     <div className="user-account-bookings">
                         <h3 className="user-account-section-title">My Bookings</h3>
                         <div className="user-account-bookings-list">
-                            {bookings.map(booking => (
-                                <div key={booking.id} className="user-account-booking-item">
-                                    <div className="user-account-booking-details">
-                                        <h4 className="user-account-booking-title">{booking.title}</h4>
-                                        <p className="user-account-booking-dates">
-                                            {new Date(booking.start_date).toLocaleDateString()} -
-                                            {new Date(booking.end_date).toLocaleDateString()}
-                                        </p>
-                                        <p className="user-account-booking-description">{booking.description}</p>
-                                        <span className={`user-account-booking-status user-account-status-${booking.status}`}>
-                      {booking.status}
-                    </span>
+                            {bookings.map(booking => {
+                                const existingReview = getReviewForBooking(booking);
+                                return (
+                                    <div key={booking.id} className="user-account-booking-item">
+                                        <div className="user-account-booking-details">
+                                            <h4 className="user-account-booking-title">{booking.title}</h4>
+                                            <p className="user-account-booking-dates">
+                                                {new Date(booking.start_date).toLocaleDateString()} -
+                                                {new Date(booking.end_date).toLocaleDateString()}
+                                            </p>
+                                            <p className="user-account-booking-description">{booking.description}</p>
+                                            <span className={`user-account-booking-status user-account-status-${booking.status}`}>
+                                                {booking.status}
+                                            </span>
+                                            {existingReview && (
+                                                <div className="user-account-booking-review-info">
+                                                    <span className="user-account-review-badge">
+                                                        Review: {'★'.repeat(existingReview.rating)}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="user-account-booking-actions">
+                                            {booking.status === 'pending' && (
+                                                <button
+                                                    className="user-account-btn user-account-btn-cancel"
+                                                    onClick={() => handleCancelBooking(booking.id)}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            )}
+                                            {canReviewBooking(booking) && (
+                                                <button
+                                                    className="user-account-btn user-account-btn-primary"
+                                                    onClick={() => handleWriteReview(booking)}
+                                                >
+                                                    Write Review
+                                                </button>
+                                            )}
+                                            {booking.customer_profile?.user && (
+                                                <button
+                                                    className="user-account-btn user-account-btn-secondary"
+                                                    onClick={() => handleChatWithUser(booking.customer_profile)}
+                                                    style={{
+                                                        marginLeft: '8px',
+                                                        backgroundColor: '#6c757d',
+                                                        color: 'white'
+                                                    }}
+                                                >
+                                                    Chat with Guide
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="user-account-booking-actions">
-                                        {booking.status === 'pending' && (
-                                            <button
-                                                className="user-account-btn user-account-btn-cancel"
-                                                onClick={() => handleCancelBooking(booking.id)}
-                                            >
-                                                Cancel
-                                            </button>
-                                        )}
-                                        {booking.status === 'completed' && !reviews.find(r => r.booking === booking.id) && (
-                                            <button
-                                                className="user-account-btn user-account-btn-primary"
-                                                onClick={() => handleWriteReview(booking)}
-                                            >
-                                                Write Review
-                                            </button>
-                                        )}
-                                        {/* YANGI: Chat button */}
-                                        {booking.customer_profile?.user && (
-                                            <button
-                                                className="user-account-btn user-account-btn-secondary"
-                                                onClick={() => handleChatWithUser(booking.customer_profile)}
-                                                style={{
-                                                    marginLeft: '8px',
-                                                    backgroundColor: '#6c757d',
-                                                    color: 'white'
-                                                }}
-                                            >
-                                                Chat with Guide
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 )}
 
                 {activeTab === 'reviews' && (
                     <div className="user-account-reviews">
-                        <h3 className="user-account-section-title">My Reviews</h3>
+                        <div className="user-account-reviews-header">
+                            <h3 className="user-account-section-title">My Reviews</h3>
+                            <p className="user-account-reviews-subtitle">
+                                {reviews.length} review{reviews.length !== 1 ? 's' : ''} written
+                            </p>
+                        </div>
                         <div className="user-account-reviews-list">
-                            {reviews.map(review => (
-                                <div key={review.id} className="user-account-review-item">
-                                    <div className="user-account-review-header">
-                                        <div className="user-account-review-rating">
-                                            {'★'.repeat(review.overall_rating)}{'☆'.repeat(5 - review.overall_rating)}
+                            {reviews.length > 0 ? (
+                                reviews.map(review => (
+                                    <div key={review.id} className="user-account-review-item">
+                                        <div className="user-account-review-header">
+                                            <div className="user-account-review-rating">
+                                                {'★'.repeat(review.rating || 0)}{'☆'.repeat(5 - (review.rating || 0))}
+                                                <span className="user-account-review-rating-number">
+                                                    {review.rating}/5
+                                                </span>
+                                            </div>
+                                            <div className="user-account-review-meta">
+                                                <span className="user-account-review-date">
+                                                    {new Date(review.created_at).toLocaleDateString()}
+                                                </span>
+                                                {review.customer_name && (
+                                                    <span className="user-account-review-guide">
+                                                        Guide: {review.customer_name}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
-                                        <span className="user-account-review-date">
-                      {new Date(review.created_at).toLocaleDateString()}
-                    </span>
+                                        <div className="user-account-review-content">
+                                            <p className="user-account-review-comment">{review.comment}</p>
+                                            {review.booking_title && (
+                                                <p className="user-account-review-booking">
+                                                    <strong>Booking:</strong> {review.booking_title}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div className="user-account-review-actions">
+                                            {canEditReview(review) && (
+                                                <button
+                                                    className="user-account-btn user-account-btn-small"
+                                                    onClick={() => handleEditReview(review)}
+                                                >
+                                                    Edit
+                                                </button>
+                                            )}
+                                            <button
+                                                className="user-account-btn user-account-btn-small user-account-btn-danger"
+                                                onClick={() => handleDeleteReview(review.id)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                        {!canEditReview(review) && (
+                                            <small className="user-account-review-edit-note">
+                                                Reviews can only be edited within 7 days of creation
+                                            </small>
+                                        )}
                                     </div>
-                                    <h4 className="user-account-review-title">{review.title}</h4>
-                                    <p className="user-account-review-comment">{review.comment}</p>
-                                    <div className="user-account-review-details">
-                                        <span className="user-account-review-detail">Communication: {review.communication_rating}/5</span>
-                                        <span className="user-account-review-detail">Service: {review.service_rating}/5</span>
-                                        <span className="user-account-review-detail">Punctuality: {review.punctuality_rating}/5</span>
-                                        <span className="user-account-review-detail">Value: {review.value_rating}/5</span>
-                                    </div>
+                                ))
+                            ) : (
+                                <div className="user-account-empty-state">
+                                    <p>You haven't written any reviews yet.</p>
+                                    <p>Complete a booking and share your experience!</p>
                                 </div>
-                            ))}
+                            )}
                         </div>
                     </div>
                 )}
             </div>
 
-            {/* TO'G'RILANGAN: Booking Form Modal */}
+            {/* Booking Form Modal */}
             {showBookingForm && (
                 <div className="user-account-modal">
                     <div className="user-account-modal-content">
@@ -888,7 +1031,6 @@ const UserAccount = () => {
                                 )}
                             </div>
 
-                            {/* Error display in form */}
                             {error && (
                                 <div style={{
                                     background: '#f8d7da',
@@ -932,103 +1074,81 @@ const UserAccount = () => {
                 <div className="user-account-modal">
                     <div className="user-account-modal-content">
                         <div className="user-account-modal-header">
-                            <h3 className="user-account-modal-title">Write Review</h3>
+                            <h3 className="user-account-modal-title">
+                                {editingReview ? 'Edit Review' : 'Write Review'}
+                            </h3>
                             <button
                                 className="user-account-modal-close"
                                 onClick={() => {
                                     setShowReviewForm(false);
                                     setSelectedBookingForReview(null);
+                                    setEditingReview(null);
+                                    setError(null);
                                 }}
                             >
                                 ×
                             </button>
                         </div>
+
+                        {selectedBookingForReview && (
+                            <div className="user-account-review-booking-info">
+                                <h4>Booking: {selectedBookingForReview.title}</h4>
+                                <p>Guide: {selectedBookingForReview.customer_profile?.user?.full_name}</p>
+                            </div>
+                        )}
+
                         <form onSubmit={handleReviewSubmit} className="user-account-form">
-                            <div className="user-account-rating-group">
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">Overall Rating</label>
-                                    <select
-                                        className="user-account-select"
-                                        value={reviewForm.overall_rating}
-                                        onChange={(e) => setReviewForm({...reviewForm, overall_rating: parseInt(e.target.value)})}
-                                    >
-                                        {[1,2,3,4,5].map(num => (
-                                            <option key={num} value={num}>{num} Star{num > 1 ? 's' : ''}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">Communication</label>
-                                    <select
-                                        className="user-account-select"
-                                        value={reviewForm.communication_rating}
-                                        onChange={(e) => setReviewForm({...reviewForm, communication_rating: parseInt(e.target.value)})}
-                                    >
-                                        {[1,2,3,4,5].map(num => (
-                                            <option key={num} value={num}>{num}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">Service Quality</label>
-                                    <select
-                                        className="user-account-select"
-                                        value={reviewForm.service_rating}
-                                        onChange={(e) => setReviewForm({...reviewForm, service_rating: parseInt(e.target.value)})}
-                                    >
-                                        {[1,2,3,4,5].map(num => (
-                                            <option key={num} value={num}>{num}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">Punctuality</label>
-                                    <select
-                                        className="user-account-select"
-                                        value={reviewForm.punctuality_rating}
-                                        onChange={(e) => setReviewForm({...reviewForm, punctuality_rating: parseInt(e.target.value)})}
-                                    >
-                                        {[1,2,3,4,5].map(num => (
-                                            <option key={num} value={num}>{num}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">Value for Money</label>
-                                    <select
-                                        className="user-account-select"
-                                        value={reviewForm.value_rating}
-                                        onChange={(e) => setReviewForm({...reviewForm, value_rating: parseInt(e.target.value)})}
-                                    >
-                                        {[1,2,3,4,5].map(num => (
-                                            <option key={num} value={num}>{num}</option>
-                                        ))}
-                                    </select>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">Rating *</label>
+                                <div className="user-account-rating-input">
+                                    {[1, 2, 3, 4, 5].map(rating => (
+                                        <button
+                                            key={rating}
+                                            type="button"
+                                            className={`user-account-star-btn ${reviewForm.rating >= rating ? 'active' : ''}`}
+                                            onClick={() => setReviewForm({...reviewForm, rating})}
+                                        >
+                                            ★
+                                        </button>
+                                    ))}
+                                    <span className="user-account-rating-text">
+                                        {reviewForm.rating}/5
+                                    </span>
                                 </div>
                             </div>
+
                             <div className="user-account-form-group">
-                                <label className="user-account-label">Title</label>
-                                <input
-                                    type="text"
-                                    className="user-account-input"
-                                    value={reviewForm.title}
-                                    onChange={(e) => setReviewForm({...reviewForm, title: e.target.value})}
-                                    required
-                                />
-                            </div>
-                            <div className="user-account-form-group">
-                                <label className="user-account-label">Comment</label>
+                                <label className="user-account-label">Comment *</label>
                                 <textarea
                                     className="user-account-textarea"
                                     value={reviewForm.comment}
                                     onChange={(e) => setReviewForm({...reviewForm, comment: e.target.value})}
                                     rows="4"
                                     required
+                                    placeholder="Share your experience with this guide..."
                                 />
                             </div>
+
+                            {error && (
+                                <div style={{
+                                    background: '#f8d7da',
+                                    color: '#721c24',
+                                    padding: '8px 12px',
+                                    borderRadius: '4px',
+                                    marginBottom: '16px',
+                                    fontSize: '14px'
+                                }}>
+                                    {error}
+                                </div>
+                            )}
+
                             <div className="user-account-form-actions">
-                                <button type="submit" className="user-account-btn user-account-btn-primary">
-                                    Submit Review
+                                <button
+                                    type="submit"
+                                    className="user-account-btn user-account-btn-primary"
+                                    disabled={!reviewForm.comment.trim()}
+                                >
+                                    {editingReview ? 'Update Review' : 'Submit Review'}
                                 </button>
                                 <button
                                     type="button"
@@ -1036,6 +1156,8 @@ const UserAccount = () => {
                                     onClick={() => {
                                         setShowReviewForm(false);
                                         setSelectedBookingForReview(null);
+                                        setEditingReview(null);
+                                        setError(null);
                                     }}
                                 >
                                     Cancel
@@ -1046,7 +1168,7 @@ const UserAccount = () => {
                 </div>
             )}
 
-            {/* YANGI: Chat Widget */}
+            {/* Chat Widget */}
             <ChatWidgets
                 isOpen={showChat}
                 onClose={handleCloseChat}

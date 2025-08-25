@@ -1,1546 +1,963 @@
-/* ===== GUIDE ACCOUNT OPTIMIZED STYLES ===== */
+/* GuideAccount Component Styles */
 
-/* Base CSS Variables */
-.guide-account {
-    --guide-primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --guide-secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --guide-success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --guide-warning-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-    --guide-danger-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-
-    --guide-primary-color: #667eea;
-    --guide-secondary-color: #764ba2;
-    --guide-success-color: #10b981;
-    --guide-warning-color: #f59e0b;
-    --guide-danger-color: #ef4444;
-
-    --guide-text-primary: #1a202c;
-    --guide-text-secondary: #4a5568;
-    --guide-text-muted: #718096;
-
-    --guide-bg-primary: #ffffff;
-    --guide-bg-secondary: #f7fafc;
-    --guide-bg-accent: rgba(255, 255, 255, 0.8);
-
-    --guide-border-light: rgba(255, 255, 255, 0.2);
-    --guide-border-medium: #e2e8f0;
-
-    --guide-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-    --guide-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-    --guide-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-    --guide-shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
-
-    --guide-radius-sm: 8px;
-    --guide-radius-md: 12px;
-    --guide-radius-lg: 16px;
-    --guide-radius-xl: 24px;
-
-    --guide-transition-fast: 0.15s ease;
-    --guide-transition-normal: 0.3s ease;
-    --guide-transition-slow: 0.5s ease;
-}
-
-/* Theme Support */
-[data-theme="dark"] {
-    --guide-text-primary: #f3f4f6;
-    --guide-text-secondary: #d1d5db;
-    --guide-text-muted: #9ca3af;
-    --guide-bg-primary: #1e293b;
-    --guide-bg-secondary: #374151;
-    --guide-bg-accent: rgba(45, 55, 72, 0.9);
-    --guide-border-light: rgba(255, 255, 255, 0.1);
-    --guide-border-medium: #4b5563;
-}
-
-/* Base Component Styles */
-.guide-account {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    background: var(--guide-bg-primary);
+/* Container and Layout */
+.guide-account-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
     min-height: 100vh;
-    color: var(--guide-text-primary);
+}
+
+/* Header Styles */
+.guide-account-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 35px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
     position: relative;
-    overflow-x: hidden;
-    box-sizing: border-box;
+    overflow: hidden;
 }
 
-.guide-account *,
-.guide-account *::before,
-.guide-account *::after {
-    box-sizing: border-box;
-}
-
-.guide-account::before {
+.guide-account-header::before {
     content: '';
-    position: fixed;
+    position: absolute;
     top: 0;
-    left: 0;
     right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(240, 147, 251, 0.1) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: -1;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(50px, -50px);
 }
 
-/* Loading State */
+.guide-account-title {
+    margin: 0 0 10px 0;
+    font-size: 2.8rem;
+    font-weight: 700;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.guide-account-user-info {
+    margin-top: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+.guide-account-welcome {
+    font-size: 1.3rem;
+    opacity: 0.95;
+    font-weight: 500;
+}
+
+/* Loading Styles */
 .guide-account-loading {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    gap: 1rem;
+    height: 400px;
+    color: #6c757d;
 }
 
 .guide-account-spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid var(--guide-border-medium);
-    border-top: 4px solid var(--guide-primary-color);
+    width: 60px;
+    height: 60px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #667eea;
     border-radius: 50%;
-    animation: guideSpinner 1s linear infinite;
+    animation: guideAccountSpin 1s linear infinite;
+    margin-bottom: 25px;
 }
 
-@keyframes guideSpinner {
+@keyframes guideAccountSpin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
-/* Notifications */
-.guide-account-notifications {
-    position: fixed;
-    top: 2rem;
-    right: 2rem;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    max-width: 400px;
-}
-
-.guide-account-notification {
-    background: var(--guide-bg-accent);
-    border-radius: var(--guide-radius-md);
-    padding: 1rem 1.5rem;
-    box-shadow: var(--guide-shadow-lg);
-    border-left: 4px solid;
+/* Error Styles */
+.guide-account-error {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    color: white;
+    padding: 18px 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    animation: guideSlideInRight 0.3s ease, guideFadeOut 0.3s ease 4.7s forwards;
-    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(238, 90, 82, 0.3);
+    animation: slideDown 0.3s ease-out;
 }
 
-.guide-account-notification.guide-account-notification-success {
-    border-left-color: var(--guide-success-color);
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, var(--guide-bg-accent) 100%);
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
-.guide-account-notification.guide-account-notification-error {
-    border-left-color: var(--guide-danger-color);
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--guide-bg-accent) 100%);
+.guide-account-error p {
+    margin: 0;
+    font-weight: 500;
 }
 
-.guide-account-notification.guide-account-notification-info {
-    border-left-color: var(--guide-primary-color);
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, var(--guide-bg-accent) 100%);
-}
-
-.guide-account-notification button {
+.guide-account-error-close {
     background: none;
     border: none;
-    color: var(--guide-text-muted);
+    color: white;
+    font-size: 1.8rem;
     cursor: pointer;
-    padding: 0.25rem;
-    border-radius: var(--guide-radius-sm);
-    transition: var(--guide-transition-fast);
+    padding: 0;
+    line-height: 1;
+    font-weight: bold;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
 }
 
-.guide-account-notification button:hover {
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--guide-text-primary);
+.guide-account-error-close:hover {
+    opacity: 1;
 }
 
-@keyframes guideSlideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes guideFadeOut {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(100%);
-    }
-}
-
-/* Header */
-.guide-account-header {
-    background: var(--guide-bg-accent);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--guide-border-light);
-    padding: 1.5rem 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: var(--guide-shadow-md);
-}
-
-.guide-account-header-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2rem;
+/* Navigation Styles */
+.guide-account-navigation {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    gap: 6px;
+    margin-bottom: 30px;
+    background: white;
+    padding: 8px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
-.guide-account-user-info {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
+.guide-account-navigation::-webkit-scrollbar {
+    display: none;
 }
 
-.guide-account-avatar-container {
-    position: relative;
-}
-
-.guide-account-avatar {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid transparent;
-    background: var(--guide-primary-gradient);
-    padding: 2px;
-    box-shadow: var(--guide-shadow-md);
-    transition: var(--guide-transition-normal);
-}
-
-.guide-account-avatar:hover {
-    transform: scale(1.05);
-    box-shadow: var(--guide-shadow-lg);
-}
-
-.guide-account-status-indicator {
-    position: absolute;
-    bottom: 4px;
-    right: 4px;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 3px solid var(--guide-bg-primary);
-    background: #ef4444;
-    animation: guidePulse 2s infinite;
-}
-
-.guide-account-status-indicator.online {
-    background: var(--guide-success-color);
-}
-
-@keyframes guidePulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
-.guide-account-user-info h1 {
-    margin: 0;
-    font-size: 1.75rem;
-    font-weight: 800;
-    background: var(--guide-primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.guide-account-subtitle {
-    margin: 0.5rem 0 0 0;
-    color: var(--guide-text-secondary);
-    font-size: 1rem;
-    font-weight: 500;
-}
-
-.guide-account-rating {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
-    padding: 0.5rem 1rem;
-    background: rgba(245, 158, 11, 0.1);
-    border-radius: var(--guide-radius-lg);
-    backdrop-filter: blur(5px);
-}
-
-.guide-account-star {
-    color: var(--guide-warning-color);
-    font-size: 1.25rem;
-}
-
-.guide-account-rating span {
-    font-weight: 700;
-    color: var(--guide-text-primary);
-}
-
-.guide-account-header-actions {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-.guide-account-quick-stats {
-    display: flex;
-    gap: 1.5rem;
-}
-
-.guide-account-stat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 1.5rem;
-    background: var(--guide-bg-accent);
-    backdrop-filter: blur(10px);
-    border-radius: var(--guide-radius-lg);
-    min-width: 100px;
-    cursor: pointer;
-    transition: var(--guide-transition-normal);
-    position: relative;
-    overflow: hidden;
-}
-
-.guide-account-stat-item:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--guide-shadow-lg);
-    background: rgba(255, 255, 255, 0.9);
-}
-
-.guide-account-stat-item svg {
-    font-size: 1.75rem;
-    color: var(--guide-primary-color);
-}
-
-.guide-account-stat-item span {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--guide-text-primary);
-}
-
-.guide-account-stat-item small {
-    font-size: 0.8rem;
-    color: var(--guide-text-muted);
-    text-align: center;
-    font-weight: 500;
-}
-
-.guide-account-notification-dot {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    width: 12px;
-    height: 12px;
-    background: var(--guide-danger-color);
-    border-radius: 50%;
-    border: 2px solid var(--guide-bg-primary);
-    animation: guideBounce 2s infinite;
-}
-
-@keyframes guideBounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-3px); }
-    60% { transform: translateY(-1px); }
-}
-
-.guide-account-settings-btn {
-    background: rgba(102, 126, 234, 0.1);
-    color: var(--guide-primary-color);
+.guide-account-nav-btn {
+    padding: 14px 24px;
     border: none;
-    padding: 1rem;
-    border-radius: var(--guide-radius-lg);
+    background: transparent;
+    color: #6c757d;
+    border-radius: 12px;
     cursor: pointer;
-    transition: var(--guide-transition-normal);
-    font-size: 1.5rem;
-}
-
-.guide-account-settings-btn:hover {
-    background: rgba(102, 126, 234, 0.2);
-    transform: scale(1.05);
-}
-
-/* Main Layout */
-.guide-account-main {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2rem;
-    display: grid;
-    grid-template-columns: 380px 1fr;
-    gap: 2rem;
-}
-
-/* Sidebar */
-.guide-account-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-/* Cards */
-.guide-account-card {
-    background: var(--guide-bg-accent);
-    backdrop-filter: blur(20px);
-    border-radius: var(--guide-radius-xl);
-    border: 1px solid var(--guide-border-light);
-    box-shadow: var(--guide-shadow-lg);
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    font-size: 0.95rem;
+    position: relative;
     overflow: hidden;
-    transition: var(--guide-transition-normal);
+}
+
+.guide-account-nav-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.5s;
+}
+
+.guide-account-nav-btn:hover::before {
+    left: 100%;
+}
+
+.guide-account-nav-btn:hover {
+    background-color: #f8f9fa;
+    color: #495057;
+    transform: translateY(-2px);
+}
+
+.guide-account-nav-active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Content Area */
+.guide-account-content {
+    background: white;
+    border-radius: 16px;
+    padding: 35px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    min-height: 600px;
     position: relative;
 }
 
-.guide-account-card::before {
+/* Dashboard Styles */
+.guide-account-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.guide-account-stat-card {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #f0f2f5;
+    position: relative;
+    overflow: hidden;
+}
+
+.guide-account-stat-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     height: 4px;
-    background: var(--guide-primary-gradient);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.guide-account-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--guide-shadow-xl);
+.guide-account-stat-card:nth-child(1)::before {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.guide-account-card-header {
-    padding: 2rem 2rem 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+.guide-account-stat-card:nth-child(2)::before {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
 
-.guide-account-card-header h3 {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--guide-text-primary);
+.guide-account-stat-card:nth-child(3)::before {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
 }
 
-.guide-account-edit-btn {
-    background: rgba(102, 126, 234, 0.1);
-    color: var(--guide-primary-color);
-    border: none;
-    padding: 0.75rem;
-    border-radius: var(--guide-radius-md);
-    cursor: pointer;
-    transition: var(--guide-transition-fast);
+.guide-account-stat-card:nth-child(4)::before {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.guide-account-stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.guide-account-stat-title {
+    margin: 0 0 15px 0;
     font-size: 1.1rem;
-}
-
-.guide-account-edit-btn:hover {
-    background: rgba(102, 126, 234, 0.2);
-    transform: scale(1.05);
-}
-
-/* Profile Details */
-.guide-account-profile-details {
-    padding: 1rem 2rem 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.guide-account-profile-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.02);
-    border-radius: var(--guide-radius-md);
-    transition: var(--guide-transition-fast);
-}
-
-.guide-account-profile-item:hover {
-    background: rgba(102, 126, 234, 0.05);
-    transform: translateX(5px);
-}
-
-.guide-account-profile-item svg {
-    color: var(--guide-primary-color);
-    font-size: 1.25rem;
-    margin-top: 0.25rem;
-    flex-shrink: 0;
-}
-
-.guide-account-profile-item strong {
-    display: block;
-    color: var(--guide-text-primary);
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    font-size: 1rem;
-}
-
-.guide-account-profile-item p {
-    margin: 0;
-    color: var(--guide-text-secondary);
-    font-size: 0.9rem;
-    line-height: 1.5;
-}
-
-.guide-account-profile-portfolio {
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.02);
-    border-radius: var(--guide-radius-md);
-}
-
-.guide-account-profile-portfolio strong {
-    display: block;
-    color: var(--guide-text-primary);
-    font-weight: 700;
-    margin-bottom: 1rem;
-    font-size: 1rem;
-}
-
-.guide-account-portfolio-preview {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-}
-
-.guide-account-portfolio-preview img {
-    width: 100%;
-    height: 60px;
-    object-fit: cover;
-    border-radius: var(--guide-radius-sm);
-    cursor: pointer;
-    transition: var(--guide-transition-normal);
-}
-
-.guide-account-portfolio-preview img:hover {
-    transform: scale(1.05);
-    box-shadow: var(--guide-shadow-md);
-}
-
-.guide-account-portfolio-more {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 60px;
-    background: var(--guide-primary-gradient);
-    color: white;
-    border-radius: var(--guide-radius-sm);
-    cursor: pointer;
-    font-weight: 700;
-    transition: var(--guide-transition-normal);
-}
-
-.guide-account-portfolio-more:hover {
-    transform: scale(1.05);
-    filter: brightness(1.1);
-}
-
-/* Statistics Grid */
-.guide-account-stats-grid {
-    padding: 1rem 2rem 2rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
-.guide-account-stat {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.02);
-    border-radius: var(--guide-radius-md);
-    transition: var(--guide-transition-normal);
-    cursor: pointer;
-}
-
-.guide-account-stat:hover {
-    background: rgba(0, 0, 0, 0.05);
-    transform: translateY(-2px);
-}
-
-.guide-account-stat-icon {
-    font-size: 1.75rem;
-    padding: 0.75rem;
-    border-radius: var(--guide-radius-md);
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: var(--guide-shadow-sm);
-}
-
-.guide-account-stat-icon.success {
-    color: var(--guide-success-color);
-    background: rgba(16, 185, 129, 0.1);
-}
-
-.guide-account-stat-icon.warning {
-    color: var(--guide-warning-color);
-    background: rgba(245, 158, 11, 0.1);
-}
-
-.guide-account-stat-icon.primary {
-    color: var(--guide-primary-color);
-    background: rgba(102, 126, 234, 0.1);
-}
-
-.guide-account-stat-icon.danger {
-    color: var(--guide-danger-color);
-    background: rgba(239, 68, 68, 0.1);
-}
-
-.guide-account-stat div strong {
-    display: block;
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--guide-text-primary);
-}
-
-.guide-account-stat div span {
-    font-size: 0.85rem;
-    color: var(--guide-text-muted);
-    font-weight: 500;
-}
-
-/* Content Area */
-.guide-account-content {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Tabs */
-.guide-account-tabs {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.guide-account-tab {
-    background: transparent;
-    border: 2px solid transparent;
-    color: var(--guide-text-muted);
-    padding: 1rem 1.5rem;
-    border-radius: var(--guide-radius-lg);
-    cursor: pointer;
-    font-size: 0.95rem;
     font-weight: 600;
-    transition: var(--guide-transition-normal);
-    position: relative;
-    overflow: hidden;
-}
-
-.guide-account-tab:hover {
-    background: rgba(102, 126, 234, 0.05);
-    color: var(--guide-primary-color);
-    transform: translateY(-1px);
-}
-
-.guide-account-tab.active {
-    background: var(--guide-primary-gradient);
-    color: white;
-    border-color: var(--guide-primary-color);
-    box-shadow: var(--guide-shadow-md);
-}
-
-/* Requests List */
-.guide-account-requests-list {
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.guide-account-empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem 2rem;
-    text-align: center;
-    color: var(--guide-text-muted);
-}
-
-.guide-account-empty-state h3 {
-    margin: 1rem 0 0.5rem 0;
-    color: var(--guide-text-secondary);
-}
-
-.guide-account-empty-state p {
-    margin: 0;
-    font-size: 0.9rem;
-}
-
-.guide-account-request-item {
-    background: var(--guide-bg-accent);
-    border: 1px solid var(--guide-border-light);
-    border-radius: var(--guide-radius-lg);
-    padding: 2rem;
-    transition: var(--guide-transition-normal);
-    position: relative;
-    overflow: hidden;
-}
-
-.guide-account-request-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: var(--guide-primary-gradient);
-    opacity: 0;
-    transition: var(--guide-transition-normal);
-}
-
-.guide-account-request-item:hover::before {
-    opacity: 1;
-}
-
-.guide-account-request-item:hover {
-    background: rgba(255, 255, 255, 0.95);
-    transform: translateY(-2px);
-    box-shadow: var(--guide-shadow-lg);
-}
-
-.guide-account-request-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1.5rem;
-}
-
-.guide-account-client-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.guide-account-client-avatar-container {
-    position: relative;
-}
-
-.guide-account-client-avatar-container img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid transparent;
-    background: var(--guide-primary-gradient);
-    padding: 1px;
-}
-
-.guide-account-client-status {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 2px solid var(--guide-bg-primary);
-    background: #ef4444;
-}
-
-.guide-account-client-status.online {
-    background: var(--guide-success-color);
-    animation: guidePulse 2s infinite;
-}
-
-.guide-account-client-info h4 {
-    margin: 0 0 0.25rem 0;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--guide-text-primary);
-}
-
-.guide-account-request-id {
-    font-size: 0.85rem;
-    color: var(--guide-text-muted);
-    font-weight: 500;
-}
-
-.guide-account-request-meta {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.5rem;
-}
-
-.guide-account-status {
-    padding: 0.5rem 1rem;
-    border-radius: var(--guide-radius-lg);
-    font-size: 0.8rem;
-    font-weight: 700;
+    color: #6c757d;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    box-shadow: var(--guide-shadow-sm);
 }
 
-.guide-account-status-pending {
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    color: #d97706;
-    border: 1px solid #f6e05e;
-}
-
-.guide-account-status-confirmed {
-    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-    color: #059669;
-    border: 1px solid #9ae6b4;
-}
-
-.guide-account-status-completed {
-    background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
-    color: #1d4ed8;
-    border: 1px solid #90cdf4;
-}
-
-.guide-account-status-rejected {
-    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-    color: #dc2626;
-    border: 1px solid #feb2b2;
-}
-
-.guide-account-request-details {
-    margin-bottom: 1.5rem;
-}
-
-.guide-account-request-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.guide-account-info-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    background: rgba(0, 0, 0, 0.02);
-    border-radius: var(--guide-radius-sm);
-}
-
-.guide-account-info-item svg {
-    color: var(--guide-primary-color);
-    font-size: 1.1rem;
-    flex-shrink: 0;
-}
-
-.guide-account-info-item span {
-    font-size: 0.9rem;
-    color: var(--guide-text-secondary);
-    font-weight: 500;
-}
-
-.guide-account-service-type {
-    padding: 1rem;
-    background: rgba(102, 126, 234, 0.05);
-    border-radius: var(--guide-radius-md);
-    border-left: 4px solid var(--guide-primary-color);
-}
-
-.guide-account-service-type strong {
-    display: block;
-    color: var(--guide-text-primary);
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-}
-
-.guide-account-service-type p {
+.guide-account-stat-value {
     margin: 0;
-    color: var(--guide-text-secondary);
-    font-size: 0.9rem;
-    line-height: 1.5;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #2c3e50;
 }
 
-.guide-account-service-type .guide-account-rating {
-    margin-top: 0.75rem;
-    display: inline-flex;
+/* Section Titles */
+.guide-account-section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0 0 30px 0;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #667eea;
+    display: inline-block;
+    position: relative;
 }
 
-/* Request Actions */
-.guide-account-request-actions {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.guide-account-btn {
-    background: var(--guide-bg-primary);
-    color: var(--guide-text-primary);
-    border: 2px solid var(--guide-border-medium);
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--guide-radius-lg);
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 600;
-    transition: var(--guide-transition-normal);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-}
-
-.guide-account-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--guide-shadow-md);
-}
-
-.guide-account-btn-primary {
-    background: var(--guide-primary-gradient);
-    color: white;
-    border-color: var(--guide-primary-color);
-}
-
-.guide-account-btn-success {
-    background: var(--guide-success-gradient);
-    color: white;
-    border-color: var(--guide-success-color);
-}
-
-.guide-account-btn-danger {
-    background: var(--guide-danger-gradient);
-    color: white;
-    border-color: var(--guide-danger-color);
-}
-
-.guide-account-btn-outline {
-    background: transparent;
-    color: var(--guide-primary-color);
-    border-color: var(--guide-primary-color);
-}
-
-.guide-account-btn-outline:hover {
-    background: var(--guide-primary-color);
-    color: white;
-}
-
-.guide-account-btn-small {
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-}
-
-/* Modals */
-.guide-account-modal-overlay {
-    position: fixed;
-    top: 0;
+.guide-account-section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    backdrop-filter: blur(5px);
-}
-
-.guide-account-modal {
-    background: var(--guide-bg-primary);
-    border-radius: var(--guide-radius-xl);
-    box-shadow: var(--guide-shadow-xl);
-    max-width: 500px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-    border: 1px solid var(--guide-border-light);
-}
-
-.guide-account-modal-large {
-    max-width: 800px;
-}
-
-.guide-account-modal-header {
-    padding: 2rem 2rem 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--guide-border-medium);
-}
-
-.guide-account-modal-header h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--guide-text-primary);
-}
-
-.guide-account-modal-header button {
-    background: none;
-    border: none;
-    color: var(--guide-text-muted);
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: var(--guide-radius-sm);
-    transition: var(--guide-transition-fast);
-    font-size: 1.25rem;
-}
-
-.guide-account-modal-header button:hover {
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--guide-text-primary);
-}
-
-.guide-account-modal-content {
-    padding: 2rem;
+    width: 50%;
+    height: 3px;
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
 }
 
 /* Form Styles */
-.guide-account-form-group {
-    margin-bottom: 1.5rem;
+.guide-account-form {
+    max-width: 800px;
 }
 
-.guide-account-form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
+.guide-account-form-title {
+    font-size: 1.5rem;
     font-weight: 600;
-    color: var(--guide-text-primary);
+    color: #2c3e50;
+    margin: 0 0 25px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
 }
 
-.guide-account-form-group input,
-.guide-account-form-group textarea,
-.guide-account-form-group select {
-    width: 100%;
-    padding: 1rem;
-    border: 2px solid var(--guide-border-medium);
-    border-radius: var(--guide-radius-md);
-    font-size: 1rem;
-    background: var(--guide-bg-primary);
-    color: var(--guide-text-primary);
-    transition: var(--guide-transition-fast);
-}
-
-.guide-account-form-group input:focus,
-.guide-account-form-group textarea:focus,
-.guide-account-form-group select:focus {
-    outline: none;
-    border-color: var(--guide-primary-color);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+.guide-account-form-group {
+    margin-bottom: 25px;
 }
 
 .guide-account-form-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.guide-account-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #495057;
+    font-size: 1rem;
+}
+
+.guide-account-input,
+.guide-account-select,
+.guide-account-textarea,
+.guide-account-file-input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    background: white;
+}
+
+.guide-account-input:focus,
+.guide-account-select:focus,
+.guide-account-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+}
+
+.guide-account-textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+}
+
+.guide-account-file-input {
+    padding: 12px;
+    cursor: pointer;
+}
+
+.guide-account-checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    background: #f8f9fa;
+}
+
+.guide-account-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.guide-account-checkbox-label:hover {
+    background-color: #e9ecef;
+    transform: translateX(5px);
+}
+
+.guide-account-checkbox {
+    margin: 0;
+    width: 18px;
+    height: 18px;
+    accent-color: #667eea;
 }
 
 .guide-account-form-actions {
     display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--guide-border-medium);
+    gap: 15px;
+    margin-top: 35px;
+    padding-top: 25px;
+    border-top: 1px solid #e9ecef;
 }
 
-.guide-account-error-message {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(254, 202, 202, 0.2) 100%);
-    color: var(--guide-danger-color);
-    padding: 1rem;
-    border-radius: var(--guide-radius-md);
-    margin-bottom: 1rem;
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    font-weight: 500;
-}
-
-/* Avatar Upload */
-.guide-account-avatar-upload {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.guide-account-avatar-preview {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid var(--guide-border-medium);
-}
-
-.guide-account-upload-btn {
-    background: var(--guide-primary-gradient);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--guide-radius-md);
+/* Buttons */
+.guide-account-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
     cursor: pointer;
     font-weight: 600;
-    transition: var(--guide-transition-normal);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    border: none;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    min-width: 120px;
+    position: relative;
+    overflow: hidden;
 }
 
-.guide-account-upload-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--guide-shadow-md);
-    filter: brightness(1.1);
+.guide-account-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
 }
 
-/* Languages Section */
-.guide-account-languages-section {
+.guide-account-btn:hover::before {
+    left: 100%;
+}
+
+.guide-account-btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+}
+
+.guide-account-btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+.guide-account-btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+}
+
+.guide-account-btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-3px);
+}
+
+.guide-account-btn-accept {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.guide-account-btn-accept:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+}
+
+.guide-account-btn-cancel {
+    background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+.guide-account-btn-cancel:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+}
+
+.guide-account-btn-small {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    min-width: 80px;
+}
+
+.guide-account-btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+}
+
+/* Recent Bookings */
+.guide-account-recent-bookings {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 20px;
 }
 
-.guide-account-add-language {
+.guide-account-booking-card,
+.guide-account-booking-item {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 25px;
     display: flex;
-    gap: 0.5rem;
-    align-items: end;
+    justify-content: space-between;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+    border-left: 5px solid #667eea;
+    position: relative;
 }
 
-.guide-account-add-language input {
+.guide-account-booking-card:hover,
+.guide-account-booking-item:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+}
+
+.guide-account-booking-info {
     flex: 1;
-    margin-bottom: 0;
 }
 
-.guide-account-add-language select {
-    width: 120px;
-    margin-bottom: 0;
+.guide-account-booking-title {
+    margin: 0 0 10px 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
 }
 
-.guide-account-languages-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.guide-account-language-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(102, 126, 234, 0.1);
-    color: var(--guide-primary-color);
-    padding: 0.5rem 1rem;
-    border-radius: var(--guide-radius-lg);
-    font-size: 0.9rem;
+.guide-account-booking-date,
+.guide-account-booking-dates {
+    margin: 0 0 12px 0;
+    color: #6c757d;
     font-weight: 500;
+    font-size: 1rem;
 }
 
-.guide-account-remove-btn {
-    background: none;
-    border: none;
-    color: inherit;
-    cursor: pointer;
-    padding: 0.25rem;
-    border-radius: 50%;
-    transition: var(--guide-transition-fast);
+.guide-account-booking-description {
+    margin: 0 0 15px 0;
+    color: #495057;
+    line-height: 1.6;
+}
+
+/* Status Badges */
+.guide-account-booking-status {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    letter-spacing: 0.5px;
+}
+
+.guide-account-status-pending {
+    background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+    color: #856404;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+}
+
+.guide-account-status-confirmed,
+.guide-account-status-accepted {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.guide-account-status-completed {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.guide-account-status-cancelled {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+.guide-account-booking-actions {
     display: flex;
+    gap: 12px;
     align-items: center;
-    justify-content: center;
-}
-
-.guide-account-remove-btn:hover {
-    background: rgba(0, 0, 0, 0.1);
-}
-
-/* Specializations */
-.guide-account-specializations-section {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.guide-account-specializations-list {
-    display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
 }
 
-.guide-account-specialization-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--guide-success-color);
-    padding: 0.5rem 1rem;
-    border-radius: var(--guide-radius-lg);
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-/* Certificates */
-.guide-account-certificates-section {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.guide-account-certificates-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.guide-account-certificate-item {
+/* Profile View */
+.guide-account-profile-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(0, 0, 0, 0.02);
-    padding: 1rem;
-    border-radius: var(--guide-radius-md);
-    border: 1px solid var(--guide-border-medium);
+    margin-bottom: 35px;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
-.guide-account-certificate-item span {
-    font-size: 0.9rem;
-    color: var(--guide-text-secondary);
-    font-weight: 500;
-}
-
-/* Settings */
-.guide-account-settings-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.guide-account-settings-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.5rem;
-    background: rgba(0, 0, 0, 0.02);
-    border-radius: var(--guide-radius-md);
-    border: 1px solid var(--guide-border-medium);
-    cursor: pointer;
-    transition: var(--guide-transition-normal);
-    text-align: left;
-    width: 100%;
-}
-
-.guide-account-settings-item:hover {
-    background: rgba(102, 126, 234, 0.05);
-    transform: translateX(5px);
-}
-
-.guide-account-settings-item svg {
-    color: var(--guide-primary-color);
-    font-size: 1.5rem;
-    flex-shrink: 0;
-}
-
-.guide-account-settings-item strong {
-    display: block;
-    color: var(--guide-text-primary);
-    font-weight: 700;
-    margin-bottom: 0.25rem;
-}
-
-.guide-account-settings-item p {
-    margin: 0;
-    color: var(--guide-text-secondary);
-    font-size: 0.9rem;
-}
-
-.guide-account-theme-select {
-    appearance: none;
-    background: var(--guide-bg-primary);
-    border: 2px solid var(--guide-border-medium);
-    border-radius: var(--guide-radius-md);
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--guide-text-primary);
-    cursor: pointer;
-    transition: var(--guide-transition-fast);
-    margin-top: 0.5rem;
-}
-
-.guide-account-theme-select:hover {
-    border-color: var(--guide-primary-color);
-}
-
-.guide-account-theme-select:focus {
-    outline: none;
-    border-color: var(--guide-primary-color);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Portfolio Grid */
-.guide-account-portfolio-grid {
+.guide-account-profile-info {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
 }
 
-.guide-account-portfolio-item {
-    position: relative;
-    border-radius: var(--guide-radius-md);
-    overflow: hidden;
-    aspect-ratio: 4/3;
+.guide-account-profile-field {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 25px;
+    border-radius: 12px;
+    border-left: 5px solid #667eea;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
-.guide-account-portfolio-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.guide-account-portfolio-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    opacity: 0;
-    transition: var(--guide-transition-normal);
-}
-
-.guide-account-portfolio-item:hover .guide-account-portfolio-overlay {
-    opacity: 1;
-}
-
-.guide-account-portfolio-view,
-.guide-account-portfolio-delete {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: none;
-    padding: 0.75rem;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: var(--guide-transition-fast);
-    backdrop-filter: blur(10px);
-}
-
-.guide-account-portfolio-view:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.guide-account-portfolio-delete:hover {
-    background: rgba(239, 68, 68, 0.8);
-}
-
-.guide-account-portfolio-add {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: var(--guide-border-medium);
-    color: var(--guide-text-muted);
-    border-radius: var(--guide-radius-md);
-    cursor: pointer;
-    transition: var(--guide-transition-normal);
-    aspect-ratio: 4/3;
-    border: 2px dashed var(--guide-border-medium);
-}
-
-.guide-account-portfolio-add:hover {
-    background: rgba(102, 126, 234, 0.1);
-    color: var(--guide-primary-color);
-    border-color: var(--guide-primary-color);
-}
-
-.guide-account-portfolio-add svg {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-
-/* Error States */
-.guide-account-error-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    background: var(--guide-danger-color);
-    color: white;
-    border-radius: 50%;
-    font-size: 0.8rem;
-    cursor: help;
-    animation: guidePulse 2s infinite;
-}
-
-.guide-account-error-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem 2rem;
-    text-align: center;
-    color: var(--guide-text-muted);
-}
-
-.guide-account-error-state h3 {
-    margin: 1rem 0 0.5rem 0;
-    color: var(--guide-danger-color);
+.guide-account-profile-label {
     font-weight: 700;
+    color: #495057;
+    margin-bottom: 12px;
+    display: block;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.guide-account-error-state p {
-    margin: 0 0 2rem 0;
-    font-size: 0.9rem;
-    max-width: 400px;
+.guide-account-profile-value {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.2rem;
     line-height: 1.5;
 }
 
-.guide-account-error-message-card {
-    padding: 0.75rem 2rem 1.5rem;
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(254, 202, 202, 0.1) 100%);
-    border-top: 1px solid rgba(239, 68, 68, 0.1);
-    text-align: center;
+/* Bookings List */
+.guide-account-bookings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
 }
 
-.guide-account-error-message-card small {
-    color: var(--guide-danger-color);
+/* Portfolio Styles */
+.guide-account-portfolio-header,
+.guide-account-availability-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.guide-account-portfolio-form,
+.guide-account-availability-form {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 30px;
+    border-radius: 16px;
+    margin-bottom: 35px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.guide-account-portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+.guide-account-portfolio-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.guide-account-portfolio-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.guide-account-portfolio-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.guide-account-portfolio-content {
+    padding: 25px;
+}
+
+.guide-account-portfolio-title {
+    margin: 0 0 12px 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.guide-account-portfolio-description {
+    margin: 0 0 20px 0;
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+.guide-account-portfolio-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Availability Styles */
+.guide-account-availability-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.guide-account-availability-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border-left: 5px solid #28a745;
+}
+
+.guide-account-availability-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.guide-account-availability-info {
+    margin-bottom: 20px;
+}
+
+.guide-account-availability-date {
+    margin: 0 0 8px 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.guide-account-availability-time {
+    margin: 0 0 8px 0;
+    color: #6c757d;
     font-weight: 500;
-    font-size: 0.8rem;
+}
+
+.guide-account-availability-note {
+    margin: 0 0 12px 0;
+    color: #495057;
+    font-style: italic;
+}
+
+.guide-account-availability-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.guide-account-available {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+}
+
+.guide-account-unavailable {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+}
+
+.guide-account-availability-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Reviews */
+.guide-account-reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.guide-account-review-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 30px;
+    border-left: 5px solid #ffc107;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.guide-account-review-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.guide-account-review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.guide-account-review-rating {
+    color: #ffc107;
+    font-size: 1.5rem;
+    text-shadow: 0 1px 3px rgba(255, 193, 7, 0.3);
+}
+
+.guide-account-review-date {
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.guide-account-review-title {
+    margin: 0 0 15px 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.guide-account-review-comment {
+    margin: 0 0 20px 0;
+    color: #495057;
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+.guide-account-review-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.guide-account-review-detail {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    color: #1976d2;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid #e1f5fe;
 }
 
 /* Responsive Design */
-@media (max-width: 1200px) {
-    .guide-account-main {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
+@media (max-width: 1024px) {
+    .guide-account-container {
+        padding: 15px;
     }
 
-    .guide-account-sidebar {
-        grid-row: 2;
+    .guide-account-content {
+        padding: 25px;
+    }
+
+    .guide-account-stats {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .guide-account-portfolio-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     }
 }
 
 @media (max-width: 768px) {
-    .guide-account-header-content {
+    .guide-account-title {
+        font-size: 2.2rem;
+    }
+
+    .guide-account-navigation {
         flex-direction: column;
-        gap: 1rem;
+        gap: 5px;
+    }
+
+    .guide-account-nav-btn {
         text-align: center;
+        padding: 12px 20px;
     }
 
-    .guide-account-quick-stats {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
+    .guide-account-stats {
+        grid-template-columns: 1fr;
     }
 
-    .guide-account-main {
-        padding: 1rem;
+    .guide-account-booking-card,
+    .guide-account-booking-item {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .guide-account-booking-actions {
+        align-self: stretch;
+        justify-content: center;
     }
 
     .guide-account-form-row {
         grid-template-columns: 1fr;
     }
 
-    .guide-account-request-info {
-        grid-template-columns: 1fr;
-    }
-
-    .guide-account-request-actions {
-        flex-direction: column;
-    }
-
     .guide-account-form-actions {
         flex-direction: column;
     }
 
-    .guide-account-modal {
-        width: 95%;
-        max-height: 95vh;
-    }
-
-    .guide-account-modal-header {
-        padding: 1.5rem 1.5rem 1rem;
-    }
-
-    .guide-account-modal-content {
-        padding: 1.5rem;
+    .guide-account-profile-header,
+    .guide-account-portfolio-header,
+    .guide-account-availability-header {
+        flex-direction: column;
+        align-items: stretch;
     }
 
     .guide-account-portfolio-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-columns: 1fr;
     }
 
-    .guide-account-notifications {
-        top: 1rem;
-        right: 1rem;
-        max-width: calc(100vw - 2rem);
+    .guide-account-availability-list {
+        grid-template-columns: 1fr;
+    }
+
+    .guide-account-review-details {
+        grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 480px) {
-    .guide-account-header-content {
-        padding: 0 1rem;
+    .guide-account-header {
+        padding: 25px 20px;
     }
 
-    .guide-account-user-info {
-        flex-direction: column;
-        text-align: center;
-        gap: 1rem;
+    .guide-account-title {
+        font-size: 2rem;
     }
 
-    .guide-account-quick-stats {
-        grid-template-columns: 1fr;
-        width: 100%;
+    .guide-account-welcome {
+        font-size: 1.1rem;
     }
 
-    .guide-account-stat-item {
-        min-width: auto;
-        padding: 0.75rem 1rem;
+    .guide-account-content {
+        padding: 20px;
     }
 
-    .guide-account-main {
-        padding: 0.5rem;
+    .guide-account-booking-card,
+    .guide-account-booking-item,
+    .guide-account-review-item,
+    .guide-account-availability-item {
+        padding: 20px;
     }
 
-    .guide-account-card-header {
-        padding: 1.5rem 1.5rem 1rem;
+    .guide-account-portfolio-content {
+        padding: 20px;
     }
 
-    .guide-account-profile-details,
-    .guide-account-stats-grid,
-    .guide-account-requests-list {
-        padding: 1rem 1.5rem 1.5rem;
-    }
-
-    .guide-account-stats-grid {
+    .guide-account-checkbox-group {
         grid-template-columns: 1fr;
     }
 
-    .guide-account-request-item {
-        padding: 1.5rem;
+    .guide-account-form-actions {
+        gap: 10px;
     }
 
-    .guide-account-request-header {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
+    .guide-account-btn {
+        padding: 12px 20px;
     }
 
-    .guide-account-request-meta {
-        align-items: flex-start;
+    .guide-account-portfolio-form,
+    .guide-account-availability-form {
+        padding: 20px;
     }
+}
 
-    .guide-account-tabs {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .guide-account-tab {
-        text-align: center;
-    }
-
-    .guide-account-add-language {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .guide-account-add-language select {
-        width: 100%;
-    }
+/* Custom Scrollbar */
+.guide-account-checkbox-group::-webkit-scrollbar {
+    width: 6px;
 }

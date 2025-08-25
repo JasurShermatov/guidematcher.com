@@ -41,4 +41,3 @@ urlpatterns = [
         name="update-booking",
     ),
 ]
-

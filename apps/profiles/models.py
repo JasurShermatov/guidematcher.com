@@ -52,8 +52,8 @@ class CustomerProfile(AbstractProfile):
         REJECTED = "rejected", _("Rejected")
 
     professional_bio = models.TextField(
-        blank=True,  # 👈 Ixtiyoriy qildik
-        default="",  # 👈 Default qiymat
+        blank=True,
+        default="",
         verbose_name=_("Professional biography"),
     )
     years_of_experience = models.PositiveIntegerField(
@@ -61,15 +61,15 @@ class CustomerProfile(AbstractProfile):
     )
     service_types = models.ManyToManyField(
         "common.ServiceType",
-        blank=True,  # 👈 ManyToMany doim blank=True bo'lishi kerak
+        blank=True,
         verbose_name=_("Service types offered"),
     )
 
     city = models.ForeignKey(
         "common.City",
         on_delete=models.PROTECT,
-        null=True,  # 👈 NULL qiymatga ruxsat
-        blank=True,  # 👈 Formada bo'sh bo'lishi mumkin
+        null=True,
+        blank=True,
         verbose_name=_("Service city"),
     )
     service_areas = models.TextField(

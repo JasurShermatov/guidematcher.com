@@ -2,128 +2,76 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from apps.reviews.models import Review, ReviewResponse, ReviewReaction
-
-
-class ReviewResponseInline(admin.StackedInline):
-    """
-    Inline for provider's official response to a review
-    """
-
-    model = ReviewResponse
-    extra = 0
-    min_num = 0
-    max_num = 1
-    can_delete = True
-    show_change_link = True
+from apps.reviews.models import Review
 
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    """
-    Admin panel for managing reviews left by clients.
-    """
 
     list_display = (
         "id",
         "booking",
         "client",
         "customer",
-        "overall_rating",
+        "rating_display",
+        "short_comment",
         "is_published",
-        "is_featured",
-        "like_count",
-        "dislike_count",
+        "edited_at",
         "created_at",
     )
     list_filter = (
         "is_published",
-        "is_featured",
-        "overall_rating",
-        "created_at",
+        "rating",
+        ("created_at", admin.DateFieldListFilter),
+        ("edited_at", admin.DateFieldListFilter),
     )
     search_fields = (
-        "title",
         "comment",
         "client__full_name",
+        "client__email",
         "customer__user__full_name",
+        "customer__user__email",
+        "booking__id",
     )
-    readonly_fields = (
-        "like_count",
-        "dislike_count",
-        "created_at",
-        "updated_at",
-    )
-    list_select_related = ("client", "customer", "booking")
-    raw_id_fields = ("booking", "client", "customer", "moderated_by")
+    list_select_related = ("booking", "client", "customer")
     ordering = ("-created_at",)
-    inlines = [ReviewResponseInline]
+    list_per_page = 25
+
+    readonly_fields = ("created_at", "updated_at", "edited_at")
+    raw_id_fields = ("booking", "client", "customer")
 
     fieldsets = (
         (
             _("Review Info"),
-            {"fields": ("booking", "client", "customer", "title", "comment")},
+            {"fields": ("booking", "client", "customer")},
         ),
         (
-            _("Ratings"),
-            {
-                "fields": (
-                    "overall_rating",
-                    "communication_rating",
-                    "service_rating",
-                    "punctuality_rating",
-                    "value_rating",
-                )
-            },
+            _("Content"),
+            {"fields": ("rating", "comment")},
         ),
         (
-            _("Moderation"),
-            {
-                "classes": ("collapse",),
-                "fields": (
-                    "is_published",
-                    "is_featured",
-                    "moderated_by",
-                    "moderated_at",
-                    "moderation_note",
-                ),
-            },
-        ),
-        (
-            _("Counters"),
-            {"classes": ("collapse",), "fields": ("like_count", "dislike_count")},
+            _("Publication"),
+            {"fields": ("is_published",)},
         ),
         (
             _("Timestamps"),
-            {"classes": ("collapse",), "fields": ("created_at", "updated_at")},
+            {
+                "classes": ("collapse",),
+                "fields": ("created_at", "updated_at", "edited_at"),
+            },
         ),
     )
 
+    def rating_display(self, obj):
+        return f"{'⭐' * obj.rating} ({obj.rating})" if obj.rating else "-"
 
-@admin.register(ReviewResponse)
-class ReviewResponseAdmin(admin.ModelAdmin):
-    """
-    Admin panel for provider's responses to reviews.
-    """
+    rating_display.short_description = _("Rating")
 
-    list_display = ("id", "review", "is_published", "created_at")
-    list_filter = ("is_published", "created_at")
-    search_fields = ("response_text", "review__comment")
-    raw_id_fields = ("review",)
-    readonly_fields = ("created_at", "updated_at")
-    list_select_related = ("review",)
+    def short_comment(self, obj):
+        return (
+            (obj.comment[:50] + "...")
+            if obj.comment and len(obj.comment) > 50
+            else obj.comment
+        )
 
-
-@admin.register(ReviewReaction)
-class ReviewReactionAdmin(admin.ModelAdmin):
-    """
-    Admin panel for reactions (like/dislike) to reviews.
-    """
-
-    list_display = ("id", "review", "user", "reaction_type", "created_at")
-    list_filter = ("reaction_type", "created_at")
-    search_fields = ("review__comment", "user__full_name")
-    raw_id_fields = ("review", "user")
-    readonly_fields = ("created_at", "updated_at")
-    list_select_related = ("review", "user")
-    ordering = ("-created_at",)
+    short_comment.short_description = _("Comment")

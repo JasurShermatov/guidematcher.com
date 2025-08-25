@@ -1,10 +1,11 @@
+// Authentication.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { FiX, FiMail, FiLock, FiUser, FiLogIn, FiCheckSquare, FiSquare, FiGlobe, FiCheck, FiEye, FiEyeOff, FiRotateCcw } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { loginUser, requestCode, registerUser, getCurrentUser, requestPasswordReset, confirmPasswordReset } from "../api/api";
+import { loginUser, requestCode, registerUser, requestPasswordReset, confirmPasswordReset, getCurrentUserShort } from "../api/api";
 import "./Authentication.css";
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -77,20 +78,16 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             const token = localStorage.getItem("access_token");
             if (token) {
                 try {
-                    const userData = await getCurrentUser();
+                    const userData = await getCurrentUserShort();
                     setIsAuthenticated(true);
-                    setUser({
-                        id: userData.id,
-                        role: userData.role,
-                        username: userData.full_name,
-                        email: userData.email,
-                        first_name: userData.first_name,
-                        last_name: userData.last_name,
-                        country: userData.country || "",
-                        city: userData.city || "",
-                        bio: userData.bio || "",
-                    });
-                    navigate("/account");
+                    setUser(userData);
+                    if (userData.role === "Client") {
+                        navigate("/user-account");
+                    } else if (userData.role === "Customer") {
+                        navigate("/admin-account");
+                    } else {
+                        navigate("/account");
+                    }
                 } catch (error) {
                     console.error("Failed to fetch user:", error);
                     localStorage.removeItem("access_token");
@@ -191,21 +188,22 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         }
 
         try {
-            const data = await loginUser(loginForm);
-            localStorage.setItem("access_token", data.access);
-            localStorage.setItem("refresh_token", data.refresh);
-            setIsAuthenticated(true);
-            setUser({
-                id: data.user.id,
-                role: data.user.role,
-                username: data.user.full_name,
-                email: data.user.email,
-                first_name: data.user.first_name,
-                last_name: data.user.last_name,
-                country: data.user.country || "",
-                city: data.user.city || "",
+            const tokenData = await loginUser({
+                email: loginForm.email.toLowerCase().trim(),
+                password: loginForm.password,
             });
-            navigate("/account");
+            localStorage.setItem("access_token", tokenData.access);
+            localStorage.setItem("refresh_token", tokenData.refresh);
+            setIsAuthenticated(true);
+            setUser(tokenData.user);
+            if (tokenData.user.role === "Client") {
+                navigate("/user-account");
+            } else if (tokenData.user.role === "Customer") {
+                navigate("/admin-account");
+            } else {
+                navigate("/account");
+            }
+            setLoginForm({ email: "", password: "" });
         } catch (error) {
             setError(error.message || t("auth.errors.login_failed"));
         } finally {
@@ -220,7 +218,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
 
         const { role, first_name, last_name, email, password, confirm_password, country } = registerForm;
 
-        if (!first_name || !last_name || !email || !password || !confirm_password || !country) {
+        if (!role || !first_name || !last_name || !email || !password || !confirm_password || !country) {
             setError(t("auth.validation.required_fields"));
             setLoading(false);
             return;
@@ -244,14 +242,22 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             return;
         }
 
+        if (!countries.includes(country)) {
+            setError(t("auth.validation.invalid_country"));
+            setLoading(false);
+            return;
+        }
+
         try {
-            await requestCode({ email });
+            await requestCode({ email: email.toLowerCase().trim() });
             setSuccessMessage(t("auth.success.verification_sent"));
             setVerificationStep(true);
         } catch (error) {
-            const errorMsg = error.message.includes("already exists")
-                ? t("auth.errors.email_exists")
-                : error.message || t("auth.errors.code_request_failed");
+            const errorMsg = error.message.includes("Too many verification code requests")
+                ? t("auth.errors.too_many_requests")
+                : error.message.includes("already exists")
+                    ? t("auth.errors.email_exists")
+                    : error.message || t("auth.errors.code_request_failed");
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -277,37 +283,34 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
 
         try {
             const { role, first_name, last_name, email, password, country } = registerForm;
-            const response = await registerUser({
+            const tokenResponse = await registerUser({
                 role,
                 first_name,
                 last_name,
-                email,
+                email: email.toLowerCase().trim(),
                 password,
                 country,
                 code: verificationCode,
             });
-            localStorage.setItem("access_token", response.access_token);
-            localStorage.setItem("refresh_token", response.refresh_token);
+            localStorage.setItem("access_token", tokenResponse.access);
+            localStorage.setItem("refresh_token", tokenResponse.refresh);
             setIsAuthenticated(true);
-            setUser({
-                id: response.user.id,
-                role: response.user.role,
-                username: response.user.full_name,
-                email: response.user.email,
-                first_name: response.user.first_name,
-                last_name: response.user.last_name,
-                country: response.user.country || "",
-                city: "",
-            });
+            setUser(tokenResponse.user);
             setSuccessMessage(t("auth.success.register_success"));
-            navigate("/account");
+            if (tokenResponse.user.role === "Client") {
+                navigate("/user-account");
+            } else if (tokenResponse.user.role === "Customer") {
+                navigate("/admin-account");
+            } else {
+                navigate("/account");
+            }
             resetRegisterForm();
         } catch (error) {
             const errorMsg = error.message.includes("already exists")
                 ? t("auth.errors.email_exists")
                 : error.message.includes("expired")
                     ? t("auth.errors.expired_code")
-                    : error.message.includes("invalid")
+                    : error.message.includes("Invalid or already used")
                         ? t("auth.errors.invalid_code")
                         : error.message || t("auth.errors.register_failed");
             setError(errorMsg);
@@ -320,10 +323,13 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         clearMessages();
         setLoading(true);
         try {
-            await requestCode({ email: registerForm.email });
+            await requestCode({ email: registerForm.email.toLowerCase().trim() });
             setSuccessMessage(t("auth.success.verification_sent"));
         } catch (error) {
-            setError(t("auth.errors.resend_code_failed"));
+            const errorMsg = error.message.includes("Too many verification code requests")
+                ? t("auth.errors.too_many_requests")
+                : error.message || t("auth.errors.resend_code_failed");
+            setError(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -341,11 +347,14 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         }
 
         try {
-            const response = await requestPasswordReset({ email: forgotForm.email });
+            const response = await requestPasswordReset({ email: forgotForm.email.toLowerCase().trim() });
             setSuccessMessage(response.message || t("auth.success.password_reset_sent"));
             setForgotStep(true);
         } catch (error) {
-            setError(error.message || t("auth.errors.code_request_failed"));
+            const errorMsg = error.message.includes("Too many password reset requests")
+                ? t("auth.errors.too_many_requests")
+                : error.message || t("auth.errors.code_request_failed");
+            setError(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -383,12 +392,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         }
 
         try {
-            const response = await confirmPasswordReset({
-                email,
+            await confirmPasswordReset({
+                email: email.toLowerCase().trim(),
                 code,
                 new_password,
             });
-            setSuccessMessage(response.message || t("auth.success.password_reset_success"));
+            setSuccessMessage(t("auth.success.password_reset_success"));
             setTimeout(() => {
                 setActiveTab("login");
                 setForgotStep(false);
@@ -398,13 +407,16 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                     new_password: "",
                     confirm_password: "",
                 });
+                clearMessages();
             }, 2000);
         } catch (error) {
             const errorMsg = error.message.includes("expired")
                 ? t("auth.errors.expired_code")
-                : error.message.includes("invalid")
+                : error.message.includes("Invalid")
                     ? t("auth.errors.invalid_code")
-                    : error.message || t("auth.errors.password_reset_failed");
+                    : error.message.includes("Too many failed attempts")
+                        ? t("auth.errors.too_many_attempts")
+                        : error.message || t("auth.errors.password_reset_failed");
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -415,10 +427,13 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         clearMessages();
         setLoading(true);
         try {
-            const response = await requestPasswordReset({ email: forgotForm.email });
-            setSuccessMessage(t("auth.success.password_reset_sent"));
+            const response = await requestPasswordReset({ email: forgotForm.email.toLowerCase().trim() });
+            setSuccessMessage(response.message || t("auth.success.password_reset_sent"));
         } catch (error) {
-            setError(t("auth.errors.resend_code_failed"));
+            const errorMsg = error.message.includes("Too many password reset requests")
+                ? t("auth.errors.too_many_requests")
+                : error.message || t("auth.errors.resend_code_failed");
+            setError(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -441,11 +456,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setVerificationCode("");
         setCheckboxes({ personalData: false, terms: false, travelTips: false });
         setVerificationStep(false);
+        clearMessages();
     };
 
     const closeModal = () => {
         navigate(-1);
-        setVerificationStep(false);
+        resetRegisterForm();
         setForgotStep(false);
         setCountrySuggestions([]);
         clearMessages();
@@ -457,6 +473,8 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setForgotStep(false);
         setCountrySuggestions([]);
         clearMessages();
+        setLoginForm({ email: "", password: "" });
+        setForgotForm({ email: "", code: "", new_password: "", confirm_password: "" });
     };
 
     useEffect(() => {

@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { FiUser, FiMail, FiLogOut, FiSettings, FiMapPin, FiX, FiCheck, FiCalendar, FiStar, FiDollarSign, FiImage, FiCheckCircle, FiUsers, FiClock, FiGlobe, FiAward, FiEdit, FiEye, FiMessageSquare, FiTrendingUp, FiHeart, FiPhone, FiDownload, FiLock, FiUpload, FiPlus, FiMinus, FiFileText, FiCamera, FiSave, FiRefreshCw } from 'react-icons/fi';
-import { useTranslation } from 'react-i18next';
-import './GuideAccount.css';
-import GuideChatWidget from './ChatWidgets';
+import React, { useState, useEffect } from 'react';
 import {
-    getCurrentUser,
-    updateUserProfile,
     getCustomerProfile,
     createCustomerProfile,
     updateCustomerProfile,
+    getMyBookings,
+    acceptBooking,
+    cancelBooking,
+    getMyReviews,
     getMyPortfolio,
     createPortfolioItem,
     updatePortfolioItem,
@@ -17,73 +15,52 @@ import {
     createAvailability,
     updateAvailability,
     deleteAvailability,
-    getMyDocuments,
-    uploadDocument,
-    deleteDocument,
-    getGuideBookings,
-    updateBookingStatus,
-    getGuideReviews,
-    getGuideStats,
-    getGuideChats,
-    getChatMessages,
-    sendMessage,
-    getNotifications,
-    markNotificationAsRead,
-    getCountries,
-    getCities,
     getServiceTypes,
     getLanguages,
-    changePassword
+    getCities,
+    getCurrentUser
 } from '../api/api';
+import ChatWidgets from './ChatWidgets'; // YANGI: Chat widget import
+import './GuideAccount.css';
 
-const GuideAccount = ({ user, setIsAuthenticated, setUser }) => {
-    const { t } = useTranslation();
-
-    // State variables
-    const [theme, setTheme] = useState('default');
-    const [chatOpen, setChatOpen] = useState(false);
-    const [selectedClient, setSelectedClient] = useState(null);
-    const [showProfileModal, setShowProfileModal] = useState(false);
-    const [showSettingsModal, setShowSettingsModal] = useState(false);
-    const [showPasswordModal, setShowPasswordModal] = useState(false);
-    const [showPortfolioModal, setShowPortfolioModal] = useState(false);
-    const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
-    const [showDocumentModal, setShowDocumentModal] = useState(false);
-    const [activeTab, setActiveTab] = useState('new');
-    const [notifications, setNotifications] = useState([]);
-    const [profileError, setProfileError] = useState('');
-    const [passwordError, setPasswordError] = useState('');
-    const [loading, setLoading] = useState(true);
-
-    // Data states
-    const [customerProfile, setCustomerProfile] = useState(null);
-    const [portfolio, setPortfolio] = useState([]);
-    const [availability, setAvailability] = useState([]);
-    const [documents, setDocuments] = useState([]);
+const GuideAccount = () => {
+    const [currentUser, setCurrentUser] = useState(null);
+    const [profile, setProfile] = useState(null);
     const [bookings, setBookings] = useState([]);
     const [reviews, setReviews] = useState([]);
-    const [guideStats, setGuideStats] = useState({
-        totalBookings: 0,
-        averageRating: 0,
-        responseRate: 0,
-        totalEarnings: 0,
-        totalReviews: 0
-    });
-    const [chatMessages, setChatMessages] = useState([]);
+    const [portfolio, setPortfolio] = useState([]);
+    const [availability, setAvailability] = useState([]);
+    const [serviceTypes, setServiceTypes] = useState([]);
+    const [languages, setLanguages] = useState([]);
+    const [cities, setCities] = useState([]);
+    const [activeTab, setActiveTab] = useState('dashboard');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [showProfileForm, setShowProfileForm] = useState(false);
+    const [showPortfolioForm, setShowPortfolioForm] = useState(false);
+    const [showAvailabilityForm, setShowAvailabilityForm] = useState(false);
+    const [editingPortfolioItem, setEditingPortfolioItem] = useState(null);
+    const [editingAvailability, setEditingAvailability] = useState(null);
 
-    // Form states
+    // YANGI: Chat states
+    const [showChat, setShowChat] = useState(false);
+    const [selectedUserForChat, setSelectedUserForChat] = useState(null);
+
+    // Profile form state
     const [profileForm, setProfileForm] = useState({
         professional_bio: '',
         years_of_experience: 0,
-        hourly_rate: 0,
-        daily_rate: 0,
-        currency: 'USD',
-        service_areas: '',
         service_types: [],
-        city: null,
-        languages: []
+        city: '',
+        service_areas: '',
+        hourly_rate: '',
+        daily_rate: '',
+        currency: 'USD',
+        languages: [],
+        is_available: true
     });
 
+    // Portfolio form state
     const [portfolioForm, setPortfolioForm] = useState({
         title: '',
         description: '',
@@ -91,6 +68,7 @@ const GuideAccount = ({ user, setIsAuthenticated, setUser }) => {
         order: 0
     });
 
+    // Availability form state
     const [availabilityForm, setAvailabilityForm] = useState({
         date: '',
         is_available: true,
@@ -99,1591 +77,920 @@ const GuideAccount = ({ user, setIsAuthenticated, setUser }) => {
         note: ''
     });
 
-    const [documentForm, setDocumentForm] = useState({
-        document_type: 'certificate',
-        file: null,
-        description: ''
-    });
-
-    const [passwordForm, setPasswordForm] = useState({
-        current_password: '',
-        new_password: '',
-        confirm_password: ''
-    });
-
-    // Reference data
-    const [countries, setCountries] = useState([]);
-    const [cities, setCities] = useState([]);
-    const [serviceTypes, setServiceTypes] = useState([]);
-    const [languageOptions, setLanguageOptions] = useState([]);
-
-    // Loading states
-    const [dataLoading, setDataLoading] = useState({
-        profile: false,
-        portfolio: false,
-        availability: false,
-        documents: false,
-        bookings: false,
-        reviews: false,
-        stats: false,
-        chats: false
-    });
-
-    // Error states
-    const [dataErrors, setDataErrors] = useState({
-        profile: false,
-        portfolio: false,
-        availability: false,
-        documents: false,
-        bookings: false,
-        reviews: false,
-        stats: false,
-        chats: false
-    });
-
-    // Fetch reference data
     useEffect(() => {
-        const fetchReferenceData = async () => {
-            try {
-                const [countriesData, serviceTypesData, languagesData] = await Promise.all([
-                    getCountries(),
-                    getServiceTypes(),
-                    getLanguages()
-                ]);
-                setCountries(countriesData);
-                setServiceTypes(serviceTypesData);
-                setLanguageOptions(languagesData);
-            } catch (error) {
-                console.error('Failed to fetch reference data:', error);
-            }
-        };
-        fetchReferenceData();
+        initializeData();
     }, []);
 
-    // Fetch cities when country changes
-    useEffect(() => {
-        if (profileForm.country) {
-            fetchCities(profileForm.country);
-        }
-    }, [profileForm.country]);
-
-    const fetchCities = async (countryId) => {
+    const initializeData = async () => {
         try {
-            const citiesData = await getCities(countryId);
-            setCities(citiesData);
-        } catch (error) {
-            console.error('Failed to fetch cities:', error);
-        }
-    };
+            setLoading(true);
 
-    // Initialize data
-    useEffect(() => {
-        if (user) {
-            fetchAllData();
-        }
-    }, [user]);
+            // Load current user
+            const userData = await getCurrentUser();
+            setCurrentUser(userData);
 
-    const fetchAllData = async () => {
-        setLoading(true);
+            // Load common data
+            const [serviceTypesData, languagesData, citiesData] = await Promise.all([
+                getServiceTypes(),
+                getLanguages(),
+                getCities()
+            ]);
 
-        const dataFetchers = [
-            { key: 'profile', fetcher: fetchCustomerProfile },
-            { key: 'portfolio', fetcher: fetchPortfolio },
-            { key: 'availability', fetcher: fetchAvailability },
-            { key: 'documents', fetcher: fetchDocuments },
-            { key: 'bookings', fetcher: fetchBookings },
-            { key: 'reviews', fetcher: fetchReviews },
-            { key: 'stats', fetcher: fetchGuideStats },
-            { key: 'chats', fetcher: fetchChats }
-        ];
+            setServiceTypes(serviceTypesData.results || serviceTypesData);
+            setLanguages(languagesData.results || languagesData);
+            setCities(citiesData.results || citiesData);
 
-        const results = await Promise.allSettled(
-            dataFetchers.map(({ fetcher }) => fetcher())
-        );
+            // Try to load profile
+            try {
+                const profileData = await getCustomerProfile();
+                setProfile(profileData);
+                setProfileForm({
+                    professional_bio: profileData.professional_bio || '',
+                    years_of_experience: profileData.years_of_experience || 0,
+                    service_types: profileData.service_types || [],
+                    city: profileData.city || '',
+                    service_areas: profileData.service_areas || '',
+                    hourly_rate: profileData.hourly_rate || '',
+                    daily_rate: profileData.daily_rate || '',
+                    currency: profileData.currency || 'USD',
+                    languages: profileData.languages || [],
+                    is_available: profileData.is_available !== undefined ? profileData.is_available : true
+                });
 
-        // Update error states
-        const newErrors = {};
-        results.forEach((result, index) => {
-            const key = dataFetchers[index].key;
-            newErrors[key] = result.status === 'rejected';
-            if (result.status === 'rejected') {
-                console.error(`Failed to fetch ${key}:`, result.reason);
+                // Load other data if profile exists
+                loadBookings();
+                loadReviews();
+                loadPortfolio();
+                loadAvailability();
+            } catch (profileError) {
+                console.log('No profile found, user needs to create one');
+                setShowProfileForm(true);
             }
-        });
-        setDataErrors(newErrors);
-        setLoading(false);
+
+        } catch (err) {
+            console.error('Error initializing data:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const fetchCustomerProfile = async () => {
-        setDataLoading(prev => ({ ...prev, profile: true }));
+    const loadBookings = async () => {
         try {
-            const profileData = await getCustomerProfile();
-            setCustomerProfile(profileData);
-            setProfileForm({
-                professional_bio: profileData.professional_bio || '',
-                years_of_experience: profileData.years_of_experience || 0,
-                hourly_rate: profileData.hourly_rate || 0,
-                daily_rate: profileData.daily_rate || 0,
-                currency: profileData.currency || 'USD',
-                service_areas: profileData.service_areas || '',
-                service_types: profileData.service_types || [],
-                city: profileData.city || null,
-                languages: profileData.languages || []
-            });
-        } catch (error) {
-            // If profile doesn't exist, it's not an error - user can create one
-            if (error.message.includes("don't have a customer profile")) {
-                setCustomerProfile(null);
+            const data = await getMyBookings();
+            setBookings(data.results || data);
+        } catch (err) {
+            console.error('Error loading bookings:', err);
+        }
+    };
+
+    const loadReviews = async () => {
+        try {
+            const data = await getMyReviews();
+            setReviews(data.results || data);
+        } catch (err) {
+            console.error('Error loading reviews:', err);
+        }
+    };
+
+    const loadPortfolio = async () => {
+        try {
+            const data = await getMyPortfolio();
+            setPortfolio(data.results || data);
+        } catch (err) {
+            console.error('Error loading portfolio:', err);
+        }
+    };
+
+    const loadAvailability = async () => {
+        try {
+            const data = await getMyAvailability();
+            setAvailability(data.results || data);
+        } catch (err) {
+            console.error('Error loading availability:', err);
+        }
+    };
+
+    const handleProfileSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            let result;
+            if (profile) {
+                result = await updateCustomerProfile(profileForm);
             } else {
-                throw error;
+                result = await createCustomerProfile(profileForm);
             }
-        } finally {
-            setDataLoading(prev => ({ ...prev, profile: false }));
+            setProfile(result);
+            setShowProfileForm(false);
+            setError(null);
+        } catch (err) {
+            setError(err.message);
         }
     };
 
-    const fetchPortfolio = async () => {
-        setDataLoading(prev => ({ ...prev, portfolio: true }));
+    const handlePortfolioSubmit = async (e) => {
+        e.preventDefault();
         try {
-            const portfolioData = await getMyPortfolio();
-            setPortfolio(portfolioData);
-        } catch (error) {
-            setPortfolio([]);
-            throw error;
-        } finally {
-            setDataLoading(prev => ({ ...prev, portfolio: false }));
-        }
-    };
-
-    const fetchAvailability = async () => {
-        setDataLoading(prev => ({ ...prev, availability: true }));
-        try {
-            const availabilityData = await getMyAvailability();
-            setAvailability(availabilityData);
-        } catch (error) {
-            setAvailability([]);
-            throw error;
-        } finally {
-            setDataLoading(prev => ({ ...prev, availability: false }));
-        }
-    };
-
-    const fetchDocuments = async () => {
-        setDataLoading(prev => ({ ...prev, documents: true }));
-        try {
-            const documentsData = await getMyDocuments();
-            setDocuments(documentsData);
-        } catch (error) {
-            setDocuments([]);
-            throw error;
-        } finally {
-            setDataLoading(prev => ({ ...prev, documents: false }));
-        }
-    };
-
-    const fetchBookings = async () => {
-        setDataLoading(prev => ({ ...prev, bookings: true }));
-        try {
-            const bookingsData = await getGuideBookings();
-            setBookings(Array.isArray(bookingsData.results) ? bookingsData.results : []);
-        } catch (error) {
-            setBookings([]);
-            throw error;
-        } finally {
-            setDataLoading(prev => ({ ...prev, bookings: false }));
-        }
-    };
-
-    const fetchReviews = async () => {
-        setDataLoading(prev => ({ ...prev, reviews: true }));
-        try {
-            const reviewsData = await getGuideReviews();
-            setReviews(Array.isArray(reviewsData.results) ? reviewsData.results : []);
-        } catch (error) {
-            setReviews([]);
-            throw error;
-        } finally {
-            setDataLoading(prev => ({ ...prev, reviews: false }));
-        }
-    };
-
-    const fetchGuideStats = async () => {
-        setDataLoading(prev => ({ ...prev, stats: true }));
-        try {
-            const statsData = await getGuideStats();
-            setGuideStats({
-                totalBookings: statsData.total_bookings || 0,
-                averageRating: statsData.average_rating || 0,
-                responseRate: statsData.response_rate || 0,
-                totalEarnings: statsData.total_earnings || 0,
-                totalReviews: statsData.total_reviews || 0
-            });
-        } catch (error) {
-            setGuideStats({
-                totalBookings: 0,
-                averageRating: 0,
-                responseRate: 0,
-                totalEarnings: 0,
-                totalReviews: 0
-            });
-            throw error;
-        } finally {
-            setDataLoading(prev => ({ ...prev, stats: false }));
-        }
-    };
-
-    const fetchChats = async () => {
-        setDataLoading(prev => ({ ...prev, chats: true }));
-        try {
-            const chatsData = await getGuideChats();
-            setChatMessages(Array.isArray(chatsData.results) ? chatsData.results : []);
-        } catch (error) {
-            setChatMessages([]);
-            throw error;
-        } finally {
-            setDataLoading(prev => ({ ...prev, chats: false }));
-        }
-    };
-
-    // Statistics calculations
-    const stats = useMemo(() => {
-        const pendingBookings = bookings.filter(b => b.status === 'pending').length;
-        const confirmedBookings = bookings.filter(b => b.status === 'confirmed').length;
-        const completedBookings = bookings.filter(b => b.status === 'completed').length;
-        const totalUnreadMessages = chatMessages.reduce((sum, chat) => sum + (chat.unread_count || 0), 0);
-
-        return {
-            totalBookings: guideStats.totalBookings || completedBookings,
-            pendingBookings,
-            confirmedBookings,
-            completedBookings,
-            averageRating: guideStats.averageRating || customerProfile?.average_rating || 0,
-            totalEarnings: guideStats.totalEarnings || 0,
-            responseRate: guideStats.responseRate || 0,
-            totalReviews: guideStats.totalReviews || reviews.length,
-            totalUnreadMessages
-        };
-    }, [bookings, chatMessages, guideStats, customerProfile, reviews]);
-
-    // Theme handling
-    useEffect(() => {
-        const root = document.documentElement;
-        if (theme === 'auto') {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-        } else {
-            root.setAttribute('data-theme', theme);
-        }
-
-        const handleSystemThemeChange = (e) => {
-            if (theme === 'auto') {
-                root.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+            if (editingPortfolioItem) {
+                await updatePortfolioItem(editingPortfolioItem.id, portfolioForm);
+            } else {
+                await createPortfolioItem(portfolioForm);
             }
-        };
-
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        mediaQuery.addEventListener('change', handleSystemThemeChange);
-
-        return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
-    }, [theme]);
-
-    // Notification handler
-    const addNotification = (message, type = 'info') => {
-        const notification = {
-            id: Date.now(),
-            message,
-            type,
-            timestamp: new Date().toISOString()
-        };
-        setNotifications(prev => [notification, ...prev.slice(0, 4)]);
-
-        setTimeout(() => {
-            setNotifications(prev => prev.filter(n => n.id !== notification.id));
-        }, 5000);
-    };
-
-    // Profile handlers
-    const handleCreateCustomerProfile = async () => {
-        if (!profileForm.professional_bio || !profileForm.city) {
-            setProfileError(t('guide.profile.validation.required_fields'));
-            return;
-        }
-
-        try {
-            const profileData = await createCustomerProfile(profileForm);
-            setCustomerProfile(profileData);
-            addNotification(t('guide.profile.success.created'), 'success');
-            setShowProfileModal(false);
-            setProfileError('');
-        } catch (error) {
-            setProfileError(error.message || t('guide.profile.errors.create_failed'));
-        }
-    };
-
-    const handleUpdateCustomerProfile = async () => {
-        if (!profileForm.professional_bio || !profileForm.city) {
-            setProfileError(t('guide.profile.validation.required_fields'));
-            return;
-        }
-
-        try {
-            const profileData = await updateCustomerProfile(profileForm);
-            setCustomerProfile(profileData);
-            addNotification(t('guide.profile.success.updated'), 'success');
-            setShowProfileModal(false);
-            setProfileError('');
-        } catch (error) {
-            setProfileError(error.message || t('guide.profile.errors.update_failed'));
-        }
-    };
-
-    const handleProfileSubmit = () => {
-        if (customerProfile) {
-            handleUpdateCustomerProfile();
-        } else {
-            handleCreateCustomerProfile();
-        }
-    };
-
-    // Portfolio handlers
-    const handlePortfolioSubmit = async () => {
-        try {
-            const formData = new FormData();
-            formData.append('title', portfolioForm.title);
-            formData.append('description', portfolioForm.description);
-            formData.append('order', portfolioForm.order);
-            if (portfolioForm.image) {
-                formData.append('image', portfolioForm.image);
-            }
-
-            await createPortfolioItem(formData);
-            await fetchPortfolio();
+            loadPortfolio();
+            setShowPortfolioForm(false);
+            setEditingPortfolioItem(null);
             setPortfolioForm({ title: '', description: '', image: null, order: 0 });
-            addNotification(t('guide.portfolio.success.created'), 'success');
-        } catch (error) {
-            addNotification(error.message || t('guide.portfolio.errors.create_failed'), 'error');
+        } catch (err) {
+            setError(err.message);
         }
     };
 
-    const handleDeletePortfolioItem = async (id) => {
+    const handleAvailabilitySubmit = async (e) => {
+        e.preventDefault();
+        try {
+            if (editingAvailability) {
+                await updateAvailability(editingAvailability.id, availabilityForm);
+            } else {
+                await createAvailability(availabilityForm);
+            }
+            loadAvailability();
+            setShowAvailabilityForm(false);
+            setEditingAvailability(null);
+            setAvailabilityForm({ date: '', is_available: true, start_time: '', end_time: '', note: '' });
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleBookingAction = async (bookingId, action) => {
+        try {
+            if (action === 'accept') {
+                await acceptBooking(bookingId);
+            } else if (action === 'cancel') {
+                await cancelBooking(bookingId, 'Guide cancelled the booking');
+            }
+            loadBookings();
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const handleDeletePortfolio = async (id) => {
         try {
             await deletePortfolioItem(id);
-            await fetchPortfolio();
-            addNotification(t('guide.portfolio.success.deleted'), 'success');
-        } catch (error) {
-            addNotification(error.message || t('guide.portfolio.errors.delete_failed'), 'error');
-        }
-    };
-
-    // Availability handlers
-    const handleAvailabilitySubmit = async () => {
-        try {
-            await createAvailability(availabilityForm);
-            await fetchAvailability();
-            setAvailabilityForm({ date: '', is_available: true, start_time: '', end_time: '', note: '' });
-            setShowAvailabilityModal(false);
-            addNotification(t('guide.availability.success.created'), 'success');
-        } catch (error) {
-            addNotification(error.message || t('guide.availability.errors.create_failed'), 'error');
+            loadPortfolio();
+        } catch (err) {
+            setError(err.message);
         }
     };
 
     const handleDeleteAvailability = async (id) => {
         try {
             await deleteAvailability(id);
-            await fetchAvailability();
-            addNotification(t('guide.availability.success.deleted'), 'success');
-        } catch (error) {
-            addNotification(error.message || t('guide.availability.errors.delete_failed'), 'error');
+            loadAvailability();
+        } catch (err) {
+            setError(err.message);
         }
     };
 
-    // Document handlers
-    const handleDocumentSubmit = async () => {
-        try {
-            const formData = new FormData();
-            formData.append('document_type', documentForm.document_type);
-            formData.append('description', documentForm.description);
-            if (documentForm.file) {
-                formData.append('file', documentForm.file);
-            }
-
-            await uploadDocument(formData);
-            await fetchDocuments();
-            setDocumentForm({ document_type: 'certificate', file: null, description: '' });
-            setShowDocumentModal(false);
-            addNotification(t('guide.documents.success.uploaded'), 'success');
-        } catch (error) {
-            addNotification(error.message || t('guide.documents.errors.upload_failed'), 'error');
+    // YANGI: Chat functions
+    const handleChatWithClient = (booking) => {
+        if (booking.client?.user?.email) {
+            setSelectedUserForChat(booking.client.user.email);
+            setShowChat(true);
         }
     };
 
-    const handleDeleteDocument = async (id) => {
-        try {
-            await deleteDocument(id);
-            await fetchDocuments();
-            addNotification(t('guide.documents.success.deleted'), 'success');
-        } catch (error) {
-            addNotification(error.message || t('guide.documents.errors.delete_failed'), 'error');
-        }
-    };
-
-    // Booking handlers
-    const handleBookingAction = async (bookingId, status, data = {}) => {
-        try {
-            await updateBookingStatus(bookingId, status, data);
-            await fetchBookings();
-            addNotification(t(`guide.bookings.success.${status}`), 'success');
-        } catch (error) {
-            addNotification(error.message || t('guide.bookings.errors.update_failed'), 'error');
-        }
-    };
-
-    // Password change handler
-    const handlePasswordSubmit = async () => {
-        if (!passwordForm.current_password || !passwordForm.new_password || !passwordForm.confirm_password) {
-            setPasswordError(t('guide.password.validation.all_fields_required'));
-            return;
-        }
-
-        if (passwordForm.new_password !== passwordForm.confirm_password) {
-            setPasswordError(t('guide.password.validation.passwords_not_match'));
-            return;
-        }
-
-        if (passwordForm.new_password.length < 8) {
-            setPasswordError(t('guide.password.validation.min_length'));
-            return;
-        }
-
-        try {
-            await changePassword({
-                current_password: passwordForm.current_password,
-                new_password: passwordForm.new_password
-            });
-
-            addNotification(t('guide.password.success.changed'), 'success');
-            setShowPasswordModal(false);
-            setPasswordForm({ current_password: '', new_password: '', confirm_password: '' });
-            setPasswordError('');
-        } catch (error) {
-            setPasswordError(error.message || t('guide.password.errors.change_failed'));
-        }
-    };
-
-    // Chat handler
-    const openChat = (clientId) => {
-        setSelectedClient(clientId);
-        setChatOpen(true);
-    };
-
-    // File handlers
-    const handleFileUpload = (event, type) => {
-        const file = event.target.files[0];
-        if (file) {
-            if (type === 'portfolio') {
-                setPortfolioForm(prev => ({ ...prev, image: file }));
-            } else if (type === 'document') {
-                setDocumentForm(prev => ({ ...prev, file: file }));
-            }
-        }
-    };
-
-    const getBookingsByStatus = (status) => {
-        if (!Array.isArray(bookings)) return [];
-
-        switch (status) {
-            case 'new':
-                return bookings.filter(b => b.status === 'pending');
-            case 'confirmed':
-                return bookings.filter(b => b.status === 'confirmed');
-            case 'history':
-                return bookings.filter(b => ['completed', 'cancelled', 'rejected'].includes(b.status));
-            default:
-                return bookings;
-        }
-    };
-
-    const formatDate = (dateString) => {
-        if (!dateString) return t('guide.general.no_date');
-        return new Date(dateString).toLocaleDateString();
-    };
-
-    const formatCurrency = (amount) => {
-        if (!amount) return '$0';
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(amount);
+    const handleCloseChat = () => {
+        setShowChat(false);
+        setSelectedUserForChat(null);
     };
 
     if (loading) {
         return (
-            <div className="guide-account">
-                <div className="guide-account-loading">
-                    <div className="guide-account-spinner"></div>
-                    <p>{t('guide.loading.data')}</p>
-                </div>
+            <div className="guide-account-loading">
+                <div className="guide-account-spinner"></div>
+                <p>Loading...</p>
             </div>
         );
     }
 
     return (
-        <div className="guide-account">
-            {/* Notifications */}
-            <div className="guide-account-notifications">
-                {notifications.map(notification => (
-                    <div key={notification.id} className={`guide-account-notification guide-account-notification-${notification.type}`}>
-                        <span>{notification.message}</span>
-                        <button onClick={() => setNotifications(prev => prev.filter(n => n.id !== notification.id))}>
-                            <FiX />
-                        </button>
-                    </div>
-                ))}
-            </div>
-
-            {/* Header */}
+        <div className="guide-account-container">
             <div className="guide-account-header">
-                <div className="guide-account-header-content">
+                <h1 className="guide-account-title">Guide Dashboard</h1>
+                {currentUser && (
                     <div className="guide-account-user-info">
-                        <div className="guide-account-avatar-container">
-                            <img
-                                src={user?.profile_picture || '/default-avatar.png'}
-                                alt={t('guide.profile.profile_picture_alt')}
-                                className="guide-account-avatar"
-                            />
-                            <div className={`guide-account-status-indicator ${user?.is_online ? 'online' : 'offline'}`}></div>
-                        </div>
-                        <div>
-                            <h1>{user?.first_name} {user?.last_name}</h1>
-                            <p className="guide-account-subtitle">
-                                {user?.role} • {customerProfile?.city?.name || user?.city}, {user?.country}
-                            </p>
-                            <div className="guide-account-rating">
-                                <FiStar className="guide-account-star" />
-                                <span>{stats.averageRating.toFixed(1)}</span>
-                                <span>({stats.totalReviews} {t('guide.header.reviews')})</span>
-                            </div>
-                            {customerProfile?.verification_status && (
-                                <div className={`guide-account-verification-badge ${customerProfile.verification_status}`}>
-                                    {customerProfile.verification_status === 'verified' && <FiCheckCircle />}
-                                    {t(`guide.verification.${customerProfile.verification_status}`)}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    <div className="guide-account-header-actions">
-                        <div className="guide-account-quick-stats">
-                            <div className="guide-account-stat-item">
-                                <FiUsers />
-                                <span>{stats.pendingBookings}</span>
-                                <small>{t('guide.stats.new_bookings')}</small>
-                            </div>
-                            <div className="guide-account-stat-item">
-                                <FiCheckCircle />
-                                <span>{stats.confirmedBookings}</span>
-                                <small>{t('guide.stats.confirmed')}</small>
-                            </div>
-                            <div className="guide-account-stat-item">
-                                <FiDollarSign />
-                                <span>{formatCurrency(stats.totalEarnings)}</span>
-                                <small>{t('guide.stats.earnings')}</small>
-                            </div>
-                            <div className="guide-account-stat-item" onClick={() => setChatOpen(true)}>
-                                <FiMessageSquare />
-                                <span>{stats.totalUnreadMessages}</span>
-                                <small>{t('guide.stats.new_messages')}</small>
-                                {stats.totalUnreadMessages > 0 && <div className="guide-account-notification-dot"></div>}
-                            </div>
-                        </div>
+                        <span className="guide-account-welcome">Welcome, {currentUser.full_name}</span>
+                        {/* YANGI: Messages button */}
                         <button
-                            className="guide-account-settings-btn"
-                            onClick={() => setShowSettingsModal(true)}
+                            className="guide-account-chat-btn"
+                            onClick={() => setShowChat(true)}
+                            style={{
+                                marginLeft: '16px',
+                                padding: '8px 16px',
+                                backgroundColor: '#667eea',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                fontWeight: '500'
+                            }}
                         >
-                            <FiSettings />
+                            Messages
                         </button>
                     </div>
-                </div>
+                )}
             </div>
 
-            {/* Main Content */}
-            <div className="guide-account-main">
-                {/* Left Sidebar */}
-                <div className="guide-account-sidebar">
-                    {/* Professional Profile Card */}
-                    <div className="guide-account-card">
-                        <div className="guide-account-card-header">
-                            <h3>{t('guide.profile.professional_profile')}</h3>
-                            <button onClick={() => setShowProfileModal(true)} className="guide-account-edit-btn">
-                                <FiEdit />
-                            </button>
+            {error && (
+                <div className="guide-account-error">
+                    <p>{error}</p>
+                    <button onClick={() => setError(null)} className="guide-account-error-close">×</button>
+                </div>
+            )}
+
+            <div className="guide-account-navigation">
+                <button
+                    className={`guide-account-nav-btn ${activeTab === 'dashboard' ? 'guide-account-nav-active' : ''}`}
+                    onClick={() => setActiveTab('dashboard')}
+                >
+                    Dashboard
+                </button>
+                <button
+                    className={`guide-account-nav-btn ${activeTab === 'profile' ? 'guide-account-nav-active' : ''}`}
+                    onClick={() => setActiveTab('profile')}
+                >
+                    Profile
+                </button>
+                <button
+                    className={`guide-account-nav-btn ${activeTab === 'bookings' ? 'guide-account-nav-active' : ''}`}
+                    onClick={() => setActiveTab('bookings')}
+                >
+                    Bookings
+                </button>
+                <button
+                    className={`guide-account-nav-btn ${activeTab === 'portfolio' ? 'guide-account-nav-active' : ''}`}
+                    onClick={() => setActiveTab('portfolio')}
+                >
+                    Portfolio
+                </button>
+                <button
+                    className={`guide-account-nav-btn ${activeTab === 'availability' ? 'guide-account-nav-active' : ''}`}
+                    onClick={() => setActiveTab('availability')}
+                >
+                    Availability
+                </button>
+                <button
+                    className={`guide-account-nav-btn ${activeTab === 'reviews' ? 'guide-account-nav-active' : ''}`}
+                    onClick={() => setActiveTab('reviews')}
+                >
+                    Reviews
+                </button>
+            </div>
+
+            <div className="guide-account-content">
+                {activeTab === 'dashboard' && (
+                    <div className="guide-account-dashboard">
+                        <div className="guide-account-stats">
+                            <div className="guide-account-stat-card">
+                                <h3 className="guide-account-stat-title">Total Bookings</h3>
+                                <p className="guide-account-stat-value">{bookings.length}</p>
+                            </div>
+                            <div className="guide-account-stat-card">
+                                <h3 className="guide-account-stat-title">Active Bookings</h3>
+                                <p className="guide-account-stat-value">
+                                    {bookings.filter(b => b.status === 'confirmed' || b.status === 'accepted').length}
+                                </p>
+                            </div>
+                            <div className="guide-account-stat-card">
+                                <h3 className="guide-account-stat-title">Total Reviews</h3>
+                                <p className="guide-account-stat-value">{reviews.length}</p>
+                            </div>
+                            <div className="guide-account-stat-card">
+                                <h3 className="guide-account-stat-title">Average Rating</h3>
+                                <p className="guide-account-stat-value">
+                                    {profile?.average_rating || 0}/5
+                                </p>
+                            </div>
                         </div>
-                        <div className="guide-account-profile-details">
-                            {!customerProfile ? (
-                                <div className="guide-account-no-profile">
-                                    <p>{t('guide.profile.no_customer_profile')}</p>
+
+                        <div className="guide-account-recent">
+                            <h3 className="guide-account-section-title">Recent Bookings</h3>
+                            <div className="guide-account-recent-bookings">
+                                {bookings.slice(0, 5).map(booking => (
+                                    <div key={booking.id} className="guide-account-booking-card">
+                                        <div className="guide-account-booking-info">
+                                            <h4 className="guide-account-booking-title">{booking.title}</h4>
+                                            <p className="guide-account-booking-date">
+                                                {new Date(booking.start_date).toLocaleDateString()} -
+                                                {new Date(booking.end_date).toLocaleDateString()}
+                                            </p>
+                                            <span className={`guide-account-booking-status guide-account-status-${booking.status}`}>
+                        {booking.status}
+                      </span>
+                                        </div>
+                                        <div className="guide-account-booking-actions">
+                                            {booking.status === 'pending' && (
+                                                <>
+                                                    <button
+                                                        className="guide-account-btn guide-account-btn-accept"
+                                                        onClick={() => handleBookingAction(booking.id, 'accept')}
+                                                    >
+                                                        Accept
+                                                    </button>
+                                                    <button
+                                                        className="guide-account-btn guide-account-btn-cancel"
+                                                        onClick={() => handleBookingAction(booking.id, 'cancel')}
+                                                    >
+                                                        Decline
+                                                    </button>
+                                                </>
+                                            )}
+                                            {/* YANGI: Chat button */}
+                                            {booking.client && (
+                                                <button
+                                                    className="guide-account-btn guide-account-btn-secondary"
+                                                    onClick={() => handleChatWithClient(booking)}
+                                                    style={{
+                                                        marginLeft: '8px',
+                                                        backgroundColor: '#6c757d',
+                                                        color: 'white'
+                                                    }}
+                                                >
+                                                    Chat
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'profile' && (
+                    <div className="guide-account-profile">
+                        {!profile || showProfileForm ? (
+                            <div className="guide-account-profile-form">
+                                <h3 className="guide-account-section-title">
+                                    {profile ? 'Edit Profile' : 'Create Profile'}
+                                </h3>
+                                <form onSubmit={handleProfileSubmit} className="guide-account-form">
+                                    <div className="guide-account-form-group">
+                                        <label className="guide-account-label">Professional Bio</label>
+                                        <textarea
+                                            className="guide-account-textarea"
+                                            value={profileForm.professional_bio}
+                                            onChange={(e) => setProfileForm({...profileForm, professional_bio: e.target.value})}
+                                            placeholder="Tell clients about your experience and expertise..."
+                                            rows="4"
+                                        />
+                                    </div>
+
+                                    <div className="guide-account-form-row">
+                                        <div className="guide-account-form-group">
+                                            <label className="guide-account-label">Years of Experience</label>
+                                            <input
+                                                type="number"
+                                                className="guide-account-input"
+                                                value={profileForm.years_of_experience}
+                                                onChange={(e) => setProfileForm({...profileForm, years_of_experience: parseInt(e.target.value)})}
+                                                min="0"
+                                            />
+                                        </div>
+                                        <div className="guide-account-form-group">
+                                            <label className="guide-account-label">City</label>
+                                            <select
+                                                className="guide-account-select"
+                                                value={profileForm.city}
+                                                onChange={(e) => setProfileForm({...profileForm, city: e.target.value})}
+                                            >
+                                                <option value="">Select City</option>
+                                                {cities.map(city => (
+                                                    <option key={city.id} value={city.id}>{city.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="guide-account-form-group">
+                                        <label className="guide-account-label">Service Areas</label>
+                                        <input
+                                            type="text"
+                                            className="guide-account-input"
+                                            value={profileForm.service_areas}
+                                            onChange={(e) => setProfileForm({...profileForm, service_areas: e.target.value})}
+                                            placeholder="Areas where you provide services"
+                                        />
+                                    </div>
+
+                                    <div className="guide-account-form-group">
+                                        <label className="guide-account-label">Service Types</label>
+                                        <div className="guide-account-checkbox-group">
+                                            {serviceTypes.map(service => (
+                                                <label key={service.id} className="guide-account-checkbox-label">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="guide-account-checkbox"
+                                                        checked={profileForm.service_types.includes(service.id)}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                setProfileForm({
+                                                                    ...profileForm,
+                                                                    service_types: [...profileForm.service_types, service.id]
+                                                                });
+                                                            } else {
+                                                                setProfileForm({
+                                                                    ...profileForm,
+                                                                    service_types: profileForm.service_types.filter(id => id !== service.id)
+                                                                });
+                                                            }
+                                                        }}
+                                                    />
+                                                    {service.name}
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="guide-account-form-row">
+                                        <div className="guide-account-form-group">
+                                            <label className="guide-account-label">Hourly Rate</label>
+                                            <input
+                                                type="number"
+                                                className="guide-account-input"
+                                                value={profileForm.hourly_rate}
+                                                onChange={(e) => setProfileForm({...profileForm, hourly_rate: e.target.value})}
+                                                placeholder="0"
+                                                step="0.01"
+                                            />
+                                        </div>
+                                        <div className="guide-account-form-group">
+                                            <label className="guide-account-label">Daily Rate</label>
+                                            <input
+                                                type="number"
+                                                className="guide-account-input"
+                                                value={profileForm.daily_rate}
+                                                onChange={(e) => setProfileForm({...profileForm, daily_rate: e.target.value})}
+                                                placeholder="0"
+                                                step="0.01"
+                                            />
+                                        </div>
+                                        <div className="guide-account-form-group">
+                                            <label className="guide-account-label">Currency</label>
+                                            <select
+                                                className="guide-account-select"
+                                                value={profileForm.currency}
+                                                onChange={(e) => setProfileForm({...profileForm, currency: e.target.value})}
+                                            >
+                                                <option value="USD">USD</option>
+                                                <option value="EUR">EUR</option>
+                                                <option value="UZS">UZS</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="guide-account-form-group">
+                                        <label className="guide-account-label">Languages</label>
+                                        <div className="guide-account-checkbox-group">
+                                            {languages.map(language => (
+                                                <label key={language.id} className="guide-account-checkbox-label">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="guide-account-checkbox"
+                                                        checked={profileForm.languages.includes(language.id)}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                setProfileForm({
+                                                                    ...profileForm,
+                                                                    languages: [...profileForm.languages, language.id]
+                                                                });
+                                                            } else {
+                                                                setProfileForm({
+                                                                    ...profileForm,
+                                                                    languages: profileForm.languages.filter(id => id !== language.id)
+                                                                });
+                                                            }
+                                                        }}
+                                                    />
+                                                    {language.name}
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="guide-account-form-group">
+                                        <label className="guide-account-checkbox-label">
+                                            <input
+                                                type="checkbox"
+                                                className="guide-account-checkbox"
+                                                checked={profileForm.is_available}
+                                                onChange={(e) => setProfileForm({...profileForm, is_available: e.target.checked})}
+                                            />
+                                            Available for bookings
+                                        </label>
+                                    </div>
+
+                                    <div className="guide-account-form-actions">
+                                        <button type="submit" className="guide-account-btn guide-account-btn-primary">
+                                            {profile ? 'Update Profile' : 'Create Profile'}
+                                        </button>
+                                        {profile && (
+                                            <button
+                                                type="button"
+                                                className="guide-account-btn guide-account-btn-secondary"
+                                                onClick={() => setShowProfileForm(false)}
+                                            >
+                                                Cancel
+                                            </button>
+                                        )}
+                                    </div>
+                                </form>
+                            </div>
+                        ) : (
+                            <div className="guide-account-profile-view">
+                                <div className="guide-account-profile-header">
+                                    <h3 className="guide-account-section-title">Profile Information</h3>
                                     <button
                                         className="guide-account-btn guide-account-btn-primary"
-                                        onClick={() => setShowProfileModal(true)}
+                                        onClick={() => setShowProfileForm(true)}
                                     >
-                                        {t('guide.profile.create_profile')}
+                                        Edit Profile
                                     </button>
                                 </div>
-                            ) : (
-                                <>
-                                    <div className="guide-account-profile-item">
-                                        <FiUser />
-                                        <div>
-                                            <strong>{t('guide.profile.bio')}</strong>
-                                            <p>{customerProfile.professional_bio || t('guide.profile.no_bio')}</p>
-                                        </div>
+                                <div className="guide-account-profile-info">
+                                    <div className="guide-account-profile-field">
+                                        <label className="guide-account-profile-label">Bio:</label>
+                                        <p className="guide-account-profile-value">{profile.professional_bio}</p>
                                     </div>
-                                    <div className="guide-account-profile-item">
-                                        <FiAward />
-                                        <div>
-                                            <strong>{t('guide.profile.experience')}</strong>
-                                            <p>{customerProfile.years_of_experience ? t('guide.profile.years_experience', { years: customerProfile.years_of_experience }) : t('guide.profile.no_experience')}</p>
-                                        </div>
+                                    <div className="guide-account-profile-field">
+                                        <label className="guide-account-profile-label">Experience:</label>
+                                        <p className="guide-account-profile-value">{profile.years_of_experience} years</p>
                                     </div>
-                                    <div className="guide-account-profile-item">
-                                        <FiGlobe />
-                                        <div>
-                                            <strong>{t('guide.profile.languages')}</strong>
-                                            <p>{customerProfile.languages && customerProfile.languages.length > 0 ? customerProfile.languages.map(l => l.name).join(', ') : t('guide.profile.no_languages')}</p>
-                                        </div>
+                                    <div className="guide-account-profile-field">
+                                        <label className="guide-account-profile-label">Availability:</label>
+                                        <p className="guide-account-profile-value">
+                                            {profile.is_available ? 'Available' : 'Not Available'}
+                                        </p>
                                     </div>
-                                    <div className="guide-account-profile-item">
-                                        <FiDollarSign />
-                                        <div>
-                                            <strong>{t('guide.profile.pricing')}</strong>
-                                            <p>
-                                                {customerProfile.hourly_rate ? t('guide.profile.hourly_rate', { rate: formatCurrency(customerProfile.hourly_rate) }) : t('guide.profile.no_hourly_rate')}
-                                                {customerProfile.daily_rate ? ` • ${t('guide.profile.daily_rate', { rate: formatCurrency(customerProfile.daily_rate) })}` : ` • ${t('guide.profile.no_daily_rate')}`}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="guide-account-profile-item">
-                                        <FiMapPin />
-                                        <div>
-                                            <strong>{t('guide.profile.service_areas')}</strong>
-                                            <p>{customerProfile.service_areas || t('guide.profile.no_service_areas')}</p>
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Portfolio Card */}
-                    <div className="guide-account-card">
-                        <div className="guide-account-card-header">
-                            <h3>{t('guide.portfolio.title')}</h3>
-                            <button onClick={() => setShowPortfolioModal(true)} className="guide-account-edit-btn">
-                                <FiPlus />
-                            </button>
-                        </div>
-                        <div className="guide-account-portfolio-preview">
-                            {dataLoading.portfolio ? (
-                                <div className="guide-account-loading-small">
-                                    <FiRefreshCw className="guide-account-spin" />
                                 </div>
-                            ) : dataErrors.portfolio ? (
-                                <div className="guide-account-error-small">
-                                    <FiX />
-                                    <span>{t('guide.errors.portfolio_loading_error')}</span>
-                                </div>
-                            ) : portfolio.length > 0 ? (
-                                <>
-                                    {portfolio.slice(0, 4).map((item) => (
-                                        <div key={item.id} className="guide-account-portfolio-item-small">
-                                            <img src={item.image} alt={item.title} />
-                                            <button
-                                                className="guide-account-portfolio-delete-small"
-                                                onClick={() => handleDeletePortfolioItem(item.id)}
-                                            >
-                                                <FiX />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    {portfolio.length > 4 && (
-                                        <div className="guide-account-portfolio-more-small">
-                                            +{portfolio.length - 4}
-                                        </div>
-                                    )}
-                                </>
-                            ) : (
-                                <div className="guide-account-empty-small">
-                                    <FiImage />
-                                    <p>{t('guide.portfolio.no_items')}</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Statistics Card */}
-                    <div className="guide-account-card">
-                        <div className="guide-account-card-header">
-                            <h3>{t('guide.statistics.title')}</h3>
-                            {dataErrors.stats && (
-                                <span className="guide-account-error-badge" title={t('guide.errors.data_loading_error')}>
-                                    <FiX />
-                                </span>
-                            )}
-                        </div>
-                        <div className="guide-account-stats-grid">
-                            <div className="guide-account-stat">
-                                <FiCheckCircle className="guide-account-stat-icon success" />
-                                <div>
-                                    <strong>{dataErrors.stats ? '—' : stats.totalBookings}</strong>
-                                    <span>{t('guide.statistics.completed_bookings')}</span>
-                                </div>
-                            </div>
-                            <div className="guide-account-stat">
-                                <FiStar className="guide-account-stat-icon warning" />
-                                <div>
-                                    <strong>{dataErrors.stats ? '—' : stats.averageRating.toFixed(1)}</strong>
-                                    <span>{t('guide.statistics.average_rating')}</span>
-                                </div>
-                            </div>
-                            <div className="guide-account-stat">
-                                <FiTrendingUp className="guide-account-stat-icon primary" />
-                                <div>
-                                    <strong>{dataErrors.stats ? '—' : stats.responseRate}%</strong>
-                                    <span>{t('guide.statistics.response_rate')}</span>
-                                </div>
-                            </div>
-                            <div className="guide-account-stat">
-                                <FiDollarSign className="guide-account-stat-icon success" />
-                                <div>
-                                    <strong>{dataErrors.stats ? '—' : formatCurrency(stats.totalEarnings)}</strong>
-                                    <span>{t('guide.statistics.total_earnings')}</span>
-                                </div>
-                            </div>
-                        </div>
-                        {dataErrors.stats && (
-                            <div className="guide-account-error-message-card">
-                                <small>{t('guide.errors.statistics_loading_error')}</small>
                             </div>
                         )}
                     </div>
-                </div>
+                )}
 
-                {/* Main Content Area */}
-                <div className="guide-account-content">
-                    <div className="guide-account-card">
-                        <div className="guide-account-card-header">
-                            <h3>{t('guide.bookings.title')}</h3>
-                            {dataErrors.bookings && (
-                                <span className="guide-account-error-badge" title={t('guide.errors.bookings_loading_error')}>
-                                    <FiX />
-                                </span>
-                            )}
-                            <div className="guide-account-tabs">
-                                <button
-                                    className={`guide-account-tab ${activeTab === 'new' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('new')}
-                                >
-                                    {t('guide.bookings.new')} ({dataErrors.bookings ? '—' : stats.pendingBookings})
-                                </button>
-                                <button
-                                    className={`guide-account-tab ${activeTab === 'confirmed' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('confirmed')}
-                                >
-                                    {t('guide.bookings.confirmed')} ({dataErrors.bookings ? '—' : stats.confirmedBookings})
-                                </button>
-                                <button
-                                    className={`guide-account-tab ${activeTab === 'history' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('history')}
-                                >
-                                    {t('guide.bookings.history')} ({dataErrors.bookings ? '—' : stats.completedBookings})
-                                </button>
-                            </div>
-                        </div>
-
+                {activeTab === 'bookings' && (
+                    <div className="guide-account-bookings">
+                        <h3 className="guide-account-section-title">My Bookings</h3>
                         <div className="guide-account-bookings-list">
-                            {dataLoading.bookings ? (
-                                <div className="guide-account-loading-state">
-                                    <FiRefreshCw className="guide-account-spin" />
-                                    <p>{t('guide.loading.bookings')}</p>
-                                </div>
-                            ) : dataErrors.bookings ? (
-                                <div className="guide-account-error-state">
-                                    <FiX size={48} color="#ef4444" />
-                                    <h3>{t('guide.errors.bookings_loading_error_title')}</h3>
-                                    <p>{t('guide.errors.bookings_loading_error_desc')}</p>
-                                    <button
-                                        className="guide-account-btn guide-account-btn-outline"
-                                        onClick={() => fetchBookings()}
-                                    >
-                                        {t('guide.actions.retry')}
-                                    </button>
-                                </div>
-                            ) : getBookingsByStatus(activeTab).length === 0 ? (
-                                <div className="guide-account-empty-state">
-                                    <FiUsers size={48} />
-                                    <h3>{t('guide.bookings.no_bookings_title')}</h3>
-                                    <p>{t('guide.bookings.no_bookings_desc')}</p>
-                                </div>
-                            ) : (
-                                getBookingsByStatus(activeTab).map(booking => (
-                                    <div key={booking.id} className="guide-account-booking-item">
-                                        <div className="guide-account-booking-header">
-                                            <div className="guide-account-client-info">
-                                                <div className="guide-account-client-avatar-container">
-                                                    <img src={booking.client?.profile_picture || '/default-avatar.png'} alt={booking.client?.name} />
-                                                    <div className={`guide-account-client-status ${booking.client?.is_online ? 'online' : 'offline'}`}></div>
-                                                </div>
-                                                <div>
-                                                    <h4>{booking.client?.name || t('guide.bookings.anonymous_client')}</h4>
-                                                    <span className="guide-account-booking-id">#{booking.id}</span>
-                                                </div>
-                                            </div>
-                                            <div className="guide-account-booking-meta">
-                                                <div className={`guide-account-status guide-account-status-${booking.status}`}>
-                                                    {t(`guide.status.${booking.status}`)}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="guide-account-booking-details">
-                                            <div className="guide-account-booking-info">
-                                                <div className="guide-account-info-item">
-                                                    <FiCalendar />
-                                                    <span>{formatDate(booking.start_date)}</span>
-                                                </div>
-                                                <div className="guide-account-info-item">
-                                                    <FiClock />
-                                                    <span>{booking.duration || t('guide.bookings.no_duration')}</span>
-                                                </div>
-                                                <div className="guide-account-info-item">
-                                                    <FiUsers />
-                                                    <span>{booking.travelers_count || t('guide.bookings.no_travelers')}</span>
-                                                </div>
-                                                <div className="guide-account-info-item">
-                                                    <FiDollarSign />
-                                                    <span>{formatCurrency(booking.total_price)}</span>
-                                                </div>
-                                            </div>
-
-                                            <div className="guide-account-service-type">
-                                                <strong>{booking.service_type?.name || t('guide.bookings.no_service_type')}</strong>
-                                                {booking.notes && <p>{booking.notes}</p>}
-                                                {booking.rating && (
-                                                    <div className="guide-account-rating">
-                                                        <FiStar />
-                                                        <span>{booking.rating}/5</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
+                            {bookings.map(booking => (
+                                <div key={booking.id} className="guide-account-booking-item">
+                                    <div className="guide-account-booking-details">
+                                        <h4 className="guide-account-booking-title">{booking.title}</h4>
+                                        <p className="guide-account-booking-dates">
+                                            {new Date(booking.start_date).toLocaleDateString()} -
+                                            {new Date(booking.end_date).toLocaleDateString()}
+                                        </p>
+                                        <p className="guide-account-booking-description">{booking.description}</p>
+                                        <span className={`guide-account-booking-status guide-account-status-${booking.status}`}>
+                      {booking.status}
+                    </span>
+                                    </div>
+                                    <div className="guide-account-booking-actions">
                                         {booking.status === 'pending' && (
-                                            <div className="guide-account-booking-actions">
+                                            <>
                                                 <button
-                                                    className="guide-account-btn guide-account-btn-success"
-                                                    onClick={() => handleBookingAction(booking.id, 'confirmed')}
+                                                    className="guide-account-btn guide-account-btn-accept"
+                                                    onClick={() => handleBookingAction(booking.id, 'accept')}
                                                 >
-                                                    <FiCheck /> {t('guide.actions.accept')}
+                                                    Accept
                                                 </button>
                                                 <button
-                                                    className="guide-account-btn guide-account-btn-danger"
-                                                    onClick={() => handleBookingAction(booking.id, 'rejected')}
+                                                    className="guide-account-btn guide-account-btn-cancel"
+                                                    onClick={() => handleBookingAction(booking.id, 'cancel')}
                                                 >
-                                                    <FiX /> {t('guide.actions.reject')}
+                                                    Decline
                                                 </button>
-                                                <button
-                                                    className="guide-account-btn guide-account-btn-outline"
-                                                    onClick={() => openChat(booking.client?.id)}
-                                                >
-                                                    <FiMessageSquare /> {t('guide.actions.chat')}
-                                                </button>
-                                            </div>
+                                            </>
                                         )}
-
-                                        {booking.status === 'confirmed' && (
-                                            <div className="guide-account-booking-actions">
-                                                <button
-                                                    className="guide-account-btn guide-account-btn-outline"
-                                                    onClick={() => openChat(booking.client?.id)}
-                                                >
-                                                    <FiMessageSquare /> {t('guide.actions.chat_with_client')}
-                                                </button>
-                                                <button className="guide-account-btn guide-account-btn-primary">
-                                                    <FiMapPin /> {t('guide.actions.view_route')}
-                                                </button>
-                                                <button
-                                                    className="guide-account-btn guide-account-btn-success"
-                                                    onClick={() => handleBookingAction(booking.id, 'completed')}
-                                                >
-                                                    <FiCheckCircle /> {t('guide.actions.mark_completed')}
-                                                </button>
-                                            </div>
-                                        )}
-
-                                        {(booking.status === 'completed' || booking.status === 'cancelled') && (
-                                            <div className="guide-account-booking-actions">
-                                                <button
-                                                    className="guide-account-btn guide-account-btn-outline"
-                                                    onClick={() => openChat(booking.client?.id)}
-                                                >
-                                                    <FiMessageSquare /> {t('guide.actions.send_message')}
-                                                </button>
-                                            </div>
+                                        {/* YANGI: Chat button */}
+                                        {booking.client && (
+                                            <button
+                                                className="guide-account-btn guide-account-btn-secondary"
+                                                onClick={() => handleChatWithClient(booking)}
+                                                style={{
+                                                    marginLeft: '8px',
+                                                    backgroundColor: '#6c757d',
+                                                    color: 'white'
+                                                }}
+                                            >
+                                                Chat with Client
+                                            </button>
                                         )}
                                     </div>
-                                ))
-                            )}
+                                </div>
+                            ))}
                         </div>
                     </div>
+                )}
 
-                    {/* Chat Widget */}
-                    <GuideChatWidget
-                        chatMessages={chatMessages}
-                        setChatMessages={setChatMessages}
-                        bookings={bookings}
-                        openChat={openChat}
-                        stats={stats}
-                        chatOpen={chatOpen}
-                        setChatOpen={setChatOpen}
-                        selectedClient={selectedClient}
-                    />
-                </div>
-            </div>
-
-            {/* Profile Modal */}
-            {showProfileModal && (
-                <div className="guide-account-modal-overlay" onClick={() => setShowProfileModal(false)}>
-                    <div className="guide-account-modal guide-account-modal-large" onClick={e => e.stopPropagation()}>
-                        <div className="guide-account-modal-header">
-                            <h3>{customerProfile ? t('guide.modals.edit_profile') : t('guide.modals.create_profile')}</h3>
-                            <button onClick={() => setShowProfileModal(false)}>
-                                <FiX />
+                {/* Portfolio, Availability, Reviews sections remain unchanged */}
+                {activeTab === 'portfolio' && (
+                    <div className="guide-account-portfolio">
+                        <div className="guide-account-portfolio-header">
+                            <h3 className="guide-account-section-title">Portfolio</h3>
+                            <button
+                                className="guide-account-btn guide-account-btn-primary"
+                                onClick={() => setShowPortfolioForm(true)}
+                            >
+                                Add Portfolio Item
                             </button>
                         </div>
-                        <div className="guide-account-modal-content">
-                            {profileError && (
-                                <div className="guide-account-error-message">{profileError}</div>
-                            )}
 
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.profile.form.bio')} *</label>
-                                <textarea
-                                    value={profileForm.professional_bio}
-                                    onChange={(e) => setProfileForm({...profileForm, professional_bio: e.target.value})}
-                                    rows={4}
-                                    placeholder={t('guide.profile.form.bio_placeholder')}
-                                />
+                        {showPortfolioForm && (
+                            <div className="guide-account-portfolio-form">
+                                <h4 className="guide-account-form-title">
+                                    {editingPortfolioItem ? 'Edit Portfolio Item' : 'Add Portfolio Item'}
+                                </h4>
+                                <form onSubmit={handlePortfolioSubmit} className="guide-account-form">
+                                    <div className="guide-account-form-group">
+                                        <label className="guide-account-label">Title</label>
+                                        <input
+                                            type="text"
+                                            className="guide-account-input"
+                                            value={portfolioForm.title}
+                                            onChange={(e) => setPortfolioForm({...portfolioForm, title: e.target.value})}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="guide-account-form-group">
+                                        <label className="guide-account-label">Description</label>
+                                        <textarea
+                                            className="guide-account-textarea"
+                                            value={portfolioForm.description}
+                                            onChange={(e) => setPortfolioForm({...portfolioForm, description: e.target.value})}
+                                            rows="3"
+                                        />
+                                    </div>
+                                    <div className="guide-account-form-group">
+                                        <label className="guide-account-label">Image</label>
+                                        <input
+                                            type="file"
+                                            className="guide-account-file-input"
+                                            accept="image/*"
+                                            onChange={(e) => setPortfolioForm({...portfolioForm, image: e.target.files[0]})}
+                                        />
+                                    </div>
+                                    <div className="guide-account-form-group">
+                                        <label className="guide-account-label">Order</label>
+                                        <input
+                                            type="number"
+                                            className="guide-account-input"
+                                            value={portfolioForm.order}
+                                            onChange={(e) => setPortfolioForm({...portfolioForm, order: parseInt(e.target.value)})}
+                                            min="0"
+                                        />
+                                    </div>
+                                    <div className="guide-account-form-actions">
+                                        <button type="submit" className="guide-account-btn guide-account-btn-primary">
+                                            {editingPortfolioItem ? 'Update' : 'Add'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="guide-account-btn guide-account-btn-secondary"
+                                            onClick={() => {
+                                                setShowPortfolioForm(false);
+                                                setEditingPortfolioItem(null);
+                                                setPortfolioForm({ title: '', description: '', image: null, order: 0 });
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
+                        )}
 
-                            <div className="guide-account-form-row">
-                                <div className="guide-account-form-group">
-                                    <label>{t('guide.profile.form.experience_years')}</label>
-                                    <input
-                                        type="number"
-                                        value={profileForm.years_of_experience}
-                                        onChange={(e) => setProfileForm({...profileForm, years_of_experience: Number(e.target.value)})}
-                                        min="0"
-                                        max="50"
-                                    />
-                                </div>
-                                <div className="guide-account-form-group">
-                                    <label>{t('guide.profile.form.city')} *</label>
-                                    <select
-                                        value={profileForm.city || ''}
-                                        onChange={(e) => setProfileForm({...profileForm, city: Number(e.target.value)})}
-                                    >
-                                        <option value="">{t('guide.profile.form.select_city')}</option>
-                                        {cities.map((city) => (
-                                            <option key={city.id} value={city.id}>{city.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="guide-account-form-row">
-                                <div className="guide-account-form-group">
-                                    <label>{t('guide.profile.form.hourly_rate')}</label>
-                                    <input
-                                        type="number"
-                                        value={profileForm.hourly_rate}
-                                        onChange={(e) => setProfileForm({...profileForm, hourly_rate: Number(e.target.value)})}
-                                        min="0"
-                                        step="5"
-                                    />
-                                </div>
-                                <div className="guide-account-form-group">
-                                    <label>{t('guide.profile.form.daily_rate')}</label>
-                                    <input
-                                        type="number"
-                                        value={profileForm.daily_rate}
-                                        onChange={(e) => setProfileForm({...profileForm, daily_rate: Number(e.target.value)})}
-                                        min="0"
-                                        step="10"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.profile.form.service_areas')}</label>
-                                <textarea
-                                    value={profileForm.service_areas}
-                                    onChange={(e) => setProfileForm({...profileForm, service_areas: e.target.value})}
-                                    rows={3}
-                                    placeholder={t('guide.profile.form.service_areas_placeholder')}
-                                />
-                            </div>
-
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.profile.form.service_types')}</label>
-                                <div className="guide-account-checkbox-group">
-                                    {serviceTypes.map((serviceType) => (
-                                        <label key={serviceType.id} className="guide-account-checkbox-item">
-                                            <input
-                                                type="checkbox"
-                                                checked={profileForm.service_types.includes(serviceType.id)}
-                                                onChange={(e) => {
-                                                    if (e.target.checked) {
-                                                        setProfileForm(prev => ({
-                                                            ...prev,
-                                                            service_types: [...prev.service_types, serviceType.id]
-                                                        }));
-                                                    } else {
-                                                        setProfileForm(prev => ({
-                                                            ...prev,
-                                                            service_types: prev.service_types.filter(id => id !== serviceType.id)
-                                                        }));
-                                                    }
+                        <div className="guide-account-portfolio-grid">
+                            {portfolio.map(item => (
+                                <div key={item.id} className="guide-account-portfolio-item">
+                                    {item.image && (
+                                        <img
+                                            src={item.image}
+                                            alt={item.title}
+                                            className="guide-account-portfolio-image"
+                                        />
+                                    )}
+                                    <div className="guide-account-portfolio-content">
+                                        <h4 className="guide-account-portfolio-title">{item.title}</h4>
+                                        <p className="guide-account-portfolio-description">{item.description}</p>
+                                        <div className="guide-account-portfolio-actions">
+                                            <button
+                                                className="guide-account-btn guide-account-btn-small"
+                                                onClick={() => {
+                                                    setEditingPortfolioItem(item);
+                                                    setPortfolioForm({
+                                                        title: item.title,
+                                                        description: item.description,
+                                                        image: null,
+                                                        order: item.order
+                                                    });
+                                                    setShowPortfolioForm(true);
                                                 }}
-                                            />
-                                            <span>{serviceType.name}</span>
-                                        </label>
-                                    ))}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                className="guide-account-btn guide-account-btn-small guide-account-btn-danger"
+                                                onClick={() => handleDeletePortfolio(item.id)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.profile.form.languages')}</label>
-                                <div className="guide-account-checkbox-group">
-                                    {languageOptions.map((language) => (
-                                        <label key={language.id} className="guide-account-checkbox-item">
-                                            <input
-                                                type="checkbox"
-                                                checked={profileForm.languages.includes(language.id)}
-                                                onChange={(e) => {
-                                                    if (e.target.checked) {
-                                                        setProfileForm(prev => ({
-                                                            ...prev,
-                                                            languages: [...prev.languages, language.id]
-                                                        }));
-                                                    } else {
-                                                        setProfileForm(prev => ({
-                                                            ...prev,
-                                                            languages: prev.languages.filter(id => id !== language.id)
-                                                        }));
-                                                    }
-                                                }}
-                                            />
-                                            <span>{language.name}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="guide-account-form-actions">
-                                <button
-                                    className="guide-account-btn guide-account-btn-outline"
-                                    onClick={() => setShowProfileModal(false)}
-                                >
-                                    {t('guide.actions.cancel')}
-                                </button>
-                                <button
-                                    className="guide-account-btn guide-account-btn-primary"
-                                    onClick={handleProfileSubmit}
-                                >
-                                    <FiSave /> {customerProfile ? t('guide.actions.save') : t('guide.actions.create')}
-                                </button>
-                            </div>
+                            ))}
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* Portfolio Modal */}
-            {showPortfolioModal && (
-                <div className="guide-account-modal-overlay" onClick={() => setShowPortfolioModal(false)}>
-                    <div className="guide-account-modal" onClick={e => e.stopPropagation()}>
-                        <div className="guide-account-modal-header">
-                            <h3>{t('guide.modals.add_portfolio_item')}</h3>
-                            <button onClick={() => setShowPortfolioModal(false)}>
-                                <FiX />
+                {activeTab === 'availability' && (
+                    <div className="guide-account-availability">
+                        <div className="guide-account-availability-header">
+                            <h3 className="guide-account-section-title">Availability</h3>
+                            <button
+                                className="guide-account-btn guide-account-btn-primary"
+                                onClick={() => setShowAvailabilityForm(true)}
+                            >
+                                Add Availability
                             </button>
                         </div>
-                        <div className="guide-account-modal-content">
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.portfolio.form.title')}</label>
-                                <input
-                                    type="text"
-                                    value={portfolioForm.title}
-                                    onChange={(e) => setPortfolioForm({...portfolioForm, title: e.target.value})}
-                                    placeholder={t('guide.portfolio.form.title_placeholder')}
-                                />
-                            </div>
 
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.portfolio.form.description')}</label>
-                                <textarea
-                                    value={portfolioForm.description}
-                                    onChange={(e) => setPortfolioForm({...portfolioForm, description: e.target.value})}
-                                    rows={3}
-                                    placeholder={t('guide.portfolio.form.description_placeholder')}
-                                />
-                            </div>
-
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.portfolio.form.image')}</label>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => handleFileUpload(e, 'portfolio')}
-                                />
-                            </div>
-
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.portfolio.form.order')}</label>
-                                <input
-                                    type="number"
-                                    value={portfolioForm.order}
-                                    onChange={(e) => setPortfolioForm({...portfolioForm, order: Number(e.target.value)})}
-                                    min="0"
-                                />
-                            </div>
-
-                            <div className="guide-account-form-actions">
-                                <button
-                                    className="guide-account-btn guide-account-btn-outline"
-                                    onClick={() => setShowPortfolioModal(false)}
-                                >
-                                    {t('guide.actions.cancel')}
-                                </button>
-                                <button
-                                    className="guide-account-btn guide-account-btn-primary"
-                                    onClick={handlePortfolioSubmit}
-                                >
-                                    <FiPlus /> {t('guide.actions.add')}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Availability Modal */}
-            {showAvailabilityModal && (
-                <div className="guide-account-modal-overlay" onClick={() => setShowAvailabilityModal(false)}>
-                    <div className="guide-account-modal" onClick={e => e.stopPropagation()}>
-                        <div className="guide-account-modal-header">
-                            <h3>{t('guide.modals.add_availability')}</h3>
-                            <button onClick={() => setShowAvailabilityModal(false)}>
-                                <FiX />
-                            </button>
-                        </div>
-                        <div className="guide-account-modal-content">
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.availability.form.date')}</label>
-                                <input
-                                    type="date"
-                                    value={availabilityForm.date}
-                                    onChange={(e) => setAvailabilityForm({...availabilityForm, date: e.target.value})}
-                                />
-                            </div>
-
-                            <div className="guide-account-form-group">
-                                <label className="guide-account-checkbox-item">
-                                    <input
-                                        type="checkbox"
-                                        checked={availabilityForm.is_available}
-                                        onChange={(e) => setAvailabilityForm({...availabilityForm, is_available: e.target.checked})}
-                                    />
-                                    <span>{t('guide.availability.form.is_available')}</span>
-                                </label>
-                            </div>
-
-                            {availabilityForm.is_available && (
-                                <>
+                        {showAvailabilityForm && (
+                            <div className="guide-account-availability-form">
+                                <h4 className="guide-account-form-title">
+                                    {editingAvailability ? 'Edit Availability' : 'Add Availability'}
+                                </h4>
+                                <form onSubmit={handleAvailabilitySubmit} className="guide-account-form">
                                     <div className="guide-account-form-row">
                                         <div className="guide-account-form-group">
-                                            <label>{t('guide.availability.form.start_time')}</label>
+                                            <label className="guide-account-label">Date</label>
+                                            <input
+                                                type="date"
+                                                className="guide-account-input"
+                                                value={availabilityForm.date}
+                                                onChange={(e) => setAvailabilityForm({...availabilityForm, date: e.target.value})}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="guide-account-form-group">
+                                            <label className="guide-account-checkbox-label">
+                                                <input
+                                                    type="checkbox"
+                                                    className="guide-account-checkbox"
+                                                    checked={availabilityForm.is_available}
+                                                    onChange={(e) => setAvailabilityForm({...availabilityForm, is_available: e.target.checked})}
+                                                />
+                                                Available
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div className="guide-account-form-row">
+                                        <div className="guide-account-form-group">
+                                            <label className="guide-account-label">Start Time</label>
                                             <input
                                                 type="time"
+                                                className="guide-account-input"
                                                 value={availabilityForm.start_time}
                                                 onChange={(e) => setAvailabilityForm({...availabilityForm, start_time: e.target.value})}
                                             />
                                         </div>
                                         <div className="guide-account-form-group">
-                                            <label>{t('guide.availability.form.end_time')}</label>
+                                            <label className="guide-account-label">End Time</label>
                                             <input
                                                 type="time"
+                                                className="guide-account-input"
                                                 value={availabilityForm.end_time}
                                                 onChange={(e) => setAvailabilityForm({...availabilityForm, end_time: e.target.value})}
                                             />
                                         </div>
                                     </div>
-                                </>
-                            )}
-
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.availability.form.note')}</label>
-                                <input
-                                    type="text"
-                                    value={availabilityForm.note}
-                                    onChange={(e) => setAvailabilityForm({...availabilityForm, note: e.target.value})}
-                                    placeholder={t('guide.availability.form.note_placeholder')}
-                                />
-                            </div>
-
-                            <div className="guide-account-form-actions">
-                                <button
-                                    className="guide-account-btn guide-account-btn-outline"
-                                    onClick={() => setShowAvailabilityModal(false)}
-                                >
-                                    {t('guide.actions.cancel')}
-                                </button>
-                                <button
-                                    className="guide-account-btn guide-account-btn-primary"
-                                    onClick={handleAvailabilitySubmit}
-                                >
-                                    <FiCalendar /> {t('guide.actions.add')}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Document Upload Modal */}
-            {showDocumentModal && (
-                <div className="guide-account-modal-overlay" onClick={() => setShowDocumentModal(false)}>
-                    <div className="guide-account-modal" onClick={e => e.stopPropagation()}>
-                        <div className="guide-account-modal-header">
-                            <h3>{t('guide.modals.upload_document')}</h3>
-                            <button onClick={() => setShowDocumentModal(false)}>
-                                <FiX />
-                            </button>
-                        </div>
-                        <div className="guide-account-modal-content">
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.documents.form.type')}</label>
-                                <select
-                                    value={documentForm.document_type}
-                                    onChange={(e) => setDocumentForm({...documentForm, document_type: e.target.value})}
-                                >
-                                    <option value="certificate">{t('guide.documents.types.certificate')}</option>
-                                    <option value="id_card">{t('guide.documents.types.id_card')}</option>
-                                    <option value="passport">{t('guide.documents.types.passport')}</option>
-                                    <option value="license">{t('guide.documents.types.license')}</option>
-                                    <option value="other">{t('guide.documents.types.other')}</option>
-                                </select>
-                            </div>
-
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.documents.form.file')}</label>
-                                <input
-                                    type="file"
-                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                    onChange={(e) => handleFileUpload(e, 'document')}
-                                />
-                            </div>
-
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.documents.form.description')}</label>
-                                <input
-                                    type="text"
-                                    value={documentForm.description}
-                                    onChange={(e) => setDocumentForm({...documentForm, description: e.target.value})}
-                                    placeholder={t('guide.documents.form.description_placeholder')}
-                                />
-                            </div>
-
-                            <div className="guide-account-form-actions">
-                                <button
-                                    className="guide-account-btn guide-account-btn-outline"
-                                    onClick={() => setShowDocumentModal(false)}
-                                >
-                                    {t('guide.actions.cancel')}
-                                </button>
-                                <button
-                                    className="guide-account-btn guide-account-btn-primary"
-                                    onClick={handleDocumentSubmit}
-                                >
-                                    <FiUpload /> {t('guide.actions.upload')}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Settings Modal */}
-            {showSettingsModal && (
-                <div className="guide-account-modal-overlay" onClick={() => setShowSettingsModal(false)}>
-                    <div className="guide-account-modal" onClick={e => e.stopPropagation()}>
-                        <div className="guide-account-modal-header">
-                            <h3>{t('guide.modals.settings')}</h3>
-                            <button onClick={() => setShowSettingsModal(false)}>
-                                <FiX />
-                            </button>
-                        </div>
-                        <div className="guide-account-modal-content">
-                            <div className="guide-account-settings-list">
-                                <button
-                                    className="guide-account-settings-item"
-                                    onClick={() => {
-                                        setShowSettingsModal(false);
-                                        setShowProfileModal(true);
-                                    }}
-                                >
-                                    <FiUser />
-                                    <div>
-                                        <strong>{t('guide.settings.profile_data')}</strong>
-                                        <p>{t('guide.settings.profile_data_desc')}</p>
+                                    <div className="guide-account-form-group">
+                                        <label className="guide-account-label">Note</label>
+                                        <input
+                                            type="text"
+                                            className="guide-account-input"
+                                            value={availabilityForm.note}
+                                            onChange={(e) => setAvailabilityForm({...availabilityForm, note: e.target.value})}
+                                            placeholder="Optional note"
+                                        />
                                     </div>
-                                </button>
-
-                                <button
-                                    className="guide-account-settings-item"
-                                    onClick={() => {
-                                        setShowSettingsModal(false);
-                                        setShowPortfolioModal(true);
-                                    }}
-                                >
-                                    <FiImage />
-                                    <div>
-                                        <strong>{t('guide.settings.portfolio')}</strong>
-                                        <p>{t('guide.settings.portfolio_desc')}</p>
-                                    </div>
-                                </button>
-
-                                <button
-                                    className="guide-account-settings-item"
-                                    onClick={() => {
-                                        setShowSettingsModal(false);
-                                        setShowAvailabilityModal(true);
-                                    }}
-                                >
-                                    <FiCalendar />
-                                    <div>
-                                        <strong>{t('guide.settings.availability')}</strong>
-                                        <p>{t('guide.settings.availability_desc')}</p>
-                                    </div>
-                                </button>
-
-                                <button
-                                    className="guide-account-settings-item"
-                                    onClick={() => {
-                                        setShowSettingsModal(false);
-                                        setShowDocumentModal(true);
-                                    }}
-                                >
-                                    <FiFileText />
-                                    <div>
-                                        <strong>{t('guide.settings.documents')}</strong>
-                                        <p>{t('guide.settings.documents_desc')}</p>
-                                    </div>
-                                </button>
-
-                                <button
-                                    className="guide-account-settings-item"
-                                    onClick={() => {
-                                        setShowSettingsModal(false);
-                                        setShowPasswordModal(true);
-                                    }}
-                                >
-                                    <FiLock />
-                                    <div>
-                                        <strong>{t('guide.settings.change_password')}</strong>
-                                        <p>{t('guide.settings.change_password_desc')}</p>
-                                    </div>
-                                </button>
-
-                                <div className="guide-account-settings-item">
-                                    <FiSettings />
-                                    <div>
-                                        <strong>{t('guide.settings.theme')}</strong>
-                                        <select
-                                            value={theme}
-                                            onChange={(e) => setTheme(e.target.value)}
-                                            className="guide-account-theme-select"
+                                    <div className="guide-account-form-actions">
+                                        <button type="submit" className="guide-account-btn guide-account-btn-primary">
+                                            {editingAvailability ? 'Update' : 'Add'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="guide-account-btn guide-account-btn-secondary"
+                                            onClick={() => {
+                                                setShowAvailabilityForm(false);
+                                                setEditingAvailability(null);
+                                                setAvailabilityForm({ date: '', is_available: true, start_time: '', end_time: '', note: '' });
+                                            }}
                                         >
-                                            <option value="default">{t('theme.default')}</option>
-                                            <option value="light">{t('theme.light')}</option>
-                                            <option value="dark">{t('theme.dark')}</option>
-                                            <option value="auto">{t('theme.auto')}</option>
-                                        </select>
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
+
+                        <div className="guide-account-availability-list">
+                            {availability.map(item => (
+                                <div key={item.id} className="guide-account-availability-item">
+                                    <div className="guide-account-availability-info">
+                                        <h4 className="guide-account-availability-date">
+                                            {new Date(item.date).toLocaleDateString()}
+                                        </h4>
+                                        <p className="guide-account-availability-time">
+                                            {item.start_time && item.end_time ?
+                                                `${item.start_time} - ${item.end_time}` :
+                                                'All day'
+                                            }
+                                        </p>
+                                        <p className="guide-account-availability-note">{item.note}</p>
+                                        <span className={`guide-account-availability-status ${item.is_available ? 'guide-account-available' : 'guide-account-unavailable'}`}>
+                      {item.is_available ? 'Available' : 'Unavailable'}
+                    </span>
+                                    </div>
+                                    <div className="guide-account-availability-actions">
+                                        <button
+                                            className="guide-account-btn guide-account-btn-small"
+                                            onClick={() => {
+                                                setEditingAvailability(item);
+                                                setAvailabilityForm({
+                                                    date: item.date,
+                                                    is_available: item.is_available,
+                                                    start_time: item.start_time || '',
+                                                    end_time: item.end_time || '',
+                                                    note: item.note || ''
+                                                });
+                                                setShowAvailabilityForm(true);
+                                            }}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            className="guide-account-btn guide-account-btn-small guide-account-btn-danger"
+                                            onClick={() => handleDeleteAvailability(item.id)}
+                                        >
+                                            Delete
+                                        </button>
                                     </div>
                                 </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* Password Change Modal */}
-            {showPasswordModal && (
-                <div className="guide-account-modal-overlay" onClick={() => setShowPasswordModal(false)}>
-                    <div className="guide-account-modal" onClick={e => e.stopPropagation()}>
-                        <div className="guide-account-modal-header">
-                            <h3>{t('guide.modals.change_password')}</h3>
-                            <button onClick={() => setShowPasswordModal(false)}>
-                                <FiX />
-                            </button>
-                        </div>
-                        <div className="guide-account-modal-content">
-                            {passwordError && (
-                                <div className="guide-account-error-message">{passwordError}</div>
-                            )}
-
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.password.form.current_password')}</label>
-                                <input
-                                    type="password"
-                                    value={passwordForm.current_password}
-                                    onChange={(e) => setPasswordForm({...passwordForm, current_password: e.target.value})}
-                                    placeholder={t('guide.password.form.current_password_placeholder')}
-                                />
-                            </div>
-
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.password.form.new_password')}</label>
-                                <input
-                                    type="password"
-                                    value={passwordForm.new_password}
-                                    onChange={(e) => setPasswordForm({...passwordForm, new_password: e.target.value})}
-                                    placeholder={t('guide.password.form.new_password_placeholder')}
-                                />
-                            </div>
-
-                            <div className="guide-account-form-group">
-                                <label>{t('guide.password.form.confirm_password')}</label>
-                                <input
-                                    type="password"
-                                    value={passwordForm.confirm_password}
-                                    onChange={(e) => setPasswordForm({...passwordForm, confirm_password: e.target.value})}
-                                    placeholder={t('guide.password.form.confirm_password_placeholder')}
-                                />
-                            </div>
-
-                            <div className="guide-account-form-actions">
-                                <button
-                                    className="guide-account-btn guide-account-btn-outline"
-                                    onClick={() => setShowPasswordModal(false)}
-                                >
-                                    {t('guide.actions.cancel')}
-                                </button>
-                                <button
-                                    className="guide-account-btn guide-account-btn-primary"
-                                    onClick={handlePasswordSubmit}
-                                >
-                                    <FiLock /> {t('guide.actions.change')}
-                                </button>
-                            </div>
+                {activeTab === 'reviews' && (
+                    <div className="guide-account-reviews">
+                        <h3 className="guide-account-section-title">Reviews</h3>
+                        <div className="guide-account-reviews-list">
+                            {reviews.map(review => (
+                                <div key={review.id} className="guide-account-review-item">
+                                    <div className="guide-account-review-header">
+                                        <div className="guide-account-review-rating">
+                                            {'★'.repeat(review.overall_rating)}{'☆'.repeat(5 - review.overall_rating)}
+                                        </div>
+                                        <span className="guide-account-review-date">
+                      {new Date(review.created_at).toLocaleDateString()}
+                    </span>
+                                    </div>
+                                    <h4 className="guide-account-review-title">{review.title}</h4>
+                                    <p className="guide-account-review-comment">{review.comment}</p>
+                                    <div className="guide-account-review-details">
+                                        <span className="guide-account-review-detail">Communication: {review.communication_rating}/5</span>
+                                        <span className="guide-account-review-detail">Service: {review.service_rating}/5</span>
+                                        <span className="guide-account-review-detail">Punctuality: {review.punctuality_rating}/5</span>
+                                        <span className="guide-account-review-detail">Value: {review.value_rating}/5</span>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
-                </div>
-            )}
-
-            {/* Quick Actions Floating Panel */}
-            <div className="guide-account-quick-actions">
-                <button
-                    className="guide-account-quick-action"
-                    onClick={() => setShowAvailabilityModal(true)}
-                    title={t('guide.quick_actions.set_availability')}
-                >
-                    <FiCalendar />
-                </button>
-                <button
-                    className="guide-account-quick-action"
-                    onClick={() => setShowPortfolioModal(true)}
-                    title={t('guide.quick_actions.add_portfolio')}
-                >
-                    <FiImage />
-                </button>
-                <button
-                    className="guide-account-quick-action"
-                    onClick={() => setShowDocumentModal(true)}
-                    title={t('guide.quick_actions.upload_document')}
-                >
-                    <FiFileText />
-                </button>
-                <button
-                    className="guide-account-quick-action"
-                    onClick={() => setChatOpen(true)}
-                    title={t('guide.quick_actions.open_chat')}
-                >
-                    <FiMessageSquare />
-                    {stats.totalUnreadMessages > 0 && (
-                        <div className="guide-account-quick-action-badge">
-                            {stats.totalUnreadMessages}
-                        </div>
-                    )}
-                </button>
+                )}
             </div>
 
-            {/* Additional Quick Stats */}
-            {(availability.length > 0 || documents.length > 0) && (
-                <div className="guide-account-additional-stats">
-                    <div className="guide-account-stats-card">
-                        <h4>{t('guide.stats.availability_title')}</h4>
-                        <div className="guide-account-stats-list">
-                            {availability.slice(0, 3).map((avail) => (
-                                <div key={avail.id} className="guide-account-stat-item-small">
-                                    <FiCalendar className={avail.is_available ? 'text-success' : 'text-danger'} />
-                                    <span>{formatDate(avail.date)}</span>
-                                    <span className={`guide-account-availability-status ${avail.is_available ? 'available' : 'unavailable'}`}>
-                                        {avail.is_available ? t('guide.availability.available') : t('guide.availability.unavailable')}
-                                    </span>
-                                    <button
-                                        className="guide-account-remove-btn-small"
-                                        onClick={() => handleDeleteAvailability(avail.id)}
-                                    >
-                                        <FiX />
-                                    </button>
-                                </div>
-                            ))}
-                            {availability.length > 3 && (
-                                <div className="guide-account-stat-item-more">
-                                    +{availability.length - 3} {t('guide.stats.more_items')}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="guide-account-stats-card">
-                        <h4>{t('guide.stats.documents_title')}</h4>
-                        <div className="guide-account-stats-list">
-                            {documents.slice(0, 3).map((doc) => (
-                                <div key={doc.id} className="guide-account-stat-item-small">
-                                    <FiFileText className={doc.is_verified ? 'text-success' : 'text-warning'} />
-                                    <span>{t(`guide.documents.types.${doc.document_type}`)}</span>
-                                    <span className={`guide-account-verification-status ${doc.is_verified ? 'verified' : 'pending'}`}>
-                                        {doc.is_verified ? t('guide.verification.verified') : t('guide.verification.pending')}
-                                    </span>
-                                    <button
-                                        className="guide-account-remove-btn-small"
-                                        onClick={() => handleDeleteDocument(doc.id)}
-                                    >
-                                        <FiX />
-                                    </button>
-                                </div>
-                            ))}
-                            {documents.length > 3 && (
-                                <div className="guide-account-stat-item-more">
-                                    +{documents.length - 3} {t('guide.stats.more_items')}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* YANGI: Chat Widget */}
+            <ChatWidgets
+                isOpen={showChat}
+                onClose={handleCloseChat}
+                selectedUserId={selectedUserForChat}
+                userRole="guide"
+            />
         </div>
     );
 };

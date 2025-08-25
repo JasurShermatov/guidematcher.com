@@ -12,17 +12,22 @@ import {
     FiLogIn,
     FiCheck,
     FiLogOut,
+    FiUserPlus,
 } from "react-icons/fi";
-import { useTranslation } from "react-i18next"; // i18next hook
-import { changeLanguage } from "../../i18n"; // Til o‘zgartirish funksiyasi
+import { useTranslation } from "react-i18next";
+import { changeLanguage } from "../../i18n";
 import { logoutUser } from "../../api/api";
 import "./Header.css";
 
-const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
-    const { t } = useTranslation(); // Tarjima uchun hook
+const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuthState }) => {
+    const { t } = useTranslation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [theme, setTheme] = useState("default");
-    const [language, setLanguage] = useState("en");
+    const [theme, setTheme] = useState(() => {
+        return localStorage.getItem("theme") || "default";
+    });
+    const [language, setLanguage] = useState(() => {
+        return localStorage.getItem("language") || "en";
+    });
     const [isThemeDropdownOpen, setIsThemeDropdownOpen] = useState(false);
     const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
     const [isAvatarDropdownOpen, setIsAvatarDropdownOpen] = useState(false);
@@ -51,12 +56,31 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
 
     const currentLang = languageOptions.find((lang) => lang.value === language);
 
+    // Scroll hodisasini kuzatish
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 20);
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // Theme sozlamalarini yuklash va qo'llash
+    useEffect(() => {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme && savedTheme !== theme) {
+            setTheme(savedTheme);
+        }
+    }, []);
+
+    // Language sozlamalarini yuklash
+    useEffect(() => {
+        const savedLanguage = localStorage.getItem("language");
+        if (savedLanguage && savedLanguage !== language) {
+            setLanguage(savedLanguage);
+            changeLanguage(savedLanguage);
+        }
+    }, []);
+
+    // Theme ni qo'llash
     useEffect(() => {
         const root = document.documentElement;
         const updateTheme = () => {
@@ -74,20 +98,26 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
         };
 
         updateTheme();
+        localStorage.setItem("theme", theme);
+
+        let cleanup;
 
         if (theme === "auto") {
             const interval = setInterval(updateTheme, 60000);
-            return () => clearInterval(interval);
+            cleanup = () => clearInterval(interval);
         }
 
         if (theme === "default") {
             const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
             const handler = (e) => root.setAttribute("data-theme", e.matches ? "dark" : "light");
             mediaQuery.addEventListener("change", handler);
-            return () => mediaQuery.removeEventListener("change", handler);
+            cleanup = () => mediaQuery.removeEventListener("change", handler);
         }
+
+        return cleanup;
     }, [theme]);
 
+    // Tashqariga bosilgan hodisani kuzatish
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (themeDropdownRef.current && !themeDropdownRef.current.contains(event.target)) {
@@ -104,6 +134,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    // Escape tugmasini bosish hodisasi
     useEffect(() => {
         const handleEscapeKey = (event) => {
             if (event.key === "Escape") {
@@ -117,30 +148,51 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
         return () => document.removeEventListener("keydown", handleEscapeKey);
     }, []);
 
-    const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
 
     const handleThemeChange = (newTheme) => {
         setTheme(newTheme);
+        localStorage.setItem("theme", newTheme);
         setIsThemeDropdownOpen(false);
     };
 
     const handleLanguageChange = (newLang) => {
         setLanguage(newLang);
-        changeLanguage(newLang); // i18n tilni o‘zgartirish
+        localStorage.setItem("language", newLang);
+        changeLanguage(newLang);
         setIsLangDropdownOpen(false);
     };
 
     const handleLogout = async () => {
         try {
             await logoutUser();
-            setIsAuthenticated(false);
-            setUser(null);
-            setIsAvatarDropdownOpen(false);
-            navigate("/");
         } catch (error) {
             console.error("Logout error:", error.message);
-            setIsAuthenticated(false);
-            setUser(null);
+        } finally {
+            // updateAuthState funksiyasini ishlatish (agar mavjud bo'lsa)
+            if (updateAuthState) {
+                updateAuthState(false, null);
+            } else {
+                // Fallback: eski usul
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("refresh_token");
+                localStorage.removeItem("user_data");
+                // Account-specific localStorage'larni ham tozalash
+                localStorage.removeItem("userAccount_isEditing");
+                localStorage.removeItem("userAccount_formData");
+                localStorage.removeItem("guideAccount_isEditing");
+                localStorage.removeItem("guideAccount_activeTab");
+                localStorage.removeItem("guideAccount_formData");
+                localStorage.removeItem("guideAccount_portfolioForm");
+                localStorage.removeItem("guideAccount_editingPortfolio");
+                localStorage.removeItem("guideAccount_availabilityForm");
+                localStorage.removeItem("guideAccount_editingAvailability");
+                localStorage.removeItem("guideAccount_documentForm");
+                setIsAuthenticated(false);
+                setUser(null);
+            }
             setIsAvatarDropdownOpen(false);
             navigate("/");
         }
@@ -153,6 +205,23 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
 
     const hideMenu = isAuthenticated && location.pathname === "/account";
     const logoDestination = isAuthenticated ? "/account" : "/";
+
+    // Username ni aniqlash
+    const displayUsername = user?.username || user?.full_name || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || "User";
+    const avatarLetter = displayUsername.charAt(0).toUpperCase();
+
+    // User role'ini ko'rsatish uchun
+    const getUserRoleDisplay = () => {
+        if (!user?.role) return "Client";
+
+        const role = user.role.toLowerCase();
+        if (role === "customer") return "Guide";
+        if (role === "client") return "Client";
+        if (role === "guide") return "Guide";
+        if (role === "user") return "User";
+
+        return user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase();
+    };
 
     return (
         <header className={`header-main ${isScrolled ? "header-scrolled" : ""}`}>
@@ -191,6 +260,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                 )}
 
                 <div className="header-controls">
+                    {/* Language Dropdown */}
                     <div className="header-dropdown header-lang-dropdown" ref={langDropdownRef}>
                         <button
                             className="header-control-btn header-lang-btn"
@@ -221,6 +291,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                         )}
                     </div>
 
+                    {/* Theme Dropdown */}
                     <div className="header-dropdown header-theme-dropdown" ref={themeDropdownRef}>
                         <button
                             className="header-control-btn header-theme-btn"
@@ -249,6 +320,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                         )}
                     </div>
 
+                    {/* Authentication Controls */}
                     {isAuthenticated ? (
                         <div className="header-dropdown header-avatar-dropdown" ref={avatarDropdownRef}>
                             <button
@@ -257,13 +329,20 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                                 aria-label={t("header.account")}
                                 aria-expanded={isAvatarDropdownOpen}
                             >
-                                <span className="header-avatar">{user?.username ? user.username[0].toUpperCase() : "U"}</span>
-                                <span className="header-username">{user?.username || "User"}</span>
+                                <span className="header-avatar">{avatarLetter}</span>
+                                <span className="header-username">{displayUsername}</span>
                                 <FiChevronDown className={`header-dropdown-arrow ${isAvatarDropdownOpen ? "header-open" : ""}`} />
                             </button>
                             {isAvatarDropdownOpen && (
                                 <div className="header-dropdown-menu header-avatar-menu">
                                     <div className="header-dropdown-header">{t("header.account")}</div>
+                                    <div className="header-user-info">
+                                        <span className="header-user-role">{getUserRoleDisplay()}</span>
+                                        {user?.email && <span className="header-user-email">{user.email}</span>}
+                                        {process.env.NODE_ENV === 'development' && (
+                                            <span className="header-user-debug">Debug: {user?.role}</span>
+                                        )}
+                                    </div>
                                     <button className="header-dropdown-item" onClick={handleLogout}>
                                         <FiLogOut className="header-theme-icon" />
                                         <span className="header-theme-name">{t("header.logout")}</span>
@@ -272,12 +351,19 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                             )}
                         </div>
                     ) : (
-                        <Link to="/login" className="header-btn header-auth-btn header-signin-btn">
-                            <FiLogIn />
-                            <span>{t("header.sign_in")}</span>
-                        </Link>
+                        <div className="header-auth-buttons">
+                            <Link to="/register" className="header-btn header-auth-btn header-register-btn">
+                                <FiUserPlus />
+                                <span>{t("header.register") || "Register"}</span>
+                            </Link>
+                            <Link to="/login" className="header-btn header-auth-btn header-signin-btn">
+                                <FiLogIn />
+                                <span>{t("header.sign_in")}</span>
+                            </Link>
+                        </div>
                     )}
 
+                    {/* Mobile Menu Toggle */}
                     <button
                         className="header-mobile-menu-toggle"
                         onClick={toggleMenu}
@@ -289,6 +375,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                 </div>
             </div>
 
+            {/* Mobile Menu */}
             {isMenuOpen && (
                 <div className="header-mobile-menu-overlay" onClick={toggleMenu}>
                     <div className="header-mobile-menu" onClick={(e) => e.stopPropagation()}>
@@ -301,6 +388,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                                 <FiX />
                             </button>
                         </div>
+
                         {!hideMenu && (
                             <nav className="header-mobile-nav">
                                 {menuItems.map((item, index) => (
@@ -315,7 +403,9 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                                 ))}
                             </nav>
                         )}
+
                         <div className="header-mobile-controls">
+                            {/* Mobile Theme Controls */}
                             <div className="header-mobile-control-group">
                                 <label>{t("header.choose_appearance")}</label>
                                 <div className="header-theme-buttons">
@@ -331,6 +421,8 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Mobile Language Controls */}
                             <div className="header-mobile-control-group">
                                 <label>{t("header.select_language")}</label>
                                 <div className="header-lang-buttons">
@@ -347,23 +439,42 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Mobile Authentication */}
                         <div className="header-mobile-menu-footer">
                             {isAuthenticated ? (
-                                <button
-                                    className="header-btn header-mobile-auth-btn header-logout-btn"
-                                    onClick={handleLogout}
-                                >
-                                    {t("header.logout")}
-                                </button>
+                                <div className="header-mobile-auth-section">
+                                    <div className="header-mobile-user-info">
+                                        <div className="header-mobile-avatar">{avatarLetter}</div>
+                                        <div className="header-mobile-user-details">
+                                            <span className="header-mobile-username">{displayUsername}</span>
+                                            <span className="header-mobile-role">{getUserRoleDisplay()}</span>
+                                        </div>
+                                    </div>
+                                    <button className="header-btn header-mobile-logout-btn" onClick={handleLogout}>
+                                        <FiLogOut />
+                                        <span>{t("header.logout")}</span>
+                                    </button>
+                                </div>
                             ) : (
-                                <>
-                                    <Link to="/register" className="header-btn header-mobile-auth-btn header-register-btn">
-                                        Register
+                                <div className="header-mobile-auth-actions">
+                                    <Link
+                                        to="/register"
+                                        className="header-btn header-mobile-auth-btn header-mobile-register-btn"
+                                        onClick={toggleMenu}
+                                    >
+                                        <FiUserPlus />
+                                        <span>{t("header.register")}</span>
                                     </Link>
-                                    <Link to="/login" className="header-btn header-mobile-auth-btn header-signin-btn">
-                                        {t("header.sign_in")}
+                                    <Link
+                                        to="/login"
+                                        className="header-btn header-mobile-auth-btn header-mobile-signin-btn"
+                                        onClick={toggleMenu}
+                                    >
+                                        <FiLogIn />
+                                        <span>{t("header.sign_in")}</span>
                                     </Link>
-                                </>
+                                </div>
                             )}
                         </div>
                     </div>

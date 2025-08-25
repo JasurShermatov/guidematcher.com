@@ -1,29 +1,25 @@
 # apps/profiles/signals.py
+import logging
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
 from apps.users.models import User
 from .models import CustomerProfile, ClientProfile
-import logging
 
 logger = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    """
-    User yaratilgandan keyin avtomatik ravishda tegishli profil yaratadi
-    """
+
     if created:
-        print(
-            f"🔄 Signal ishga tushdi: {instance.email} | Role: {instance.role}"
-        )  # Debug
+        print(f"🔄 Signal ishga tushdi: {instance.email} | Role: {instance.role}")
 
         try:
-            # Role'ni aniq tekshirish
             user_role = instance.role
 
-            if user_role == User.UserRole.CUSTOMER:  # Enum ishlatish
-                # CustomerProfile yaratish
+            if user_role == User.UserRole.CUSTOMER:
                 profile, prof_created = CustomerProfile.objects.get_or_create(
                     user=instance,
                     defaults={
@@ -70,11 +66,9 @@ def create_user_profile(sender, instance, created, **kwargs):
             )
             logger.error(error_msg)
             print(error_msg)
-            # Development muhitida xatolikni ko'rish uchun
             import traceback
 
             print(traceback.format_exc())
 
 
-# Signal'ning ishlaganini tekshirish uchun
 print("📡 Profile signals moduli yuklandi")

@@ -12,16 +12,15 @@ from .models import (
 )
 
 
-# --- Client Profile Admin ---
 @admin.register(ClientProfile)
 class ClientProfileAdmin(admin.ModelAdmin):
     list_display = (
-        "get_user_email",  # User email
-        "get_user_full_name",  # User full name
-        "get_user_country",  # User country
+        "get_user_email",
+        "get_user_full_name",
+        "get_user_country",
         "date_of_birth",
         "preferred_contact",
-        "get_user_role",  # User role
+        "get_user_role",
     )
     search_fields = (
         "user__first_name",
@@ -38,14 +37,13 @@ class ClientProfileAdmin(admin.ModelAdmin):
     autocomplete_fields = ["user", "languages"]
     ordering = ("user__first_name",)
 
-    # Fieldsets - User ma'lumotlarini ham ko'rsatish
     fieldsets = (
         (
             "User Information",
             {
                 "fields": (
-                    "user",  # User tanlash
-                    "get_user_details",  # User ma'lumotlarini ko'rsatish
+                    "user",
+                    "get_user_details",
                 ),
                 "description": "Basic user information",
             },
@@ -58,7 +56,6 @@ class ClientProfileAdmin(admin.ModelAdmin):
     readonly_fields = ("get_user_details",)
     filter_horizontal = ("languages",)
 
-    # Custom metodlar - User ma'lumotlarini ko'rsatish uchun
     def get_user_email(self, obj):
         return obj.user.email
 
@@ -84,7 +81,7 @@ class ClientProfileAdmin(admin.ModelAdmin):
     get_user_role.admin_order_field = "user__role"
 
     def get_user_details(self, obj):
-        """User ning barcha ma'lumotlarini ko'rsatadi"""
+
         if obj.user:
             return format_html(
                 """
@@ -112,7 +109,6 @@ class ClientProfileAdmin(admin.ModelAdmin):
     get_user_details.short_description = "User Details"
 
 
-# --- Customer Profile Admin (yaxshilangan) ---
 @admin.register(CustomerProfile)
 class CustomerProfileAdmin(admin.ModelAdmin):
     list_display = (
@@ -185,7 +181,6 @@ class CustomerProfileAdmin(admin.ModelAdmin):
     readonly_fields = ("get_user_details",)
     filter_horizontal = ("languages", "service_types")
 
-    # User ma'lumotlarini ko'rsatish
     def get_user_email(self, obj):
         return obj.user.email
 
@@ -198,7 +193,7 @@ class CustomerProfileAdmin(admin.ModelAdmin):
     get_user_full_name.short_description = "Full Name"
 
     def get_user_details(self, obj):
-        """User ning barcha ma'lumotlarini ko'rsatadi"""
+
         if obj.user:
             return format_html(
                 """
@@ -226,7 +221,6 @@ class CustomerProfileAdmin(admin.ModelAdmin):
     get_user_details.short_description = "User Details"
 
 
-# --- Qolgan admin klasslar (o'zgarishsiz) ---
 @admin.register(Portfolio)
 class PortfolioAdmin(admin.ModelAdmin):
     list_display = ("linked_customer", "title", "order")

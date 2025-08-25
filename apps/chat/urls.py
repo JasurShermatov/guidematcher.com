@@ -1,42 +1,44 @@
-# urls.py
 from django.urls import path
-from . import views
-
-app_name = "chat"
+from .views import (
+    ConversationListCreateView,
+    ConversationDetailView,
+    MessageListView,
+    MessageCreateView,
+    accept_booking_in_chat,
+    update_booking_dates,  # ⚠️ bu sizning views.py da shunday nomlangan
+)
 
 urlpatterns = [
-    # Conversation endpoints
+    # Conversations
     path(
-        "conversations/",
-        views.ConversationListCreateView.as_view(),
-        name="conversation-list-create",
+        "conversations/", ConversationListCreateView.as_view(), name="conversation-list"
     ),
     path(
         "conversations/<int:pk>/",
-        views.ConversationDetailView.as_view(),
+        ConversationDetailView.as_view(),
         name="conversation-detail",
     ),
-    # Message endpoints
+    # Messages
     path(
         "conversations/<int:conversation_id>/messages/",
-        views.MessageListView.as_view(),
+        MessageListView.as_view(),
         name="message-list",
     ),
-    path("messages/send/", views.MessageCreateView.as_view(), name="message-create"),
     path(
-        "messages/<int:message_id>/action/", views.message_action, name="message-action"
+        "messages/send/",
+        MessageCreateView.as_view(),
+        name="message-create",
     ),
-    # Message status endpoints
+    # Booking endpoints
     path(
-        "conversations/<int:conversation_id>/mark-read/",
-        views.mark_messages_read,
-        name="mark-messages-read",
+        "conversations/<int:conversation_id>/bookings/<int:booking_id>/accept/",
+        accept_booking_in_chat,
+        name="accept-booking",
     ),
-    path("unread-count/", views.unread_count, name="unread-count"),
-    # User blocking endpoints
-    path("block/", views.block_user, name="block-user"),
-    path("unblock/<int:user_id>/", views.unblock_user, name="unblock-user"),
-    path("blocked/", views.BlockedUserListView.as_view(), name="blocked-users"),
-    # Utility endpoints
-    path("users/search/", views.user_search, name="user-search"),
+    path(
+        "conversations/<int:conversation_id>/bookings/<int:booking_id>/update/",
+        update_booking_dates,
+        name="update-booking",
+    ),
 ]
+

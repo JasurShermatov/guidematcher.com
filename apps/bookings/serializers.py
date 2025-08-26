@@ -1,3 +1,5 @@
+from typing import List
+
 from rest_framework import serializers
 
 from apps.bookings.models import Booking
@@ -53,54 +55,119 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    client_profile = serializers.PrimaryKeyRelatedField(
-        queryset=ClientProfile.objects.all(),
-        required=False,
-    )
-    customer_profile = serializers.PrimaryKeyRelatedField(
-        queryset=CustomerProfile.objects.all()
-    )
-    customer_details = CustomerProfileSerializer(
-        source="customer_profile", read_only=True
-    )
-    client_details = ClientProfileSerializer(source="client_profile", read_only=True)
-    is_customer_available = serializers.SerializerMethodField()
+    customer_details = serializers.SerializerMethodField()
+    client_details = serializers.SerializerMethodField()
+    busy_dates = serializers.SerializerMethodField()
+    can_accept = serializers.SerializerMethodField()
+    can_update = serializers.SerializerMethodField()
+    can_cancel = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
-        fields = "__all__"
-        read_only_fields = (
+        exclude = ["conversation_id"]  # Hide internal field
+        read_only_fields = [
             "id",
             "created_at",
             "updated_at",
-            "conversation",
             "previous_start_date",
             "previous_end_date",
             "updated_count",
-        )
+            "accepted_at",
+            "cancelled_at",
+        ]
 
-    def get_is_customer_available(self, obj):
-        """Customer bu vaqtda bo'shmi"""
-        if obj.start_date and obj.end_date:
-            return Booking.objects.is_customer_available(
-                obj.customer_profile, obj.start_date, obj.end_date
-            )
+    def get_customer_details(self, obj):
+        return {
+            "id": obj.customer_profile.id,
+            "full_name": obj.customer_profile.user.full_name,
+            "city": (
+                obj.customer_profile.city.name if obj.customer_profile.city else None
+            ),
+            "country": (
+                str(obj.customer_profile.country)
+                if obj.customer_profile.country
+                else None
+            ),
+            "rating": float(obj.customer_profile.average_rating),
+        }
+
+    def get_client_details(self, obj):
+        if obj.client_profile:
+            return {
+                "id": obj.client_profile.id,
+                "full_name": obj.client_profile.user.full_name,
+                "email": obj.client_profile.user.email,
+            }
         return None
 
+    def get_busy_dates(self, obj) -> List[str]:
+        """Return dates as strings for JSON"""
+        dates = Booking.objects.get_customer_busy_dates(obj.customer_profile)
+        return [d.isoformat() for d in sorted(dates)]
+
+    def get_can_accept(self, obj) -> bool:
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return False
+        return (
+            obj.can_accept
+            and hasattr(request.user, "customerprofile")
+            and obj.customer_profile_id == request.user.customerprofile.id
+        )
+
+    def get_can_update(self, obj) -> bool:
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return False
+        return (
+            obj.can_update
+            and hasattr(request.user, "customerprofile")
+            and obj.customer_profile_id == request.user.customerprofile.id
+        )
+
+    def get_can_cancel(self, obj) -> bool:
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return False
+
+        # Both parties can cancel
+        if hasattr(request.user, "customerprofile"):
+            return (
+                obj.can_cancel
+                and obj.customer_profile_id == request.user.customerprofile.id
+            )
+        elif hasattr(request.user, "clientprofile") and obj.client_profile:
+            return (
+                obj.can_cancel
+                and obj.client_profile_id == request.user.clientprofile.id
+            )
+
+        return False
+
     def validate(self, data):
-        """Validate booking dates"""
+        """Enhanced validation"""
         if "start_date" in data and "end_date" in data:
             if data["start_date"] > data["end_date"]:
                 raise serializers.ValidationError("End date must be after start date")
 
-            # Customer bo'shmi tekshirish
+            # Check duration limit
+            duration = (data["end_date"] - data["start_date"]).days
+            if duration > 365:
+                raise serializers.ValidationError("Booking cannot exceed 365 days")
+
+            # Check availability
             customer = data.get("customer_profile")
-            if customer and not Booking.objects.is_customer_available(
-                customer, data["start_date"], data["end_date"]
-            ):
-                raise serializers.ValidationError(
-                    "Customer is not available for selected dates"
-                )
+            if customer:
+                instance = self.instance  # For update
+                if not Booking.objects.check_availability(
+                    customer,
+                    data["start_date"],
+                    data["end_date"],
+                    exclude_booking=instance,
+                ):
+                    raise serializers.ValidationError(
+                        "Customer is not available for selected dates"
+                    )
 
         return data
 

@@ -25,7 +25,8 @@ class BookingAdmin(admin.ModelAdmin):
         "customer_profile__user__first_name",
         "customer_profile__user__last_name",
     )
-    readonly_fields = ("conversation", "booked_days_display")
+    # Agar Booking modelida conversation yo'q bo'lsa, uni callable qilib qo'yamiz
+    readonly_fields = ("get_conversation", "booked_days_display")
     ordering = ("-created_at",)
 
     fieldsets = (
@@ -43,7 +44,7 @@ class BookingAdmin(admin.ModelAdmin):
         ),
         (
             "Client / Customer",
-            {"fields": ("client_profile", "customer_profile", "conversation")},
+            {"fields": ("client_profile", "customer_profile", "get_conversation")},
         ),
         (
             "Schedule",
@@ -65,6 +66,9 @@ class BookingAdmin(admin.ModelAdmin):
         ("Payment", {"fields": ("proposed_rate", "rate_type", "currency")}),
     )
 
+    # ------------------------
+    # Custom methods
+    # ------------------------
     def client_name(self, obj):
         return (
             obj.client_profile.user.full_name if obj.client_profile else "Self-booking"
@@ -98,3 +102,9 @@ class BookingAdmin(admin.ModelAdmin):
         return ", ".join([str(day) for day in obj.booked_days])
 
     booked_days_display.short_description = "Booked Days"
+
+    def get_conversation(self, obj):
+        # Agar Booking modelida conversation field mavjud bo'lmasa, uni shunday ko'rsatamiz
+        return getattr(obj, "conversation", "—")
+
+    get_conversation.short_description = "Conversation"

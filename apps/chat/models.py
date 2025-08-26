@@ -151,7 +151,10 @@ class Conversation(models.Model):
         try:
             from apps.bookings.models import Booking
 
-            return self.booking  # OneToOneField
+            return self.booking_set.filter(
+                status__in=["pending", "accepted", "updated"]
+            ).first()
+
         except:
             return None
 

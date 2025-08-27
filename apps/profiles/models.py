@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from apps.common.models import BaseModel
 from apps.users.models import User
+from django_countries.fields import CountryField
 
 
 class AbstractProfile(BaseModel):
@@ -64,7 +65,12 @@ class CustomerProfile(AbstractProfile):
         blank=True,
         verbose_name=_("Service types offered"),
     )
+<<<<<<< HEAD
     country = models.CharField(max_length=100, verbose_name=_("Country"), db_index=True)
+=======
+    country = CountryField(blank=True, null=True, verbose_name=_("Country"))
+
+>>>>>>> origin/jasur
     city = models.ForeignKey(
         "common.City",
         on_delete=models.PROTECT,

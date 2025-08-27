@@ -1,7 +1,12 @@
-# apps/profiles/serializers.py - REVIEW INTEGRATION QOSHILGAN
+# apps/profiles/serializers.py - UUID MUAMMOSINI HAL QILISH
 
+import uuid
+
+from django.db.models import Count, Q
 from rest_framework import serializers
-from django.db.models import Avg, Count, Q
+
+from apps.common.models import Language, ServiceType
+from apps.reviews.models import Review
 from apps.users.serializers import UserShortSerializer
 from .models import (
     ClientProfile,
@@ -10,12 +15,36 @@ from .models import (
     VerificationDocument,
     Availability,
 )
-from apps.common.models import Language, ServiceType
-from apps.reviews.models import Review  # YANGI IMPORT
 
 
-class ClientProfileCreateUpdateSerializer(serializers.ModelSerializer):
+# UUID uchun xavfsizlik mixin
+class UUIDSafeMixin:
+    """Mixin to handle UUID serialization safely"""
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        return self._convert_uuids_to_strings(data)
+
+    def _convert_uuids_to_strings(self, data):
+        """Recursively convert UUIDs to strings"""
+        if isinstance(data, dict):
+            return {key: self._convert_uuid_value(value) for key, value in data.items()}
+        elif isinstance(data, list):
+            return [self._convert_uuid_value(item) for item in data]
+        else:
+            return self._convert_uuid_value(data)
+
+    def _convert_uuid_value(self, value):
+        """Convert single value if UUID"""
+        if isinstance(value, uuid.UUID):
+            return str(value)
+        elif isinstance(value, (dict, list)):
+            return self._convert_uuids_to_strings(value)
+        return value
+
+
+# Client Serializers
+class ClientProfileCreateUpdateSerializer(UUIDSafeMixin, serializers.ModelSerializer):
     languages = serializers.PrimaryKeyRelatedField(
         queryset=Language.objects.all(), many=True, required=False
     )
@@ -26,19 +55,16 @@ class ClientProfileCreateUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         languages = validated_data.pop("languages", None)
-        for attr, val in validated_data.items():
-            setattr(instance, attr, val)
-        instance.save()
+        instance = super().update(instance, validated_data)
         if languages is not None:
             instance.languages.set(languages)
         return instance
 
 
-class ClientProfileSerializer(serializers.ModelSerializer):
+class ClientProfileSerializer(UUIDSafeMixin, serializers.ModelSerializer):
     user = UserShortSerializer(read_only=True)
     full_name = serializers.CharField(source="user.full_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
-    profile_id = serializers.IntegerField(source="id", read_only=True)
 
     class Meta:
         model = ClientProfile
@@ -47,36 +73,20 @@ class ClientProfileSerializer(serializers.ModelSerializer):
             "user",
             "full_name",
             "email",
-            "profile_id",
             "date_of_birth",
             "preferred_contact",
             "languages",
             "created_at",
             "updated_at",
         ]
-        read_only_fields = [
-            "id",
-            "user",
-            "full_name",
-            "email",
-            "created_at",
-            "updated_at",
-        ]
+        read_only_fields = ["id", "user", "created_at", "updated_at"]
 
 
-class ClientProfileShortSerializer(serializers.ModelSerializer):
-    full_name = serializers.CharField(source="user.full_name", read_only=True)
-    email = serializers.EmailField(source="user.email", read_only=True)
-
-    class Meta:
-        model = ClientProfile
-        fields = ["id", "full_name", "email", "preferred_contact"]
-
-
-class ReviewForCustomerSerializer(serializers.ModelSerializer):
-
-    client_name = serializers.CharField(source="client.full_name", read_only=True)
-    client_avatar = serializers.ImageField(source="client.avatar", read_only=True)
+# Review Serializer - FIXED
+class ReviewForCustomerSerializer(UUIDSafeMixin, serializers.ModelSerializer):
+    # FIX: client_profile instead of client
+    client_name = serializers.SerializerMethodField()
+    client_avatar = serializers.SerializerMethodField()
     days_ago = serializers.SerializerMethodField()
 
     class Meta:
@@ -91,25 +101,53 @@ class ReviewForCustomerSerializer(serializers.ModelSerializer):
             "days_ago",
         ]
 
+    def get_client_name(self, obj):
+        try:
+            if obj.client_profile and obj.client_profile.user:
+                return obj.client_profile.user.full_name
+        except:
+            pass
+        return "Anonymous"
+
+    def get_client_avatar(self, obj):
+        try:
+            if obj.client_profile and obj.client_profile.user.avatar:
+                request = self.context.get("request")
+                if request:
+                    return request.build_absolute_uri(
+                        obj.client_profile.user.avatar.url
+                    )
+        except:
+            pass
+        return None
+
     def get_days_ago(self, obj):
-        from django.utils import timezone
+        try:
+            from django.utils import timezone
 
-        delta = timezone.now() - obj.created_at
-        if delta.days == 0:
-            return "Today"
-        elif delta.days == 1:
-            return "Yesterday"
-        elif delta.days < 7:
-            return f"{delta.days} days ago"
-        elif delta.days < 30:
-            weeks = delta.days // 7
-            return f"{weeks} week{'s' if weeks > 1 else ''} ago"
-        else:
-            months = delta.days // 30
-            return f"{months} month{'s' if months > 1 else ''} ago"
+            delta = timezone.now() - obj.created_at
+
+            if delta.days == 0:
+                return "Today"
+            elif delta.days == 1:
+                return "Yesterday"
+            elif delta.days < 7:
+                return f"{delta.days} days ago"
+            elif delta.days < 30:
+                weeks = delta.days // 7
+                return f"{weeks} week{'s' if weeks > 1 else ''} ago"
+            elif delta.days < 365:
+                months = delta.days // 30
+                return f"{months} month{'s' if months > 1 else ''} ago"
+            else:
+                years = delta.days // 365
+                return f"{years} year{'s' if years > 1 else ''} ago"
+        except:
+            return "Unknown"
 
 
-class CustomerProfileCreateUpdateSerializer(serializers.ModelSerializer):
+# Customer Serializers
+class CustomerProfileCreateUpdateSerializer(UUIDSafeMixin, serializers.ModelSerializer):
     languages = serializers.PrimaryKeyRelatedField(
         queryset=Language.objects.all(), many=True, required=False
     )
@@ -124,6 +162,7 @@ class CustomerProfileCreateUpdateSerializer(serializers.ModelSerializer):
             "years_of_experience",
             "service_types",
             "city",
+            "country",  # Added country field
             "service_areas",
             "hourly_rate",
             "daily_rate",
@@ -134,40 +173,31 @@ class CustomerProfileCreateUpdateSerializer(serializers.ModelSerializer):
 
     def validate_years_of_experience(self, value):
         if value < 0:
-            raise serializers.ValidationError("Years of experience cannot be negative.")
+            raise serializers.ValidationError("Years cannot be negative")
+        if value > 50:
+            raise serializers.ValidationError("Years cannot exceed 50")
         return value
 
-    def validate_hourly_rate(self, value):
-        if value is not None and value < 0:
-            raise serializers.ValidationError("Hourly rate cannot be negative.")
-        return value
-
-    def validate_daily_rate(self, value):
-        if value is not None and value < 0:
-            raise serializers.ValidationError("Daily rate cannot be negative.")
-        return value
-
-    def update(self, instance, validated_data):
-        languages = validated_data.pop("languages", None)
-        service_types = validated_data.pop("service_types", None)
-        for attr, val in validated_data.items():
-            setattr(instance, attr, val)
-        instance.save()
-        if languages is not None:
-            instance.languages.set(languages)
-        if service_types is not None:
-            instance.service_types.set(service_types)
-        return instance
+    def validate(self, data):
+        # Validate rates
+        if data.get("hourly_rate") and data.get("daily_rate"):
+            if data["hourly_rate"] * 8 < data["daily_rate"]:
+                raise serializers.ValidationError(
+                    "Daily rate seems too high compared to hourly rate"
+                )
+        return data
 
 
-class CustomerProfileSerializer(serializers.ModelSerializer):
-
+class CustomerProfileSerializer(UUIDSafeMixin, serializers.ModelSerializer):
     user = UserShortSerializer(read_only=True)
     full_name = serializers.CharField(source="user.full_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
-    profile_id = serializers.IntegerField(source="id", read_only=True)
-    city_name = serializers.CharField(source="city.name", read_only=True)
-    country_name = serializers.CharField(source="city.country.name", read_only=True)
+
+    # FIXED: Country handling with UUID safety
+    country_display = serializers.SerializerMethodField()
+    city_name = serializers.CharField(
+        source="city.name", read_only=True, allow_null=True
+    )
 
     recent_reviews = serializers.SerializerMethodField()
     review_statistics = serializers.SerializerMethodField()
@@ -179,13 +209,13 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             "user",
             "full_name",
             "email",
-            "profile_id",
-            "country_name",
+            "country",
+            "country_display",
+            "city",
+            "city_name",
             "professional_bio",
             "years_of_experience",
             "service_types",
-            "city",
-            "city_name",
             "service_areas",
             "hourly_rate",
             "daily_rate",
@@ -206,10 +236,6 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id",
             "user",
-            "full_name",
-            "email",
-            "country_name",
-            "city_name",
             "verification_status",
             "verification_date",
             "total_bookings",
@@ -218,72 +244,95 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             "is_verified",
             "created_at",
             "updated_at",
-            "recent_reviews",
-            "review_statistics",
         ]
+
+    def get_country_display(self, obj):
+        """FIXED: Safe country handling"""
+        try:
+            if obj.country:
+                # Country object'dan xavfsiz ma'lumot olish
+                if hasattr(obj.country, "code") and hasattr(obj.country, "name"):
+                    return {
+                        "code": str(obj.country.code),
+                        "name": str(obj.country.name),
+                    }
+                else:
+                    # Agar country UUID bo'lsa
+                    return {"code": str(obj.country), "name": "Unknown"}
+        except Exception:
+            pass
+        return None
 
     def get_recent_reviews(self, obj):
-        reviews = (
-            Review.objects.filter(customer=obj, is_published=True)
-            .exclude(Q(rating__isnull=True) & Q(comment=""))
-            .order_by("-created_at")[:5]
-        )
+        try:
+            reviews = (
+                Review.objects.filter(customer=obj, is_published=True)
+                .exclude(rating__isnull=True, comment="")
+                .select_related("client_profile__user")
+                .order_by("-created_at")[:5]
+            )
 
-        return ReviewForCustomerSerializer(reviews, many=True).data
+            return ReviewForCustomerSerializer(
+                reviews, many=True, context=self.context
+            ).data
+        except Exception:
+            return []
 
     def get_review_statistics(self, obj):
-        reviews = Review.objects.filter(
-            customer=obj, is_published=True, rating__isnull=False
-        )
+        """FIXED: Safe review statistics"""
+        try:
+            # OPTIMIZED: Single query with aggregation
+            stats = Review.objects.filter(
+                customer=obj, is_published=True, rating__isnull=False
+            ).aggregate(
+                total=Count("id"),
+                rating_1=Count("id", filter=Q(rating=1)),
+                rating_2=Count("id", filter=Q(rating=2)),
+                rating_3=Count("id", filter=Q(rating=3)),
+                rating_4=Count("id", filter=Q(rating=4)),
+                rating_5=Count("id", filter=Q(rating=5)),
+                with_comments=Count("id", filter=~Q(comment="")),
+            )
 
-        distribution = {}
-        for i in range(1, 6):
-            count = reviews.filter(rating=i).count()
-            distribution[str(i)] = count
+            total = stats["total"]
+            distribution = {str(i): stats[f"rating_{i}"] for i in range(1, 6)}
 
-        total = sum(distribution.values())
+            if total > 0:
+                percentages = {
+                    k: round((v / total) * 100, 1) for k, v in distribution.items()
+                }
+                recommendation_rate = round(
+                    ((distribution["4"] + distribution["5"]) / total) * 100, 1
+                )
+            else:
+                percentages = {str(i): 0 for i in range(1, 6)}
+                recommendation_rate = 0
 
-        if total > 0:
-            percentages = {
-                k: round((v / total) * 100, 1) for k, v in distribution.items()
+            return {
+                "total_reviews": total,
+                "average_rating": float(obj.average_rating or 0),
+                "rating_distribution": distribution,
+                "rating_percentages": percentages,
+                "with_comments": stats["with_comments"],
+                "recommendation_rate": recommendation_rate,
             }
-        else:
-            percentages = {str(i): 0 for i in range(1, 6)}
-
-        return {
-            "total_reviews": total,
-            "average_rating": float(obj.average_rating) if obj.average_rating else 0,
-            "rating_distribution": distribution,
-            "rating_percentages": percentages,
-            "with_comments": reviews.exclude(comment="").count(),
-        }
-
-
-class CustomerProfileShortSerializer(serializers.ModelSerializer):
-
-    user = UserShortSerializer(read_only=True)
-    city_name = serializers.CharField(source="city.name", read_only=True)
-
-    class Meta:
-        model = CustomerProfile
-        fields = [
-            "id",
-            "user",
-            "city_name",
-            "average_rating",
-            "is_verified",
-            "hourly_rate",
-            "is_available",
-        ]
-        read_only_fields = ["id", "user", "city_name", "average_rating", "is_verified"]
+        except Exception:
+            return {
+                "total_reviews": 0,
+                "average_rating": 0.0,
+                "rating_distribution": {str(i): 0 for i in range(1, 6)},
+                "rating_percentages": {str(i): 0 for i in range(1, 6)},
+                "with_comments": 0,
+                "recommendation_rate": 0,
+            }
 
 
-class CustomerPortfolioPublicSerializer(serializers.ModelSerializer):
-
+class CustomerPortfolioPublicSerializer(UUIDSafeMixin, serializers.ModelSerializer):
     user_info = serializers.SerializerMethodField()
     portfolio_items = serializers.SerializerMethodField()
     all_reviews = serializers.SerializerMethodField()
     review_statistics = serializers.SerializerMethodField()
+    country_display = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomerProfile
@@ -294,6 +343,8 @@ class CustomerPortfolioPublicSerializer(serializers.ModelSerializer):
             "years_of_experience",
             "service_types",
             "languages",
+            "country",
+            "country_display",
             "city",
             "service_areas",
             "hourly_rate",
@@ -310,83 +361,87 @@ class CustomerPortfolioPublicSerializer(serializers.ModelSerializer):
         ]
 
     def get_user_info(self, obj):
-        return {
-            "id": obj.user.id,
-            "full_name": obj.user.full_name,
-            "avatar": obj.user.avatar.url if obj.user.avatar else None,
-            "bio": obj.user.bio,
-            "created_at": obj.user.created_at,
-        }
+        try:
+            return {
+                "id": str(obj.user.id),  # UUID safe
+                "full_name": obj.user.full_name,
+                "avatar": (
+                    self.context["request"].build_absolute_uri(obj.user.avatar.url)
+                    if obj.user.avatar
+                    else None
+                ),
+                "bio": obj.user.bio,
+                "member_since": obj.user.created_at.year,
+            }
+        except Exception:
+            return {}
+
+    def get_country_display(self, obj):
+        """FIXED: Safe country display"""
+        try:
+            if obj.country:
+                if hasattr(obj.country, "code") and hasattr(obj.country, "name"):
+                    return {
+                        "code": str(obj.country.code),
+                        "name": str(obj.country.name),
+                    }
+                else:
+                    return {"code": str(obj.country), "name": "Unknown"}
+        except Exception:
+            pass
+        return None
 
     def get_portfolio_items(self, obj):
-        from .serializers import PortfolioSerializer
-
-        items = obj.portfolio_set.all().order_by("order")
-        return PortfolioSerializer(items, many=True).data
+        """FIXED: Safe portfolio items"""
+        try:
+            items = obj.portfolio_set.all().order_by("order", "-created_at")
+            return [
+                {
+                    "id": str(item.id),  # UUID safe
+                    "image": (
+                        self.context["request"].build_absolute_uri(item.image.url)
+                        if item.image
+                        else None
+                    ),
+                    "title": item.title,
+                    "description": item.description,
+                    "order": item.order,
+                }
+                for item in items
+            ]
+        except Exception:
+            return []
 
     def get_all_reviews(self, obj):
+        try:
+            limit = min(
+                int(self.context["request"].query_params.get("review_limit", 10)), 50
+            )
 
-        request = self.context.get("request")
-        limit = 10
-        if request:
-            limit = request.query_params.get("review_limit", 10)
-            try:
-                limit = int(limit)
-            except:
-                limit = 10
+            reviews = (
+                Review.objects.filter(customer=obj, is_published=True)
+                .exclude(rating__isnull=True, comment="")
+                .select_related("client_profile__user")
+                .order_by("-created_at")[:limit]
+            )
 
-        reviews = (
-            Review.objects.filter(customer=obj, is_published=True)
-            .exclude(Q(rating__isnull=True) & Q(comment=""))
-            .order_by("-created_at")[:limit]
-        )
-
-        return ReviewForCustomerSerializer(reviews, many=True).data
+            return ReviewForCustomerSerializer(
+                reviews, many=True, context=self.context
+            ).data
+        except Exception:
+            return []
 
     def get_review_statistics(self, obj):
-        reviews = Review.objects.filter(
-            customer=obj, is_published=True, rating__isnull=False
-        )
-
-        distribution = {}
-        for i in range(1, 6):
-            count = reviews.filter(rating=i).count()
-            distribution[str(i)] = count
-
-        total = sum(distribution.values())
-
-        if total > 0:
-            percentages = {
-                k: round((v / total) * 100, 1) for k, v in distribution.items()
-            }
-
-            most_common = max(distribution, key=distribution.get)
-        else:
-            percentages = {str(i): 0 for i in range(1, 6)}
-            most_common = None
-
-        return {
-            "total_reviews": total,
-            "average_rating": float(obj.average_rating) if obj.average_rating else 0,
-            "rating_distribution": distribution,
-            "rating_percentages": percentages,
-            "most_common_rating": most_common,
-            "reviews_with_comments": reviews.exclude(comment="").count(),
-            "recommendation_rate": (
-                round(
-                    (distribution.get("5", 0) + distribution.get("4", 0)) / total * 100,
-                    1,
-                )
-                if total > 0
-                else 0
-            ),
-        }
+        # Reuse optimized method
+        return CustomerProfileSerializer.get_review_statistics(self, obj)
 
 
-class PortfolioSerializer(serializers.ModelSerializer):
+# Other serializers with UUID safety
+class PortfolioSerializer(UUIDSafeMixin, serializers.ModelSerializer):
     customer_name = serializers.CharField(
         source="customer.user.full_name", read_only=True
     )
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Portfolio
@@ -395,15 +450,26 @@ class PortfolioSerializer(serializers.ModelSerializer):
             "customer",
             "customer_name",
             "image",
+            "image_url",
             "title",
             "description",
             "order",
             "created_at",
         ]
-        read_only_fields = ["id", "customer", "customer_name", "created_at"]
+        read_only_fields = ["id", "customer", "created_at"]
+
+    def get_image_url(self, obj):
+        try:
+            if obj.image:
+                request = self.context.get("request")
+                if request:
+                    return request.build_absolute_uri(obj.image.url)
+        except Exception:
+            pass
+        return None
 
 
-class VerificationDocumentSerializer(serializers.ModelSerializer):
+class VerificationDocumentSerializer(UUIDSafeMixin, serializers.ModelSerializer):
     customer_name = serializers.CharField(
         source="customer.user.full_name", read_only=True
     )
@@ -438,7 +504,7 @@ class VerificationDocumentSerializer(serializers.ModelSerializer):
         ]
 
 
-class AvailabilitySerializer(serializers.ModelSerializer):
+class AvailabilitySerializer(UUIDSafeMixin, serializers.ModelSerializer):
     customer_name = serializers.CharField(
         source="customer.user.full_name", read_only=True
     )

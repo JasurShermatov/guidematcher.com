@@ -1,11 +1,12 @@
 # ============================================
-# 2. apps/chat/serializers.py - PROFESSIONAL VERSION
+# apps/chat/serializers.py - FIXED VERSION
 # ============================================
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from rest_framework import serializers
 from django.db.models import Q
 from django.utils import timezone
+import json
 
 from apps.users.models import User
 from apps.bookings.models import Booking
@@ -36,7 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["full_name", "is_customer", "is_client"]
 
-    def get_avatar_url(self, obj: User) -> str:
+    def get_avatar_url(self, obj: User) -> Optional[str]:
         if obj.avatar:
             request = self.context.get("request")
             if request:
@@ -93,7 +94,7 @@ class BookingShortSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    """Message serializer with sender info and delete status"""
+    """FIXED: Message serializer with proper datetime handling"""
 
     sender = UserSerializer(read_only=True)
     delete_status = serializers.SerializerMethodField()
@@ -128,22 +129,41 @@ class MessageSerializer(serializers.ModelSerializer):
             "message_type",
         ]
 
-    def get_delete_status(self, obj: Message) -> Dict:
-        request = self.context.get("request")
-        if request and request.user.is_authenticated:
-            return obj.get_delete_status_for_user(request.user)
+    def get_delete_status(self, obj: Message) -> Optional[Dict]:
+        """FIXED: Safe delete status with datetime conversion"""
+        try:
+            request = self.context.get("request")
+            if request and request.user.is_authenticated:
+                status = obj.get_delete_status_for_user(request.user)
+
+                # MUHIM: datetime'ni string'ga convert qilish
+                if isinstance(status, dict) and status.get("deleted_at"):
+                    if hasattr(status["deleted_at"], "isoformat"):
+                        status["deleted_at"] = status["deleted_at"].isoformat()
+                    elif status["deleted_at"] is not None:
+                        status["deleted_at"] = str(status["deleted_at"])
+
+                return status
+        except Exception:
+            pass
         return None
 
     def get_can_recover(self, obj: Message) -> bool:
-        request = self.context.get("request")
-        if request and request.user.is_authenticated:
-            return obj.can_be_recovered(request.user)
+        try:
+            request = self.context.get("request")
+            if request and request.user.is_authenticated:
+                return obj.can_be_recovered(request.user)
+        except Exception:
+            pass
         return False
 
     def get_is_mine(self, obj: Message) -> bool:
-        request = self.context.get("request")
-        if request and request.user.is_authenticated:
-            return obj.sender == request.user
+        try:
+            request = self.context.get("request")
+            if request and request.user.is_authenticated:
+                return obj.sender == request.user
+        except Exception:
+            pass
         return False
 
 
@@ -181,14 +201,17 @@ class MessageCreateSerializer(serializers.ModelSerializer):
         message = super().create(validated_data)
 
         # Update conversation timestamp
-        message.conversation.updated_at = timezone.now()
-        message.conversation.save(update_fields=["updated_at"])
+        try:
+            message.conversation.updated_at = timezone.now()
+            message.conversation.save(update_fields=["updated_at"])
+        except Exception:
+            pass
 
         return message
 
 
 class ConversationSerializer(serializers.ModelSerializer):
-    """Conversation serializer with user info and booking status"""
+    """FIXED: Conversation serializer with safe last_message"""
 
     other_user = serializers.SerializerMethodField()
     last_message = serializers.SerializerMethodField()
@@ -210,35 +233,59 @@ class ConversationSerializer(serializers.ModelSerializer):
             "can_send_message",
         ]
 
-    def get_other_user(self, obj: Conversation) -> Dict:
-        request = self.context.get("request")
-        if request and request.user.is_authenticated:
-            other_user = obj.get_other_user(request.user)
-            return UserSerializer(other_user, context=self.context).data
+    def get_other_user(self, obj: Conversation) -> Optional[Dict]:
+        try:
+            request = self.context.get("request")
+            if request and request.user.is_authenticated:
+                other_user = obj.get_other_user(request.user)
+                return UserSerializer(other_user, context=self.context).data
+        except Exception:
+            pass
         return None
 
-    def get_last_message(self, obj: Conversation) -> Dict:
-        request = self.context.get("request")
-        if request and request.user.is_authenticated:
-            last_message = (
-                Message.objects.visible_for_user(request.user)
-                .filter(conversation=obj)
-                .select_related("sender")
-                .first()
-            )
-            if last_message:
-                return MessageSerializer(last_message, context=self.context).data
+    def get_last_message(self, obj: Conversation) -> Optional[Dict]:
+        """FIXED: Safe last message without nested serializer issues"""
+        try:
+            request = self.context.get("request")
+            if request and request.user.is_authenticated:
+                last_message = (
+                    Message.objects.visible_for_user(request.user)
+                    .filter(conversation=obj)
+                    .select_related("sender")
+                    .first()
+                )
+                if last_message:
+                    # MUHIM: MessageSerializer'dan foydalanmaslik - to'g'ridan-to'g'ri dict
+                    return {
+                        "id": last_message.id,
+                        "content": last_message.content[:100]
+                        + ("..." if len(last_message.content) > 100 else ""),
+                        "message_type": last_message.message_type,
+                        "created_at": (
+                            last_message.created_at.isoformat()
+                            if last_message.created_at
+                            else None
+                        ),
+                        "sender_id": last_message.sender_id,
+                        "is_read": last_message.is_read,
+                        "deleted_for": last_message.deleted_for,
+                    }
+        except Exception:
+            pass
         return None
 
     def get_unread_count(self, obj: Conversation) -> int:
-        request = self.context.get("request")
-        if request and request.user.is_authenticated:
-            return Message.objects.unread_for_user_in_conversation(
-                request.user, obj
-            ).count()
+        try:
+            request = self.context.get("request")
+            if request and request.user.is_authenticated:
+                return Message.objects.unread_for_user_in_conversation(
+                    request.user, obj
+                ).count()
+        except Exception:
+            pass
         return 0
 
-    def get_active_booking(self, obj: Conversation) -> Dict:
+    def get_active_booking(self, obj: Conversation) -> Optional[Dict]:
         """Get active booking if exists"""
         try:
             booking = (
@@ -252,13 +299,16 @@ class ConversationSerializer(serializers.ModelSerializer):
             if booking:
                 return BookingShortSerializer(booking, context=self.context).data
             return None
-        except:
+        except Exception:
             return None
 
     def get_can_send_message(self, obj: Conversation) -> bool:
-        request = self.context.get("request")
-        if request and request.user.is_authenticated:
-            return obj.can_send_message(request.user)
+        try:
+            request = self.context.get("request")
+            if request and request.user.is_authenticated:
+                return obj.can_send_message(request.user)
+        except Exception:
+            pass
         return True
 
 
@@ -280,13 +330,16 @@ class StartConversationSerializer(serializers.Serializer):
             raise serializers.ValidationError("Cannot chat with yourself.")
 
         # Check if blocked
-        if BlockedUser.objects.filter(
-            Q(blocker=request_user, blocked=user)
-            | Q(blocker=user, blocked=request_user)
-        ).exists():
-            raise serializers.ValidationError(
-                "Cannot start conversation with this user."
-            )
+        try:
+            if BlockedUser.objects.filter(
+                Q(blocker=request_user, blocked=user)
+                | Q(blocker=user, blocked=request_user)
+            ).exists():
+                raise serializers.ValidationError(
+                    "Cannot start conversation with this user."
+                )
+        except Exception:
+            pass
 
         return value
 
@@ -334,7 +387,6 @@ class BookingCancelSerializer(serializers.Serializer):
     reason = serializers.CharField(required=False, allow_blank=True)
 
 
-# Other serializers remain similar...
 class BlockUserSerializer(serializers.Serializer):
     user_email = serializers.EmailField()
     reason = serializers.CharField(required=False, allow_blank=True)

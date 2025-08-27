@@ -151,7 +151,10 @@ class Conversation(models.Model):
         try:
             from apps.bookings.models import Booking
 
-            return self.booking  # OneToOneField
+            return self.booking_set.filter(
+                status__in=["pending", "accepted", "updated"]
+            ).first()
+
         except:
             return None
 
@@ -276,11 +279,15 @@ class Message(models.Model):
         return True
 
     def get_delete_status_for_user(self, user: User) -> dict:
-        """Get comprehensive delete status for user"""
+        """Get comprehensive delete status for user - FIXED datetime issue"""
+        deleted_at_safe = None
+        if self.deleted_at:
+            deleted_at_safe = self.deleted_at.isoformat()  # String'ga convert
+
         return {
             "is_deleted": self.deleted_for != "none",
             "deleted_for": self.deleted_for,
-            "deleted_at": self.deleted_at,
+            "deleted_at": deleted_at_safe,  # Safe ISO string format
             "can_recover": self.can_be_recovered(user),
             "is_visible": self.is_visible_for_user(user),
         }

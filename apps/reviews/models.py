@@ -2,17 +2,24 @@
 # 1. apps/reviews/models.py - SIMPLIFIED & PROFESSIONAL
 # ============================================
 
-from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db import models
 from django.db.models import Avg, Count
 from django.utils import timezone
+<<<<<<< HEAD
 
 from apps.common.models import BaseModel
 from apps.users.models import User
 from apps.profiles.models import CustomerProfile
 from django.core.exceptions import ValidationError
+=======
+from django.utils.translation import gettext_lazy as _
+
+>>>>>>> origin/jasur
 from apps.bookings.models import Booking
+from apps.common.models import BaseModel
+from apps.profiles.models import CustomerProfile
+from apps.users.models import User
 
 
 class ReviewManager(models.Manager):

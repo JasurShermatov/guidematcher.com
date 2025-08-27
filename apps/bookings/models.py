@@ -88,9 +88,7 @@ class Booking(BaseModel):
     description = models.TextField(blank=True, verbose_name=_("Description"))
 
     # Search uchun muhim fieldlar
-    country = models.CharField(
-        max_length=100, verbose_name=_("Country"), db_index=True  # search tezligi uchun
-    )
+    country = models.CharField(max_length=100, verbose_name=_("Country"), db_index=True)
     city = models.CharField(
         max_length=100, blank=True, verbose_name=_("City"), db_index=True
     )

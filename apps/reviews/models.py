@@ -6,10 +6,12 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Avg, Count
+from django.utils import timezone
 
 from apps.common.models import BaseModel
 from apps.users.models import User
 from apps.profiles.models import CustomerProfile
+from django.core.exceptions import ValidationError
 from apps.bookings.models import Booking
 
 
@@ -88,7 +90,7 @@ class Review(BaseModel):
 
     def clean(self):
         if not self.rating and not self.comment:
-            raise models.ValidationError(_("Please provide either a rating or comment"))
+            raise ValidationError(_("Please provide either a rating or comment"))
 
     def save(self, *args, **kwargs):
 

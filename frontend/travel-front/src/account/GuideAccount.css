@@ -1,963 +1,814 @@
-/* GuideAccount Component Styles */
+/* GuideAccount.css */
 
-/* Container and Layout */
-.guide-account-container {
-    max-width: 1400px;
+/* General container styles */
+.customer-dashboard-container {
+    max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Arial', sans-serif;
     background-color: #f5f7fa;
     min-height: 100vh;
 }
 
-/* Header Styles */
-.guide-account-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 35px;
-    border-radius: 16px;
-    margin-bottom: 30px;
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
-    position: relative;
-    overflow: hidden;
+/* Header styles */
+.customer-dashboard-header {
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
 }
 
-.guide-account-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 200px;
-    height: 200px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    transform: translate(50px, -50px);
-}
-
-.guide-account-title {
-    margin: 0 0 10px 0;
-    font-size: 2.8rem;
-    font-weight: 700;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    position: relative;
-    z-index: 1;
-}
-
-.guide-account-user-info {
-    margin-top: 15px;
-    position: relative;
-    z-index: 1;
-}
-
-.guide-account-welcome {
-    font-size: 1.3rem;
-    opacity: 0.95;
-    font-weight: 500;
-}
-
-/* Loading Styles */
-.guide-account-loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 400px;
-    color: #6c757d;
-}
-
-.guide-account-spinner {
-    width: 60px;
-    height: 60px;
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid #667eea;
-    border-radius: 50%;
-    animation: guideAccountSpin 1s linear infinite;
-    margin-bottom: 25px;
-}
-
-@keyframes guideAccountSpin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Error Styles */
-.guide-account-error {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-    color: white;
-    padding: 18px 25px;
-    border-radius: 12px;
-    margin-bottom: 25px;
+.customer-dashboard-header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 15px rgba(238, 90, 82, 0.3);
-    animation: slideDown 0.3s ease-out;
 }
 
-@keyframes slideDown {
-    from { transform: translateY(-20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-.guide-account-error p {
+.customer-dashboard-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
     margin: 0;
-    font-weight: 500;
 }
 
-.guide-account-error-close {
+.customer-dashboard-user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.customer-dashboard-welcome {
+    font-size: 16px;
+    color: #333;
+}
+
+.customer-dashboard-chat-btn,
+.customer-dashboard-logout-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.customer-dashboard-chat-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.customer-dashboard-chat-btn:hover {
+    background-color: #0056b3;
+}
+
+.customer-dashboard-logout-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.customer-dashboard-logout-btn:hover {
+    background-color: #c82333;
+}
+
+/* Error message styles */
+.customer-dashboard-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px 20px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.customer-dashboard-error-close {
     background: none;
     border: none;
-    color: white;
-    font-size: 1.8rem;
+    color: #721c24;
+    font-size: 18px;
     cursor: pointer;
-    padding: 0;
-    line-height: 1;
-    font-weight: bold;
-    opacity: 0.8;
-    transition: opacity 0.2s ease;
 }
 
-.guide-account-error-close:hover {
-    opacity: 1;
-}
-
-/* Navigation Styles */
-.guide-account-navigation {
+/* Navigation styles */
+.customer-dashboard-navigation {
     display: flex;
-    gap: 6px;
-    margin-bottom: 30px;
-    background: white;
-    padding: 8px;
-    border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
-.guide-account-navigation::-webkit-scrollbar {
-    display: none;
-}
-
-.guide-account-nav-btn {
-    padding: 14px 24px;
+.customer-dashboard-nav-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    background-color: #e9ecef;
     border: none;
-    background: transparent;
-    color: #6c757d;
-    border-radius: 12px;
+    border-radius: 4px;
     cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    white-space: nowrap;
-    font-size: 0.95rem;
-    position: relative;
-    overflow: hidden;
+    transition: background-color 0.2s;
 }
 
-.guide-account-nav-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    transition: left 0.5s;
+.customer-dashboard-nav-btn:hover {
+    background-color: #dee2e6;
 }
 
-.guide-account-nav-btn:hover::before {
-    left: 100%;
+.customer-dashboard-nav-active {
+    background-color: #007bff;
+    color: white;
 }
 
-.guide-account-nav-btn:hover {
-    background-color: #f8f9fa;
-    color: #495057;
-    transform: translateY(-2px);
-}
-
-.guide-account-nav-active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white !important;
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-    transform: translateY(-2px);
-}
-
-/* Content Area */
-.guide-account-content {
-    background: white;
-    border-radius: 16px;
-    padding: 35px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-    min-height: 600px;
-    position: relative;
-}
-
-/* Dashboard Styles */
-.guide-account-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 25px;
-    margin-bottom: 40px;
-}
-
-.guide-account-stat-card {
-    background: white;
-    padding: 30px;
-    border-radius: 16px;
-    text-align: center;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid #f0f2f5;
-    position: relative;
-    overflow: hidden;
-}
-
-.guide-account-stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.guide-account-stat-card:nth-child(1)::before {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.guide-account-stat-card:nth-child(2)::before {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-}
-
-.guide-account-stat-card:nth-child(3)::before {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-}
-
-.guide-account-stat-card:nth-child(4)::before {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-}
-
-.guide-account-stat-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-}
-
-.guide-account-stat-title {
-    margin: 0 0 15px 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #6c757d;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.guide-account-stat-value {
-    margin: 0;
-    font-size: 2.8rem;
-    font-weight: 700;
-    color: #2c3e50;
-}
-
-/* Section Titles */
-.guide-account-section-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin: 0 0 30px 0;
-    padding-bottom: 15px;
-    border-bottom: 3px solid #667eea;
-    display: inline-block;
-    position: relative;
-}
-
-.guide-account-section-title::after {
-    content: '';
-    position: absolute;
-    bottom: -3px;
-    left: 0;
-    width: 50%;
-    height: 3px;
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-}
-
-/* Form Styles */
-.guide-account-form {
-    max-width: 800px;
-}
-
-.guide-account-form-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #2c3e50;
-    margin: 0 0 25px 0;
+/* Content area */
+.customer-dashboard-content {
+    background-color: #ffffff;
     padding: 20px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Dashboard overview */
+.customer-dashboard-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.customer-dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.customer-dashboard-stat-card {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.customer-dashboard-stat-title {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.customer-dashboard-stat-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+/* Recent bookings */
+.customer-dashboard-recent {
+    margin-top: 20px;
+}
+
+.customer-dashboard-section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 15px;
+}
+
+.customer-dashboard-recent-bookings {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.customer-dashboard-booking-card {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.customer-dashboard-booking-info {
+    flex: 1;
+}
+
+.customer-dashboard-booking-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.customer-dashboard-booking-date {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.customer-dashboard-booking-status {
+    font-size: 12px;
+    padding: 4px 8px;
     border-radius: 12px;
-    border-left: 4px solid #667eea;
+    color: white;
 }
 
-.guide-account-form-group {
-    margin-bottom: 25px;
+.customer-dashboard-status-pending {
+    background-color: #ffc107;
 }
 
-.guide-account-form-row {
+.customer-dashboard-status-accepted {
+    background-color: #28a745;
+}
+
+.customer-dashboard-status-completed {
+    background-color: #17a2b8;
+}
+
+.customer-dashboard-status-cancelled {
+    background-color: #dc3545;
+}
+
+.customer-dashboard-booking-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Button styles */
+.customer-dashboard-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.customer-dashboard-btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.customer-dashboard-btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.customer-dashboard-btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.customer-dashboard-btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.customer-dashboard-btn-accept {
+    background-color: #28a745;
+    color: white;
+}
+
+.customer-dashboard-btn-accept:hover {
+    background-color: #218838;
+}
+
+.customer-dashboard-btn-cancel,
+.customer-dashboard-btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.customer-dashboard-btn-cancel:hover,
+.customer-dashboard-btn-danger:hover {
+    background-color: #c82333;
+}
+
+.customer-dashboard-btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.customer-dashboard-btn:disabled {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Availability warning */
+.customer-dashboard-availability-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 10px 20px;
+    border-radius: 4px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Profile section */
+.customer-dashboard-profile {
+    padding: 20px;
+}
+
+.customer-dashboard-profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.customer-dashboard-profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.customer-dashboard-profile-field {
+    display: flex;
+    gap: 10px;
+}
+
+.customer-dashboard-profile-label {
+    font-weight: 600;
+    color: #1a1a1a;
+    width: 150px;
+}
+
+.customer-dashboard-profile-value {
+    color: #555;
+}
+
+/* Form styles */
+.customer-dashboard-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 600px;
+}
+
+.customer-dashboard-form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.customer-dashboard-form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.customer-dashboard-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 5px;
+}
+
+.customer-dashboard-input,
+.customer-dashboard-select,
+.customer-dashboard-textarea {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.customer-dashboard-input:focus,
+.customer-dashboard-select:focus,
+.customer-dashboard-textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
+}
+
+.customer-dashboard-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.customer-dashboard-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+}
+
+.customer-dashboard-checkbox {
+    width: 16px;
+    height: 16px;
+}
+
+.customer-dashboard-form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Bookings section */
+.customer-dashboard-bookings {
+    padding: 20px;
+}
+
+.customer-dashboard-bookings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.customer-dashboard-booking-item {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.customer-dashboard-booking-details {
+    flex: 1;
+}
+
+.customer-dashboard-booking-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.customer-dashboard-booking-dates,
+.customer-dashboard-booking-description,
+.customer-dashboard-booking-client {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+/* Portfolio section */
+.customer-dashboard-portfolio {
+    padding: 20px;
+}
+
+.customer-dashboard-portfolio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.customer-dashboard-portfolio-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
 }
 
-.guide-account-label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: 600;
-    color: #495057;
-    font-size: 1rem;
-}
-
-.guide-account-input,
-.guide-account-select,
-.guide-account-textarea,
-.guide-account-file-input {
-    width: 100%;
-    padding: 14px 18px;
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-    background: white;
-}
-
-.guide-account-input:focus,
-.guide-account-select:focus,
-.guide-account-textarea:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-    transform: translateY(-1px);
-}
-
-.guide-account-textarea {
-    resize: vertical;
-    min-height: 120px;
-    line-height: 1.6;
-}
-
-.guide-account-file-input {
-    padding: 12px;
-    cursor: pointer;
-}
-
-.guide-account-checkbox-group {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
-    max-height: 220px;
-    overflow-y: auto;
+.customer-dashboard-portfolio-item {
+    background-color: #f8f9fa;
     padding: 15px;
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    background: #f8f9fa;
+    border-radius: 6px;
 }
 
-.guide-account-checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    padding: 12px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    font-weight: 500;
-}
-
-.guide-account-checkbox-label:hover {
-    background-color: #e9ecef;
-    transform: translateX(5px);
-}
-
-.guide-account-checkbox {
-    margin: 0;
-    width: 18px;
-    height: 18px;
-    accent-color: #667eea;
-}
-
-.guide-account-form-actions {
-    display: flex;
-    gap: 15px;
-    margin-top: 35px;
-    padding-top: 25px;
-    border-top: 1px solid #e9ecef;
-}
-
-/* Buttons */
-.guide-account-btn {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-    min-width: 120px;
-    position: relative;
-    overflow: hidden;
-}
-
-.guide-account-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
+.customer-dashboard-portfolio-image {
     width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.5s;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 10px;
 }
 
-.guide-account-btn:hover::before {
-    left: 100%;
-}
-
-.guide-account-btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
-}
-
-.guide-account-btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-}
-
-.guide-account-btn-secondary {
-    background-color: #6c757d;
-    color: white;
-    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
-}
-
-.guide-account-btn-secondary:hover {
-    background-color: #5a6268;
-    transform: translateY(-3px);
-}
-
-.guide-account-btn-accept {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-}
-
-.guide-account-btn-accept:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
-}
-
-.guide-account-btn-cancel {
-    background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
-}
-
-.guide-account-btn-cancel:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
-}
-
-.guide-account-btn-small {
-    padding: 8px 16px;
-    font-size: 0.85rem;
-    min-width: 80px;
-}
-
-.guide-account-btn-danger {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-}
-
-/* Recent Bookings */
-.guide-account-recent-bookings {
+.customer-dashboard-portfolio-content {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 5px;
 }
 
-.guide-account-booking-card,
-.guide-account-booking-item {
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 12px;
-    padding: 25px;
+.customer-dashboard-portfolio-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.customer-dashboard-portfolio-description {
+    font-size: 14px;
+    color: #555;
+}
+
+.customer-dashboard-portfolio-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Availability section */
+.customer-dashboard-availability {
+    padding: 20px;
+}
+
+.customer-dashboard-availability-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    transition: all 0.3s ease;
-    border-left: 5px solid #667eea;
-    position: relative;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-.guide-account-booking-card:hover,
-.guide-account-booking-item:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    transform: translateY(-3px);
+.customer-dashboard-availability-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-.guide-account-booking-info {
+.customer-dashboard-availability-item {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.customer-dashboard-availability-info {
     flex: 1;
 }
 
-.guide-account-booking-title {
-    margin: 0 0 10px 0;
-    font-size: 1.3rem;
+.customer-dashboard-availability-date {
+    font-size: 16px;
     font-weight: 600;
-    color: #2c3e50;
 }
 
-.guide-account-booking-date,
-.guide-account-booking-dates {
-    margin: 0 0 12px 0;
-    color: #6c757d;
-    font-weight: 500;
-    font-size: 1rem;
+.customer-dashboard-availability-time,
+.customer-dashboard-availability-note {
+    font-size: 14px;
+    color: #555;
 }
 
-.guide-account-booking-description {
-    margin: 0 0 15px 0;
-    color: #495057;
-    line-height: 1.6;
-}
-
-/* Status Badges */
-.guide-account-booking-status {
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 25px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: capitalize;
-    letter-spacing: 0.5px;
-}
-
-.guide-account-status-pending {
-    background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
-    color: #856404;
-    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
-}
-
-.guide-account-status-confirmed,
-.guide-account-status-accepted {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
-}
-
-.guide-account-status-completed {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
-}
-
-.guide-account-status-cancelled {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
-}
-
-.guide-account-booking-actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-/* Profile View */
-.guide-account-profile-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 35px;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.guide-account-profile-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
-}
-
-.guide-account-profile-field {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    padding: 25px;
+.customer-dashboard-availability-status {
+    font-size: 12px;
+    padding: 4px 8px;
     border-radius: 12px;
-    border-left: 5px solid #667eea;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    color: white;
 }
 
-.guide-account-profile-label {
-    font-weight: 700;
-    color: #495057;
-    margin-bottom: 12px;
-    display: block;
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.customer-dashboard-available {
+    background-color: #28a745;
 }
 
-.guide-account-profile-value {
-    margin: 0;
-    color: #2c3e50;
-    font-size: 1.2rem;
-    line-height: 1.5;
+.customer-dashboard-unavailable {
+    background-color: #dc3545;
 }
 
-/* Bookings List */
-.guide-account-bookings-list {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-}
-
-/* Portfolio Styles */
-.guide-account-portfolio-header,
-.guide-account-availability-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 35px;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.guide-account-portfolio-form,
-.guide-account-availability-form {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    padding: 30px;
-    border-radius: 16px;
-    margin-bottom: 35px;
-    border: 1px solid #e9ecef;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.guide-account-portfolio-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 25px;
-}
-
-.guide-account-portfolio-item {
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 16px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-}
-
-.guide-account-portfolio-item:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-}
-
-.guide-account-portfolio-image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.guide-account-portfolio-content {
-    padding: 25px;
-}
-
-.guide-account-portfolio-title {
-    margin: 0 0 12px 0;
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #2c3e50;
-}
-
-.guide-account-portfolio-description {
-    margin: 0 0 20px 0;
-    color: #6c757d;
-    line-height: 1.6;
-}
-
-.guide-account-portfolio-actions {
+.customer-dashboard-availability-actions {
     display: flex;
     gap: 10px;
 }
 
-/* Availability Styles */
-.guide-account-availability-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px;
+/* Schedule section */
+.customer-dashboard-schedule {
+    padding: 20px;
 }
 
-.guide-account-availability-item {
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 12px;
-    padding: 25px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    border-left: 5px solid #28a745;
-}
-
-.guide-account-availability-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-.guide-account-availability-info {
-    margin-bottom: 20px;
-}
-
-.guide-account-availability-date {
-    margin: 0 0 8px 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #2c3e50;
-}
-
-.guide-account-availability-time {
-    margin: 0 0 8px 0;
-    color: #6c757d;
-    font-weight: 500;
-}
-
-.guide-account-availability-note {
-    margin: 0 0 12px 0;
-    color: #495057;
-    font-style: italic;
-}
-
-.guide-account-availability-status {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.guide-account-available {
-    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-    color: #155724;
-}
-
-.guide-account-unavailable {
-    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-    color: #721c24;
-}
-
-.guide-account-availability-actions {
-    display: flex;
-    gap: 10px;
-}
-
-/* Reviews */
-.guide-account-reviews-list {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-}
-
-.guide-account-review-item {
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 12px;
-    padding: 30px;
-    border-left: 5px solid #ffc107;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-}
-
-.guide-account-review-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-.guide-account-review-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.guide-account-review-rating {
-    color: #ffc107;
-    font-size: 1.5rem;
-    text-shadow: 0 1px 3px rgba(255, 193, 7, 0.3);
-}
-
-.guide-account-review-date {
-    color: #6c757d;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.guide-account-review-title {
-    margin: 0 0 15px 0;
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #2c3e50;
-}
-
-.guide-account-review-comment {
-    margin: 0 0 20px 0;
-    color: #495057;
-    line-height: 1.7;
-    font-size: 1.05rem;
-}
-
-.guide-account-review-details {
+.customer-dashboard-schedule-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
+    margin-bottom: 20px;
 }
 
-.guide-account-review-detail {
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-    padding: 10px 15px;
-    border-radius: 25px;
-    font-size: 0.9rem;
-    color: #1976d2;
+.customer-dashboard-schedule-stats .customer-dashboard-stat-card {
     text-align: center;
+}
+
+.customer-dashboard-schedule-stats h4 {
+    font-size: 16px;
+    color: #555;
+}
+
+.customer-dashboard-schedule-stats p {
+    font-size: 20px;
     font-weight: 600;
-    border: 1px solid #e1f5fe;
+    color: #1a1a1a;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-    .guide-account-container {
-        padding: 15px;
-    }
-
-    .guide-account-content {
-        padding: 25px;
-    }
-
-    .guide-account-stats {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }
-
-    .guide-account-portfolio-grid {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    }
+.customer-dashboard-busy-dates {
+    margin-top: 20px;
 }
 
+.customer-dashboard-dates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.customer-dashboard-busy-date {
+    background-color: #f8f9fa;
+    padding: 8px;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+}
+
+/* Documents section */
+.customer-dashboard-documents {
+    padding: 20px;
+}
+
+.customer-dashboard-documents-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.customer-dashboard-documents-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.customer-dashboard-document-item {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.customer-dashboard-document-info {
+    flex: 1;
+}
+
+.customer-dashboard-document-type {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.customer-dashboard-document-description {
+    font-size: 14px;
+    color: #555;
+}
+
+.customer-dashboard-document-status {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    color: white;
+}
+
+.customer-dashboard-document-status.verified {
+    background-color: #28a745;
+}
+
+.customer-dashboard-document-status.pending {
+    background-color: #ffc107;
+}
+
+.customer-dashboard-document-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Reviews section */
+.customer-dashboard-reviews {
+    padding: 20px;
+}
+
+.customer-dashboard-reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.customer-dashboard-review-item {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+.customer-dashboard-review-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.customer-dashboard-review-rating {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffc107;
+}
+
+.customer-dashboard-review-comment {
+    font-size: 14px;
+    color: #333;
+}
+
+.customer-dashboard-review-client {
+    font-size: 12px;
+    color: #555;
+}
+
+/* Modal styles */
+.customer-dashboard-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.customer-dashboard-modal-content {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.customer-dashboard-modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* Empty state */
+.customer-dashboard-empty-state {
+    text-align: center;
+    padding: 20px;
+    color: #555;
+}
+
+.customer-dashboard-empty-state p {
+    margin-bottom: 10px;
+}
+
+/* Loading state */
+.customer-dashboard-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    color: #555;
+}
+
+.customer-dashboard-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e9ecef;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive design */
 @media (max-width: 768px) {
-    .guide-account-title {
-        font-size: 2.2rem;
+    .customer-dashboard-container {
+        padding: 10px;
     }
 
-    .guide-account-navigation {
+    .customer-dashboard-header-content {
         flex-direction: column;
-        gap: 5px;
-    }
-
-    .guide-account-nav-btn {
-        text-align: center;
-        padding: 12px 20px;
-    }
-
-    .guide-account-stats {
-        grid-template-columns: 1fr;
-    }
-
-    .guide-account-booking-card,
-    .guide-account-booking-item {
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .guide-account-booking-actions {
-        align-self: stretch;
-        justify-content: center;
-    }
-
-    .guide-account-form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .guide-account-form-actions {
-        flex-direction: column;
-    }
-
-    .guide-account-profile-header,
-    .guide-account-portfolio-header,
-    .guide-account-availability-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .guide-account-portfolio-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .guide-account-availability-list {
-        grid-template-columns: 1fr;
-    }
-
-    .guide-account-review-details {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 480px) {
-    .guide-account-header {
-        padding: 25px 20px;
-    }
-
-    .guide-account-title {
-        font-size: 2rem;
-    }
-
-    .guide-account-welcome {
-        font-size: 1.1rem;
-    }
-
-    .guide-account-content {
-        padding: 20px;
-    }
-
-    .guide-account-booking-card,
-    .guide-account-booking-item,
-    .guide-account-review-item,
-    .guide-account-availability-item {
-        padding: 20px;
-    }
-
-    .guide-account-portfolio-content {
-        padding: 20px;
-    }
-
-    .guide-account-checkbox-group {
-        grid-template-columns: 1fr;
-    }
-
-    .guide-account-form-actions {
         gap: 10px;
     }
 
-    .guide-account-btn {
-        padding: 12px 20px;
+    .customer-dashboard-navigation {
+        flex-direction: column;
     }
 
-    .guide-account-portfolio-form,
-    .guide-account-availability-form {
-        padding: 20px;
+    .customer-dashboard-nav-btn {
+        width: 100%;
+        text-align: center;
     }
-}
 
-/* Custom Scrollbar */
-.guide-account-checkbox-group::-webkit-scrollbar {
-    width: 6px;
+    .customer-dashboard-stats,
+    .customer-dashboard-schedule-stats,
+    .customer-dashboard-dates-grid,
+    .customer-dashboard-portfolio-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .customer-dashboard-booking-card,
+    .customer-dashboard-booking-item,
+    .customer-dashboard-availability-item,
+    .customer-dashboard-document-item {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .customer-dashboard-booking-actions,
+    .customer-dashboard-availability-actions,
+    .customer-dashboard-document-actions {
+        justify-content: center;
+    }
+
+    .customer-dashboard-form-row {
+        grid-template-columns: 1fr;
+    }
 }

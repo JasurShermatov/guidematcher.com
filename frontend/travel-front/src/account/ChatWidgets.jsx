@@ -1,4 +1,7 @@
-import React, {useState, useEffect, useRef, useCallback, useMemo} from 'react';
+// ChatWidgets.jsx (fully shaped with WebSocket and booking actions)
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import {
     getConversations,
     getChatMessages,
@@ -11,11 +14,14 @@ import {
     unblockUser,
     getBlockedUsers,
     messageAction,
-    getCurrentUser
+    getCurrentUser,
+    acceptBookingInChat,
+    updateBookingInChat,
+    cancelBookingInChat
 } from '../api/api';
 import './ChatWidgets.css';
 
-// Improved WebSocket hook with better connection management
+// WebSocket hook for real-time messaging
 const useWebSocket = (conversationId, user, callbacks) => {
     const [ws, setWs] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
@@ -25,12 +31,10 @@ const useWebSocket = (conversationId, user, callbacks) => {
     const isConnectingRef = useRef(false);
     const shouldConnectRef = useRef(true);
 
-    const maxReconnectAttempts = 2; // Reduced attempts
-    const baseReconnectDelay = 3000; // Increased delay
+    const maxReconnectAttempts = 2;
+    const baseReconnectDelay = 3000;
 
     const cleanup = useCallback(() => {
-        console.log('🧹 Cleaning up WebSocket connection...');
-
         shouldConnectRef.current = false;
         isConnectingRef.current = false;
 
@@ -57,20 +61,16 @@ const useWebSocket = (conversationId, user, callbacks) => {
     }, []);
 
     const connect = useCallback(() => {
-        // Prevent multiple simultaneous connections
         if (isConnectingRef.current || !shouldConnectRef.current) {
-            console.log('⏸️ Connection blocked - already connecting or not allowed');
             return;
         }
 
         if (!conversationId || !user) {
-            console.log('❌ Cannot connect: missing conversation ID or user');
             return;
         }
 
         const token = localStorage.getItem('access_token');
         if (!token) {
-            console.log('❌ Cannot connect: no access token');
             return;
         }
 
@@ -81,13 +81,10 @@ const useWebSocket = (conversationId, user, callbacks) => {
             const wsHost = process.env.REACT_APP_WS_HOST || 'localhost:8000';
             const wsUrl = `${wsProtocol}//${wsHost}/ws/chat/${conversationId}/?token=${token}`;
 
-            console.log('🔌 Attempting WebSocket connection to:', wsUrl);
-
             const websocket = new WebSocket(wsUrl);
             wsRef.current = websocket;
 
             websocket.onopen = () => {
-                console.log('✅ WebSocket connected successfully to conversation:', conversationId);
                 setIsConnected(true);
                 setWs(websocket);
                 isConnectingRef.current = false;
@@ -96,8 +93,6 @@ const useWebSocket = (conversationId, user, callbacks) => {
             websocket.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
-                    console.log('📨 WebSocket message received:', data.type, data);
-
                     const { onMessage, onMessageRead, onMessageAction, onTyping, onUserOnline, onUserOffline } = callbacks;
 
                     switch (data.type) {
@@ -120,15 +115,14 @@ const useWebSocket = (conversationId, user, callbacks) => {
                             onUserOffline?.(data.user_name);
                             break;
                         default:
-                            console.log('❓ Unknown WebSocket message type:', data.type);
+                            break;
                     }
                 } catch (err) {
-                    console.error('❌ Error parsing WebSocket message:', err);
+                    console.error('Error parsing WebSocket message:', err);
                 }
             };
 
             websocket.onclose = (event) => {
-                console.log('🔌 WebSocket closed:', event.code, event.reason);
                 setIsConnected(false);
                 setWs(null);
                 isConnectingRef.current = false;
@@ -137,15 +131,11 @@ const useWebSocket = (conversationId, user, callbacks) => {
                     wsRef.current = null;
                 }
 
-                // Only reconnect on unexpected closures (not user-initiated)
                 if (shouldConnectRef.current && event.code !== 1000 && event.code !== 1001 && event.code !== 1005) {
-                    // Don't reconnect on auth errors
                     if (event.code === 4001 || event.code === 4003) {
-                        console.error('🚫 Authentication failed - not reconnecting');
                         return;
                     }
 
-                    console.log('🔄 Attempting to reconnect in 3 seconds...');
                     reconnectTimeoutRef.current = setTimeout(() => {
                         if (shouldConnectRef.current) {
                             connect();
@@ -155,12 +145,12 @@ const useWebSocket = (conversationId, user, callbacks) => {
             };
 
             websocket.onerror = (error) => {
-                console.error('❌ WebSocket error:', error);
+                console.error('WebSocket error:', error);
                 isConnectingRef.current = false;
             };
 
         } catch (err) {
-            console.error('❌ Failed to create WebSocket:', err);
+            console.error('Failed to create WebSocket:', err);
             isConnectingRef.current = false;
         }
     }, [conversationId, user, callbacks]);
@@ -169,18 +159,15 @@ const useWebSocket = (conversationId, user, callbacks) => {
         if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
             try {
                 wsRef.current.send(JSON.stringify(message));
-                console.log('📤 Message sent via WebSocket:', message.type);
                 return true;
             } catch (err) {
-                console.error('❌ Error sending WebSocket message:', err);
+                console.error('Error sending WebSocket message:', err);
                 return false;
             }
         }
-        console.log('📵 WebSocket not connected, cannot send message');
         return false;
     }, []);
 
-    // Effect to handle connection
     useEffect(() => {
         shouldConnectRef.current = true;
 
@@ -194,7 +181,7 @@ const useWebSocket = (conversationId, user, callbacks) => {
     return { isConnected, sendWebSocketMessage, cleanup };
 };
 
-const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'client' }) => {
+const ChatWidget = ({ isOpen, onClose, selectedUserId = null, userRole = 'client' }) => {
     const [currentUser, setCurrentUser] = useState(null);
     const [conversations, setConversations] = useState([]);
     const [activeConversation, setActiveConversation] = useState(null);
@@ -210,13 +197,20 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
     const [onlineStatus, setOnlineStatus] = useState('');
     const [blockedUsers, setBlockedUsers] = useState([]);
     const [isSending, setIsSending] = useState(false);
+    const [showAcceptModal, setShowAcceptModal] = useState(false);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [selectedBookingId, setSelectedBookingId] = useState(null);
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
+    const [cancelReason, setCancelReason] = useState('');
 
     const messagesEndRef = useRef(null);
     const searchTimeoutRef = useRef(null);
     const typingTimeoutRef = useRef(null);
     const inputRef = useRef(null);
 
-    // Separate functions to avoid infinite loops
+    // Moved all function definitions before useEffects
     const loadConversations = useCallback(async () => {
         try {
             const data = await getConversations();
@@ -235,19 +229,296 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
         }
     }, []);
 
-    // WebSocket message handlers - FIXED to prevent infinite loops
+    const initializeChat = useCallback(async () => {
+        try {
+            setLoading(true);
+
+            const userData = await getCurrentUser();
+            setCurrentUser(userData);
+
+            await Promise.all([
+                loadConversations(),
+                loadUnreadCount()
+            ]);
+
+        } catch (err) {
+            console.error('Error initializing chat:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [loadConversations, loadUnreadCount]);
+
+    const loadMessages = useCallback(async (conversationId) => {
+        try {
+            const data = await getChatMessages(conversationId);
+            setMessages(data.results || data);
+
+            await markMessagesAsRead(conversationId);
+            loadUnreadCount();
+        } catch (err) {
+            console.error('Error loading messages:', err);
+        }
+    }, [loadUnreadCount]);
+
+    const loadBlockedUsers = useCallback(async () => {
+        try {
+            const data = await getBlockedUsers();
+            setBlockedUsers(data.results || data);
+        } catch (err) {
+            console.error('Error loading blocked users:', err);
+        }
+    }, []);
+
+    const handleConversationSelect = useCallback(async (conversation) => {
+        if (activeConversation?.id !== conversation.id) {
+            cleanup();
+        }
+
+        setActiveConversation(conversation);
+        setChatView('chat');
+        await loadMessages(conversation.id);
+    }, [activeConversation, loadMessages]);
+
+    const handleUserSearch = useCallback(async (query) => {
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        searchTimeoutRef.current = setTimeout(async () => {
+            if (query.length >= 2) {
+                try {
+                    const data = await searchUsers(query);
+                    setSearchResults(data.results || []);
+                } catch (err) {
+                    console.error('Error searching users:', err);
+                }
+            } else {
+                setSearchResults([]);
+            }
+        }, 300);
+    }, []);
+
+    const startConversationWithUser = useCallback(async (userEmail) => {
+        try {
+            const conversationData = await createConversation({
+                user_email: userEmail,
+                message: ''
+            });
+
+            const existingConv = conversations.find(c => c.id === conversationData.id);
+            if (!existingConv) {
+                setConversations(prev => [conversationData, ...prev]);
+            }
+
+            setActiveConversation(conversationData);
+            setChatView('chat');
+            await loadMessages(conversationData.id);
+
+        } catch (err) {
+            setError(err.message);
+        }
+    }, [conversations, loadMessages]);
+
+    const handleBlockUser = useCallback(async (userEmail) => {
+        try {
+            await blockUser(userEmail, { user_email: userEmail });
+            setError('User blocked successfully');
+            loadConversations();
+        } catch (err) {
+            setError(err.message);
+        }
+    }, [loadConversations]);
+
+    const handleUnblockUser = useCallback(async (userId) => {
+        try {
+            await unblockUser(userId);
+            loadBlockedUsers();
+            setError('User unblocked successfully');
+        } catch (err) {
+            setError(err.message);
+        }
+    }, [loadBlockedUsers]);
+
+    const performMessageAction = useCallback(async (messageId, action) => {
+        try {
+            const webSocketSent = sendWebSocketMessage({
+                type: 'message_action',
+                message_id: messageId,
+                action: action
+            });
+
+            if (!webSocketSent) {
+                await messageAction(messageId, action);
+                if (activeConversation) {
+                    await loadMessages(activeConversation.id);
+                }
+            }
+        } catch (err) {
+            setError(err.message);
+        }
+    }, [activeConversation, loadMessages, sendWebSocketMessage]);
+
+    const handleInputChange = useCallback((e) => {
+        const value = e.target.value;
+        setNewMessage(value);
+
+        if (isConnected && value.trim()) {
+            sendWebSocketMessage({
+                type: 'typing',
+                is_typing: true
+            });
+
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            typingTimeoutRef.current = setTimeout(() => {
+                sendWebSocketMessage({
+                    type: 'typing',
+                    is_typing: false
+                });
+            }, 1000);
+        }
+    }, [isConnected, sendWebSocketMessage]);
+
+    const markMessageAsRead = useCallback((messageId) => {
+        if (isConnected) {
+            sendWebSocketMessage({
+                type: 'message_read',
+                message_id: messageId
+            });
+        }
+    }, [isConnected, sendWebSocketMessage]);
+
+    const scrollToBottom = useCallback(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, []);
+
+    const formatTime = useCallback((dateString) => {
+        return new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }, []);
+
+    const formatDate = useCallback((dateString) => {
+        return new Date(dateString).toLocaleDateString();
+    }, []);
+
+    const handleClose = useCallback(() => {
+        cleanup();
+        onClose();
+    }, [cleanup, onClose]);
+
+    const handleBackToConversations = useCallback(() => {
+        cleanup();
+        setChatView('conversations');
+        setActiveConversation(null);
+    }, [cleanup]);
+
+    const handleSendMessage = useCallback(async (e) => {
+        e.preventDefault();
+
+        if (!newMessage.trim() || !activeConversation || isSending) {
+            return;
+        }
+
+        const content = newMessage.trim();
+        setNewMessage('');
+        setIsSending(true);
+
+        try {
+            const webSocketSent = sendWebSocketMessage({
+                type: 'chat_message',
+                content: content
+            });
+
+            if (!webSocketSent) {
+                const messageData = {
+                    conversation: activeConversation.id,
+                    content: content
+                };
+
+                const sentMessage = await sendMessage(messageData);
+                setMessages(prev => [...prev, sentMessage]);
+
+                setTimeout(() => {
+                    loadConversations();
+                    loadUnreadCount();
+                }, 100);
+            }
+
+        } catch (err) {
+            console.error('Error sending message:', err);
+            setError(err.message);
+            setNewMessage(content);
+        } finally {
+            setIsSending(false);
+
+            if (inputRef.current) {
+                inputRef.current.focus();
+            }
+        }
+    }, [activeConversation, isSending, newMessage, sendWebSocketMessage, loadConversations, loadUnreadCount]);
+
+    const openAcceptModal = useCallback((bookingId) => {
+        setSelectedBookingId(bookingId);
+        setShowAcceptModal(true);
+    }, []);
+
+    const openUpdateModal = useCallback((bookingId) => {
+        setSelectedBookingId(bookingId);
+        setShowUpdateModal(true);
+    }, []);
+
+    const openCancelModal = useCallback((bookingId) => {
+        setSelectedBookingId(bookingId);
+        setShowCancelModal(true);
+    }, []);
+
+    const handleAccept = useCallback(async () => {
+        try {
+            await acceptBookingInChat(activeConversation.id, selectedBookingId, {
+                start_date: startDate.toISOString().split('T')[0],
+                end_date: endDate.toISOString().split('T')[0]
+            });
+            await loadMessages(activeConversation.id);
+            setShowAcceptModal(false);
+        } catch (err) {
+            setError(err.message);
+        }
+    }, [activeConversation, selectedBookingId, startDate, endDate, loadMessages]);
+
+    const handleUpdate = useCallback(async () => {
+        try {
+            await updateBookingInChat(activeConversation.id, selectedBookingId, {
+                start_date: startDate.toISOString().split('T')[0],
+                end_date: endDate.toISOString().split('T')[0]
+            });
+            await loadMessages(activeConversation.id);
+            setShowUpdateModal(false);
+        } catch (err) {
+            setError(err.message);
+        }
+    }, [activeConversation, selectedBookingId, startDate, endDate, loadMessages]);
+
+    const handleCancel = useCallback(async () => {
+        try {
+            await cancelBookingInChat(activeConversation.id, selectedBookingId, {
+                confirm: true,
+                reason: cancelReason
+            });
+            await loadMessages(activeConversation.id);
+            setShowCancelModal(false);
+            setCancelReason('');
+        } catch (err) {
+            setError(err.message);
+        }
+    }, [activeConversation, selectedBookingId, cancelReason, loadMessages]);
+
     const webSocketCallbacks = useMemo(() => ({
         onMessage: (message) => {
-            console.log('📥 New message received via WebSocket:', message.id);
-
-            // Add message to current conversation
             setMessages(prev => {
                 const messageExists = prev.some(m => m.id === message.id);
                 if (messageExists) return prev;
                 return [...prev, message];
             });
 
-            // Update conversations without causing reconnection
             setTimeout(() => {
                 loadConversations();
                 loadUnreadCount();
@@ -263,7 +534,6 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
         },
 
         onMessageAction: (messageId, action, messageData) => {
-            console.log('🔄 Message action via WebSocket:', messageId, action);
             setMessages(prev => prev.map(msg =>
                 msg.id === messageId ? messageData : msg
             ));
@@ -292,33 +562,31 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
         }
     }), [currentUser, loadConversations, loadUnreadCount]);
 
-    // WebSocket connection
     const { isConnected, sendWebSocketMessage, cleanup } = useWebSocket(
         activeConversation?.id,
         currentUser,
         webSocketCallbacks
     );
 
+    // Now useEffects after all functions
     useEffect(() => {
         if (isOpen) {
             initializeChat();
         } else {
-            // Clean up when chat is closed
             cleanup();
         }
-    }, [isOpen, cleanup]);
+    }, [isOpen, cleanup, initializeChat]);
 
     useEffect(() => {
         if (selectedUserId && isOpen) {
             startConversationWithUser(selectedUserId);
         }
-    }, [selectedUserId, isOpen]);
+    }, [selectedUserId, isOpen, startConversationWithUser]);
 
     useEffect(() => {
         scrollToBottom();
-    }, [messages]);
+    }, [messages, scrollToBottom]);
 
-    // Cleanup timeouts on unmount
     useEffect(() => {
         return () => {
             if (typingTimeoutRef.current) {
@@ -330,266 +598,26 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
         };
     }, []);
 
-    const initializeChat = async () => {
-        try {
-            setLoading(true);
-
-            const userData = await getCurrentUser();
-            setCurrentUser(userData);
-
-            await Promise.all([
-                loadConversations(),
-                loadUnreadCount()
-            ]);
-
-        } catch (err) {
-            console.error('Error initializing chat:', err);
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const loadMessages = async (conversationId) => {
-        try {
-            const data = await getChatMessages(conversationId);
-            setMessages(data.results || data);
-
-            await markMessagesAsRead(conversationId);
-            loadUnreadCount();
-        } catch (err) {
-            console.error('Error loading messages:', err);
-        }
-    };
-
-    const loadBlockedUsers = async () => {
-        try {
-            const data = await getBlockedUsers();
-            setBlockedUsers(data.results || data);
-        } catch (err) {
-            console.error('Error loading blocked users:', err);
-        }
-    };
-
-    // Message sending function
-    const handleSendMessage = async (e) => {
-        e.preventDefault();
-
-        if (!newMessage.trim() || !activeConversation || isSending) {
-            return;
-        }
-
-        const content = newMessage.trim();
-        setNewMessage(''); // Clear input immediately
-        setIsSending(true);
-
-        try {
-            // Try WebSocket first for real-time experience
-            const webSocketSent = sendWebSocketMessage({
-                type: 'chat_message',
-                content: content
-            });
-
-            if (!webSocketSent) {
-                // Fallback to HTTP API
-                console.log('📡 WebSocket not available, using HTTP API');
-                const messageData = {
-                    conversation: activeConversation.id,
-                    content: content
-                };
-
-                const sentMessage = await sendMessage(messageData);
-
-                // Add message to UI immediately
-                setMessages(prev => [...prev, sentMessage]);
-
-                // Update conversations list
-                setTimeout(() => {
-                    loadConversations();
-                    loadUnreadCount();
-                }, 100);
-            }
-
-        } catch (err) {
-            console.error('Error sending message:', err);
-            setError(err.message);
-            setNewMessage(content); // Restore message on error
-        } finally {
-            setIsSending(false);
-
-            // Focus back to input
-            if (inputRef.current) {
-                inputRef.current.focus();
-            }
-        }
-    };
-
-    const handleConversationSelect = async (conversation) => {
-        // Clean up previous connection before switching
-        if (activeConversation?.id !== conversation.id) {
-            cleanup();
-        }
-
-        setActiveConversation(conversation);
-        setChatView('chat');
-        await loadMessages(conversation.id);
-    };
-
-    const handleUserSearch = async (query) => {
-        if (searchTimeoutRef.current) {
-            clearTimeout(searchTimeoutRef.current);
-        }
-
-        searchTimeoutRef.current = setTimeout(async () => {
-            if (query.length >= 2) {
-                try {
-                    const data = await searchUsers(query);
-                    setSearchResults(data.results || []);
-                } catch (err) {
-                    console.error('Error searching users:', err);
-                }
-            } else {
-                setSearchResults([]);
-            }
-        }, 300);
-    };
-
-    const startConversationWithUser = async (userEmail) => {
-        try {
-            const conversationData = await createConversation({
-                user_email: userEmail,
-                message: ''
-            });
-
-            const existingConv = conversations.find(c => c.id === conversationData.id);
-            if (!existingConv) {
-                setConversations(prev => [conversationData, ...prev]);
-            }
-
-            setActiveConversation(conversationData);
-            setChatView('chat');
-            await loadMessages(conversationData.id);
-
-        } catch (err) {
-            setError(err.message);
-        }
-    };
-
-    const handleBlockUser = async (userEmail) => {
-        try {
-            await blockUser({ user_email: userEmail });
-            setError('User blocked successfully');
-            loadConversations();
-        } catch (err) {
-            setError(err.message);
-        }
-    };
-
-    const handleUnblockUser = async (userId) => {
-        try {
-            await unblockUser(userId);
-            loadBlockedUsers();
-            setError('User unblocked successfully');
-        } catch (err) {
-            setError(err.message);
-        }
-    };
-
-    const performMessageAction = async (messageId, action) => {
-        try {
-            const webSocketSent = sendWebSocketMessage({
-                type: 'message_action',
-                message_id: messageId,
-                action: action
-            });
-
-            if (!webSocketSent) {
-                await messageAction(messageId, action);
-                if (activeConversation) {
-                    await loadMessages(activeConversation.id);
-                }
-            }
-        } catch (err) {
-            setError(err.message);
-        }
-    };
-
-    // Input change handler
-    const handleInputChange = (e) => {
-        const value = e.target.value;
-        setNewMessage(value);
-
-        // Send typing indicator via WebSocket (throttled)
-        if (isConnected && value.trim()) {
-            sendWebSocketMessage({
-                type: 'typing',
-                is_typing: true
-            });
-
-            // Clear typing after 1 second of inactivity
-            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-            typingTimeoutRef.current = setTimeout(() => {
-                sendWebSocketMessage({
-                    type: 'typing',
-                    is_typing: false
-                });
-            }, 1000);
-        }
-    };
-
-    const markMessageAsRead = (messageId) => {
-        if (isConnected) {
-            sendWebSocketMessage({
-                type: 'message_read',
-                message_id: messageId
-            });
-        }
-    };
-
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    const formatTime = (dateString) => {
-        return new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    };
-
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString();
-    };
-
-    const handleClose = () => {
-        cleanup(); // Clean up WebSocket when closing
-        onClose();
-    };
-
-    const handleBackToConversations = () => {
-        cleanup(); // Clean up WebSocket when leaving chat
-        setChatView('conversations');
-        setActiveConversation(null);
-    };
-
     if (!isOpen) return null;
 
     return (
-        <div className="chat-widgets-container">
-            <div className="chat-widgets-overlay" onClick={handleClose}></div>
+        <div className="chat-widget-container">
+            <div className="chat-widget-overlay" onClick={handleClose}></div>
 
-            <div className="chat-widgets-main">
-                <div className="chat-widgets-header">
-                    <h3 className="chat-widgets-title">
+            <div className="chat-widget-main">
+                <div className="chat-widget-header">
+                    <h3 className="chat-widget-title">
                         {chatView === 'conversations' && 'Messages'}
                         {chatView === 'chat' && activeConversation && activeConversation.other_user?.full_name}
                         {chatView === 'search' && 'Find Users'}
                         {chatView === 'blocked' && 'Blocked Users'}
                     </h3>
 
-                    <div className="chat-widgets-header-actions">
-                        {/* Connection Status */}
+                    <div className="chat-widget-header-actions">
                         {chatView === 'chat' && (
-                            <div className={`chat-widgets-connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
-                                <span className="status-dot"></span>
-                                <span className="status-text">
+                            <div className={`chat-widget-connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
+                                <span className="chat-widget-status-dot"></span>
+                                <span className="chat-widget-status-text">
                                     {isConnected ? 'Live' : 'Offline'}
                                 </span>
                             </div>
@@ -597,7 +625,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
 
                         {chatView !== 'conversations' && (
                             <button
-                                className="chat-widgets-back-btn"
+                                className="chat-widget-back-btn"
                                 onClick={handleBackToConversations}
                             >
                                 ← Back
@@ -607,13 +635,13 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                         {chatView === 'conversations' && (
                             <>
                                 <button
-                                    className="chat-widgets-action-btn"
+                                    className="chat-widget-action-btn"
                                     onClick={() => setChatView('search')}
                                 >
-                                    + New
+                                    + New New
                                 </button>
                                 <button
-                                    className="chat-widgets-action-btn"
+                                    className="chat-widget-action-btn"
                                     onClick={() => {
                                         setChatView('blocked');
                                         loadBlockedUsers();
@@ -624,78 +652,76 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                             </>
                         )}
 
-                        <button className="chat-widgets-close-btn" onClick={handleClose}>×</button>
+                        <button className="chat-widget-close-btn" onClick={handleClose}>×</button>
                     </div>
                 </div>
 
                 {error && (
-                    <div className="chat-widgets-error">
+                    <div className="chat-widget-error">
                         <p>{error}</p>
-                        <button onClick={() => setError(null)} className="chat-widgets-error-close">×</button>
+                        <button onClick={() => setError(null)} className="chat-widget-error-close">×</button>
                     </div>
                 )}
 
-                {/* Status indicators */}
                 {onlineStatus && (
-                    <div className="chat-widgets-status-indicator online">
+                    <div className="chat-widget-status-indicator chat-widget-online">
                         {onlineStatus}
                     </div>
                 )}
 
-                <div className="chat-widgets-content">
-                    {/* Conversations List View */}
+                <div className="chat-widget-content">
                     {chatView === 'conversations' && (
-                        <div className="chat-widgets-conversations">
+                        <div className="chat-widget-conversations">
                             {loading ? (
-                                <div className="chat-widgets-loading">Loading conversations...</div>
+                                <div className="chat-widget-loading">Loading conversations...</div>
                             ) : conversations.length === 0 ? (
-                                <div className="chat-widgets-empty">
+                                <div className="chat-widget-empty">
                                     <p>No conversations yet</p>
                                     <button
-                                        className="chat-widgets-btn chat-widgets-btn-primary"
+                                        className="chat-widget-btn chat-widget-btn-primary"
                                         onClick={() => setChatView('search')}
                                     >
                                         Start a conversation
                                     </button>
                                 </div>
                             ) : (
-                                <div className="chat-widgets-conversations-list">
+                                <div className="chat-widget-conversations-list">
                                     {conversations.map(conversation => (
                                         <div
                                             key={conversation.id}
-                                            className="chat-widgets-conversation-item"
+                                            className="chat-widget-conversation-item"
                                             onClick={() => handleConversationSelect(conversation)}
                                         >
-                                            <div className="chat-widgets-conversation-avatar">
+                                            <div className="chat-widget-conversation-avatar">
                                                 {conversation.other_user?.avatar ? (
                                                     <img
                                                         src={conversation.other_user.avatar}
                                                         alt={conversation.other_user.full_name}
-                                                        className="chat-widgets-avatar-image"
+                                                        className="chat-widget-avatar-image"
                                                     />
                                                 ) : (
-                                                    <div className="chat-widgets-avatar-placeholder">
+                                                    <div className="chat-widget-avatar-placeholder">
                                                         {conversation.other_user?.full_name?.charAt(0) || 'U'}
                                                     </div>
                                                 )}
                                             </div>
 
-                                            <div className="chat-widgets-conversation-info">
-                                                <div className="chat-widgets-conversation-header">
-                                                    <h4 className="chat-widgets-conversation-name">
+                                            <div className="chat-widget-conversation-info">
+                                                <div className="chat-widget-conversation-header">
+                                                    <h4 className="chat-widget-conversation-name">
                                                         {conversation.other_user?.full_name || 'Unknown User'}
                                                     </h4>
-                                                    <span className="chat-widgets-conversation-time">
+                                                    <span className="chat-widget-conversation-time">
                                                         {formatTime(conversation.updated_at)}
                                                     </span>
                                                 </div>
 
-                                                <div className="chat-widgets-conversation-preview">
-                                                    <p className="chat-widgets-last-message">
+                                                <div className="chat-widget-conversation-preview">
+                                                    <p className="chat-widget-last-message">
                                                         {conversation.last_message?.content || 'No messages yet'}
                                                     </p>
                                                     {conversation.unread_count > 0 && (
-                                                        <span className="chat-widgets-unread-badge">
+                                                        <span className="chat-widget-unread-badge">
                                                             {conversation.unread_count}
                                                         </span>
                                                     )}
@@ -708,63 +734,103 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                         </div>
                     )}
 
-                    {/* Chat Messages View */}
                     {chatView === 'chat' && activeConversation && (
-                        <div className="chat-widgets-chat">
-                            {/* Typing indicator */}
+                        <div className="chat-widget-chat">
                             {typingIndicator && (
-                                <div className="chat-widgets-typing-indicator">
-                                    <div className="typing-dots">
+                                <div className="chat-widget-typing-indicator">
+                                    <div className="chat-widget-typing-dots">
                                         <span></span>
                                         <span></span>
                                         <span></span>
                                     </div>
-                                    <span className="typing-text">{typingIndicator}</span>
+                                    <span className="chat-widget-typing-text">{typingIndicator}</span>
                                 </div>
                             )}
 
-                            <div className="chat-widgets-messages">
-                                <div className="chat-widgets-messages-list">
+                            <div className="chat-widget-messages">
+                                <div className="chat-widget-messages-list">
                                     {messages.map(message => (
                                         <div
                                             key={message.id}
-                                            className={`chat-widgets-message ${message.is_mine ? 'chat-widgets-message-mine' : 'chat-widgets-message-other'}`}
+                                            className={`chat-widget-message ${message.is_mine ? 'chat-widget-message-mine' : 'chat-widget-message-other'}`}
                                             onClick={() => {
                                                 if (!message.is_mine && !message.is_read) {
                                                     markMessageAsRead(message.id);
                                                 }
                                             }}
                                         >
-                                            <div className="chat-widgets-message-content">
+                                            <div className="chat-widget-message-content">
                                                 {message.delete_status?.is_deleted ? (
-                                                    <span className="chat-widgets-message-deleted">
-                                                        {message.delete_status.deleted_for === 'sender' && message.is_mine ? 'You deleted this message' : 'This message was deleted'}
+                                                    <span className="chat-widget-message-deleted">
+                                                        {message.delete_status.deleted_for === 'sender' && message.is_mine ?
+                                                            'You deleted this message' : 'This message was deleted'}
                                                     </span>
                                                 ) : (
-                                                    <p className="chat-widgets-message-text">{message.content}</p>
+                                                    <div>
+                                                        <p className="chat-widget-message-text">{message.content}</p>
+
+                                                        {message.message_type === 'booking' && message.metadata && (
+                                                            <div className="chat-widget-booking-message">
+                                                                <div className="chat-widget-booking-actions">
+                                                                    {message.metadata.action === 'created' && userRole === 'customer' && (
+                                                                        <>
+                                                                            <button
+                                                                                className="chat-widget-btn chat-widget-btn-small chat-widget-btn-primary"
+                                                                                onClick={() => openAcceptModal(message.metadata.booking_id)}
+                                                                            >
+                                                                                Accept
+                                                                            </button>
+                                                                            <button
+                                                                                className="chat-widget-btn chat-widget-btn-small chat-widget-btn-danger"
+                                                                                onClick={() => openCancelModal(message.metadata.booking_id)}
+                                                                            >
+                                                                                Decline
+                                                                            </button>
+                                                                        </>
+                                                                    )}
+                                                                    {message.metadata.action === 'accepted' && userRole === 'customer' && (
+                                                                        <button
+                                                                            className="chat-widget-btn chat-widget-btn-small chat-widget-btn-primary"
+                                                                            onClick={() => openUpdateModal(message.metadata.booking_id)}
+                                                                        >
+                                                                            Update Dates
+                                                                        </button>
+                                                                    )}
+                                                                    {(message.metadata.action === 'created' || message.metadata.action === 'accepted') && (
+                                                                        <button
+                                                                            className="chat-widget-btn chat-widget-btn-small chat-widget-btn-danger"
+                                                                            onClick={() => openCancelModal(message.metadata.booking_id)}
+                                                                        >
+                                                                            Cancel
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 )}
 
-                                                <div className="chat-widgets-message-meta">
-                                                    <span className="chat-widgets-message-time">
+                                                <div className="chat-widget-message-meta">
+                                                    <span className="chat-widget-message-time">
                                                         {formatTime(message.created_at)}
                                                     </span>
                                                     {message.is_mine && (
-                                                        <span className="chat-widgets-message-status">
+                                                        <span className="chat-widget-message-status">
                                                             {message.is_read ? '✓✓' : '✓'}
                                                         </span>
                                                     )}
                                                     {message.is_mine && (
-                                                        <div className="chat-widgets-message-actions">
+                                                        <div className="chat-widget-message-actions">
                                                             {!message.delete_status?.is_deleted && (
                                                                 <>
                                                                     <button
-                                                                        className="chat-widgets-message-action"
+                                                                        className="chat-widget-message-action"
                                                                         onClick={() => performMessageAction(message.id, 'delete_sender')}
                                                                     >
                                                                         Delete for me
                                                                     </button>
                                                                     <button
-                                                                        className="chat-widgets-message-action"
+                                                                        className="chat-widget-message-action"
                                                                         onClick={() => performMessageAction(message.id, 'delete_both')}
                                                                     >
                                                                         Delete for everyone
@@ -773,7 +839,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                                             )}
                                                             {message.can_recover && (
                                                                 <button
-                                                                    className="chat-widgets-message-action"
+                                                                    className="chat-widget-message-action"
                                                                     onClick={() => performMessageAction(message.id, 'recover')}
                                                                 >
                                                                     Recover
@@ -789,12 +855,12 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                 </div>
                             </div>
 
-                            <form onSubmit={handleSendMessage} className="chat-widgets-input-form">
-                                <div className="chat-widgets-input-container">
+                            <form onSubmit={handleSendMessage} className="chat-widget-input-form">
+                                <div className="chat-widget-input-container">
                                     <input
                                         ref={inputRef}
                                         type="text"
-                                        className="chat-widgets-input"
+                                        className="chat-widget-input"
                                         placeholder="Type a message..."
                                         value={newMessage}
                                         onChange={handleInputChange}
@@ -803,7 +869,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                     />
                                     <button
                                         type="submit"
-                                        className="chat-widgets-send-btn"
+                                        className="chat-widget-send-btn"
                                         disabled={!newMessage.trim() || isSending}
                                     >
                                         {isSending ? '⌛' : '📤'}
@@ -811,9 +877,9 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                 </div>
                             </form>
 
-                            <div className="chat-widgets-chat-actions">
+                            <div className="chat-widget-chat-actions">
                                 <button
-                                    className="chat-widgets-action-btn chat-widgets-block-btn"
+                                    className="chat-widget-action-btn chat-widget-block-btn"
                                     onClick={() => {
                                         if (activeConversation?.other_user?.email) {
                                             handleBlockUser(activeConversation.other_user.email);
@@ -826,13 +892,12 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                         </div>
                     )}
 
-                    {/* User Search View */}
                     {chatView === 'search' && (
-                        <div className="chat-widgets-search">
-                            <div className="chat-widgets-search-input">
+                        <div className="chat-widget-search">
+                            <div className="chat-widget-search-input">
                                 <input
                                     type="text"
-                                    className="chat-widgets-input"
+                                    className="chat-widget-input"
                                     placeholder="Search users by name or email..."
                                     value={searchQuery}
                                     onChange={(e) => {
@@ -842,36 +907,36 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                 />
                             </div>
 
-                            <div className="chat-widgets-search-results">
+                            <div className="chat-widget-search-results">
                                 {searchQuery.length < 2 ? (
-                                    <p className="chat-widgets-search-hint">Enter at least 2 characters to search</p>
+                                    <p className="chat-widget-search-hint">Enter at least 2 characters to search</p>
                                 ) : searchResults.length === 0 ? (
-                                    <p className="chat-widgets-no-results">No users found</p>
+                                    <p className="chat-widget-no-results">No users found</p>
                                 ) : (
-                                    <div className="chat-widgets-users-list">
+                                    <div className="chat-widget-users-list">
                                         {searchResults.map(user => (
                                             <div
                                                 key={user.id}
-                                                className="chat-widgets-user-item"
+                                                className="chat-widget-user-item"
                                                 onClick={() => startConversationWithUser(user.email)}
                                             >
-                                                <div className="chat-widgets-user-avatar">
+                                                <div className="chat-widget-user-avatar">
                                                     {user.avatar_url ? (
                                                         <img
                                                             src={user.avatar_url}
                                                             alt={user.full_name}
-                                                            className="chat-widgets-avatar-image"
+                                                            className="chat-widget-avatar-image"
                                                         />
                                                     ) : (
-                                                        <div className="chat-widgets-avatar-placeholder">
+                                                        <div className="chat-widget-avatar-placeholder">
                                                             {user.full_name?.charAt(0) || 'U'}
                                                         </div>
                                                     )}
                                                 </div>
 
-                                                <div className="chat-widgets-user-info">
-                                                    <h4 className="chat-widgets-user-name">{user.full_name}</h4>
-                                                    <p className="chat-widgets-user-email">{user.email}</p>
+                                                <div className="chat-widget-user-info">
+                                                    <h4 className="chat-widget-user-name">{user.full_name}</h4>
+                                                    <p className="chat-widget-user-email">{user.email}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -881,45 +946,44 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                         </div>
                     )}
 
-                    {/* Blocked Users View */}
                     {chatView === 'blocked' && (
-                        <div className="chat-widgets-blocked">
+                        <div className="chat-widget-blocked">
                             {blockedUsers.length === 0 ? (
-                                <p className="chat-widgets-no-blocked">No blocked users</p>
+                                <p className="chat-widget-no-blocked">No blocked users</p>
                             ) : (
-                                <div className="chat-widgets-blocked-list">
+                                <div className="chat-widget-blocked-list">
                                     {blockedUsers.map(blockedUser => (
-                                        <div key={blockedUser.id} className="chat-widgets-blocked-item">
-                                            <div className="chat-widgets-blocked-user-info">
-                                                <div className="chat-widgets-user-avatar">
+                                        <div key={blockedUser.id} className="chat-widget-blocked-item">
+                                            <div className="chat-widget-blocked-user-info">
+                                                <div className="chat-widget-user-avatar">
                                                     {blockedUser.blocked_user?.avatar_url ? (
                                                         <img
                                                             src={blockedUser.blocked_user.avatar_url}
                                                             alt={blockedUser.blocked_user.full_name}
-                                                            className="chat-widgets-avatar-image"
+                                                            className="chat-widget-avatar-image"
                                                         />
                                                     ) : (
-                                                        <div className="chat-widgets-avatar-placeholder">
+                                                        <div className="chat-widget-avatar-placeholder">
                                                             {blockedUser.blocked_user?.full_name?.charAt(0) || 'U'}
                                                         </div>
                                                     )}
                                                 </div>
 
-                                                <div className="chat-widgets-user-info">
-                                                    <h4 className="chat-widgets-user-name">
+                                                <div className="chat-widget-user-info">
+                                                    <h4 className="chat-widget-user-name">
                                                         {blockedUser.blocked_user?.full_name}
                                                     </h4>
-                                                    <p className="chat-widgets-user-email">
+                                                    <p className="chat-widget-user-email">
                                                         {blockedUser.blocked_user?.email}
                                                     </p>
-                                                    <span className="chat-widgets-blocked-date">
+                                                    <span className="chat-widget-blocked-date">
                                                         Blocked on {formatDate(blockedUser.created_at)}
                                                     </span>
                                                 </div>
                                             </div>
 
                                             <button
-                                                className="chat-widgets-btn chat-widgets-btn-unblock"
+                                                className="chat-widget-btn chat-widget-btn-unblock"
                                                 onClick={() => handleUnblockUser(blockedUser.blocked_user.id)}
                                             >
                                                 Unblock
@@ -932,10 +996,42 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                     )}
                 </div>
 
-                {/* Unread Count Badge */}
                 {unreadCount > 0 && chatView === 'conversations' && (
-                    <div className="chat-widgets-unread-total">
+                    <div className="chat-widget-unread-total">
                         Total unread: {unreadCount}
+                    </div>
+                )}
+
+                {showAcceptModal && (
+                    <div className="chat-widget-modal">
+                        <h3>Accept Booking</h3>
+                        <DatePicker selected={startDate} onChange={date => setStartDate(date)} selectsStart startDate={startDate} />
+                        <DatePicker selected={endDate} onChange={date => setEndDate(date)} selectsEnd startDate={startDate} endDate={endDate} minDate={startDate} />
+                        <button onClick={handleAccept}>Confirm Accept</button>
+                        <button onClick={() => setShowAcceptModal(false)}>Close</button>
+                    </div>
+                )}
+
+                {showUpdateModal && (
+                    <div className="chat-widget-modal">
+                        <h3>Update Dates</h3>
+                        <DatePicker selected={startDate} onChange={date => setStartDate(date)} selectsStart startDate={startDate} />
+                        <DatePicker selected={endDate} onChange={date => setEndDate(date)} selectsEnd startDate={startDate} endDate={endDate} minDate={startDate} />
+                        <button onClick={handleUpdate}>Confirm Update</button>
+                        <button onClick={() => setShowUpdateModal(false)}>Close</button>
+                    </div>
+                )}
+
+                {showCancelModal && (
+                    <div className="chat-widget-modal">
+                        <h3>Cancel Booking</h3>
+                        <textarea
+                            placeholder="Reason (optional)"
+                            value={cancelReason}
+                            onChange={e => setCancelReason(e.target.value)}
+                        />
+                        <button onClick={handleCancel}>Confirm Cancel</button>
+                        <button onClick={() => setShowCancelModal(false)}>Close</button>
                     </div>
                 )}
             </div>
@@ -943,4 +1039,4 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
     );
 };
 
-export default ChatWidgets;
+export default ChatWidget;

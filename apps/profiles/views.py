@@ -1,4 +1,3 @@
-# apps/profiles/views.py
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.utils import extend_schema
@@ -31,7 +30,6 @@ from .serializers import (
 
 
 class BaseProfileViewSet(viewsets.ModelViewSet):
-
     lookup_field = "user_id"
 
     def get_permissions(self):
@@ -65,30 +63,42 @@ class BaseProfileViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get", "put", "patch"], url_path="my")
     def my_profile(self, request):
+        try:
+            profile = getattr(request.user, self.profile_attr, None)
+            if not profile:
+                raise NotFound({"detail": "Profile not found."})
 
-        profile = getattr(request.user, self.profile_attr, None)
-        if not profile:
-            raise NotFound({"detail": "Profile not found."})
+            if request.method == "GET":
+                serializer = self.serializer_class(profile)
+                return Response(serializer.data)
 
-        if request.method == "GET":
-            serializer = self.serializer_class(profile)
-            return Response(serializer.data)
-
-        partial = request.method == "PATCH"
-        serializer = self.create_update_serializer_class(
-            profile, data=request.data, partial=partial
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(self.serializer_class(profile).data)
+            partial = request.method == "PATCH"
+            serializer = self.create_update_serializer_class(
+                profile, data=request.data, partial=partial
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(self.serializer_class(profile).data)
+        except Exception as e:
+            raise ValidationError({"detail": str(e)})
 
     def perform_create(self, serializer):
-        if hasattr(self.request.user, self.profile_attr):
-            raise ValidationError({"detail": "You already have a profile."})
-        if self.request.user.role != self.user_role:
-            raise ValidationError(
-                {"detail": f"Only {self.user_role}s can create profile."}
-            )
+        # FIXED: Profile mavjudligini to'g'ri tekshirish
+        try:
+            existing_profile = getattr(self.request.user, self.profile_attr, None)
+            if existing_profile:
+                raise ValidationError({"detail": "You already have a profile."})
+        except AttributeError:
+            # Profile attribute mavjud emas, davom etamiz
+            pass
+
+        # FIXED: User role tekshirishni to'g'irlash
+        if hasattr(self.request.user, "role"):
+            if self.request.user.role.lower() != self.user_role.lower():
+                raise ValidationError(
+                    {"detail": f"Only {self.user_role}s can create profile."}
+                )
+
         serializer.save(user=self.request.user)
 
     def perform_update(self, serializer):
@@ -126,13 +136,17 @@ class CustomerProfileViewSet(BaseProfileViewSet):
     ordering = ["-average_rating"]
 
     def get_queryset(self):
+        # FIXED: List action uchun to'g'ri queryset
         if self.action in ["list", "retrieve", "portfolio"]:
             return (
-                CustomerProfile.objects.filter(is_available=True)
+                CustomerProfile.objects.filter(is_available=True, user__is_active=True)
                 .select_related("user", "city", "city__country")
                 .prefetch_related("service_types", "languages", "portfolio_set")
             )
-        return CustomerProfile.objects.filter(user=self.request.user)
+        elif self.action == "my_profile":
+            # My profile uchun faqat foydalanuvchining profili
+            return CustomerProfile.objects.filter(user=self.request.user)
+        return CustomerProfile.objects.all()
 
     @extend_schema(
         summary="Get customer public portfolio with reviews",

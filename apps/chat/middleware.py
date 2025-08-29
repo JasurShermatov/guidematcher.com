@@ -1,4 +1,3 @@
-# apps/chat/middleware.py
 import logging
 from urllib.parse import parse_qs
 from channels.db import database_sync_to_async

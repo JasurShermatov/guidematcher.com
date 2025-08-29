@@ -1,7 +1,3 @@
-# ============================================
-# apps/chat/urls.py - PROFESSIONAL VERSION
-# ============================================
-
 from django.urls import path
 
 from .views import (

@@ -1,7 +1,3 @@
-# ============================================
-# apps/chat/serializers.py - FIXED VERSION
-# ============================================
-
 from typing import Any, Dict, Optional
 from rest_framework import serializers
 from django.db.models import Q

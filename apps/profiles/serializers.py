@@ -1,5 +1,3 @@
-# apps/profiles/serializers.py - UUID MUAMMOSINI HAL QILISH
-
 import uuid
 
 from django.db.models import Count, Q
@@ -43,48 +41,222 @@ class UUIDSafeMixin:
         return value
 
 
-# Client Serializers
-class ClientProfileCreateUpdateSerializer(UUIDSafeMixin, serializers.ModelSerializer):
+# Customer Serializers
+class CustomerProfileCreateUpdateSerializer(UUIDSafeMixin, serializers.ModelSerializer):
     languages = serializers.PrimaryKeyRelatedField(
         queryset=Language.objects.all(), many=True, required=False
     )
+    service_types = serializers.PrimaryKeyRelatedField(
+        queryset=ServiceType.objects.all(), many=True, required=False
+    )
+    country = serializers.CharField(allow_blank=True, allow_null=True)
 
     class Meta:
-        model = ClientProfile
-        fields = ["date_of_birth", "preferred_contact", "languages"]
+        model = CustomerProfile
+        fields = [
+            "professional_bio",
+            "years_of_experience",
+            "service_types",
+            "city",
+            "country",
+            "service_areas",
+            "hourly_rate",
+            "daily_rate",
+            "currency",
+            "languages",
+            "is_available",
+        ]
 
-    def update(self, instance, validated_data):
-        languages = validated_data.pop("languages", None)
-        instance = super().update(instance, validated_data)
-        if languages is not None:
-            instance.languages.set(languages)
-        return instance
+    def validate_years_of_experience(self, value):
+        if value < 0:
+            raise serializers.ValidationError("Years cannot be negative")
+        if value > 50:
+            raise serializers.ValidationError("Years cannot exceed 50")
+        return value
+
+    def validate_country(self, value):
+        # FIXED: Country field validation - accept string values
+        if value:
+            # Simple validation for country codes (2-3 characters)
+            if len(str(value).strip()) > 100:
+                raise serializers.ValidationError("Country name/code too long")
+        return value
+
+    def validate(self, data):
+        # Validate rates
+        if data.get("hourly_rate") and data.get("daily_rate"):
+            if data["hourly_rate"] * 8 < data["daily_rate"]:
+                raise serializers.ValidationError(
+                    "Daily rate seems too high compared to hourly rate"
+                )
+        return data
 
 
-class ClientProfileSerializer(UUIDSafeMixin, serializers.ModelSerializer):
+class CustomerProfileSerializer(UUIDSafeMixin, serializers.ModelSerializer):
     user = UserShortSerializer(read_only=True)
     full_name = serializers.CharField(source="user.full_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
 
+    # FIXED: Country handling - serialize as string directly
+    country_display = serializers.SerializerMethodField()
+    city_name = serializers.CharField(
+        source="city.name", read_only=True, allow_null=True
+    )
+
+    recent_reviews = serializers.SerializerMethodField()
+    review_statistics = serializers.SerializerMethodField()
+
+    def to_representation(self, instance):
+        """FIXED: Handle Country field serialization"""
+        data = super().to_representation(instance)
+
+        # Country field serialization fix
+        if "country" in data and data["country"]:
+            try:
+                # Convert Country object to string
+                if hasattr(data["country"], "code"):
+                    data["country"] = str(data["country"].code)
+                elif hasattr(data["country"], "name"):
+                    data["country"] = str(data["country"].name)
+                else:
+                    data["country"] = str(data["country"])
+            except Exception as e:
+                print(f"Country serialization error: {e}")
+                data["country"] = None
+
+        return data
+
     class Meta:
-        model = ClientProfile
+        model = CustomerProfile
         fields = [
             "id",
             "user",
             "full_name",
             "email",
-            "date_of_birth",
-            "preferred_contact",
+            # "country",  # FIXED: Country field'ni chiqarib tashlaymiz
+            "country_display",  # Faqat country_display ishlatamiz
+            "city",
+            "city_name",
+            "professional_bio",
+            "years_of_experience",
+            "service_types",
+            "service_areas",
+            "hourly_rate",
+            "daily_rate",
+            "currency",
             "languages",
+            "verification_status",
+            "verification_date",
+            "total_bookings",
+            "total_reviews",
+            "average_rating",
+            "is_available",
+            "is_verified",
+            "created_at",
+            "updated_at",
+            "recent_reviews",
+            "review_statistics",
+        ]
+        read_only_fields = [
+            "id",
+            "user",
+            "verification_status",
+            "verification_date",
+            "total_bookings",
+            "total_reviews",
+            "average_rating",
+            "is_verified",
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "user", "created_at", "updated_at"]
+
+    def get_country_display(self, obj):
+        """FIXED: Safe country display - handle as string"""
+        try:
+            if obj.country:
+                # Country field ni string sifatida qaytarish
+                country_str = str(obj.country)
+                return {
+                    "code": country_str,
+                    "name": country_str,  # Yoki country name mapping logic
+                }
+        except Exception as e:
+            # Debug uchun xatolikni log qilish
+            print(f"Country serialization error: {e}")
+            return None
+        return None
+
+    def get_recent_reviews(self, obj):
+        try:
+            reviews = (
+                Review.objects.filter(customer=obj, is_published=True)
+                .exclude(rating__isnull=True, comment="")
+                .select_related("client_profile__user")
+                .order_by("-created_at")[:5]
+            )
+
+            return ReviewForCustomerSerializer(
+                reviews, many=True, context=self.context
+            ).data
+        except Exception:
+            return []
+
+    def get_review_statistics(self, obj):
+        """Safe review statistics"""
+        try:
+            stats = Review.objects.filter(
+                customer=obj, is_published=True, rating__isnull=False
+            ).aggregate(
+                total=Count("id"),
+                rating_1=Count("id", filter=Q(rating=1)),
+                rating_2=Count("id", filter=Q(rating=2)),
+                rating_3=Count("id", filter=Q(rating=3)),
+                rating_4=Count("id", filter=Q(rating=4)),
+                rating_5=Count("id", filter=Q(rating=5)),
+                with_comments=Count("id", filter=~Q(comment="")),
+            )
+
+            total = stats["total"]
+            distribution = {str(i): stats[f"rating_{i}"] for i in range(1, 6)}
+
+            if total > 0:
+                percentages = {
+                    k: round((v / total) * 100, 1) for k, v in distribution.items()
+                }
+                recommendation_rate = round(
+                    ((distribution["4"] + distribution["5"]) / total) * 100, 1
+                )
+            else:
+                percentages = {str(i): 0 for i in range(1, 6)}
+                recommendation_rate = 0
+
+            return {
+                "total": total,
+                "rating_1": stats["rating_1"],
+                "rating_2": stats["rating_2"],
+                "rating_3": stats["rating_3"],
+                "rating_4": stats["rating_4"],
+                "rating_5": stats["rating_5"],
+                "percentages": percentages,
+                "with_comments": stats["with_comments"],
+                "recommendation_rate": recommendation_rate,
+            }
+        except Exception:
+            return {
+                "total": 0,
+                "rating_1": 0,
+                "rating_2": 0,
+                "rating_3": 0,
+                "rating_4": 0,
+                "rating_5": 0,
+                "percentages": {str(i): 0 for i in range(1, 6)},
+                "with_comments": 0,
+                "recommendation_rate": 0,
+            }
 
 
-# Review Serializer - FIXED
+# Review Serializer
 class ReviewForCustomerSerializer(UUIDSafeMixin, serializers.ModelSerializer):
-    # FIX: client_profile instead of client
     client_name = serializers.SerializerMethodField()
     client_avatar = serializers.SerializerMethodField()
     days_ago = serializers.SerializerMethodField()
@@ -146,193 +318,30 @@ class ReviewForCustomerSerializer(UUIDSafeMixin, serializers.ModelSerializer):
             return "Unknown"
 
 
-# Customer Serializers
-class CustomerProfileCreateUpdateSerializer(UUIDSafeMixin, serializers.ModelSerializer):
-    languages = serializers.PrimaryKeyRelatedField(
-        queryset=Language.objects.all(), many=True, required=False
-    )
-    service_types = serializers.PrimaryKeyRelatedField(
-        queryset=ServiceType.objects.all(), many=True, required=False
-    )
-
-    class Meta:
-        model = CustomerProfile
-        fields = [
-            "professional_bio",
-            "years_of_experience",
-            "service_types",
-            "city",
-            "country",  # Added country field
-            "service_areas",
-            "hourly_rate",
-            "daily_rate",
-            "currency",
-            "languages",
-            "is_available",
-        ]
-
-    def validate_years_of_experience(self, value):
-        if value < 0:
-            raise serializers.ValidationError("Years cannot be negative")
-        if value > 50:
-            raise serializers.ValidationError("Years cannot exceed 50")
-        return value
-
-    def validate(self, data):
-        # Validate rates
-        if data.get("hourly_rate") and data.get("daily_rate"):
-            if data["hourly_rate"] * 8 < data["daily_rate"]:
-                raise serializers.ValidationError(
-                    "Daily rate seems too high compared to hourly rate"
-                )
-        return data
-
-
-class CustomerProfileSerializer(UUIDSafeMixin, serializers.ModelSerializer):
-    user = UserShortSerializer(read_only=True)
-    full_name = serializers.CharField(source="user.full_name", read_only=True)
-    email = serializers.EmailField(source="user.email", read_only=True)
-
-    # FIXED: Country handling with UUID safety
-    country_display = serializers.SerializerMethodField()
-    city_name = serializers.CharField(
-        source="city.name", read_only=True, allow_null=True
-    )
-
-    recent_reviews = serializers.SerializerMethodField()
-    review_statistics = serializers.SerializerMethodField()
-
-    class Meta:
-        model = CustomerProfile
-        fields = [
-            "id",
-            "user",
-            "full_name",
-            "email",
-            "country",
-            "country_display",
-            "city",
-            "city_name",
-            "professional_bio",
-            "years_of_experience",
-            "service_types",
-            "service_areas",
-            "hourly_rate",
-            "daily_rate",
-            "currency",
-            "languages",
-            "verification_status",
-            "verification_date",
-            "total_bookings",
-            "total_reviews",
-            "average_rating",
-            "is_available",
-            "is_verified",
-            "created_at",
-            "updated_at",
-            "recent_reviews",
-            "review_statistics",
-        ]
-        read_only_fields = [
-            "id",
-            "user",
-            "verification_status",
-            "verification_date",
-            "total_bookings",
-            "total_reviews",
-            "average_rating",
-            "is_verified",
-            "created_at",
-            "updated_at",
-        ]
-
-    def get_country_display(self, obj):
-        """FIXED: Safe country handling"""
-        try:
-            if obj.country:
-                # Country object'dan xavfsiz ma'lumot olish
-                if hasattr(obj.country, "code") and hasattr(obj.country, "name"):
-                    return {
-                        "code": str(obj.country.code),
-                        "name": str(obj.country.name),
-                    }
-                else:
-                    # Agar country UUID bo'lsa
-                    return {"code": str(obj.country), "name": "Unknown"}
-        except Exception:
-            pass
-        return None
-
-    def get_recent_reviews(self, obj):
-        try:
-            reviews = (
-                Review.objects.filter(customer=obj, is_published=True)
-                .exclude(rating__isnull=True, comment="")
-                .select_related("client_profile__user")
-                .order_by("-created_at")[:5]
-            )
-
-            return ReviewForCustomerSerializer(
-                reviews, many=True, context=self.context
-            ).data
-        except Exception:
-            return []
-
-    def get_review_statistics(self, obj):
-        """FIXED: Safe review statistics"""
-        try:
-            # OPTIMIZED: Single query with aggregation
-            stats = Review.objects.filter(
-                customer=obj, is_published=True, rating__isnull=False
-            ).aggregate(
-                total=Count("id"),
-                rating_1=Count("id", filter=Q(rating=1)),
-                rating_2=Count("id", filter=Q(rating=2)),
-                rating_3=Count("id", filter=Q(rating=3)),
-                rating_4=Count("id", filter=Q(rating=4)),
-                rating_5=Count("id", filter=Q(rating=5)),
-                with_comments=Count("id", filter=~Q(comment="")),
-            )
-
-            total = stats["total"]
-            distribution = {str(i): stats[f"rating_{i}"] for i in range(1, 6)}
-
-            if total > 0:
-                percentages = {
-                    k: round((v / total) * 100, 1) for k, v in distribution.items()
-                }
-                recommendation_rate = round(
-                    ((distribution["4"] + distribution["5"]) / total) * 100, 1
-                )
-            else:
-                percentages = {str(i): 0 for i in range(1, 6)}
-                recommendation_rate = 0
-
-            return {
-                "total_reviews": total,
-                "average_rating": float(obj.average_rating or 0),
-                "rating_distribution": distribution,
-                "rating_percentages": percentages,
-                "with_comments": stats["with_comments"],
-                "recommendation_rate": recommendation_rate,
-            }
-        except Exception:
-            return {
-                "total_reviews": 0,
-                "average_rating": 0.0,
-                "rating_distribution": {str(i): 0 for i in range(1, 6)},
-                "rating_percentages": {str(i): 0 for i in range(1, 6)},
-                "with_comments": 0,
-                "recommendation_rate": 0,
-            }
-
-
 class CustomerPortfolioPublicSerializer(UUIDSafeMixin, serializers.ModelSerializer):
     user_info = serializers.SerializerMethodField()
     portfolio_items = serializers.SerializerMethodField()
     all_reviews = serializers.SerializerMethodField()
     review_statistics = serializers.SerializerMethodField()
     country_display = serializers.SerializerMethodField()
+
+    def to_representation(self, instance):
+        """FIXED: Handle Country field serialization"""
+        data = super().to_representation(instance)
+
+        # Country field serialization fix
+        if "country" in data and data["country"]:
+            try:
+                if hasattr(data["country"], "code"):
+                    data["country"] = str(data["country"].code)
+                elif hasattr(data["country"], "name"):
+                    data["country"] = str(data["country"].name)
+                else:
+                    data["country"] = str(data["country"])
+            except Exception:
+                data["country"] = None
+
+        return data
 
     class Meta:
         model = CustomerProfile
@@ -343,8 +352,8 @@ class CustomerPortfolioPublicSerializer(UUIDSafeMixin, serializers.ModelSerializ
             "years_of_experience",
             "service_types",
             "languages",
-            "country",
-            "country_display",
+            # "country",  # FIXED: Country field'ni chiqarib tashlaymiz
+            "country_display",  # Faqat country_display ishlatamiz
             "city",
             "service_areas",
             "hourly_rate",
@@ -363,7 +372,7 @@ class CustomerPortfolioPublicSerializer(UUIDSafeMixin, serializers.ModelSerializ
     def get_user_info(self, obj):
         try:
             return {
-                "id": str(obj.user.id),  # UUID safe
+                "id": str(obj.user.id),
                 "full_name": obj.user.full_name,
                 "avatar": (
                     self.context["request"].build_absolute_uri(obj.user.avatar.url)
@@ -380,24 +389,19 @@ class CustomerPortfolioPublicSerializer(UUIDSafeMixin, serializers.ModelSerializ
         """FIXED: Safe country display"""
         try:
             if obj.country:
-                if hasattr(obj.country, "code") and hasattr(obj.country, "name"):
-                    return {
-                        "code": str(obj.country.code),
-                        "name": str(obj.country.name),
-                    }
-                else:
-                    return {"code": str(obj.country), "name": "Unknown"}
+                country_str = str(obj.country)
+                return {"code": country_str, "name": country_str}
         except Exception:
             pass
         return None
 
     def get_portfolio_items(self, obj):
-        """FIXED: Safe portfolio items"""
+        """Safe portfolio items"""
         try:
             items = obj.portfolio_set.all().order_by("order", "-created_at")
             return [
                 {
-                    "id": str(item.id),  # UUID safe
+                    "id": str(item.id),
                     "image": (
                         self.context["request"].build_absolute_uri(item.image.url)
                         if item.image
@@ -432,8 +436,46 @@ class CustomerPortfolioPublicSerializer(UUIDSafeMixin, serializers.ModelSerializ
             return []
 
     def get_review_statistics(self, obj):
-        # Reuse optimized method
         return CustomerProfileSerializer.get_review_statistics(self, obj)
+
+
+# Client Serializers
+class ClientProfileCreateUpdateSerializer(UUIDSafeMixin, serializers.ModelSerializer):
+    languages = serializers.PrimaryKeyRelatedField(
+        queryset=Language.objects.all(), many=True, required=False
+    )
+
+    class Meta:
+        model = ClientProfile
+        fields = ["date_of_birth", "preferred_contact", "languages"]
+
+    def update(self, instance, validated_data):
+        languages = validated_data.pop("languages", None)
+        instance = super().update(instance, validated_data)
+        if languages is not None:
+            instance.languages.set(languages)
+        return instance
+
+
+class ClientProfileSerializer(UUIDSafeMixin, serializers.ModelSerializer):
+    user = UserShortSerializer(read_only=True)
+    full_name = serializers.CharField(source="user.full_name", read_only=True)
+    email = serializers.EmailField(source="user.email", read_only=True)
+
+    class Meta:
+        model = ClientProfile
+        fields = [
+            "id",
+            "user",
+            "full_name",
+            "email",
+            "date_of_birth",
+            "preferred_contact",
+            "languages",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "user", "created_at", "updated_at"]
 
 
 # Other serializers with UUID safety

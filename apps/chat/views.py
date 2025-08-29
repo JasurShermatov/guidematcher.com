@@ -1,7 +1,3 @@
-# ============================================
-# apps/chat/views.py - FIXED VERSION
-# ============================================
-
 from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Prefetch
@@ -67,9 +63,8 @@ class ConversationListCreateView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         """Create or get conversation and send initial message"""
         try:
-            serializer = self.get_serializer(data=request.data)
+            serializer = StartConversationSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-
             # Check if user exists and is active
             try:
                 other_user = User.objects.get(

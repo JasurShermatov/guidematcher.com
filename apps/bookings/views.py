@@ -1,4 +1,4 @@
-# apps/bookings/views.py - COMPLETE PRODUCTION VERSION
+# apps/bookings/views.py - FIXED VERSION WITH UUID STRING CONVERSION IN METADATA
 
 from django.core.cache import cache
 from django.db import transaction
@@ -106,7 +106,10 @@ class BookingViewSet(viewsets.ModelViewSet):
                 f"💰 {instance.proposed_rate} {instance.currency if instance.proposed_rate else 'Price TBD'}"
             ),
             message_type="booking",
-            metadata={"booking_id": instance.id, "action": "created"},
+            metadata={
+                "booking_id": str(instance.id),
+                "action": "created",
+            },  # FIXED: str(UUID)
         )
 
     @extend_schema(
@@ -174,7 +177,10 @@ class BookingViewSet(viewsets.ModelViewSet):
                         f"📅 Confirmed dates: {start.strftime('%b %d')} - {end.strftime('%b %d, %Y')}"
                     ),
                     message_type="booking",
-                    metadata={"booking_id": booking.id, "action": "accepted"},
+                    metadata={
+                        "booking_id": str(booking.id),
+                        "action": "accepted",
+                    },  # FIXED: str(UUID)
                 )
 
         # Clear cache
@@ -250,7 +256,7 @@ class BookingViewSet(viewsets.ModelViewSet):
                     ),
                     message_type="booking",
                     metadata={
-                        "booking_id": booking.id,
+                        "booking_id": str(booking.id),  # FIXED: str(UUID)
                         "action": "updated",
                         "update_count": booking.updated_count,
                     },
@@ -319,19 +325,18 @@ class BookingViewSet(viewsets.ModelViewSet):
                 id=booking.conversation_id
             ).first()
             if conversation:
-                reason = request.data.get("reason", "")
+                reason = request.data.get("reason", "No reason provided")
                 Message.objects.create(
                     conversation=conversation,
                     sender=request.user,
                     content=(
-                        "📋 New booking request\n"
-                        f"📍 {instance.city}, {instance.country}\n"
-                        f"📅 {instance.start_date.strftime('%b %d')} - "
-                        f"{instance.end_date.strftime('%b %d, %Y')}\n"
+                        f"❌ Booking cancelled\n"
+                        f"Reason: {reason}\n"
+                        f"Cancelled by: {canceller_type.capitalize()}"
                     ),
                     message_type="booking",
                     metadata={
-                        "booking_id": booking.id,
+                        "booking_id": str(booking.id),  # FIXED: str(UUID)
                         "action": "cancelled",
                         "cancelled_by": canceller_type,
                     },

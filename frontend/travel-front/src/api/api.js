@@ -8,7 +8,7 @@ const api = axios.create({
     withCredentials: false,
 });
 
-// Token refresh loop oldini olish uchun
+// Token refresh loop prevention
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -23,45 +23,24 @@ const processQueue = (error, token = null) => {
     failedQueue = [];
 };
 
-// Tokenni avtomatik qo'shish
+// Auto add token to requests
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("access_token");
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
-
-    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
-        headers: config.headers,
-        data: config.data,
-    });
-
     return config;
 });
 
-// Token muddati tugasa, refresh qilish (FIXED - infinite loop oldini olish)
+// Token refresh on 401
 api.interceptors.response.use(
-    (response) => {
-        console.log(`API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-            status: response.status,
-            data: response.data,
-        });
-        return response;
-    },
+    (response) => response,
     async (error) => {
-        console.error(`API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
-            status: error.response?.status,
-            data: error.response?.data,
-            message: error.message,
-        });
-
         const originalRequest = error.config;
 
-        // MUHIM: Agar token refresh endpoint bo'lsa, infinite loop oldini olish
         if (originalRequest.url && originalRequest.url.includes('token/refresh/')) {
-            console.error('Refresh token failed, clearing tokens and redirecting to login');
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
-            // Avoid immediate redirect during testing
             setTimeout(() => {
                 window.location.href = "/login";
             }, 1000);
@@ -70,7 +49,6 @@ api.interceptors.response.use(
 
         if (error.response?.status === 401 && !originalRequest._retry) {
             if (isRefreshing) {
-                // Agar refresh qilinayotgan bo'lsa, queuega qo'shish
                 return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
                 }).then(token => {
@@ -87,7 +65,6 @@ api.interceptors.response.use(
             const refreshToken = localStorage.getItem("refresh_token");
 
             if (!refreshToken) {
-                console.error("No refresh token available");
                 processQueue(new Error("No refresh token"), null);
                 localStorage.removeItem("access_token");
                 localStorage.removeItem("refresh_token");
@@ -98,14 +75,13 @@ api.interceptors.response.use(
             }
 
             try {
-                // MUHIM: Refresh uchun alohida axios instance yaratish
                 const refreshResponse = await axios.post(`${API_URL}token/refresh/`, {
                     refresh: refreshToken,
                 }, {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    timeout: 10000, // 10 second timeout
+                    timeout: 10000,
                 });
 
                 const newAccessToken = refreshResponse.data.access || refreshResponse.data.access_token;
@@ -115,35 +91,23 @@ api.interceptors.response.use(
                 }
 
                 localStorage.setItem("access_token", newAccessToken);
-
-                // Queue'dagi barcha requestlarni yangi token bilan yuborish
                 processQueue(null, newAccessToken);
-
-                // Original requestni yangi token bilan qayta yuborish
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                 return api(originalRequest);
 
             } catch (refreshError) {
-                console.error("Token refresh failed:", refreshError);
-
-                // Queue'dagi barcha requestlarni error bilan reject qilish
                 processQueue(refreshError, null);
-
-                // Tokenlarni o'chirish va login sahifasiga yo'naltirish
                 localStorage.removeItem("access_token");
                 localStorage.removeItem("refresh_token");
-
                 setTimeout(() => {
                     window.location.href = "/login";
                 }, 1000);
-
                 return Promise.reject(refreshError);
             } finally {
                 isRefreshing = false;
             }
         }
 
-        // Error message yaratish
         let errorMessage = "Unknown error occurred";
 
         if (error.response?.data) {
@@ -164,14 +128,12 @@ api.interceptors.response.use(
     }
 );
 
-// ─── Auth & Accounts APIs ──────────────────────────────────────────
+// Auth & Accounts APIs
 export const requestCode = (data) => {
-    console.log("Requesting verification code for:", data.email);
     return api.post("accounts/request-code/", data).then((r) => r.data);
 };
 
 export const registerUser = (data) => {
-    console.log("Registering user:", { ...data, password: "***" });
     return api.post("accounts/register/", data).then((r) => ({
         access: r.data.access_token,
         refresh: r.data.refresh_token,
@@ -180,7 +142,6 @@ export const registerUser = (data) => {
 };
 
 export const loginUser = (payload) => {
-    console.log("Logging in user:", { ...payload, password: "***" });
     return api.post("accounts/login/", payload).then((r) => ({
         access: r.data.access_token,
         refresh: r.data.refresh_token,
@@ -190,8 +151,6 @@ export const loginUser = (payload) => {
 
 export const logoutUser = () => {
     const refreshToken = localStorage.getItem("refresh_token");
-    console.log("Logging out user");
-
     return api
         .post("accounts/logout/", {
             refresh: refreshToken,
@@ -202,18 +161,14 @@ export const logoutUser = () => {
             return r.data;
         })
         .catch((error) => {
-            console.error("Logout error:", error);
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
             return { detail: "Logged out" };
         });
 };
 
-// MUHIM: refreshToken funksiyasini alohida axios bilan qilish
 export const refreshToken = () => {
     const refreshToken = localStorage.getItem("refresh_token");
-
-    // Direct axios call without interceptors
     return axios.post(`${API_URL}token/refresh/`, {
         refresh: refreshToken,
     }, {
@@ -234,9 +189,9 @@ export const requestPasswordReset = (data) =>
 export const confirmPasswordReset = (payload) =>
     api.post("accounts/reset-password/", payload).then((r) => r.data);
 
-// ─── Users APIs ────────────────────────────────────────────────────
+// Users APIs
 export const googleLogin = (data) =>
-    api.post("auth/google/", data).then((r) => ({
+    api.post("auth/auth/google/", data).then((r) => ({
         access: r.data.access,
         refresh: r.data.refresh,
     }));
@@ -260,32 +215,56 @@ export const deleteUser = (id) =>
     api.delete(`auth/users/${id}/`).then((r) => r.data);
 
 export const getCurrentUser = () => {
-    console.log("Getting current user info...");
     return api.get("auth/users/short/").then((r) => r.data);
 };
 
 export const getCurrentUserShort = () => {
-    console.log("Getting current user short info...");
     return api.get("auth/users/short/").then((r) => r.data);
 };
 
 export const getCustomerProfileByUserId = (userId) =>
     api.get(`profiles/customers/${userId}/`).then((r) => r.data);
 
-// ─── Profile APIs ──────────────────────────────────────────────────
-// Client Profile APIs
+// Common APIs
+export const getCountries = () => {
+    return api.get("common/countries/").then((r) => r.data);
+};
+
+export const getCountryById = (id) =>
+    api.get(`common/countries/${id}/`).then((r) => r.data);
+
+export const getCities = (countryId = null) => {
+    const params = countryId ? { country: countryId } : {};
+    return api.get("common/cities/", { params }).then((r) => r.data);
+};
+
+export const getCityById = (id) =>
+    api.get(`common/cities/${id}/`).then((r) => r.data);
+
+export const getServiceTypes = () => {
+    return api.get("common/service-types/").then((r) => r.data);
+};
+
+export const getServiceTypeById = (id) =>
+    api.get(`common/service-types/${id}/`).then((r) => r.data);
+
+export const getLanguages = () => {
+    return api.get("common/languages/").then((r) => r.data);
+};
+
+export const getLanguageById = (id) =>
+    api.get(`common/languages/${id}/`).then((r) => r.data);
+
+// Profile APIs - Client Profile
 export const getClientProfile = () => {
-    console.log("Getting client profile...");
     return api.get("profiles/clients/my/").then((r) => r.data);
 };
 
 export const createClientProfile = (payload) => {
-    console.log("Creating client profile:", payload);
     return api.post("profiles/clients/", payload).then((r) => r.data);
 };
 
 export const updateClientProfile = (payload) => {
-    console.log("Updating client profile:", payload);
     return api.patch("profiles/clients/my/", payload).then((r) => r.data);
 };
 
@@ -295,31 +274,50 @@ export const getClientProfileById = (userId) =>
 export const getClientProfiles = (params = {}) =>
     api.get("profiles/clients/", { params }).then((r) => r.data);
 
-// Customer Profile APIs
+// Profile APIs - Customer Profile
 export const getCustomerProfile = () => {
-    console.log("Getting customer profile...");
     return api.get("profiles/customers/my/").then((r) => r.data);
 };
 
 export const createCustomerProfile = (payload) => {
-    console.log("Creating customer profile:", payload);
     return api.post("profiles/customers/", payload).then((r) => r.data);
 };
 
 export const updateCustomerProfile = (payload) => {
-    console.log("Updating customer profile:", payload);
     return api.patch("profiles/customers/my/", payload).then((r) => r.data);
 };
 
-export const getCustomerProfiles = (params = {}) =>
-    api.get("profiles/customers/", { params }).then((r) => r.data);
+// FIXED: Customer profiles API call for finding guides
+export const getCustomerProfiles = (params = {}) => {
+    // Clean up parameters - remove empty values
+    const cleanParams = {};
+    Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+            cleanParams[key] = params[key];
+        }
+    });
+
+    console.log('API: Requesting customer profiles with params:', cleanParams);
+
+    return api.get("profiles/customers/", { params: cleanParams })
+        .then((r) => {
+            console.log('API: Customer profiles response:', r.data);
+            return r.data;
+        })
+        .catch((error) => {
+            console.error('API: Error fetching customer profiles:', error);
+            throw error;
+        });
+};
 
 export const getCustomerProfileById = (userId) =>
     api.get(`profiles/customers/${userId}/`).then((r) => r.data);
 
-// ─── Portfolio APIs ────────────────────────────────────────────────
+export const getCustomerPortfolio = (userId, params = {}) =>
+    api.get(`profiles/customers/${userId}/portfolio/`, { params }).then((r) => r.data);
+
+// Portfolio APIs
 export const getMyPortfolio = () => {
-    console.log("Getting my portfolio...");
     return api.get("profiles/portfolios/my/").then((r) => r.data);
 };
 
@@ -327,7 +325,6 @@ export const getPortfolioById = (id) =>
     api.get(`profiles/portfolios/${id}/`).then((r) => r.data);
 
 export const createPortfolioItem = (payload) => {
-    console.log("Creating portfolio item...");
     const formData = new FormData();
     Object.keys(payload).forEach(key => {
         if (payload[key] !== null && payload[key] !== undefined) {
@@ -340,7 +337,6 @@ export const createPortfolioItem = (payload) => {
 };
 
 export const updatePortfolioItem = (id, payload) => {
-    console.log("Updating portfolio item:", id);
     const formData = new FormData();
     Object.keys(payload).forEach(key => {
         if (payload[key] !== null && payload[key] !== undefined) {
@@ -353,16 +349,14 @@ export const updatePortfolioItem = (id, payload) => {
 };
 
 export const deletePortfolioItem = (id) => {
-    console.log("Deleting portfolio item:", id);
     return api.delete(`profiles/portfolios/${id}/`).then((r) => r.data);
 };
 
 export const getPortfolios = (params = {}) =>
     api.get("profiles/portfolios/", { params }).then((r) => r.data);
 
-// ─── Availability APIs ─────────────────────────────────────────────
+// Availability APIs
 export const getMyAvailability = () => {
-    console.log("Getting my availability...");
     return api.get("profiles/availabilities/my/").then((r) => r.data);
 };
 
@@ -370,26 +364,22 @@ export const getAvailabilityById = (id) =>
     api.get(`profiles/availabilities/${id}/`).then((r) => r.data);
 
 export const createAvailability = (payload) => {
-    console.log("Creating availability:", payload);
     return api.post("profiles/availabilities/", payload).then((r) => r.data);
 };
 
 export const updateAvailability = (id, payload) => {
-    console.log("Updating availability:", id, payload);
     return api.patch(`profiles/availabilities/${id}/`, payload).then((r) => r.data);
 };
 
 export const deleteAvailability = (id) => {
-    console.log("Deleting availability:", id);
     return api.delete(`profiles/availabilities/${id}/`).then((r) => r.data);
 };
 
 export const getAvailabilities = (params = {}) =>
     api.get("profiles/availabilities/", { params }).then((r) => r.data);
 
-// ─── Verification Documents APIs ───────────────────────────────────
+// Verification Documents APIs
 export const getMyDocuments = () => {
-    console.log("Getting my documents...");
     return api.get("profiles/verifications/my/").then((r) => r.data);
 };
 
@@ -397,7 +387,6 @@ export const getDocumentById = (id) =>
     api.get(`profiles/verifications/${id}/`).then((r) => r.data);
 
 export const uploadDocument = (payload) => {
-    console.log("Uploading document...");
     const formData = new FormData();
     Object.keys(payload).forEach(key => {
         if (payload[key] !== null && payload[key] !== undefined) {
@@ -410,7 +399,6 @@ export const uploadDocument = (payload) => {
 };
 
 export const updateDocument = (id, payload) => {
-    console.log("Updating document:", id);
     const formData = new FormData();
     Object.keys(payload).forEach(key => {
         if (payload[key] !== null && payload[key] !== undefined) {
@@ -423,168 +411,124 @@ export const updateDocument = (id, payload) => {
 };
 
 export const deleteDocument = (id) => {
-    console.log("Deleting document:", id);
     return api.delete(`profiles/verifications/${id}/`).then((r) => r.data);
 };
 
 export const getDocuments = (params = {}) =>
     api.get("profiles/verifications/", { params }).then((r) => r.data);
 
-// ─── Common APIs ───────────────────────────────────────────────────
-export const getCountries = () => {
-    console.log("Getting countries...");
-    return api.get("common/countries/").then((r) => r.data);
-};
-
-export const getCountryById = (id) =>
-    api.get(`common/countries/${id}/`).then((r) => r.data);
-
-export const getCities = (countryId = null) => {
-    const params = countryId ? { country: countryId } : {};
-    console.log("Getting cities...", params);
-    return api.get("common/cities/", { params }).then((r) => r.data);
-};
-
-export const getCityById = (id) =>
-    api.get(`common/cities/${id}/`).then((r) => r.data);
-
-export const getServiceTypes = () => {
-    console.log("Getting service types...");
-    return api.get("common/service-types/").then((r) => r.data);
-};
-
-export const getServiceTypeById = (id) =>
-    api.get(`common/service-types/${id}/`).then((r) => r.data);
-
-export const getLanguages = () => {
-    console.log("Getting languages...");
-    return api.get("common/languages/").then((r) => r.data);
-};
-
-export const getLanguageById = (id) =>
-    api.get(`common/languages/${id}/`).then((r) => r.data);
-
-// ─── Booking APIs ──────────────────────────────────────────────────
-export const getMyBookings = (status = null) => {
-    const params = status ? { status } : {};
-    console.log("Getting my bookings...", params);
+// Booking APIs
+export const getMyBookings = (params = {}) => {
     return api.get("bookings/bookings/", { params }).then((r) => r.data);
 };
 
 export const createBooking = (payload) => {
-    console.log("Creating booking:", payload);
     return api.post("bookings/bookings/", payload).then((r) => r.data);
-};
-
-export const updateBookingStatus = (id, status, data = {}) => {
-    console.log("Updating booking status:", id, status);
-    return api.patch(`bookings/bookings/${id}/`, { status, ...data }).then((r) => r.data);
 };
 
 export const getBookingById = (id) =>
     api.get(`bookings/bookings/${id}/`).then((r) => r.data);
 
-export const cancelBooking = (id, reason = "") => {
-    console.log("Canceling booking:", id, reason);
-    return api.patch(`bookings/bookings/${id}/`, {
-        status: "cancelled",
-        cancellation_reason: reason
-    }).then((r) => r.data);
+export const updateBooking = (id, payload) =>
+    api.patch(`bookings/bookings/${id}/`, payload).then((r) => r.data);
+
+export const deleteBooking = (id) =>
+    api.delete(`bookings/bookings/${id}/`).then((r) => r.data);
+
+export const acceptBooking = (id, payload) => {
+    return api.post(`bookings/bookings/${id}/accept/`, payload).then((r) => r.data);
 };
 
-export const acceptBooking = (id) => {
-    console.log("Accepting booking:", id);
-    return api.post(`bookings/bookings/${id}/accept/`).then((r) => r.data);
+export const updateBookingDates = (id, payload) => {
+    return api.post(`bookings/bookings/${id}/update_dates/`, payload).then((r) => r.data);
+};
+
+export const cancelBooking = (id, payload) => {
+    return api.post(`bookings/bookings/${id}/cancel/`, payload).then((r) => r.data);
+};
+
+export const searchCustomers = (params = {}) => {
+    return api.get("bookings/bookings/search_customers/", { params }).then((r) => r.data);
+};
+
+export const getMySchedule = (params = {}) => {
+    return api.get("bookings/bookings/my_schedule/", { params }).then((r) => r.data);
 };
 
 export const getBookings = (params = {}) =>
     api.get("bookings/bookings/", { params }).then((r) => r.data);
 
-// ─── Reviews APIs ──────────────────────────────────────────────────
+// Reviews APIs
 export const getMyReviews = () => {
-    console.log("Getting my reviews...");
-    return api.get("reviews/my/").then((r) => r.data);
+    return api.get("reviews/my_reviews/").then((r) => r.data);
 };
 
-export const createReview = (payload) => {
-    console.log("Creating review:", payload);
-    return api.post("reviews/reviews/", payload).then((r) => r.data);
+export const createReview = (bookingId, payload) => {
+    return api.post(`reviews/?booking_id=${bookingId}`, payload).then((r) => r.data);
 };
 
 export const updateReview = (id, payload) => {
-    console.log("Updating review:", id);
-    return api.patch(`reviews/reviews/${id}/`, payload).then((r) => r.data);
+    return api.patch(`reviews/${id}/`, payload).then((r) => r.data);
 };
 
 export const deleteReview = (id) => {
-    console.log("Deleting review:", id);
-    return api.delete(`reviews/reviews/${id}/`).then((r) => r.data);
+    return api.delete(`reviews/${id}/`).then((r) => r.data);
 };
 
 export const getReviews = (params = {}) =>
-    api.get("reviews/reviews/", { params }).then((r) => r.data);
+    api.get("reviews/", { params }).then((r) => r.data);
 
 export const getReviewById = (id) =>
-    api.get(`reviews/reviews/${id}/`).then((r) => r.data);
+    api.get(`reviews/${id}/`).then((r) => r.data);
 
-export const reactToReview = (id, reactionType, comment = "") => {
-    console.log("Reacting to review:", id, reactionType);
-    return api.post(`reviews/reviews/${id}/react/`, {
-        reaction_type: reactionType,
-        comment: comment
-    }).then((r) => r.data);
-};
+export const getCustomerReviews = (customerId, params = {}) =>
+    api.get(`reviews/customer/${customerId}/`, { params }).then((r) => r.data);
 
-export const removeReactionFromReview = (id) => {
-    console.log("Removing reaction from review:", id);
-    return api.delete(`reviews/reviews/${id}/react/`).then((r) => r.data);
-};
+export const canReviewBooking = (bookingId) =>
+    api.get(`reviews/can-review/${bookingId}/`).then((r) => r.data);
 
-export const getReviewReactions = (id, type = null) => {
-    const params = type ? { type } : {};
-    return api.get(`reviews/reviews/${id}/reactions/`, { params }).then((r) => r.data);
-};
-
-export const getReviewSummary = (id) =>
-    api.get(`reviews/reviews/${id}/reactions/summary/`).then((r) => r.data);
-
-// ─── Chat APIs ─────────────────────────────────────────────────────
+// Chat APIs
 export const getConversations = () => {
-    console.log("Getting conversations...");
     return api.get("chat/conversations/").then((r) => r.data);
-};
-
-export const getChatMessages = (conversationId, params = {}) => {
-    console.log("Getting chat messages for conversation:", conversationId);
-    return api.get(`chat/conversations/${conversationId}/messages/`, { params }).then((r) => r.data);
-};
-
-export const sendMessage = (payload) => {
-    console.log("Sending message:", payload);
-    return api.post("chat/messages/send/", payload).then((r) => r.data);
-};
-
-export const markMessagesAsRead = (conversationId) => {
-    console.log("Marking messages as read:", conversationId);
-    return api.post(`chat/conversations/${conversationId}/mark-read/`).then((r) => r.data);
-};
-
-export const createConversation = (payload) => {
-    console.log("Creating conversation:", payload);
-    return api.post("chat/conversations/", payload).then((r) => r.data);
 };
 
 export const getConversationById = (id) =>
     api.get(`chat/conversations/${id}/`).then((r) => r.data);
 
-export const blockUser = (payload) => {
-    console.log("Blocking user:", payload);
-    return api.post("chat/block/", payload).then((r) => r.data);
+export const createConversation = (payload) => {
+    return api.post("chat/conversations/", payload).then((r) => r.data);
+};
+
+export const getChatMessages = (conversationId, params = {}) => {
+    return api.get(`chat/conversations/${conversationId}/messages/`, { params }).then((r) => r.data);
+};
+
+export const sendMessage = (payload) => {
+    return api.post("chat/messages/send/", payload).then((r) => r.data);
+};
+
+export const markMessagesAsRead = (conversationId) => {
+    return api.post(`chat/conversations/${conversationId}/mark-read/`).then((r) => r.data);
+};
+
+export const acceptBookingInChat = (conversationId, bookingId, payload) => {
+    return api.post(`chat/conversations/${conversationId}/bookings/${bookingId}/accept/`, payload).then((r) => r.data);
+};
+
+export const updateBookingInChat = (conversationId, bookingId, payload) => {
+    return api.post(`chat/conversations/${conversationId}/bookings/${bookingId}/update/`, payload).then((r) => r.data);
+};
+
+export const cancelBookingInChat = (conversationId, bookingId, payload) => {
+    return api.post(`chat/conversations/${conversationId}/bookings/${bookingId}/cancel/`, payload).then((r) => r.data);
+};
+
+export const blockUser = (userId, payload = {}) => {
+    return api.post(`chat/users/block/${userId}/`, payload).then((r) => r.data);
 };
 
 export const unblockUser = (userId) => {
-    console.log("Unblocking user:", userId);
-    return api.delete(`chat/unblock/${userId}/`).then((r) => r.data);
+    return api.post(`chat/users/unblock/${userId}/`).then((r) => r.data);
 };
 
 export const getBlockedUsers = () =>
@@ -594,16 +538,14 @@ export const getUnreadCount = () =>
     api.get("chat/unread-count/").then((r) => r.data);
 
 export const searchUsers = (query) => {
-    console.log("Searching users:", query);
     return api.get("chat/users/search/", { params: { q: query } }).then((r) => r.data);
 };
 
 export const messageAction = (messageId, action) => {
-    console.log("Message action:", messageId, action);
     return api.post(`chat/messages/${messageId}/action/`, { action }).then((r) => r.data);
 };
 
-// ─── File Upload Helpers ───────────────────────────────────────────
+// File Upload Helpers
 export const uploadFile = (file, path = "general") => {
     const formData = new FormData();
     formData.append("file", file);
@@ -624,7 +566,7 @@ export const uploadAvatar = (file) => {
 export const deleteFile = (fileUrl) =>
     api.delete("upload/delete/", { data: { file_url: fileUrl } }).then((r) => r.data);
 
-// ─── Utility Functions ─────────────────────────────────────────────
+// Utility Functions
 export const healthCheck = () =>
     api.get("health/").then((r) => r.data);
 
@@ -637,5 +579,4 @@ export const reportBug = (payload) =>
 export const contactSupport = (payload) =>
     api.post("support/contact/", payload).then((r) => r.data);
 
-// Default export
 export default api;

@@ -64,14 +64,17 @@ class CustomerProfile(AbstractProfile):
         blank=True,  # 👈 ManyToMany doim blank=True bo'lishi kerak
         verbose_name=_("Service types offered"),
     )
-
+    country = models.CharField(max_length=100, verbose_name=_("Country"), db_index=True)
     city = models.ForeignKey(
         "common.City",
         on_delete=models.PROTECT,
+
         null=True,  # 👈 NULL qiymatga ruxsat
         blank=True,  # 👈 Formada bo'sh bo'lishi mumkin
+
         verbose_name=_("Service city"),
     )
+
     service_areas = models.TextField(
         blank=True, default="", verbose_name=_("Service areas")
     )

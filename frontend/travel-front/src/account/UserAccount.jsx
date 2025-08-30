@@ -1,5 +1,3 @@
-// src/account/UserAccount.jsx
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -60,21 +58,24 @@ const UserAccount = ({ user, setUser, setIsAuthenticated }) => {
     });
 
     const [originalData, setOriginalData] = useState({});
-    const [guides] = useState([]);
+    const [guides, setGuides] = useState([]);
     const [bookings] = useState([]);
     const [chatMessages] = useState({});
     const [filter, setFilter] = useState({
-        name: '',
-        minRating: '',
-        language: '',
-        maxPrice: '',
-        location: ''
+        country: '',
+        city: '',
+        start_date: '',
+        end_date: '',
+        service_type: '',
+        min_rating: ''
     });
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [bookingDate, setBookingDate] = useState('');
     const [travelers, setTravelers] = useState({ adults: 1, children: 0 });
     const [showBookingSummary, setShowBookingSummary] = useState(null);
     const [dataLoaded, setDataLoaded] = useState(false);
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [searchError, setSearchError] = useState('');
 
     const fetchUserFromAccounts = useCallback(async () => {
         try {
@@ -324,6 +325,32 @@ const UserAccount = ({ user, setUser, setIsAuthenticated }) => {
 
     const handleTravelersChange = (e) => {
         setTravelers({ ...travelers, [e.target.name]: Math.max(0, parseInt(e.target.value) || 0) });
+    };
+
+    const handleSearchGuides = async () => {
+        if (!filter.country) {
+            setSearchError(t('user.validation.country_required'));
+            return;
+        }
+        setSearchError('');
+        setSearchLoading(true);
+        try {
+            const params = {
+                country: filter.country,
+                city: filter.city,
+                start_date: filter.start_date,
+                end_date: filter.end_date,
+                service_type: filter.service_type,
+                min_rating: filter.min_rating
+            };
+            const response = await api.get("bookings/search_customers/", { params });
+            setGuides(response.data);
+        } catch (error) {
+            console.error('Error searching guides:', error);
+            setSearchError(t('user.errors.search_failed'));
+        } finally {
+            setSearchLoading(false);
+        }
     };
 
     const handleBookGuide = () => {
@@ -624,21 +651,79 @@ const UserAccount = ({ user, setUser, setIsAuthenticated }) => {
                                 <p className="user-account-subtitle">{t('user.guides.subtitle')}</p>
                             </div>
 
-                            <APINotConnected
-                                message={t('user.api_not_connected.guides')}
-                                icon={FiUsers}
-                            />
-
-                            <div className="user-account-search-section user-account-disabled">
-                                <div className="user-account-search-form">
+                            <div className="user-account-search-section">
+                                <form onSubmit={(e) => { e.preventDefault(); handleSearchGuides(); }} className="user-account-search-form">
                                     <div className="user-account-form-group">
-                                        <label>{t('user.guides.travel_date')}</label>
+                                        <label>{t('user.guides.country')} *</label>
+                                        <input
+                                            type="text"
+                                            name="country"
+                                            value={filter.country}
+                                            onChange={handleFilterChange}
+                                            placeholder={t('user.guides.country_placeholder')}
+                                            className="user-account-input"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="user-account-form-group">
+                                        <label>{t('user.guides.city')}</label>
+                                        <input
+                                            type="text"
+                                            name="city"
+                                            value={filter.city}
+                                            onChange={handleFilterChange}
+                                            placeholder={t('user.guides.city_placeholder')}
+                                            className="user-account-input"
+                                        />
+                                    </div>
+
+                                    <div className="user-account-form-group">
+                                        <label>{t('user.guides.start_date')}</label>
                                         <input
                                             type="date"
-                                            value={bookingDate}
-                                            onChange={(e) => setBookingDate(e.target.value)}
+                                            name="start_date"
+                                            value={filter.start_date}
+                                            onChange={handleFilterChange}
                                             className="user-account-input"
-                                            disabled
+                                        />
+                                    </div>
+
+                                    <div className="user-account-form-group">
+                                        <label>{t('user.guides.end_date')}</label>
+                                        <input
+                                            type="date"
+                                            name="end_date"
+                                            value={filter.end_date}
+                                            onChange={handleFilterChange}
+                                            className="user-account-input"
+                                        />
+                                    </div>
+
+                                    <div className="user-account-form-group">
+                                        <label>{t('user.guides.service_type')}</label>
+                                        <input
+                                            type="text"
+                                            name="service_type"
+                                            value={filter.service_type}
+                                            onChange={handleFilterChange}
+                                            placeholder={t('user.guides.service_type_placeholder')}
+                                            className="user-account-input"
+                                        />
+                                    </div>
+
+                                    <div className="user-account-form-group">
+                                        <label>{t('user.guides.min_rating')}</label>
+                                        <input
+                                            type="number"
+                                            name="min_rating"
+                                            value={filter.min_rating}
+                                            onChange={handleFilterChange}
+                                            placeholder={t('user.guides.min_rating_placeholder')}
+                                            className="user-account-input"
+                                            min="0"
+                                            max="5"
+                                            step="0.1"
                                         />
                                     </div>
 
@@ -652,7 +737,6 @@ const UserAccount = ({ user, setUser, setIsAuthenticated }) => {
                                                 onChange={handleTravelersChange}
                                                 placeholder={t('user.guides.adults')}
                                                 className="user-account-input"
-                                                disabled
                                             />
                                             <input
                                                 type="number"
@@ -661,17 +745,58 @@ const UserAccount = ({ user, setUser, setIsAuthenticated }) => {
                                                 onChange={handleTravelersChange}
                                                 placeholder={t('user.guides.children')}
                                                 className="user-account-input"
-                                                disabled
                                             />
                                         </div>
                                     </div>
 
                                     <button
-                                        className="user-account-btn user-account-btn-outline"
-                                        disabled
+                                        type="submit"
+                                        className="user-account-btn user-account-btn-primary"
+                                        disabled={searchLoading}
                                     >
-                                        <FiFilter /> {t('user.actions.filters')}
+                                        {searchLoading ? t('user.actions.searching') : t('user.actions.search')}
                                     </button>
+                                </form>
+
+                                {searchError && (
+                                    <div className="user-account-error-message">
+                                        <FiAlertCircle size={16} />
+                                        {searchError}
+                                    </div>
+                                )}
+
+                                <div className="user-account-guides-list">
+                                    {searchLoading ? (
+                                        <div className="user-account-loading">
+                                            <div className="user-account-spinner"></div>
+                                            <p>{t('user.loading.searching')}</p>
+                                        </div>
+                                    ) : guides.length > 0 ? (
+                                        guides.map((guide) => (
+                                            <div key={guide.id} className="user-account-guide-card">
+                                                <div className="user-account-guide-header">
+                                                    <div className="user-account-avatar-placeholder">
+                                                        <img src={guide.user.avatar_url || ''} alt="" />
+                                                    </div>
+                                                    <h3>{guide.user.full_name}</h3>
+                                                    <span className="user-account-guide-rating">
+                                                        <FiStar /> {guide.average_rating || 'N/A'}
+                                                    </span>
+                                                </div>
+                                                <p>{guide.country}, {guide.city}</p>
+                                                <p>{t('user.guides.services')}: {guide.service_areas}</p>
+                                                <p>{t('user.guides.available')}: {guide.is_available ? t('yes') : t('no')}</p>
+                                                <button
+                                                    className="user-account-btn user-account-btn-primary"
+                                                    onClick={() => handleBookGuide(guide)}
+                                                >
+                                                    {t('user.actions.book')}
+                                                </button>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p>{t('user.guides.no_results')}</p>
+                                    )}
                                 </div>
                             </div>
                         </div>

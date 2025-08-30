@@ -1,4 +1,3 @@
-// ClientDashboard.jsx (modified to ensure chat integration)
 import React, { useState, useEffect } from 'react';
 import {
     getClientProfile,
@@ -15,68 +14,78 @@ import {
     getLanguages,
     getCurrentUser,
     getServiceTypes,
-    getCities,
-    getCountries,
-    canReviewBooking,
-    logoutUser
+    reactToReview,
+    removeReactionFromReview,
+    getReviewReactions,
+    getReviewSummary
 } from '../api/api';
-import ChatWidget from './ChatWidgets';
+import ChatWidgets from './ChatWidgets';
 import './UserAccount.css';
 
-const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
+const UserAccount = () => {
+    const [currentUser, setCurrentUser] = useState(null);
     const [profile, setProfile] = useState(null);
     const [bookings, setBookings] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [guides, setGuides] = useState([]);
     const [languages, setLanguages] = useState([]);
     const [serviceTypes, setServiceTypes] = useState([]);
-    const [cities, setCities] = useState([]);
-    const [countries, setCountries] = useState([]);
     const [activeTab, setActiveTab] = useState('dashboard');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showProfileForm, setShowProfileForm] = useState(false);
     const [showBookingForm, setShowBookingForm] = useState(false);
     const [showReviewForm, setShowReviewForm] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [showReactionsModal, setShowReactionsModal] = useState(false);
+    const [cancelReason, setCancelReason] = useState('');
     const [selectedGuide, setSelectedGuide] = useState(null);
     const [selectedBookingForReview, setSelectedBookingForReview] = useState(null);
-    const [editingReview, setEditingReview] = useState(null);
+    const [selectedBookingForCancel, setSelectedBookingForCancel] = useState(null);
+    const [selectedReviewForReactions, setSelectedReviewForReactions] = useState(null);
+    const [reactions, setReactions] = useState([]);
+    const [reactionSummary, setReactionSummary] = useState(null);
     const [showChat, setShowChat] = useState(false);
     const [selectedUserForChat, setSelectedUserForChat] = useState(null);
-
-    // Form states
+    const [guidesFilter, setGuidesFilter] = useState({
+        search: '',
+        service_type: '',
+        city: '',
+        min_rating: '',
+        is_available: true
+    });
+    const [reviewFilter, setReviewFilter] = useState({
+        minRating: '',
+        sortBy: 'date_desc'
+    });
+    const [editingReview, setEditingReview] = useState(null);
     const [profileForm, setProfileForm] = useState({
         date_of_birth: '',
         preferred_contact: 'email',
         languages: []
     });
-
     const [bookingForm, setBookingForm] = useState({
         title: '',
         description: '',
         start_date: '',
         end_date: '',
-        country: '',
-        city: '',
-        location: '',
-        proposed_rate: '',
         special_requirements: '',
+        budget: '',
         customer_profile: ''
     });
-
     const [reviewForm, setReviewForm] = useState({
-        rating: 5,
-        comment: ''
+        overall_rating: 5,
+        communication_rating: 5,
+        service_rating: 5,
+        punctuality_rating: 5,
+        value_rating: 5,
+        title: '',
+        comment: '',
+        booking_id: ''
     });
-
-    // FIXED: Filters for guides search - to'g'ri parametrlar
-    const [guidesFilter, setGuidesFilter] = useState({
-        search: '',
-        service_types: '', // FIXED: service_type -> service_types
-        country: '',
-        city: '',
-        average_rating__gte: '', // FIXED: min_rating -> average_rating__gte
-        is_available: true
+    const [reactionForm, setReactionForm] = useState({
+        reaction_type: 'like',
+        comment: ''
     });
 
     useEffect(() => {
@@ -86,21 +95,14 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
     const initializeData = async () => {
         try {
             setLoading(true);
-
-            // Load common data
-            const [languagesData, serviceTypesData, citiesData, countriesData] = await Promise.all([
-                getLanguages().catch(() => ({ results: [] })),
-                getServiceTypes().catch(() => ({ results: [] })),
-                getCities().catch(() => ({ results: [] })),
-                getCountries().catch(() => ({ results: [] }))
+            const userData = await getCurrentUser();
+            setCurrentUser(userData);
+            const [languagesData, serviceTypesData] = await Promise.all([
+                getLanguages(),
+                getServiceTypes()
             ]);
-
-            setLanguages(languagesData.results || languagesData || []);
-            setServiceTypes(serviceTypesData.results || serviceTypesData || []);
-            setCities(citiesData.results || citiesData || []);
-            setCountries(countriesData.results || countriesData || []);
-
-            // Try to load profile
+            setLanguages(languagesData.results || languagesData);
+            setServiceTypes(serviceTypesData.results || serviceTypesData);
             try {
                 const profileData = await getClientProfile();
                 setProfile(profileData);
@@ -113,14 +115,11 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
                 console.log('No profile found, user needs to create one');
                 setShowProfileForm(true);
             }
-
-            // Load other data
             await Promise.all([
                 loadBookings(),
                 loadReviews(),
                 loadGuides()
             ]);
-
         } catch (err) {
             console.error('Error initializing data:', err);
             setError(err.message);
@@ -132,7 +131,7 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
     const loadBookings = async () => {
         try {
             const data = await getMyBookings();
-            setBookings(data.results || data || []);
+            setBookings(data.results || data);
         } catch (err) {
             console.error('Error loading bookings:', err);
         }
@@ -141,66 +140,44 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
     const loadReviews = async () => {
         try {
             const data = await getMyReviews();
-            setReviews(data.results || data || []);
+            setReviews(data.results || data);
         } catch (err) {
             console.error('Error loading reviews:', err);
         }
     };
 
-    // FIXED: Guides loading with correct parameters
     const loadGuides = async () => {
         try {
             const params = {};
-
-            // FIXED: To'g'ri parameter nomlari
-            if (guidesFilter.search?.trim()) {
-                params.search = guidesFilter.search.trim();
-            }
-            if (guidesFilter.service_types) {
-                params.service_types = guidesFilter.service_types;
-            }
-            if (guidesFilter.country) {
-                params.country = guidesFilter.country;
-            }
-            if (guidesFilter.city?.trim()) {
-                params.city = guidesFilter.city.trim();
-            }
-            if (guidesFilter.average_rating__gte) {
-                params.average_rating__gte = guidesFilter.average_rating__gte;
-            }
-            if (guidesFilter.is_available !== undefined) {
-                params.is_available = guidesFilter.is_available;
-            }
-
-            console.log('Loading guides with params:', params); // Debug log
-
+            if (guidesFilter.search) params.search = guidesFilter.search;
+            if (guidesFilter.service_type) params.service_types = guidesFilter.service_type;
+            if (guidesFilter.city) params.city = guidesFilter.city;
+            if (guidesFilter.min_rating) params.average_rating__gte = guidesFilter.min_rating;
+            if (guidesFilter.is_available) params.is_available = guidesFilter.is_available;
             const data = await getCustomerProfiles(params);
-            console.log('Guides data received:', data); // Debug log
-
-            setGuides(data.results || data || []);
-
-            // FIXED: Error handling uchun message
-            if (!data.results && !Array.isArray(data)) {
-                console.warn('No guides data or unexpected format:', data);
-                setGuides([]);
-            }
-
+            setGuides(data.results || data);
         } catch (err) {
             console.error('Error loading guides:', err);
-            setError('Failed to load guides. Please try again.');
-            setGuides([]);
         }
     };
 
-    const handleLogout = async () => {
+    const loadReviewReactions = async (reviewId) => {
         try {
-            await logoutUser();
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("refresh_token");
-            setIsAuthenticated(false);
-            setUser(null);
+            const data = await getReviewReactions(reviewId);
+            setReactions(data.results || data);
         } catch (err) {
-            console.error('Logout error:', err);
+            console.error('Error loading reactions:', err);
+            setError(err.message || 'Failed to load reactions');
+        }
+    };
+
+    const loadReviewSummary = async (reviewId) => {
+        try {
+            const data = await getReviewSummary(reviewId);
+            setReactionSummary(data);
+        } catch (err) {
+            console.error('Error loading review summary:', err);
+            setError(err.message || 'Failed to load review summary');
         }
     };
 
@@ -217,54 +194,43 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
             setShowProfileForm(false);
             setError(null);
         } catch (err) {
-            console.error('Profile submit error:', err);
-            setError(err.message || 'Failed to save profile');
+            setError(err.message);
         }
     };
 
     const handleBookingSubmit = async (e) => {
         e.preventDefault();
-
+        if (!bookingForm.start_date) {
+            setError('Start date is required');
+            return;
+        }
+        if (!bookingForm.end_date) {
+            setError('End date is required');
+            return;
+        }
         if (!bookingForm.title.trim()) {
             setError('Title is required');
             return;
         }
-
-        if (!bookingForm.start_date || !bookingForm.end_date) {
-            setError('Dates are required');
-            return;
-        }
-
-        if (!bookingForm.country.trim()) {
-            setError('Country is required');
-            return;
-        }
-
         if (new Date(bookingForm.start_date) > new Date(bookingForm.end_date)) {
             setError('Start date must be before end date');
             return;
         }
-
         const today = new Date().toISOString().split('T')[0];
         if (bookingForm.start_date < today) {
             setError('Start date cannot be in the past');
             return;
         }
-
         try {
             const bookingData = {
                 title: bookingForm.title.trim(),
                 description: bookingForm.description.trim(),
                 start_date: bookingForm.start_date,
                 end_date: bookingForm.end_date,
-                country: bookingForm.country.trim(),
-                city: bookingForm.city?.trim() || null,
-                location: bookingForm.location.trim(),
                 special_requirements: bookingForm.special_requirements.trim(),
-                proposed_rate: bookingForm.proposed_rate ? parseFloat(bookingForm.proposed_rate) : null,
+                budget: bookingForm.budget ? parseFloat(bookingForm.budget) : null,
                 customer_profile: selectedGuide.id
             };
-
             await createBooking(bookingData);
             loadBookings();
             setShowBookingForm(false);
@@ -274,14 +240,12 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
                 description: '',
                 start_date: '',
                 end_date: '',
-                country: '',
-                city: '',
-                location: '',
-                proposed_rate: '',
                 special_requirements: '',
+                budget: '',
                 customer_profile: ''
             });
             setError(null);
+            alert('Booking created successfully!');
         } catch (err) {
             console.error('Booking creation error:', err);
             setError(err.message || 'Failed to create booking');
@@ -290,127 +254,172 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
 
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
-
-        if (!reviewForm.comment.trim()) {
-            setError('Please provide a comment');
+        if (!reviewForm.title.trim()) {
+            setError('Review title is required');
             return;
         }
-
+        if (!reviewForm.comment.trim()) {
+            setError('Review comment is required');
+            return;
+        }
         try {
             const reviewData = {
-                rating: reviewForm.rating,
-                comment: reviewForm.comment.trim()
+                ...reviewForm,
+                booking_id: selectedBookingForReview.id
             };
-
             if (editingReview) {
                 await updateReview(editingReview.id, reviewData);
             } else {
-                await createReview(selectedBookingForReview.id, reviewData);
+                await createReview(reviewData);
             }
-
             loadReviews();
             loadBookings();
             setShowReviewForm(false);
             setSelectedBookingForReview(null);
             setEditingReview(null);
             setReviewForm({
-                rating: 5,
-                comment: ''
+                overall_rating: 5,
+                communication_rating: 5,
+                service_rating: 5,
+                punctuality_rating: 5,
+                value_rating: 5,
+                title: '',
+                comment: '',
+                booking_id: ''
             });
             setError(null);
-
+            alert(editingReview ? 'Review updated successfully!' : 'Review submitted successfully!');
         } catch (err) {
-            console.error('Review error:', err);
-            setError(err.message || 'Failed to save review');
+            setError(err.message || 'Failed to submit review');
         }
     };
 
     const handleDeleteReview = async (reviewId) => {
-        if (!window.confirm('Are you sure you want to delete this review?')) {
-            return;
-        }
-
+        if (!window.confirm('Are you sure you want to delete this review?')) return;
         try {
             await deleteReview(reviewId);
             loadReviews();
             loadBookings();
             setError(null);
+            alert('Review deleted successfully!');
         } catch (err) {
-            console.error('Delete review error:', err);
             setError(err.message || 'Failed to delete review');
         }
     };
 
-    const handleCancelBooking = async (bookingId) => {
-        if (!window.confirm('Are you sure you want to cancel this booking?')) {
+    const handleReactToReview = async (reviewId) => {
+        if (reactionForm.reaction_type === 'dislike' && !reactionForm.comment.trim()) {
+            setError('Comment is required for dislike');
             return;
         }
-
         try {
-            await cancelBooking(bookingId, { confirm: true, reason: 'Client cancelled the booking' });
-            loadBookings();
+            await reactToReview(reviewId, reactionForm.reaction_type, reactionForm.comment);
+            loadReviewReactions(reviewId);
+            loadReviewSummary(reviewId);
+            setReactionForm({ reaction_type: 'like', comment: '' });
+            setError(null);
+            alert('Reaction submitted successfully!');
         } catch (err) {
-            setError(err.message);
+            setError(err.message || 'Failed to submit reaction');
+        }
+    };
+
+    const handleRemoveReaction = async (reviewId) => {
+        try {
+            await removeReactionFromReview(reviewId);
+            loadReviewReactions(reviewId);
+            loadReviewSummary(reviewId);
+            setError(null);
+            alert('Reaction removed successfully!');
+        } catch (err) {
+            setError(err.message || 'Failed to remove reaction');
+        }
+    };
+
+    const handleViewReactions = (review) => {
+        setSelectedReviewForReactions(review);
+        loadReviewReactions(review.id);
+        loadReviewSummary(review.id);
+        setShowReactionsModal(true);
+    };
+
+    const handleEditReview = (review, booking) => {
+        setSelectedBookingForReview(booking);
+        setEditingReview(review);
+        setReviewForm({
+            overall_rating: review.overall_rating,
+            communication_rating: review.communication_rating,
+            service_rating: review.service_rating,
+            punctuality_rating: review.punctuality_rating,
+            value_rating: review.value_rating,
+            title: review.title,
+            comment: review.comment,
+            booking_id: review.booking
+        });
+        setShowReviewForm(true);
+    };
+
+    const handleCancelBooking = async () => {
+        if (!cancelReason.trim()) {
+            setError('Cancellation reason is required');
+            return;
+        }
+        try {
+            await cancelBooking(selectedBookingForCancel.id, cancelReason);
+            loadBookings();
+            setShowCancelModal(false);
+            setSelectedBookingForCancel(null);
+            setCancelReason('');
+            setError(null);
+            alert('Booking cancelled successfully!');
+        } catch (err) {
+            setError(err.message || 'Failed to cancel booking');
         }
     };
 
     const handleBookGuide = (guide) => {
         setSelectedGuide(guide);
-
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
         const nextWeek = new Date(today);
         nextWeek.setDate(nextWeek.getDate() + 7);
-
         setBookingForm({
             title: `Tour with ${guide.user?.full_name || 'Guide'}`,
             description: '',
             start_date: tomorrow.toISOString().split('T')[0],
             end_date: nextWeek.toISOString().split('T')[0],
-            country: guide.country_display?.name || '',
-            city: guide.city_name || '',
-            location: '',
-            proposed_rate: guide.daily_rate || guide.hourly_rate || '',
             special_requirements: '',
-            customer_profile: guide.id
+            budget: guide.daily_rate || guide.hourly_rate || '',
+            customer_profile: ''
         });
-
         setShowBookingForm(true);
     };
 
-    const handleWriteReview = async (booking) => {
-        try {
-            const canReview = await canReviewBooking(booking.id);
-            if (!canReview.can_review) {
-                setError(canReview.reason || 'Cannot review this booking');
-                return;
-            }
-        } catch (err) {
-            console.error('Error checking review eligibility:', err);
-        }
-
+    const handleWriteReview = (booking) => {
         setSelectedBookingForReview(booking);
         setEditingReview(null);
         setReviewForm({
-            rating: 5,
-            comment: ''
+            overall_rating: 5,
+            communication_rating: 5,
+            service_rating: 5,
+            punctuality_rating: 5,
+            value_rating: 5,
+            title: `Review for ${booking.title}`,
+            comment: '',
+            booking_id: booking.id
         });
         setShowReviewForm(true);
     };
 
-    const handleEditReview = (review) => {
-        setEditingReview(review);
-        setSelectedBookingForReview(null);
-        setReviewForm({
-            rating: review.rating || 5,
-            comment: review.comment || ''
-        });
-        setShowReviewForm(true);
+    const handleOpenCancelModal = (booking) => {
+        setSelectedBookingForCancel(booking);
+        setCancelReason('');
+        setShowCancelModal(true);
     };
 
-    const handleChatWithUser = (guide) => {
-        setSelectedUserForChat(guide.user?.email);
+    const handleChatWithUser = (user) => {
+        setSelectedUserForChat(user?.user?.email || user?.email);
         setShowChat(true);
     };
 
@@ -419,173 +428,179 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
         setSelectedUserForChat(null);
     };
 
-    // FIXED: Filter change handler with correct parameter names
     const handleFilterChange = (key, value) => {
-        setGuidesFilter(prev => ({ ...prev, [key]: value }));
+        setGuidesFilter({ ...guidesFilter, [key]: value });
     };
 
-    // FIXED: useEffect for loading guides when filters change
+    const handleReviewFilterChange = (key, value) => {
+        setReviewFilter({ ...reviewFilter, [key]: value });
+    };
+
+    // Filter and sort reviews
+    const filteredReviews = reviews
+        .filter(review => reviewFilter.minRating ? review.overall_rating >= parseInt(reviewFilter.minRating) : true)
+        .sort((a, b) => {
+            if (reviewFilter.sortBy === 'date_desc') {
+                return new Date(b.created_at) - new Date(a.created_at);
+            } else if (reviewFilter.sortBy === 'date_asc') {
+                return new Date(a.created_at) - new Date(b.created_at);
+            } else if (reviewFilter.sortBy === 'rating_desc') {
+                return b.overall_rating - a.overall_rating;
+            } else if (reviewFilter.sortBy === 'rating_asc') {
+                return a.overall_rating - b.overall_rating;
+            }
+            return 0;
+        });
+
     useEffect(() => {
-        if (activeTab === 'guides') {
-            const delayedSearch = setTimeout(() => {
-                loadGuides();
-            }, 500); // 500ms delay for search input
-
-            return () => clearTimeout(delayedSearch);
-        }
-    }, [guidesFilter, activeTab]);
-
-    const canReviewBookingCheck = (booking) => {
-        return booking.status === 'completed' && !reviews.find(r => r.booking === booking.id);
-    };
-
-    const getReviewForBooking = (booking) => {
-        return reviews.find(r => r.booking === booking.id);
-    };
-
-    const canEditReview = (review) => {
-        if (!review.created_at) return false;
-        const reviewDate = new Date(review.created_at);
-        const today = new Date();
-        const daysDiff = Math.floor((today - reviewDate) / (1000 * 60 * 60 * 24));
-        return daysDiff <= 7;
-    };
+        loadGuides();
+    }, [guidesFilter]);
 
     if (loading) {
         return (
-            <div className="client-dashboard-loading">
-                <div className="client-dashboard-spinner"></div>
-                <p>Loading dashboard...</p>
+            <div className="user-account-loading">
+                <div className="user-account-spinner"></div>
+                <p>Loading...</p>
             </div>
         );
     }
 
     return (
-        <div className="client-dashboard-container">
-            <div className="client-dashboard-header">
-                <div className="client-dashboard-header-content">
-                    <h1 className="client-dashboard-title">Client Dashboard</h1>
-                    {user && (
-                        <div className="client-dashboard-user-info">
-                            <span className="client-dashboard-welcome">Welcome, {user.full_name}</span>
-                            <button
-                                className="client-dashboard-chat-btn"
-                                onClick={() => setShowChat(true)}
-                            >
-                                Messages
-                            </button>
-                            <button
-                                className="client-dashboard-logout-btn"
-                                onClick={handleLogout}
-                            >
-                                Logout
-                            </button>
-                        </div>
-                    )}
-                </div>
+        <div className="user-account-container">
+            <div className="user-account-header">
+                <h1 className="user-account-title">My Account</h1>
+                {currentUser && (
+                    <div className="user-account-user-info">
+                        <span className="user-account-welcome">Welcome, {currentUser.full_name}</span>
+                        <button
+                            className="user-account-chat-btn"
+                            onClick={() => setShowChat(true)}
+                            style={{
+                                marginLeft: '16px',
+                                padding: '8px 16px',
+                                backgroundColor: '#667eea',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                fontWeight: '500'
+                            }}
+                        >
+                            Messages
+                        </button>
+                    </div>
+                )}
             </div>
-
             {error && (
-                <div className="client-dashboard-error">
+                <div className="user-account-error" style={{ background: '#f8d7da', color: '#721c24', padding: '8px 12px', borderRadius: '4px', marginBottom: '16px' }}>
                     <p>{error}</p>
-                    <button onClick={() => setError(null)} className="client-dashboard-error-close">×</button>
+                    <button onClick={() => setError(null)} className="user-account-error-close">×</button>
                 </div>
             )}
-
-            <div className="client-dashboard-navigation">
+            <div className="user-account-navigation">
                 <button
-                    className={`client-dashboard-nav-btn ${activeTab === 'dashboard' ? 'client-dashboard-nav-active' : ''}`}
+                    className={`user-account-nav-btn ${activeTab === 'dashboard' ? 'user-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('dashboard')}
                 >
                     Dashboard
                 </button>
                 <button
-                    className={`client-dashboard-nav-btn ${activeTab === 'profile' ? 'client-dashboard-nav-active' : ''}`}
+                    className={`user-account-nav-btn ${activeTab === 'profile' ? 'user-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('profile')}
                 >
                     Profile
                 </button>
                 <button
-                    className={`client-dashboard-nav-btn ${activeTab === 'guides' ? 'client-dashboard-nav-active' : ''}`}
+                    className={`user-account-nav-btn ${activeTab === 'guides' ? 'user-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('guides')}
                 >
                     Find Guides
                 </button>
                 <button
-                    className={`client-dashboard-nav-btn ${activeTab === 'bookings' ? 'client-dashboard-nav-active' : ''}`}
+                    className={`user-account-nav-btn ${activeTab === 'bookings' ? 'user-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('bookings')}
                 >
                     My Bookings
                 </button>
                 <button
-                    className={`client-dashboard-nav-btn ${activeTab === 'reviews' ? 'client-dashboard-nav-active' : ''}`}
+                    className={`user-account-nav-btn ${activeTab === 'reviews' ? 'user-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('reviews')}
                 >
                     My Reviews
                 </button>
             </div>
-
-            <div className="client-dashboard-content">
+            <div className="user-account-content">
                 {activeTab === 'dashboard' && (
-                    <div className="client-dashboard-overview">
-                        <div className="client-dashboard-stats">
-                            <div className="client-dashboard-stat-card">
-                                <h3 className="client-dashboard-stat-title">Total Bookings</h3>
-                                <p className="client-dashboard-stat-value">{bookings.length}</p>
+                    <div className="user-account-dashboard">
+                        <div className="user-account-stats">
+                            <div className="user-account-stat-card">
+                                <h3 className="user-account-stat-title">Total Bookings</h3>
+                                <p className="user-account-stat-value">{bookings.length}</p>
                             </div>
-                            <div className="client-dashboard-stat-card">
-                                <h3 className="client-dashboard-stat-title">Active Bookings</h3>
-                                <p className="client-dashboard-stat-value">
-                                    {bookings.filter(b => ['pending', 'accepted'].includes(b.status)).length}
+                            <div className="user-account-stat-card">
+                                <h3 className="user-account-stat-title">Active Bookings</h3>
+                                <p className="user-account-stat-value">
+                                    {bookings.filter(b => b.status === 'confirmed' || b.status === 'accepted').length}
                                 </p>
                             </div>
-                            <div className="client-dashboard-stat-card">
-                                <h3 className="client-dashboard-stat-title">Completed Trips</h3>
-                                <p className="client-dashboard-stat-value">
+                            <div className="user-account-stat-card">
+                                <h3 className="user-account-stat-title">Completed Trips</h3>
+                                <p className="user-account-stat-value">
                                     {bookings.filter(b => b.status === 'completed').length}
                                 </p>
                             </div>
-                            <div className="client-dashboard-stat-card">
-                                <h3 className="client-dashboard-stat-title">Reviews Written</h3>
-                                <p className="client-dashboard-stat-value">{reviews.length}</p>
+                            <div className="user-account-stat-card">
+                                <h3 className="user-account-stat-title">Reviews Written</h3>
+                                <p className="user-account-stat-value">{reviews.length}</p>
                             </div>
                         </div>
-
-                        <div className="client-dashboard-recent">
-                            <h3 className="client-dashboard-section-title">Recent Activity</h3>
-                            <div className="client-dashboard-recent-bookings">
+                        <div className="user-account-recent">
+                            <h3 className="user-account-section-title">Recent Bookings</h3>
+                            <div className="user-account-recent-bookings">
                                 {bookings.slice(0, 5).map(booking => (
-                                    <div key={booking.id} className="client-dashboard-booking-card">
-                                        <div className="client-dashboard-booking-info">
-                                            <h4 className="client-dashboard-booking-title">{booking.title}</h4>
-                                            <p className="client-dashboard-booking-date">
-                                                {new Date(booking.start_date).toLocaleDateString()} - {new Date(booking.end_date).toLocaleDateString()}
+                                    <div key={booking.id} className="user-account-booking-card">
+                                        <div className="user-account-booking-info">
+                                            <h4 className="user-account-booking-title">{booking.title}</h4>
+                                            <p className="user-account-booking-date">
+                                                {new Date(booking.start_date).toLocaleDateString()} -
+                                                {new Date(booking.end_date).toLocaleDateString()}
                                             </p>
-                                            <span className={`client-dashboard-booking-status client-dashboard-status-${booking.status}`}>
+                                            <span className={`user-account-booking-status user-account-status-${booking.status}`}>
                                                 {booking.status}
                                             </span>
+                                            {booking.status === 'cancelled' && booking.cancellation_reason && (
+                                                <p className="user-account-booking-cancel-reason" style={{ color: '#721c24', fontSize: '14px', marginTop: '8px' }}>
+                                                    Cancellation Reason: {booking.cancellation_reason}
+                                                </p>
+                                            )}
                                         </div>
-                                        <div className="client-dashboard-booking-actions">
+                                        <div className="user-account-booking-actions">
                                             {booking.status === 'pending' && (
                                                 <button
-                                                    className="client-dashboard-btn client-dashboard-btn-cancel"
-                                                    onClick={() => handleCancelBooking(booking.id)}
+                                                    className="user-account-btn user-account-btn-cancel"
+                                                    onClick={() => handleOpenCancelModal(booking)}
                                                 >
                                                     Cancel
                                                 </button>
                                             )}
-                                            {booking.status === 'completed' && canReviewBookingCheck(booking) && (
+                                            {booking.status === 'completed' && !reviews.find(r => r.booking === booking.id) && (
                                                 <button
-                                                    className="client-dashboard-btn client-dashboard-btn-primary"
+                                                    className="user-account-btn user-account-btn-primary"
                                                     onClick={() => handleWriteReview(booking)}
                                                 >
                                                     Write Review
                                                 </button>
                                             )}
-                                            {booking.customer_details && (
+                                            {booking.customer_profile?.user && (
                                                 <button
-                                                    className="client-dashboard-btn client-dashboard-btn-secondary"
-                                                    onClick={() => handleChatWithUser({ user: { email: booking.customer_details.email } })}
+                                                    className="user-account-btn user-account-btn-secondary"
+                                                    onClick={() => handleChatWithUser(booking.customer_profile)}
+                                                    style={{
+                                                        marginLeft: '8px',
+                                                        backgroundColor: '#6c757d',
+                                                        color: 'white'
+                                                    }}
                                                 >
                                                     Chat
                                                 </button>
@@ -597,29 +612,27 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
                         </div>
                     </div>
                 )}
-
                 {activeTab === 'profile' && (
-                    <div className="client-dashboard-profile">
+                    <div className="user-account-profile">
                         {!profile || showProfileForm ? (
-                            <div className="client-dashboard-profile-form">
-                                <h3 className="client-dashboard-section-title">
+                            <div className="user-account-profile-form">
+                                <h3 className="user-account-section-title">
                                     {profile ? 'Edit Profile' : 'Create Profile'}
                                 </h3>
-                                <form onSubmit={handleProfileSubmit} className="client-dashboard-form">
-                                    <div className="client-dashboard-form-group">
-                                        <label className="client-dashboard-label">Date of Birth</label>
+                                <form onSubmit={handleProfileSubmit} className="user-account-form">
+                                    <div className="user-account-form-group">
+                                        <label className="user-account-label">Date of Birth</label>
                                         <input
                                             type="date"
-                                            className="client-dashboard-input"
+                                            className="user-account-input"
                                             value={profileForm.date_of_birth}
                                             onChange={(e) => setProfileForm({...profileForm, date_of_birth: e.target.value})}
                                         />
                                     </div>
-
-                                    <div className="client-dashboard-form-group">
-                                        <label className="client-dashboard-label">Preferred Contact Method</label>
+                                    <div className="user-account-form-group">
+                                        <label className="user-account-label">Preferred Contact Method</label>
                                         <select
-                                            className="client-dashboard-select"
+                                            className="user-account-select"
                                             value={profileForm.preferred_contact}
                                             onChange={(e) => setProfileForm({...profileForm, preferred_contact: e.target.value})}
                                         >
@@ -628,15 +641,14 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
                                             <option value="chat">Chat</option>
                                         </select>
                                     </div>
-
-                                    <div className="client-dashboard-form-group">
-                                        <label className="client-dashboard-label">Languages</label>
-                                        <div className="client-dashboard-checkbox-group">
+                                    <div className="user-account-form-group">
+                                        <label className="user-account-label">Languages</label>
+                                        <div className="user-account-checkbox-group">
                                             {languages.map(language => (
-                                                <label key={language.id} className="client-dashboard-checkbox-label">
+                                                <label key={language.id} className="user-account-checkbox-label">
                                                     <input
                                                         type="checkbox"
-                                                        className="client-dashboard-checkbox"
+                                                        className="user-account-checkbox"
                                                         checked={profileForm.languages.includes(language.id)}
                                                         onChange={(e) => {
                                                             if (e.target.checked) {
@@ -657,15 +669,14 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
                                             ))}
                                         </div>
                                     </div>
-
-                                    <div className="client-dashboard-form-actions">
-                                        <button type="submit" className="client-dashboard-btn client-dashboard-btn-primary">
+                                    <div className="user-account-form-actions">
+                                        <button type="submit" className="user-account-btn user-account-btn-primary">
                                             {profile ? 'Update Profile' : 'Create Profile'}
                                         </button>
                                         {profile && (
                                             <button
                                                 type="button"
-                                                className="client-dashboard-btn client-dashboard-btn-secondary"
+                                                className="user-account-btn user-account-btn-secondary"
                                                 onClick={() => setShowProfileForm(false)}
                                             >
                                                 Cancel
@@ -675,49 +686,48 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
                                 </form>
                             </div>
                         ) : (
-                            <div className="client-dashboard-profile-view">
-                                <div className="client-dashboard-profile-header">
-                                    <h3 className="client-dashboard-section-title">Profile Information</h3>
+                            <div className="user-account-profile-view">
+                                <div className="user-account-profile-header">
+                                    <h3 className="user-account-section-title">Profile Information</h3>
                                     <button
-                                        className="client-dashboard-btn client-dashboard-btn-primary"
+                                        className="user-account-btn user-account-btn-primary"
                                         onClick={() => setShowProfileForm(true)}
                                     >
                                         Edit Profile
                                     </button>
                                 </div>
-                                <div className="client-dashboard-profile-info">
-                                    <div className="client-dashboard-profile-field">
-                                        <label className="client-dashboard-profile-label">Date of Birth:</label>
-                                        <p className="client-dashboard-profile-value">
+                                <div className="user-account-profile-info">
+                                    <div className="user-account-profile-field">
+                                        <label className="user-account-profile-label">Date of Birth:</label>
+                                        <p className="user-account-profile-value">
                                             {profile.date_of_birth ? new Date(profile.date_of_birth).toLocaleDateString() : 'Not set'}
                                         </p>
                                     </div>
-                                    <div className="client-dashboard-profile-field">
-                                        <label className="client-dashboard-profile-label">Preferred Contact:</label>
-                                        <p className="client-dashboard-profile-value">{profile.preferred_contact}</p>
+                                    <div className="user-account-profile-field">
+                                        <label className="user-account-profile-label">Preferred Contact:</label>
+                                        <p className="user-account-profile-value">{profile.preferred_contact}</p>
                                     </div>
                                 </div>
                             </div>
                         )}
                     </div>
                 )}
-
                 {activeTab === 'guides' && (
-                    <div className="client-dashboard-guides">
-                        <div className="client-dashboard-guides-header">
-                            <h3 className="client-dashboard-section-title">Find Guides</h3>
-                            <div className="client-dashboard-guides-filters">
+                    <div className="user-account-guides">
+                        <div className="user-account-guides-header">
+                            <h3 className="user-account-section-title">Find Guides</h3>
+                            <div className="user-account-guides-filters">
                                 <input
                                     type="text"
-                                    className="client-dashboard-filter-input"
+                                    className="user-account-filter-input"
                                     placeholder="Search guides..."
                                     value={guidesFilter.search}
                                     onChange={(e) => handleFilterChange('search', e.target.value)}
                                 />
                                 <select
-                                    className="client-dashboard-filter-select"
-                                    value={guidesFilter.service_types}
-                                    onChange={(e) => handleFilterChange('service_types', e.target.value)}
+                                    className="user-account-filter-select"
+                                    value={guidesFilter.service_type}
+                                    onChange={(e) => handleFilterChange('service_type', e.target.value)}
                                 >
                                     <option value="">All Services</option>
                                     {serviceTypes.map(service => (
@@ -725,33 +735,16 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
                                     ))}
                                 </select>
                                 <select
-                                    className="client-dashboard-filter-select"
-                                    value={guidesFilter.country}
-                                    onChange={(e) => handleFilterChange('country', e.target.value)}
-                                >
-                                    <option value="">All Countries</option>
-                                    {countries.map(country => (
-                                        <option key={country.id} value={country.name}>{country.name}</option>
-                                    ))}
-                                </select>
-                                <input
-                                    type="text"
-                                    className="client-dashboard-filter-input"
-                                    placeholder="City..."
-                                    value={guidesFilter.city}
-                                    onChange={(e) => handleFilterChange('city', e.target.value)}
-                                />
-                                <select
-                                    className="client-dashboard-filter-select"
-                                    value={guidesFilter.average_rating__gte}
-                                    onChange={(e) => handleFilterChange('average_rating__gte', e.target.value)}
+                                    className="user-account-filter-select"
+                                    value={guidesFilter.min_rating}
+                                    onChange={(e) => handleFilterChange('min_rating', e.target.value)}
                                 >
                                     <option value="">Any Rating</option>
                                     <option value="4">4+ Stars</option>
                                     <option value="4.5">4.5+ Stars</option>
                                     <option value="5">5 Stars</option>
                                 </select>
-                                <label className="client-dashboard-filter-checkbox">
+                                <label className="user-account-filter-checkbox">
                                     <input
                                         type="checkbox"
                                         checked={guidesFilter.is_available}
@@ -761,257 +754,332 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
                                 </label>
                             </div>
                         </div>
-
-                        <div className="client-dashboard-guides-grid">
-                            {guides.length > 0 ? guides.map(guide => (
-                                <div key={guide.id} className="client-dashboard-guide-card">
-                                    <div className="client-dashboard-guide-avatar">
+                        <div className="user-account-guides-grid">
+                            {guides.map(guide => (
+                                <div key={guide.id} className="user-account-guide-card">
+                                    <div className="user-account-guide-avatar">
                                         {guide.user?.avatar ? (
                                             <img src={guide.user.avatar} alt={guide.user.full_name} />
                                         ) : (
-                                            <div className="client-dashboard-guide-avatar-placeholder">
+                                            <div className="user-account-guide-avatar-placeholder">
                                                 {guide.user?.full_name?.charAt(0) || 'G'}
                                             </div>
                                         )}
                                     </div>
-                                    <div className="client-dashboard-guide-info">
-                                        <h4 className="client-dashboard-guide-name">{guide.user?.full_name}</h4>
-                                        <p className="client-dashboard-guide-bio">{guide.professional_bio}</p>
-                                        <div className="client-dashboard-guide-details">
-                                            <span className="client-dashboard-guide-experience">
+                                    <div className="user-account-guide-info">
+                                        <h4 className="user-account-guide-name">{guide.user?.full_name}</h4>
+                                        <p className="user-account-guide-bio">{guide.professional_bio}</p>
+                                        <div className="user-account-guide-details">
+                                            <span className="user-account-guide-experience">
                                                 {guide.years_of_experience} years experience
                                             </span>
-                                            <div className="client-dashboard-guide-rating">
+                                            <div className="user-account-guide-rating">
                                                 {'★'.repeat(Math.floor(guide.average_rating || 0))}
                                                 {'☆'.repeat(5 - Math.floor(guide.average_rating || 0))}
-                                                <span className="client-dashboard-guide-rating-text">
+                                                <span className="user-account-guide-rating-text">
                                                     {guide.average_rating || 0}/5 ({guide.total_reviews || 0} reviews)
                                                 </span>
                                             </div>
-                                            <div className="client-dashboard-guide-pricing">
+                                            <div className="user-account-guide-pricing">
                                                 {guide.hourly_rate && (
-                                                    <span className="client-dashboard-guide-price">
+                                                    <span className="user-account-guide-price">
                                                         ${guide.hourly_rate}/hour
                                                     </span>
                                                 )}
                                                 {guide.daily_rate && (
-                                                    <span className="client-dashboard-guide-price">
+                                                    <span className="user-account-guide-price">
                                                         ${guide.daily_rate}/day
                                                     </span>
                                                 )}
                                             </div>
-                                            <div className="client-dashboard-guide-location">
-                                                {guide.city_name && guide.country_display?.name && (
-                                                    <span className="client-dashboard-guide-location-text">
-                                                        {guide.city_name}, {guide.country_display.name}
-                                                    </span>
-                                                )}
-                                            </div>
                                         </div>
-                                        <div className="client-dashboard-guide-actions">
+                                        <div className="user-account-guide-actions">
                                             <button
-                                                className="client-dashboard-btn client-dashboard-btn-primary"
+                                                className="user-account-btn user-account-btn-primary"
                                                 onClick={() => handleBookGuide(guide)}
                                                 disabled={!guide.is_available}
                                             >
                                                 {guide.is_available ? 'Book Now' : 'Unavailable'}
                                             </button>
                                             <button
-                                                className="client-dashboard-btn client-dashboard-btn-secondary"
+                                                className="user-account-btn user-account-btn-secondary"
                                                 onClick={() => handleChatWithUser(guide)}
+                                                style={{
+                                                    marginLeft: '8px',
+                                                    backgroundColor: '#6c757d',
+                                                    color: 'white'
+                                                }}
                                             >
                                                 Chat
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-                            )) : (
-                                <div className="client-dashboard-empty-state">
-                                    <p>No guides found. This could be due to:</p>
-                                    <ul>
-                                        <li>No guides available in the system</li>
-                                        <li>All guides are currently unavailable</li>
-                                        <li>Your search filters are too restrictive</li>
-                                    </ul>
-                                    <button
-                                        className="client-dashboard-btn client-dashboard-btn-primary"
-                                        onClick={() => {
-                                            setGuidesFilter({
-                                                search: '',
-                                                service_types: '',
-                                                country: '',
-                                                city: '',
-                                                average_rating__gte: '',
-                                                is_available: true
-                                            });
-                                        }}
-                                    >
-                                        Clear All Filters
-                                    </button>
-                                </div>
-                            )}
+                            ))}
                         </div>
                     </div>
                 )}
-
                 {activeTab === 'bookings' && (
-                    <div className="client-dashboard-bookings">
-                        <h3 className="client-dashboard-section-title">My Bookings</h3>
-                        <div className="client-dashboard-bookings-list">
-                            {bookings.map(booking => {
-                                const existingReview = getReviewForBooking(booking);
-                                return (
-                                    <div key={booking.id} className="client-dashboard-booking-item">
-                                        <div className="client-dashboard-booking-details">
-                                            <h4 className="client-dashboard-booking-title">{booking.title}</h4>
-                                            <p className="client-dashboard-booking-dates">
-                                                {new Date(booking.start_date).toLocaleDateString()} - {new Date(booking.end_date).toLocaleDateString()}
+                    <div className="user-account-bookings">
+                        <h3 className="user-account-section-title">My Bookings</h3>
+                        <div className="user-account-bookings-list">
+                            {bookings.map(booking => (
+                                <div key={booking.id} className="user-account-booking-item">
+                                    <div className="user-account-booking-details">
+                                        <h4 className="user-account-booking-title">{booking.title}</h4>
+                                        <p className="user-account-booking-dates">
+                                            {new Date(booking.start_date).toLocaleDateString()} -
+                                            {new Date(booking.end_date).toLocaleDateString()}
+                                        </p>
+                                        <p className="user-account-booking-description">{booking.description}</p>
+                                        <span className={`user-account-booking-status user-account-status-${booking.status}`}>
+                                            {booking.status}
+                                        </span>
+                                        {booking.status === 'cancelled' && booking.cancellation_reason && (
+                                            <p className="user-account-booking-cancel-reason" style={{ color: '#721c24', fontSize: '14px', marginTop: '8px' }}>
+                                                Cancellation Reason: {booking.cancellation_reason}
                                             </p>
-                                            <p className="client-dashboard-booking-description">{booking.description}</p>
-                                            {booking.location && (
-                                                <p className="client-dashboard-booking-location">📍 {booking.location}</p>
-                                            )}
-                                            {booking.proposed_rate && (
-                                                <p className="client-dashboard-booking-rate">💰 ${booking.proposed_rate}</p>
-                                            )}
-                                            <span className={`client-dashboard-booking-status client-dashboard-status-${booking.status}`}>
-                                                {booking.status}
-                                            </span>
-                                            {existingReview && (
-                                                <div className="client-dashboard-booking-review-info">
-                                                    <span className="client-dashboard-review-badge">
-                                                        Review: {'★'.repeat(existingReview.rating)}
+                                        )}
+                                    </div>
+                                    <div className="user-account-booking-actions">
+                                        {booking.status === 'pending' && (
+                                            <button
+                                                className="user-account-btn user-account-btn-cancel"
+                                                onClick={() => handleOpenCancelModal(booking)}
+                                            >
+                                                Cancel
+                                            </button>
+                                        )}
+                                        {booking.status === 'completed' && !reviews.find(r => r.booking === booking.id) && (
+                                            <button
+                                                className="user-account-btn user-account-btn-primary"
+                                                onClick={() => handleWriteReview(booking)}
+                                            >
+                                                Write Review
+                                            </button>
+                                        )}
+                                        {booking.customer_profile?.user && (
+                                            <button
+                                                className="user-account-btn user-account-btn-secondary"
+                                                onClick={() => handleChatWithUser(booking.customer_profile)}
+                                                style={{
+                                                    marginLeft: '8px',
+                                                    backgroundColor: '#6c757d',
+                                                    color: 'white'
+                                                }}
+                                            >
+                                                Chat with Guide
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                {activeTab === 'reviews' && (
+                    <div className="user-account-reviews">
+                        <div className="user-account-reviews-header">
+                            <h3 className="user-account-section-title">My Reviews</h3>
+                            <div className="user-account-reviews-filters">
+                                <select
+                                    className="user-account-filter-select"
+                                    value={reviewFilter.minRating}
+                                    onChange={(e) => handleReviewFilterChange('minRating', e.target.value)}
+                                >
+                                    <option value="">All Ratings</option>
+                                    <option value="5">5 Stars</option>
+                                    <option value="4">4+ Stars</option>
+                                    <option value="3">3+ Stars</option>
+                                    <option value="2">2+ Stars</option>
+                                    <option value="1">1+ Stars</option>
+                                </select>
+                                <select
+                                    className="user-account-filter-select"
+                                    value={reviewFilter.sortBy}
+                                    onChange={(e) => handleReviewFilterChange('sortBy', e.target.value)}
+                                >
+                                    <option value="date_desc">Newest First</option>
+                                    <option value="date_asc">Oldest First</option>
+                                    <option value="rating_desc">Highest Rating</option>
+                                    <option value="rating_asc">Lowest Rating</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="user-account-reviews-summary">
+                            <h4 className="user-account-section-subtitle">Review Summary</h4>
+                            <div className="user-account-reviews-summary-grid">
+                                <div className="user-account-summary-item">
+                                    <span className="user-account-summary-label">Total Reviews:</span>
+                                    <span className="user-account-summary-value">{reviews.length}</span>
+                                </div>
+                                <div className="user-account-summary-item">
+                                    <span className="user-account-summary-label">Average Overall Rating:</span>
+                                    <span className="user-account-summary-value">
+                                        {reviews.length > 0
+                                            ? (reviews.reduce((sum, r) => sum + r.overall_rating, 0) / reviews.length).toFixed(1)
+                                            : 0}/5
+                                    </span>
+                                </div>
+                                <div className="user-account-summary-item">
+                                    <span className="user-account-summary-label">Average Communication:</span>
+                                    <span className="user-account-summary-value">
+                                        {reviews.length > 0
+                                            ? (reviews.reduce((sum, r) => sum + r.communication_rating, 0) / reviews.length).toFixed(1)
+                                            : 0}/5
+                                    </span>
+                                </div>
+                                <div className="user-account-summary-item">
+                                    <span className="user-account-summary-label">Average Service:</span>
+                                    <span className="user-account-summary-value">
+                                        {reviews.length > 0
+                                            ? (reviews.reduce((sum, r) => sum + r.service_rating, 0) / reviews.length).toFixed(1)
+                                            : 0}/5
+                                    </span>
+                                </div>
+                                <div className="user-account-summary-item">
+                                    <span className="user-account-summary-label">Average Punctuality:</span>
+                                    <span className="user-account-summary-value">
+                                        {reviews.length > 0
+                                            ? (reviews.reduce((sum, r) => sum + r.punctuality_rating, 0) / reviews.length).toFixed(1)
+                                            : 0}/5
+                                    </span>
+                                </div>
+                                <div className="user-account-summary-item">
+                                    <span className="user-account-summary-label">Average Value:</span>
+                                    <span className="user-account-summary-value">
+                                        {reviews.length > 0
+                                            ? (reviews.reduce((sum, r) => sum + r.value_rating, 0) / reviews.length).toFixed(1)
+                                            : 0}/5
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {filteredReviews.length === 0 ? (
+                            <p>No reviews match your current filters. Complete a booking to write a review!</p>
+                        ) : (
+                            <div className="user-account-reviews-list">
+                                {filteredReviews.map(review => {
+                                    const relatedBooking = bookings.find(b => b.id === review.booking);
+                                    return (
+                                        <div key={review.id} className="user-account-review-item">
+                                            <div className="user-account-review-header">
+                                                <div className="user-account-review-rating">
+                                                    {'★'.repeat(review.overall_rating)}{'☆'.repeat(5 - review.overall_rating)}
+                                                    <span className="user-account-review-rating-text">
+                                                        ({review.overall_rating}/5)
                                                     </span>
+                                                </div>
+                                                <span className="user-account-review-date">
+                                                    {new Date(review.created_at).toLocaleDateString()}
+                                                </span>
+                                            </div>
+                                            <h4 className="user-account-review-title">{review.title}</h4>
+                                            <p className="user-account-review-comment">{review.comment}</p>
+                                            <div className="user-account-review-details">
+                                                <span className="user-account-review-detail">Communication: {review.communication_rating}/5</span>
+                                                <span className="user-account-review-detail">Service: {review.service_rating}/5</span>
+                                                <span className="user-account-review-detail">Punctuality: {review.punctuality_rating}/5</span>
+                                                <span className="user-account-review-detail">Value: {review.value_rating}/5</span>
+                                            </div>
+                                            {relatedBooking && (
+                                                <div className="user-account-review-booking">
+                                                    <p>Booking: {relatedBooking.title} ({new Date(relatedBooking.start_date).toLocaleDateString()} - {new Date(relatedBooking.end_date).toLocaleDateString()})</p>
+                                                </div>
+                                            )}
+                                            <div className="user-account-review-reactions">
+                                                <span className="user-account-review-reaction-count">
+                                                    👍 {review.like_count || 0}
+                                                </span>
+                                                <span className="user-account-review-reaction-count">
+                                                    👎 {review.dislike_count || 0}
+                                                </span>
+                                                <button
+                                                    className="user-account-btn user-account-btn-small"
+                                                    onClick={() => handleViewReactions(review)}
+                                                >
+                                                    View Reactions
+                                                </button>
+                                            </div>
+                                            <div className="user-account-review-actions">
+                                                <button
+                                                    className="user-account-btn user-account-btn-small"
+                                                    onClick={() => handleEditReview(review, relatedBooking)}
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    className="user-account-btn user-account-btn-small user-account-btn-danger"
+                                                    onClick={() => handleDeleteReview(review.id)}
+                                                >
+                                                    Delete
+                                                </button>
+                                                <button
+                                                    className="user-account-btn user-account-btn-small"
+                                                    onClick={() => {
+                                                        setSelectedReviewForReactions(review);
+                                                        setReactionForm({ reaction_type: 'like', comment: '' });
+                                                    }}
+                                                >
+                                                    React
+                                                </button>
+                                            </div>
+                                            {selectedReviewForReactions?.id === review.id && (
+                                                <div className="user-account-reaction-form">
+                                                    <select
+                                                        className="user-account-select"
+                                                        value={reactionForm.reaction_type}
+                                                        onChange={(e) => setReactionForm({ ...reactionForm, reaction_type: e.target.value })}
+                                                    >
+                                                        <option value="like">Like</option>
+                                                        <option value="dislike">Dislike</option>
+                                                    </select>
+                                                    <textarea
+                                                        className="user-account-textarea"
+                                                        value={reactionForm.comment}
+                                                        onChange={(e) => setReactionForm({ ...reactionForm, comment: e.target.value })}
+                                                        placeholder={reactionForm.reaction_type === 'dislike' ? 'Comment (required for dislike)' : 'Comment (optional)'}
+                                                        rows="2"
+                                                    />
+                                                    <div className="user-account-form-actions">
+                                                        <button
+                                                            className="user-account-btn user-account-btn-small user-account-btn-primary"
+                                                            onClick={() => handleReactToReview(review.id)}
+                                                        >
+                                                            Submit Reaction
+                                                        </button>
+                                                        <button
+                                                            className="user-account-btn user-account-btn-small user-account-btn-secondary"
+                                                            onClick={() => setSelectedReviewForReactions(null)}
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button
+                                                            className="user-account-btn user-account-btn-small user-account-btn-danger"
+                                                            onClick={() => handleRemoveReaction(review.id)}
+                                                        >
+                                                            Remove My Reaction
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="client-dashboard-booking-actions">
-                                            {booking.status === 'pending' && (
-                                                <button
-                                                    className="client-dashboard-btn client-dashboard-btn-cancel"
-                                                    onClick={() => handleCancelBooking(booking.id)}
-                                                >
-                                                    Cancel
-                                                </button>
-                                            )}
-                                            {booking.status === 'completed' && canReviewBookingCheck(booking) && (
-                                                <button
-                                                    className="client-dashboard-btn client-dashboard-btn-primary"
-                                                    onClick={() => handleWriteReview(booking)}
-                                                >
-                                                    Write Review
-                                                </button>
-                                            )}
-                                            {booking.customer_details && (
-                                                <button
-                                                    className="client-dashboard-btn client-dashboard-btn-secondary"
-                                                    onClick={() => handleChatWithUser({ user: { email: booking.customer_details.email } })}
-                                                >
-                                                    Chat
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-                        {bookings.length === 0 && (
-                            <div className="client-dashboard-empty-state">
-                                <p>You haven't made any bookings yet.</p>
-                                <button
-                                    className="client-dashboard-btn client-dashboard-btn-primary"
-                                    onClick={() => setActiveTab('guides')}
-                                >
-                                    Find Guides
-                                </button>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
                 )}
-
-                {activeTab === 'reviews' && (
-                    <div className="client-dashboard-reviews">
-                        <div className="client-dashboard-reviews-header">
-                            <h3 className="client-dashboard-section-title">My Reviews</h3>
-                            <p className="client-dashboard-reviews-subtitle">
-                                {reviews.length} review{reviews.length !== 1 ? 's' : ''} written
-                            </p>
-                        </div>
-                        <div className="client-dashboard-reviews-list">
-                            {reviews.length > 0 ? (
-                                reviews.map(review => (
-                                    <div key={review.id} className="client-dashboard-review-item">
-                                        <div className="client-dashboard-review-header">
-                                            <div className="client-dashboard-review-rating">
-                                                {'★'.repeat(review.rating || 0)}{'☆'.repeat(5 - (review.rating || 0))}
-                                                <span className="client-dashboard-review-rating-number">
-                                                    {review.rating}/5
-                                                </span>
-                                            </div>
-                                            <div className="client-dashboard-review-meta">
-                                                <span className="client-dashboard-review-date">
-                                                    {new Date(review.created_at).toLocaleDateString()}
-                                                </span>
-                                                {review.customer_name && (
-                                                    <span className="client-dashboard-review-guide">
-                                                        Guide: {review.customer_name}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="client-dashboard-review-content">
-                                            <p className="client-dashboard-review-comment">{review.comment}</p>
-                                            {review.booking_title && (
-                                                <p className="client-dashboard-review-booking">
-                                                    <strong>Booking:</strong> {review.booking_title}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="client-dashboard-review-actions">
-                                            {canEditReview(review) && (
-                                                <button
-                                                    className="client-dashboard-btn client-dashboard-btn-small"
-                                                    onClick={() => handleEditReview(review)}
-                                                >
-                                                    Edit
-                                                </button>
-                                            )}
-                                            <button
-                                                className="client-dashboard-btn client-dashboard-btn-small client-dashboard-btn-danger"
-                                                onClick={() => handleDeleteReview(review.id)}
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                        {!canEditReview(review) && (
-                                            <small className="client-dashboard-review-edit-note">
-                                                Reviews can only be edited within 7 days of creation
-                                            </small>
-                                        )}
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="client-dashboard-empty-state">
-                                    <p>You haven't written any reviews yet.</p>
-                                    <p>Complete a booking and share your experience!</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
             </div>
-
-            {/* Booking Form Modal */}
             {showBookingForm && (
-                <div className="client-dashboard-modal">
-                    <div className="client-dashboard-modal-content">
-                        <div className="client-dashboard-modal-header">
-                            <h3 className="client-dashboard-modal-title">
+                <div className="user-account-modal">
+                    <div className="user-account-modal-content">
+                        <div className="user-account-modal-header">
+                            <h3 className="user-account-modal-title">
                                 Book Guide: {selectedGuide?.user?.full_name}
                             </h3>
                             <button
-                                className="client-dashboard-modal-close"
+                                className="user-account-modal-close"
                                 onClick={() => {
                                     setShowBookingForm(false);
                                     setSelectedGuide(null);
@@ -1021,47 +1089,45 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
                                 ×
                             </button>
                         </div>
-                        <form onSubmit={handleBookingSubmit} className="client-dashboard-form">
-                            <div className="client-dashboard-form-group">
-                                <label className="client-dashboard-label">Title *</label>
+                        <form onSubmit={handleBookingSubmit} className="user-account-form">
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">Title *</label>
                                 <input
                                     type="text"
-                                    className="client-dashboard-input"
+                                    className="user-account-input"
                                     value={bookingForm.title}
                                     onChange={(e) => setBookingForm({...bookingForm, title: e.target.value})}
                                     required
                                     placeholder="Enter booking title"
                                 />
                             </div>
-
-                            <div className="client-dashboard-form-group">
-                                <label className="client-dashboard-label">Description</label>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">Description</label>
                                 <textarea
-                                    className="client-dashboard-textarea"
+                                    className="user-account-textarea"
                                     value={bookingForm.description}
                                     onChange={(e) => setBookingForm({...bookingForm, description: e.target.value})}
                                     rows="3"
                                     placeholder="Describe what kind of tour/service you need"
                                 />
                             </div>
-
-                            <div className="client-dashboard-form-row">
-                                <div className="client-dashboard-form-group">
-                                    <label className="client-dashboard-label">Start Date *</label>
+                            <div className="user-account-form-row">
+                                <div className="user-account-form-group">
+                                    <label className="user-account-label">Start Date *</label>
                                     <input
                                         type="date"
-                                        className="client-dashboard-input"
+                                        className="user-account-input"
                                         value={bookingForm.start_date}
                                         onChange={(e) => setBookingForm({...bookingForm, start_date: e.target.value})}
                                         required
                                         min={new Date().toISOString().split('T')[0]}
                                     />
                                 </div>
-                                <div className="client-dashboard-form-group">
-                                    <label className="client-dashboard-label">End Date *</label>
+                                <div className="user-account-form-group">
+                                    <label className="user-account-label">End Date *</label>
                                     <input
                                         type="date"
-                                        className="client-dashboard-input"
+                                        className="user-account-input"
                                         value={bookingForm.end_date}
                                         onChange={(e) => setBookingForm({...bookingForm, end_date: e.target.value})}
                                         required
@@ -1069,87 +1135,61 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
                                     />
                                 </div>
                             </div>
-
-                            <div className="client-dashboard-form-row">
-                                <div className="client-dashboard-form-group">
-                                    <label className="client-dashboard-label">Country *</label>
-                                    <input
-                                        type="text"
-                                        className="client-dashboard-input"
-                                        value={bookingForm.country}
-                                        onChange={(e) => setBookingForm({...bookingForm, country: e.target.value})}
-                                        required
-                                        placeholder="Enter country"
-                                    />
-                                </div>
-                                <div className="client-dashboard-form-group">
-                                    <label className="client-dashboard-label">City</label>
-                                    <input
-                                        type="text"
-                                        className="client-dashboard-input"
-                                        value={bookingForm.city}
-                                        onChange={(e) => setBookingForm({...bookingForm, city: e.target.value})}
-                                        placeholder="Enter city"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="client-dashboard-form-group">
-                                <label className="client-dashboard-label">Specific Location</label>
-                                <input
-                                    type="text"
-                                    className="client-dashboard-input"
-                                    value={bookingForm.location}
-                                    onChange={(e) => setBookingForm({...bookingForm, location: e.target.value})}
-                                    placeholder="Specific meeting point or location"
-                                />
-                            </div>
-
-                            <div className="client-dashboard-form-group">
-                                <label className="client-dashboard-label">Special Requirements</label>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">Special Requirements</label>
                                 <textarea
-                                    className="client-dashboard-textarea"
+                                    className="user-account-textarea"
                                     value={bookingForm.special_requirements}
                                     onChange={(e) => setBookingForm({...bookingForm, special_requirements: e.target.value})}
                                     rows="2"
                                     placeholder="Any special requests or requirements"
                                 />
                             </div>
-
-                            <div className="client-dashboard-form-group">
-                                <label className="client-dashboard-label">Proposed Rate (USD)</label>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">Budget (USD)</label>
                                 <input
                                     type="number"
-                                    className="client-dashboard-input"
-                                    value={bookingForm.proposed_rate}
-                                    onChange={(e) => setBookingForm({...bookingForm, proposed_rate: e.target.value})}
+                                    className="user-account-input"
+                                    value={bookingForm.budget}
+                                    onChange={(e) => setBookingForm({...bookingForm, budget: e.target.value})}
                                     placeholder="0"
                                     step="0.01"
                                     min="0"
                                 />
                                 {selectedGuide?.daily_rate && (
-                                    <small className="client-dashboard-guide-rate-info">
+                                    <small style={{color: '#666', fontSize: '12px', display: 'block', marginTop: '4px'}}>
                                         Guide's daily rate: ${selectedGuide.daily_rate}
                                     </small>
                                 )}
                                 {selectedGuide?.hourly_rate && (
-                                    <small className="client-dashboard-guide-rate-info">
+                                    <small style={{color: '#666', fontSize: '12px', display: 'block', marginTop: '4px'}}>
                                         Guide's hourly rate: ${selectedGuide.hourly_rate}
                                     </small>
                                 )}
                             </div>
-
-                            <div className="client-dashboard-form-actions">
+                            {error && (
+                                <div style={{
+                                    background: '#f8d7da',
+                                    color: '#721c24',
+                                    padding: '8px 12px',
+                                    borderRadius: '4px',
+                                    marginBottom: '16px',
+                                    fontSize: '14px'
+                                }}>
+                                    {error}
+                                </div>
+                            )}
+                            <div className="user-account-form-actions">
                                 <button
                                     type="submit"
-                                    className="client-dashboard-btn client-dashboard-btn-primary"
-                                    disabled={!bookingForm.title.trim() || !bookingForm.start_date || !bookingForm.end_date || !bookingForm.country.trim()}
+                                    className="user-account-btn user-account-btn-primary"
+                                    disabled={!bookingForm.title.trim() || !bookingForm.start_date || !bookingForm.end_date}
                                 >
                                     Book Guide
                                 </button>
                                 <button
                                     type="button"
-                                    className="client-dashboard-btn client-dashboard-btn-secondary"
+                                    className="user-account-btn user-account-btn-secondary"
                                     onClick={() => {
                                         setShowBookingForm(false);
                                         setSelectedGuide(null);
@@ -1163,17 +1203,15 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
                     </div>
                 </div>
             )}
-
-            {/* Review Form Modal */}
             {showReviewForm && (
-                <div className="client-dashboard-modal">
-                    <div className="client-dashboard-modal-content">
-                        <div className="client-dashboard-modal-header">
-                            <h3 className="client-dashboard-modal-title">
-                                {editingReview ? 'Edit Review' : 'Write Review'}
+                <div className="user-account-modal">
+                    <div className="user-account-modal-content">
+                        <div className="user-account-modal-header">
+                            <h3 className="user-account-modal-title">
+                                {editingReview ? 'Edit Review' : 'Write Review'} for {selectedBookingForReview?.title}
                             </h3>
                             <button
-                                className="client-dashboard-modal-close"
+                                className="user-account-modal-close"
                                 onClick={() => {
                                     setShowReviewForm(false);
                                     setSelectedBookingForReview(null);
@@ -1184,57 +1222,115 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
                                 ×
                             </button>
                         </div>
-
-                        {selectedBookingForReview && (
-                            <div className="client-dashboard-review-booking-info">
-                                <h4>Booking: {selectedBookingForReview.title}</h4>
-                                <p>Guide: {selectedBookingForReview.customer_details?.full_name}</p>
-                            </div>
-                        )}
-
-                        <form onSubmit={handleReviewSubmit} className="client-dashboard-form">
-                            <div className="client-dashboard-form-group">
-                                <label className="client-dashboard-label">Rating *</label>
-                                <div className="client-dashboard-rating-input">
-                                    {[1, 2, 3, 4, 5].map(rating => (
-                                        <button
-                                            key={rating}
-                                            type="button"
-                                            className={`client-dashboard-star-btn ${reviewForm.rating >= rating ? 'active' : ''}`}
-                                            onClick={() => setReviewForm({...reviewForm, rating})}
-                                        >
-                                            ★
-                                        </button>
-                                    ))}
-                                    <span className="client-dashboard-rating-text">
-                                        {reviewForm.rating}/5
-                                    </span>
+                        <form onSubmit={handleReviewSubmit} className="user-account-form">
+                            <div className="user-account-rating-group">
+                                <div className="user-account-form-group">
+                                    <label className="user-account-label">Overall Rating *</label>
+                                    <select
+                                        className="user-account-select"
+                                        value={reviewForm.overall_rating}
+                                        onChange={(e) => setReviewForm({...reviewForm, overall_rating: parseInt(e.target.value)})}
+                                        required
+                                    >
+                                        {[1,2,3,4,5].map(num => (
+                                            <option key={num} value={num}>{num} Star{num > 1 ? 's' : ''}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="user-account-form-group">
+                                    <label className="user-account-label">Communication *</label>
+                                    <select
+                                        className="user-account-select"
+                                        value={reviewForm.communication_rating}
+                                        onChange={(e) => setReviewForm({...reviewForm, communication_rating: parseInt(e.target.value)})}
+                                        required
+                                    >
+                                        {[1,2,3,4,5].map(num => (
+                                            <option key={num} value={num}>{num}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="user-account-form-group">
+                                    <label className="user-account-label">Service Quality *</label>
+                                    <select
+                                        className="user-account-select"
+                                        value={reviewForm.service_rating}
+                                        onChange={(e) => setReviewForm({...reviewForm, service_rating: parseInt(e.target.value)})}
+                                        required
+                                    >
+                                        {[1,2,3,4,5].map(num => (
+                                            <option key={num} value={num}>{num}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="user-account-form-group">
+                                    <label className="user-account-label">Punctuality *</label>
+                                    <select
+                                        className="user-account-select"
+                                        value={reviewForm.punctuality_rating}
+                                        onChange={(e) => setReviewForm({...reviewForm, punctuality_rating: parseInt(e.target.value)})}
+                                        required
+                                    >
+                                        {[1,2,3,4,5].map(num => (
+                                            <option key={num} value={num}>{num}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="user-account-form-group">
+                                    <label className="user-account-label">Value for Money *</label>
+                                    <select
+                                        className="user-account-select"
+                                        value={reviewForm.value_rating}
+                                        onChange={(e) => setReviewForm({...reviewForm, value_rating: parseInt(e.target.value)})}
+                                        required
+                                    >
+                                        {[1,2,3,4,5].map(num => (
+                                            <option key={num} value={num}>{num}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
-
-                            <div className="client-dashboard-form-group">
-                                <label className="client-dashboard-label">Comment *</label>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">Title *</label>
+                                <input
+                                    type="text"
+                                    className="user-account-input"
+                                    value={reviewForm.title}
+                                    onChange={(e) => setReviewForm({...reviewForm, title: e.target.value})}
+                                    required
+                                    placeholder="Enter review title"
+                                />
+                            </div>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">Comment *</label>
                                 <textarea
-                                    className="client-dashboard-textarea"
+                                    className="user-account-textarea"
                                     value={reviewForm.comment}
                                     onChange={(e) => setReviewForm({...reviewForm, comment: e.target.value})}
                                     rows="4"
                                     required
-                                    placeholder="Share your experience with this guide..."
+                                    placeholder="Share your experience..."
                                 />
                             </div>
-
-                            <div className="client-dashboard-form-actions">
-                                <button
-                                    type="submit"
-                                    className="client-dashboard-btn client-dashboard-btn-primary"
-                                    disabled={!reviewForm.comment.trim()}
-                                >
+                            {error && (
+                                <div style={{
+                                    background: '#f8d7da',
+                                    color: '#721c24',
+                                    padding: '8px 12px',
+                                    borderRadius: '4px',
+                                    marginBottom: '16px',
+                                    fontSize: '14px'
+                                }}>
+                                    {error}
+                                </div>
+                            )}
+                            <div className="user-account-form-actions">
+                                <button type="submit" className="user-account-btn user-account-btn-primary">
                                     {editingReview ? 'Update Review' : 'Submit Review'}
                                 </button>
                                 <button
                                     type="button"
-                                    className="client-dashboard-btn client-dashboard-btn-secondary"
+                                    className="user-account-btn user-account-btn-secondary"
                                     onClick={() => {
                                         setShowReviewForm(false);
                                         setSelectedBookingForReview(null);
@@ -1249,18 +1345,157 @@ const ClientDashboard = ({ user, setIsAuthenticated, setUser }) => {
                     </div>
                 </div>
             )}
-
-            {/* Chat Widget */}
-            {showChat && (
-                <ChatWidget
-                    isOpen={showChat}
-                    onClose={handleCloseChat}
-                    selectedUserId={selectedUserForChat}
-                    userRole="client"
-                />
+            {showCancelModal && (
+                <div className="user-account-modal">
+                    <div className="user-account-modal-content">
+                        <div className="user-account-modal-header">
+                            <h3 className="user-account-modal-title">Cancel Booking</h3>
+                            <button
+                                className="user-account-modal-close"
+                                onClick={() => {
+                                    setShowCancelModal(false);
+                                    setSelectedBookingForCancel(null);
+                                    setCancelReason('');
+                                    setError(null);
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <form onSubmit={(e) => { e.preventDefault(); handleCancelBooking(); }} className="user-account-form">
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">Cancellation Reason *</label>
+                                <textarea
+                                    className="user-account-textarea"
+                                    value={cancelReason}
+                                    onChange={(e) => setCancelReason(e.target.value)}
+                                    rows="4"
+                                    required
+                                    placeholder="Please provide a reason for cancellation"
+                                />
+                            </div>
+                            {error && (
+                                <div style={{
+                                    background: '#f8d7da',
+                                    color: '#721c24',
+                                    padding: '8px 12px',
+                                    borderRadius: '4px',
+                                    marginBottom: '16px',
+                                    fontSize: '14px'
+                                }}>
+                                    {error}
+                                </div>
+                            )}
+                            <div className="user-account-form-actions">
+                                <button type="submit" className="user-account-btn user-account-btn-danger">
+                                    Confirm Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    className="user-account-btn user-account-btn-secondary"
+                                    onClick={() => {
+                                        setShowCancelModal(false);
+                                        setSelectedBookingForCancel(null);
+                                        setCancelReason('');
+                                        setError(null);
+                                    }}
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             )}
+            {showReactionsModal && (
+                <div className="user-account-modal">
+                    <div className="user-account-modal-content">
+                        <div className="user-account-modal-header">
+                            <h3 className="user-account-modal-title">Review Reactions</h3>
+                            <button
+                                className="user-account-modal-close"
+                                onClick={() => {
+                                    setShowReactionsModal(false);
+                                    setSelectedReviewForReactions(null);
+                                    setReactions([]);
+                                    setReactionSummary(null);
+                                    setError(null);
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        {reactionSummary && (
+                            <div className="user-account-reactions-summary">
+                                <h4 className="user-account-section-subtitle">Reaction Summary</h4>
+                                <div className="user-account-reactions-summary-grid">
+                                    <div className="user-account-summary-item">
+                                        <span className="user-account-summary-label">Likes:</span>
+                                        <span className="user-account-summary-value">{reactionSummary.like_count}</span>
+                                    </div>
+                                    <div className="user-account-summary-item">
+                                        <span className="user-account-summary-label">Dislikes:</span>
+                                        <span className="user-account-summary-value">{reactionSummary.dislike_count}</span>
+                                    </div>
+                                </div>
+                                <h4 className="user-account-section-subtitle">Latest Like Comments</h4>
+                                {reactionSummary.latest_likes.length > 0 ? (
+                                    <ul className="user-account-reactions-list">
+                                        {reactionSummary.latest_likes.map(like => (
+                                            <li key={like.id} className="user-account-reaction-item">
+                                                <span>{like.user__first_name} {like.user__last_name}: {like.comment}</span>
+                                                <span className="user-account-reaction-date">
+                                                    {new Date(like.created_at).toLocaleDateString()}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>No like comments available.</p>
+                                )}
+                                <h4 className="user-account-section-subtitle">Latest Dislike Comments</h4>
+                                {reactionSummary.latest_dislikes.length > 0 ? (
+                                    <ul className="user-account-reactions-list">
+                                        {reactionSummary.latest_dislikes.map(dislike => (
+                                            <li key={dislike.id} className="user-account-reaction-item">
+                                                <span>{dislike.user__first_name} {dislike.user__last_name}: {dislike.comment}</span>
+                                                <span className="user-account-reaction-date">
+                                                    {new Date(dislike.created_at).toLocaleDateString()}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>No dislike comments available.</p>
+                                )}
+                            </div>
+                        )}
+                        <h4 className="user-account-section-subtitle">All Reactions</h4>
+                        {reactions.length > 0 ? (
+                            <ul className="user-account-reactions-list">
+                                {reactions.map(reaction => (
+                                    <li key={reaction.id} className="user-account-reaction-item">
+                                        <span>{reaction.user.first_name} {reaction.user.last_name}: {reaction.reaction_type === 'like' ? '👍' : '👎'} {reaction.comment}</span>
+                                        <span className="user-account-reaction-date">
+                                            {new Date(reaction.created_at).toLocaleDateString()}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No reactions available.</p>
+                        )}
+                    </div>
+                </div>
+            )}
+            <ChatWidgets
+                isOpen={showChat}
+                onClose={handleCloseChat}
+                selectedUserId={selectedUserForChat}
+                userRole="client"
+            />
         </div>
     );
 };
 
-export default ClientDashboard;
+export default UserAccount;

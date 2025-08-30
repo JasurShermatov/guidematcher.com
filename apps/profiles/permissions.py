@@ -11,6 +11,7 @@ class IsOwnerOrAdmin(BasePermission):
         if user.is_admin:
             return True
 
+        # obj can be a profile or related object
         if hasattr(obj, "user"):
             return obj.user == user
         elif hasattr(obj, "customer") and hasattr(obj.customer, "user"):

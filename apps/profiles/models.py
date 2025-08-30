@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from apps.common.models import BaseModel
 from apps.users.models import User
-from django_countries.fields import CountryField
 
 
 class AbstractProfile(BaseModel):
@@ -53,8 +52,8 @@ class CustomerProfile(AbstractProfile):
         REJECTED = "rejected", _("Rejected")
 
     professional_bio = models.TextField(
-        blank=True,
-        default="",
+        blank=True,  # 👈 Ixtiyoriy qildik
+        default="",  # 👈 Default qiymat
         verbose_name=_("Professional biography"),
     )
     years_of_experience = models.PositiveIntegerField(
@@ -62,16 +61,15 @@ class CustomerProfile(AbstractProfile):
     )
     service_types = models.ManyToManyField(
         "common.ServiceType",
-        blank=True,
+        blank=True,  # 👈 ManyToMany doim blank=True bo'lishi kerak
         verbose_name=_("Service types offered"),
     )
-    country = CountryField(blank=True, null=True, verbose_name=_("Country"))
 
     city = models.ForeignKey(
         "common.City",
         on_delete=models.PROTECT,
-        null=True,
-        blank=True,
+        null=True,  # 👈 NULL qiymatga ruxsat
+        blank=True,  # 👈 Formada bo'sh bo'lishi mumkin
         verbose_name=_("Service city"),
     )
     service_areas = models.TextField(

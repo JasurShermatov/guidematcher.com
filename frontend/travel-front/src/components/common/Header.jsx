@@ -40,18 +40,18 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
     const location = useLocation();
 
     const themeOptions = [
-        { value: "light", label: t("theme.light"), icon: <FiSun />, description: t("theme.light_desc") },
-        { value: "dark", label: t("theme.dark"), icon: <FiMoon />, description: t("theme.dark_desc") },
-        { value: "default", label: t("theme.default"), icon: <FiMonitor />, description: t("theme.default_desc") },
-        { value: "auto", label: t("theme.auto"), icon: <FiClock />, description: t("theme.auto_desc") },
+        { value: "light", label: t("theme.light") || "Light", icon: <FiSun />, description: t("theme.light_desc") || "Light theme" },
+        { value: "dark", label: t("theme.dark") || "Dark", icon: <FiMoon />, description: t("theme.dark_desc") || "Dark theme" },
+        { value: "default", label: t("theme.default") || "System", icon: <FiMonitor />, description: t("theme.default_desc") || "Follow system theme" },
+        { value: "auto", label: t("theme.auto") || "Auto", icon: <FiClock />, description: t("theme.auto_desc") || "Auto theme based on time" },
     ];
 
     const languageOptions = [
-        { value: "en", label: t("language.en"), nativeName: t("language.en_native"), flag: "🇺🇸", dir: "ltr" },
-        { value: "ru", label: t("language.ru"), nativeName: t("language.ru_native"), flag: "🇷🇺", dir: "ltr" },
-        { value: "uz", label: t("language.uz"), nativeName: t("language.uz_native"), flag: "🇺🇿", dir: "ltr" },
-        { value: "es", label: t("language.es"), nativeName: t("language.es_native"), flag: "🇪🇸", dir: "ltr" },
-        { value: "ar", label: t("language.ar"), nativeName: t("language.ar_native"), flag: "🇸🇦", dir: "rtl" },
+        { value: "en", label: t("language.en") || "English", nativeName: t("language.en_native") || "English", flag: "🇺🇸", dir: "ltr" },
+        { value: "ru", label: t("language.ru") || "Russian", nativeName: t("language.ru_native") || "Русский", flag: "🇷🇺", dir: "ltr" },
+        { value: "uz", label: t("language.uz") || "Uzbek", nativeName: t("language.uz_native") || "O'zbek", flag: "🇺🇿", dir: "ltr" },
+        { value: "es", label: t("language.es") || "Spanish", nativeName: t("language.es_native") || "Español", flag: "🇪🇸", dir: "ltr" },
+        { value: "ar", label: t("language.ar") || "Arabic", nativeName: t("language.ar_native") || "العربية", flag: "🇸🇦", dir: "rtl" },
     ];
 
     const currentLang = languageOptions.find((lang) => lang.value === language);
@@ -69,7 +69,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
         if (savedTheme && savedTheme !== theme) {
             setTheme(savedTheme);
         }
-    }, []);
+    }, [theme]);
 
     // Language sozlamalarini yuklash
     useEffect(() => {
@@ -78,7 +78,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
             setLanguage(savedLanguage);
             changeLanguage(savedLanguage);
         }
-    }, []);
+    }, [language]);
 
     // Theme ni qo'llash
     useEffect(() => {
@@ -199,8 +199,8 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
     };
 
     const menuItems = [
-        { label: t("header.find_guides"), href: "/find-guides" },
-        { label: t("header.blog"), href: "#blog" },
+        { label: t("header.find_guides") || "Find Guides", href: "/find-guides" },
+        { label: t("header.blog") || "Blog", href: "#blog" },
     ];
 
     const hideMenu = isAuthenticated && location.pathname === "/account";
@@ -233,8 +233,8 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                             <div className="header-logo-glow"></div>
                         </div>
                         <div className="header-logo-text-container">
-                            <span className="header-logo-text">{t("header.logo_text")}</span>
-                            <span className="header-logo-tagline">{t("header.tagline")}</span>
+                            <span className="header-logo-text">{t("header.logo_text") || "TourGuide"}</span>
+                            <span className="header-logo-tagline">{t("header.tagline") || "Explore Together"}</span>
                         </div>
                     </Link>
                 </div>
@@ -263,9 +263,10 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                     {/* Language Dropdown */}
                     <div className="header-dropdown header-lang-dropdown" ref={langDropdownRef}>
                         <button
+                            type="button"
                             className="header-control-btn header-lang-btn"
                             onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                            aria-label={t("header.select_language")}
+                            aria-label={t("header.select_language") || "Select Language"}
                             aria-expanded={isLangDropdownOpen}
                         >
                             <span className="header-flag">{currentLang?.flag}</span>
@@ -274,10 +275,11 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                         </button>
                         {isLangDropdownOpen && (
                             <div className="header-dropdown-menu header-lang-menu">
-                                <div className="header-dropdown-header">{t("header.select_language")}</div>
+                                <div className="header-dropdown-header">{t("header.select_language") || "Select Language"}</div>
                                 {languageOptions.map((option) => (
                                     <button
                                         key={option.value}
+                                        type="button"
                                         className={`header-dropdown-item ${language === option.value ? "header-active" : ""}`}
                                         onClick={() => handleLanguageChange(option.value)}
                                         dir={option.dir}
@@ -294,9 +296,10 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                     {/* Theme Dropdown */}
                     <div className="header-dropdown header-theme-dropdown" ref={themeDropdownRef}>
                         <button
+                            type="button"
                             className="header-control-btn header-theme-btn"
                             onClick={() => setIsThemeDropdownOpen(!isThemeDropdownOpen)}
-                            aria-label={t("header.choose_appearance")}
+                            aria-label={t("header.choose_appearance") || "Choose Appearance"}
                             aria-expanded={isThemeDropdownOpen}
                         >
                             {themeOptions.find((opt) => opt.value === theme)?.icon}
@@ -304,10 +307,11 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                         </button>
                         {isThemeDropdownOpen && (
                             <div className="header-dropdown-menu header-theme-menu">
-                                <div className="header-dropdown-header">{t("header.choose_appearance")}</div>
+                                <div className="header-dropdown-header">{t("header.choose_appearance") || "Choose Appearance"}</div>
                                 {themeOptions.map((option) => (
                                     <button
                                         key={option.value}
+                                        type="button"
                                         className={`header-dropdown-item ${theme === option.value ? "header-active" : ""}`}
                                         onClick={() => handleThemeChange(option.value)}
                                     >
@@ -324,9 +328,10 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                     {isAuthenticated ? (
                         <div className="header-dropdown header-avatar-dropdown" ref={avatarDropdownRef}>
                             <button
+                                type="button"
                                 className="header-control-btn header-avatar-btn"
                                 onClick={() => setIsAvatarDropdownOpen(!isAvatarDropdownOpen)}
-                                aria-label={t("header.account")}
+                                aria-label={t("header.account") || "Account"}
                                 aria-expanded={isAvatarDropdownOpen}
                             >
                                 <span className="header-avatar">{avatarLetter}</span>
@@ -335,36 +340,35 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                             </button>
                             {isAvatarDropdownOpen && (
                                 <div className="header-dropdown-menu header-avatar-menu">
-                                    <div className="header-dropdown-header">{t("header.account")}</div>
+                                    <div className="header-dropdown-header">{t("header.account") || "Account"}</div>
                                     <div className="header-user-info">
-                                        <span className="header-user-role">{getUserRoleDisplay()}</span>
-                                        {user?.email && <span className="header-user-email">{user.email}</span>}
                                         {process.env.NODE_ENV === 'development' && (
                                             <span className="header-user-debug">Debug: {user?.role}</span>
                                         )}
                                     </div>
-                                    <button className="header-dropdown-item" onClick={handleLogout}>
+                                    <button type="button" className="header-dropdown-item" onClick={handleLogout}>
                                         <FiLogOut className="header-theme-icon" />
-                                        <span className="header-theme-name">{t("header.logout")}</span>
+                                        <span className="header-theme-name">{t("header.logout") || "Logout"}</span>
                                     </button>
                                 </div>
                             )}
                         </div>
                     ) : (
                         <div className="header-auth-buttons">
-                            <Link to="/register" className="header-btn header-auth-btn header-register-btn">
-                                <FiUserPlus />
-                                <span>{t("header.register") || "Register"}</span>
-                            </Link>
+                            {/*<Link to="/register" className="header-btn header-auth-btn header-register-btn">*/}
+                            {/*    <FiUserPlus />*/}
+                            {/*    <span>{t("header.register") || "Register"}</span>*/}
+                            {/*</Link>*/}
                             <Link to="/login" className="header-btn header-auth-btn header-signin-btn">
                                 <FiLogIn />
-                                <span>{t("header.sign_in")}</span>
+                                <span>{t("header.sign_in") || "Sign In"}</span>
                             </Link>
                         </div>
                     )}
 
                     {/* Mobile Menu Toggle */}
                     <button
+                        type="button"
                         className="header-mobile-menu-toggle"
                         onClick={toggleMenu}
                         aria-label="Toggle menu"
@@ -382,9 +386,9 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                         <div className="header-mobile-menu-header">
                             <div className="header-mobile-logo">
                                 <FiGlobe />
-                                <span>{t("header.logo_text")}</span>
+                                <span>{t("header.logo_text") || "TourGuide"}</span>
                             </div>
-                            <button className="header-mobile-close-btn" onClick={toggleMenu}>
+                            <button type="button" className="header-mobile-close-btn" onClick={toggleMenu}>
                                 <FiX />
                             </button>
                         </div>
@@ -407,11 +411,12 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                         <div className="header-mobile-controls">
                             {/* Mobile Theme Controls */}
                             <div className="header-mobile-control-group">
-                                <label>{t("header.choose_appearance")}</label>
+                                <label>{t("header.choose_appearance") || "Choose Appearance"}</label>
                                 <div className="header-theme-buttons">
                                     {themeOptions.map((option) => (
                                         <button
                                             key={option.value}
+                                            type="button"
                                             className={`header-btn header-theme-option ${theme === option.value ? "header-active" : ""}`}
                                             onClick={() => handleThemeChange(option.value)}
                                         >
@@ -424,11 +429,12 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
 
                             {/* Mobile Language Controls */}
                             <div className="header-mobile-control-group">
-                                <label>{t("header.select_language")}</label>
+                                <label>{t("header.select_language") || "Select Language"}</label>
                                 <div className="header-lang-buttons">
                                     {languageOptions.map((option) => (
                                         <button
                                             key={option.value}
+                                            type="button"
                                             className={`header-btn header-lang-option ${language === option.value ? "header-active" : ""}`}
                                             onClick={() => handleLanguageChange(option.value)}
                                         >
@@ -451,9 +457,9 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                                             <span className="header-mobile-role">{getUserRoleDisplay()}</span>
                                         </div>
                                     </div>
-                                    <button className="header-btn header-mobile-logout-btn" onClick={handleLogout}>
+                                    <button type="button" className="header-btn header-mobile-logout-btn" onClick={handleLogout}>
                                         <FiLogOut />
-                                        <span>{t("header.logout")}</span>
+                                        <span>{t("header.logout") || "Logout"}</span>
                                     </button>
                                 </div>
                             ) : (
@@ -464,7 +470,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                                         onClick={toggleMenu}
                                     >
                                         <FiUserPlus />
-                                        <span>{t("header.register")}</span>
+                                        <span>{t("header.register") || "Register"}</span>
                                     </Link>
                                     <Link
                                         to="/login"
@@ -472,7 +478,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                                         onClick={toggleMenu}
                                     >
                                         <FiLogIn />
-                                        <span>{t("header.sign_in")}</span>
+                                        <span>{t("header.sign_in") || "Sign In"}</span>
                                     </Link>
                                 </div>
                             )}

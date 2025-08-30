@@ -141,19 +141,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         try:
             country_instance = Country.objects.get(name__iexact=country_name)
         except Country.DoesNotExist:
-            # Country yaratish uchun alohida country_code talab qilinadi
-            country_code = self.initial_data.get("country_code", "").strip().upper()
-            if len(country_code) != 2:
-                raise serializers.ValidationError(
-                    {
-                        "country": "Country code must be exactly 2 characters (ISO 3166-1 alpha-2)."
-                    }
-                )
-            country_instance = Country.objects.create(
-                name=country_name, code=country_code
-            )
-
+            country_instance = Country.objects.create(name=country_name)
         attrs["country"] = country_instance
+
         self.ev = ev
         attrs["email"] = email
         return attrs

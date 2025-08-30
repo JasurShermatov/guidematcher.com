@@ -1,124 +1,151 @@
-#  apps/reviews/serializers.py
-
-
-from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from apps.profiles.models import CustomerProfile
+from apps.reviews.models import ReviewResponse, ReviewReaction
 from apps.users.models import User
 from .models import Review
 
 
-class ClientSerializer(serializers.ModelSerializer):
+class UserShortSerializer(serializers.ModelSerializer):
+    """Minimal foydalanuvchi ma'lumotlari (frontend uchun yetarli)."""
 
     class Meta:
         model = User
-        fields = ["id", "full_name", "first_name", "last_name", "avatar"]
-        read_only_fields = fields
+        fields = ["id", "first_name", "last_name"]
 
 
-class CustomerSerializer(serializers.ModelSerializer):
-
-    name = serializers.CharField(source="user.full_name", read_only=True)
+class CustomerShortSerializer(serializers.ModelSerializer):
+    # modelda yo‘q bo‘lgani uchun explicit tarzda ta’riflaymiz
+    business_name = serializers.CharField(source="user.full_name", read_only=True)
 
     class Meta:
         model = CustomerProfile
-        fields = ["id", "name", "average_rating", "total_reviews"]
-        read_only_fields = fields
+        fields = ["id", "business_name", "average_rating", "total_reviews"]
 
 
-class ReviewListSerializer(serializers.ModelSerializer):
+class ReviewReactionSerializer(serializers.ModelSerializer):
+    """
+    Review ostidagi LIKE / DISLIKE reaksiyalar.
+    Frontend hover/bosganda izohlarni chiqarishi uchun `comment` ham yuboriladi.
+    """
 
-    client = ClientSerializer(read_only=True)
-    customer = CustomerSerializer(read_only=True)
-    days_ago = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Review
-        fields = [
-            "id",
-            "rating",
-            "comment",
-            "client",
-            "customer",
-            "created_at",
-            "edited_at",
-            "days_ago",
-        ]
-        read_only_fields = fields
-
-    def get_days_ago(self, obj):
-        delta = timezone.now() - obj.created_at
-        return delta.days
-
-
-class ReviewDetailSerializer(ReviewListSerializer):
-
-    booking_info = serializers.SerializerMethodField()
-
-    class Meta(ReviewListSerializer.Meta):
-        fields = ReviewListSerializer.Meta.fields + ["booking_info", "is_published"]
-
-    def get_booking_info(self, obj):
-        booking = obj.booking
-        return {
-            "id": booking.id,
-            "title": booking.title,
-            "start_date": booking.start_date,
-            "end_date": booking.end_date,
-            "location": f"{booking.city}, {booking.country}",
-        }
-
-
-class ReviewCreateUpdateSerializer(serializers.ModelSerializer):
+    user = UserShortSerializer(read_only=True)
 
     class Meta:
-        model = Review
-        fields = ["rating", "comment"]
+        model = ReviewReaction
+        fields = ["id", "reaction_type", "comment", "created_at", "user"]
+        read_only_fields = ["id", "created_at", "user"]
 
     def validate(self, attrs):
-        if not attrs.get("rating") and not attrs.get("comment"):
+        """
+        DISLIKE bo‘lsa — comment majburiy.
+        LIKE bo‘lsa — comment optional.
+        """
+        if attrs.get(
+            "reaction_type"
+        ) == ReviewReaction.ReactionType.DISLIKE and not attrs.get("comment"):
             raise serializers.ValidationError(
-                _("Please provide either a rating or comment")
+                {"comment": _("Comment is required when reaction is 'dislike'.")}
             )
         return attrs
 
     def create(self, validated_data):
-        booking = self.context["booking"]
-
-        return Review.objects.create(
-            booking=booking,
-            client=self.context["request"].user,
-            customer=booking.customer_profile,
-            **validated_data,
-        )
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            validated_data["user"] = request.user
+        return super().create(validated_data)
 
 
-class MyReviewSerializer(serializers.ModelSerializer):
+class ReviewResponseSerializer(serializers.ModelSerializer):
+    """Review ga provider tomonidan berilgan javob."""
 
-    customer_name = serializers.CharField(
-        source="customer.user.full_name", read_only=True
-    )
-    booking_title = serializers.CharField(source="booking.title", read_only=True)
-    can_edit = serializers.SerializerMethodField()
+    class Meta:
+        model = ReviewResponse
+        fields = ["id", "response_text", "is_published", "created_at", "updated_at"]
+        read_only_fields = ["id", "created_at", "updated_at"]
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    """
+    Full review serializer with nested relations:
+    - Client info
+    - Customer short info
+    - Reaction counts
+    - List of reactions (for hover in frontend)
+    - Provider response
+    """
+
+    client = UserShortSerializer(read_only=True)
+    customer = CustomerShortSerializer(read_only=True)
+
+    reactions = ReviewReactionSerializer(many=True, read_only=True)
+    response = ReviewResponseSerializer(read_only=True)
 
     class Meta:
         model = Review
         fields = [
             "id",
-            "rating",
+            "booking",
+            "client",
+            "customer",
+            "overall_rating",
+            "communication_rating",
+            "service_rating",
+            "punctuality_rating",
+            "value_rating",
+            "title",
             "comment",
-            "customer_name",
-            "booking_title",
-            "created_at",
-            "edited_at",
             "is_published",
-            "can_edit",
+            "is_featured",
+            "created_at",
+            "updated_at",
+            # Denormalized counters
+            "like_count",
+            "dislike_count",
+            # Nested
+            "reactions",
+            "response",
         ]
-        read_only_fields = ["id", "created_at", "edited_at", "is_published"]
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+            "client",
+            "customer",
+            "like_count",
+            "dislike_count",
+            "reactions",
+            "response",
+        ]
 
-    def get_can_edit(self, obj):
-        if not obj.is_published:
-            return False
-        days_passed = (timezone.now() - obj.created_at).days
-        return days_passed <= 7
+
+class ReviewCreateSerializer(serializers.ModelSerializer):
+    """
+    Review yaratish uchun serializer.
+    Client va Customer backend’da avtomatik set qilinadi (request.user va booking’dan).
+    """
+
+    class Meta:
+        model = Review
+        fields = [
+            "overall_rating",
+            "communication_rating",
+            "service_rating",
+            "punctuality_rating",
+            "value_rating",
+            "title",
+            "comment",
+        ]
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        booking = self.context.get("booking")  # view’dan keladi
+        if not booking:
+            raise serializers.ValidationError({"booking": _("Booking is required.")})
+
+        validated_data["booking"] = booking
+        validated_data["client"] = request.user
+        validated_data["customer"] = booking.customer  # booking orqali provider
+
+        return super().create(validated_data)

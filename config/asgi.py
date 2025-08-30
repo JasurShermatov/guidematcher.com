@@ -1,26 +1,28 @@
+# config/asgi.py
 import os
+import django
 from django.core.asgi import get_asgi_application
+
+# Set Django settings module
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+
+# Initialize Django ASGI application early to ensure the AppRegistry
+# is populated before importing code that may import ORM models.
+django_asgi_app = get_asgi_application()
+
+# Now import channels and our routing after Django is set up
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
 
-# Django settings ni o'rnatish
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-
-# Django ASGI application
-django_asgi_app = get_asgi_application()
-
-# WebSocket routing va middleware import
-from apps.chat.routing import websocket_urlpatterns
+# Import our custom JWT middleware and routing
 from apps.chat.middleware import JWTAuthMiddlewareStack
+from apps.chat import routing as chat_routing
 
-# ASGI application configuration
 application = ProtocolTypeRouter(
     {
-        # HTTP uchun Django
         "http": django_asgi_app,
-        # WebSocket uchun Channels with JWT authentication
         "websocket": AllowedHostsOriginValidator(
-            JWTAuthMiddlewareStack(URLRouter(websocket_urlpatterns))
+            JWTAuthMiddlewareStack(URLRouter(chat_routing.websocket_urlpatterns))
         ),
     }
 )

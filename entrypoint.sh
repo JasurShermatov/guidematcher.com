@@ -18,9 +18,6 @@ while ! nc -z "$POSTGRES_HOST" "$POSTGRES_PORT"; do
 done
 echo "✅  PostgreSQL is up!"
 
-echo "🚀  Making migrations …"
-python manage.py makemigrations
-
 echo "🚀  Applying migrations …"
 python manage.py migrate --noinput
 

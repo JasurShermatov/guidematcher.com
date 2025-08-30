@@ -348,6 +348,31 @@ const HomePage = () => {
                             </div>
                         </div>
                     </div>
+                    <div className="homepage-hero-visual">
+                        <div className="homepage-hero-card homepage-guide-card">
+                            <div className="homepage-guide-preview">
+                                <img src="https://randomuser.me/api/portraits/men/75.jpg" alt={t('home.hero.guide_alt')} className="homepage-guide-avatar" />
+                                <div className="homepage-guide-info">
+                                    <h4>{t('home.hero.guide_name')}</h4>
+                                    <p>{t('home.hero.guide_expert')}</p>
+                                    <div className="homepage-rating">
+                                        {[...Array(5)].map((_, i) => <FiStar key={i} className="homepage-star homepage-filled" />)}
+                                        <span>{t('home.hero.guide_rating')}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="homepage-hero-card homepage-booking-card">
+                            <div className="homepage-booking-preview">
+                                <h4>{t('home.hero.tour_name')}</h4>
+                                <div className="homepage-booking-details">
+                                    <span><FiCalendar /> {t('home.hero.tour_date')}</span>
+                                    <span><FiClock /> {t('home.hero.tour_duration')}</span>
+                                </div>
+                                <div className="homepage-booking-status"><FiCheck /> {t('home.hero.tour_status')}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 

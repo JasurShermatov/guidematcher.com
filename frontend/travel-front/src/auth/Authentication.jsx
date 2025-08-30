@@ -1,17 +1,17 @@
+// Authentication.jsx
 import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { FiX, FiMail, FiLock, FiUser, FiLogIn, FiCheckSquare, FiSquare, FiGlobe, FiCheck, FiEye, FiEyeOff, FiRotateCcw } from "react-icons/fi";
+import { FcGoogle } from "react-icons/fc";
+import { FaFacebook } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import {
-    loginUser,
-    requestCode,
-    registerUser,
-    requestPasswordReset,
-    confirmPasswordReset,
-    getCurrentUserShort,
-    googleLogin
-} from "../api/api";
-import './Authentication.css';
+import { loginUser, requestCode, registerUser, requestPasswordReset, confirmPasswordReset, getCurrentUserShort } from "../api/api";
+import "./Authentication.css";
+
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 const Authentication = ({ setIsAuthenticated, setUser }) => {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState("login");
     const [loginForm, setLoginForm] = useState({ email: "", password: "" });
     const [registerForm, setRegisterForm] = useState({
@@ -22,7 +22,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         password: "",
         confirm_password: "",
         country: "",
-        country_code: "",
     });
     const [forgotForm, setForgotForm] = useState({
         email: "",
@@ -46,93 +45,33 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
-    const [expiryTime, setExpiryTime] = useState(null);
-
     const countryInputRef = useRef(null);
     const navigate = useNavigate();
 
     const countries = [
-        { name: "Afghanistan", code: "AF" },
-        { name: "Albania", code: "AL" },
-        { name: "Algeria", code: "DZ" },
-        { name: "Argentina", code: "AR" },
-        { name: "Armenia", code: "AM" },
-        { name: "Australia", code: "AU" },
-        { name: "Austria", code: "AT" },
-        { name: "Azerbaijan", code: "AZ" },
-        { name: "Bangladesh", code: "BD" },
-        { name: "Belarus", code: "BY" },
-        { name: "Belgium", code: "BE" },
-        { name: "Brazil", code: "BR" },
-        { name: "Bulgaria", code: "BG" },
-        { name: "Canada", code: "CA" },
-        { name: "China", code: "CN" },
-        { name: "Colombia", code: "CO" },
-        { name: "Croatia", code: "HR" },
-        { name: "Czech Republic", code: "CZ" },
-        { name: "Denmark", code: "DK" },
-        { name: "Egypt", code: "EG" },
-        { name: "Estonia", code: "EE" },
-        { name: "Finland", code: "FI" },
-        { name: "France", code: "FR" },
-        { name: "Georgia", code: "GE" },
-        { name: "Germany", code: "DE" },
-        { name: "Greece", code: "GR" },
-        { name: "Hungary", code: "HU" },
-        { name: "Iceland", code: "IS" },
-        { name: "India", code: "IN" },
-        { name: "Indonesia", code: "ID" },
-        { name: "Iran", code: "IR" },
-        { name: "Iraq", code: "IQ" },
-        { name: "Ireland", code: "IE" },
-        { name: "Israel", code: "IL" },
-        { name: "Italy", code: "IT" },
-        { name: "Japan", code: "JP" },
-        { name: "Jordan", code: "JO" },
-        { name: "Kazakhstan", code: "KZ" },
-        { name: "Kenya", code: "KE" },
-        { name: "South Korea", code: "KR" },
-        { name: "Kuwait", code: "KW" },
-        { name: "Kyrgyzstan", code: "KG" },
-        { name: "Latvia", code: "LV" },
-        { name: "Lithuania", code: "LT" },
-        { name: "Luxembourg", code: "LU" },
-        { name: "Malaysia", code: "MY" },
-        { name: "Mexico", code: "MX" },
-        { name: "Netherlands", code: "NL" },
-        { name: "New Zealand", code: "NZ" },
-        { name: "Norway", code: "NO" },
-        { name: "Pakistan", code: "PK" },
-        { name: "Philippines", code: "PH" },
-        { name: "Poland", code: "PL" },
-        { name: "Portugal", code: "PT" },
-        { name: "Qatar", code: "QA" },
-        { name: "Romania", code: "RO" },
-        { name: "Russia", code: "RU" },
-        { name: "Saudi Arabia", code: "SA" },
-        { name: "Singapore", code: "SG" },
-        { name: "Slovakia", code: "SK" },
-        { name: "Slovenia", code: "SI" },
-        { name: "South Africa", code: "ZA" },
-        { name: "Spain", code: "ES" },
-        { name: "Sri Lanka", code: "LK" },
-        { name: "Sweden", code: "SE" },
-        { name: "Switzerland", code: "CH" },
-        { name: "Tajikistan", code: "TJ" },
-        { name: "Thailand", code: "TH" },
-        { name: "Turkey", code: "TR" },
-        { name: "Turkmenistan", code: "TM" },
-        { name: "Ukraine", code: "UA" },
-        { name: "United Arab Emirates", code: "AE" },
-        { name: "United Kingdom", code: "GB" },
-        { name: "United States", code: "US" },
-        { name: "Uruguay", code: "UY" },
-        { name: "Uzbekistan", code: "UZ" },
-        { name: "Vietnam", code: "VN" },
-        { name: "Yemen", code: "YE" },
+        "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
+        "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin",
+        "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
+        "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia",
+        "Comoros", "Congo (Congo-Brazzaville)", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia (Czech Republic)",
+        "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea",
+        "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany",
+        "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary",
+        "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan",
+        "Kazakhstan", "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kuwait", "Kyrgyzstan", "Laos", "Latvia",
+        "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi",
+        "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia",
+        "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar (Burma)", "Namibia", "Nauru",
+        "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Macedonia", "Norway", "Oman",
+        "Pakistan", "Palau", "Palestine State", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland",
+        "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines",
+        "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone",
+        "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Sudan", "Spain", "Sri Lanka",
+        "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste",
+        "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine",
+        "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City",
+        "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
     ];
-
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -143,11 +82,14 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                     setIsAuthenticated(true);
                     setUser(userData);
                     if (userData.role === "Client") {
-                        navigate("/client-dashboard");
+                        navigate("/user-account");
                     } else if (userData.role === "Customer") {
-                        navigate("/customer-dashboard");
+                        navigate("/admin-account");
+                    } else {
+                        navigate("/account");
                     }
                 } catch (error) {
+                    console.error("Failed to fetch user:", error);
                     localStorage.removeItem("access_token");
                     localStorage.removeItem("refresh_token");
                     setIsAuthenticated(false);
@@ -156,23 +98,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         };
         checkAuth();
     }, [setIsAuthenticated, setUser, navigate]);
-
-    // Countdown timer for code expiry
-    useEffect(() => {
-        let timer;
-        if (expiryTime && expiryTime > Date.now()) {
-            timer = setInterval(() => {
-                const remaining = expiryTime - Date.now();
-                if (remaining <= 0) {
-                    setExpiryTime(null);
-                    clearInterval(timer);
-                }
-            }, 1000);
-        }
-        return () => {
-            if (timer) clearInterval(timer);
-        };
-    }, [expiryTime]);
 
     const clearMessages = () => {
         setError("");
@@ -191,9 +116,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
 
         if (name === "country") {
             const filteredSuggestions = countries
-                .filter((country) =>
-                    country.name.toLowerCase().startsWith(value.toLowerCase())
-                )
+                .filter((country) => country.toLowerCase().startsWith(value.toLowerCase()))
                 .slice(0, 5);
             setCountrySuggestions(filteredSuggestions);
         }
@@ -203,9 +126,9 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             const currentConfirmPassword = name === "confirm_password" ? value : registerForm.confirm_password;
 
             if (value && !passwordRegex.test(value)) {
-                setError("Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character (@$!%*?&).");
+                setError(t("auth.validation.password_requirements"));
             } else if (currentPassword && currentConfirmPassword && currentPassword !== currentConfirmPassword) {
-                setError("Passwords do not match.");
+                setError(t("auth.validation.passwords_not_match"));
             } else {
                 setError("");
             }
@@ -222,9 +145,9 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             const currentConfirmPassword = name === "confirm_password" ? value : forgotForm.confirm_password;
 
             if (value && !passwordRegex.test(value)) {
-                setError("Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character (@$!%*?&).");
+                setError(t("auth.validation.password_requirements"));
             } else if (currentNewPassword && currentConfirmPassword && currentNewPassword !== currentConfirmPassword) {
-                setError("Passwords do not match.");
+                setError(t("auth.validation.passwords_not_match"));
             } else {
                 setError("");
             }
@@ -232,7 +155,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     };
 
     const handleCountrySelect = (country) => {
-        setRegisterForm({ ...registerForm, country: country.name, country_code: country.code });
+        setRegisterForm({ ...registerForm, country });
         setCountrySuggestions([]);
         if (countryInputRef.current) countryInputRef.current.focus();
     };
@@ -247,24 +170,19 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     const toggleShowNewPassword = () => setShowNewPassword(!showNewPassword);
     const toggleShowConfirmNewPassword = () => setShowConfirmNewPassword(!showConfirmNewPassword);
 
-    const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
-    };
-
-    const getRemainingTime = () => {
-        if (!expiryTime) return 0;
-        return Math.max(0, Math.floor((expiryTime - Date.now()) / 1000));
-    };
-
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
         clearMessages();
         setLoading(true);
 
         if (!loginForm.email || !loginForm.password) {
-            setError("All fields are required.");
+            setError(t("auth.validation.required_fields"));
+            setLoading(false);
+            return;
+        }
+
+        if (!passwordRegex.test(loginForm.password)) {
+            setError(t("auth.validation.password_requirements"));
             setLoading(false);
             return;
         }
@@ -274,21 +192,20 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                 email: loginForm.email.toLowerCase().trim(),
                 password: loginForm.password,
             });
-
             localStorage.setItem("access_token", tokenData.access);
             localStorage.setItem("refresh_token", tokenData.refresh);
             setIsAuthenticated(true);
             setUser(tokenData.user);
-
             if (tokenData.user.role === "Client") {
-                navigate("/client-dashboard");
+                navigate("/user-account");
             } else if (tokenData.user.role === "Customer") {
-                navigate("/customer-dashboard");
+                navigate("/admin-account");
+            } else {
+                navigate("/account");
             }
-
             setLoginForm({ email: "", password: "" });
         } catch (error) {
-            setError(error.message || "Login failed. Please check your credentials.");
+            setError(error.message || t("auth.errors.login_failed"));
         } finally {
             setLoading(false);
         }
@@ -299,50 +216,48 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         clearMessages();
         setLoading(true);
 
-        const { role, first_name, last_name, email, password, confirm_password, country, country_code } = registerForm;
+        const { role, first_name, last_name, email, password, confirm_password, country } = registerForm;
 
         if (!role || !first_name || !last_name || !email || !password || !confirm_password || !country) {
-            setError("All fields are required.");
+            setError(t("auth.validation.required_fields"));
             setLoading(false);
             return;
         }
 
         if (password !== confirm_password) {
-            setError("Passwords do not match.");
+            setError(t("auth.validation.passwords_not_match"));
             setLoading(false);
             return;
         }
 
         if (!passwordRegex.test(password)) {
-            setError("Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character (@$!%*?&).");
+            setError(t("auth.validation.password_requirements"));
             setLoading(false);
             return;
         }
 
         if (!checkboxes.personalData || !checkboxes.terms) {
-            setError("You must agree to the terms and privacy policy.");
+            setError(t("auth.validation.required_checkboxes"));
             setLoading(false);
             return;
         }
 
-        const selectedCountry = countries.find(c => c.name === country);
-        if (!selectedCountry) {
-            setError("Please select a valid country from the suggestions.");
+        if (!countries.includes(country)) {
+            setError(t("auth.validation.invalid_country"));
             setLoading(false);
             return;
         }
 
         try {
-            const response = await requestCode({ email: email.toLowerCase().trim() });
-            setSuccessMessage("Verification code sent successfully to your email.");
+            await requestCode({ email: email.toLowerCase().trim() });
+            setSuccessMessage(t("auth.success.verification_sent"));
             setVerificationStep(true);
-            setExpiryTime(Date.now() + (response.expires_at ? new Date(response.expires_at).getTime() - Date.now() : 300000));
         } catch (error) {
             const errorMsg = error.message.includes("Too many verification code requests")
-                ? "Too many requests. Please wait 15 minutes and try again."
+                ? t("auth.errors.too_many_requests")
                 : error.message.includes("already exists")
-                    ? "This email is already registered."
-                    : error.message || "Failed to send verification code.";
+                    ? t("auth.errors.email_exists")
+                    : error.message || t("auth.errors.code_request_failed");
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -355,19 +270,19 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setLoading(true);
 
         if (!verificationCode) {
-            setError("Verification code is required.");
+            setError(t("auth.validation.required_code"));
             setLoading(false);
             return;
         }
 
         if (!/^\d{6}$/.test(verificationCode)) {
-            setError("Verification code must be 6 digits.");
+            setError(t("auth.validation.invalid_code"));
             setLoading(false);
             return;
         }
 
         try {
-            const { role, first_name, last_name, email, password, country, country_code } = registerForm;
+            const { role, first_name, last_name, email, password, country } = registerForm;
             const tokenResponse = await registerUser({
                 role,
                 first_name,
@@ -375,31 +290,29 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                 email: email.toLowerCase().trim(),
                 password,
                 country,
-                country_code,
                 code: verificationCode,
             });
-
             localStorage.setItem("access_token", tokenResponse.access);
             localStorage.setItem("refresh_token", tokenResponse.refresh);
             setIsAuthenticated(true);
             setUser(tokenResponse.user);
-            setSuccessMessage("Registration successful! Welcome!");
-
+            setSuccessMessage(t("auth.success.register_success"));
             if (tokenResponse.user.role === "Client") {
-                navigate("/client-dashboard");
+                navigate("/user-account");
             } else if (tokenResponse.user.role === "Customer") {
-                navigate("/customer-dashboard");
+                navigate("/admin-account");
+            } else {
+                navigate("/account");
             }
-
             resetRegisterForm();
         } catch (error) {
             const errorMsg = error.message.includes("already exists")
-                ? "This email is already registered."
+                ? t("auth.errors.email_exists")
                 : error.message.includes("expired")
-                    ? "Verification code has expired."
+                    ? t("auth.errors.expired_code")
                     : error.message.includes("Invalid or already used")
-                        ? "Invalid or already used verification code."
-                        : error.message || "Registration failed.";
+                        ? t("auth.errors.invalid_code")
+                        : error.message || t("auth.errors.register_failed");
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -410,13 +323,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         clearMessages();
         setLoading(true);
         try {
-            const response = await requestCode({ email: registerForm.email.toLowerCase().trim() });
-            setSuccessMessage("New verification code sent successfully.");
-            setExpiryTime(Date.now() + (response.expires_at ? new Date(response.expires_at).getTime() - Date.now() : 300000));
+            await requestCode({ email: registerForm.email.toLowerCase().trim() });
+            setSuccessMessage(t("auth.success.verification_sent"));
         } catch (error) {
             const errorMsg = error.message.includes("Too many verification code requests")
-                ? "Too many requests. Please wait 15 minutes and try again."
-                : error.message || "Failed to resend verification code.";
+                ? t("auth.errors.too_many_requests")
+                : error.message || t("auth.errors.resend_code_failed");
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -429,19 +341,19 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setLoading(true);
 
         if (!forgotForm.email) {
-            setError("Email is required.");
+            setError(t("auth.validation.required_fields"));
             setLoading(false);
             return;
         }
 
         try {
             const response = await requestPasswordReset({ email: forgotForm.email.toLowerCase().trim() });
-            setSuccessMessage(response.message || "Password reset code sent to your email.");
+            setSuccessMessage(response.message || t("auth.success.password_reset_sent"));
             setForgotStep(true);
         } catch (error) {
             const errorMsg = error.message.includes("Too many password reset requests")
-                ? "Too many requests. Please wait 30 minutes and try again."
-                : error.message || "Failed to send password reset code.";
+                ? t("auth.errors.too_many_requests")
+                : error.message || t("auth.errors.code_request_failed");
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -456,25 +368,25 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         const { email, code, new_password, confirm_password } = forgotForm;
 
         if (!code || !new_password || !confirm_password) {
-            setError("All fields are required.");
+            setError(t("auth.validation.required_fields"));
             setLoading(false);
             return;
         }
 
         if (new_password !== confirm_password) {
-            setError("Passwords do not match.");
+            setError(t("auth.validation.passwords_not_match"));
             setLoading(false);
             return;
         }
 
         if (!passwordRegex.test(new_password)) {
-            setError("Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character (@$!%*?&).");
+            setError(t("auth.validation.password_requirements"));
             setLoading(false);
             return;
         }
 
         if (!/^\d{6}$/.test(code)) {
-            setError("Verification code must be 6 digits.");
+            setError(t("auth.validation.invalid_code"));
             setLoading(false);
             return;
         }
@@ -485,7 +397,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                 code,
                 new_password,
             });
-            setSuccessMessage("Password has been reset successfully!");
+            setSuccessMessage(t("auth.success.password_reset_success"));
             setTimeout(() => {
                 setActiveTab("login");
                 setForgotStep(false);
@@ -499,12 +411,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             }, 2000);
         } catch (error) {
             const errorMsg = error.message.includes("expired")
-                ? "Verification code has expired."
+                ? t("auth.errors.expired_code")
                 : error.message.includes("Invalid")
-                    ? "Invalid verification code."
+                    ? t("auth.errors.invalid_code")
                     : error.message.includes("Too many failed attempts")
-                        ? "Too many failed attempts. Please request a new code."
-                        : error.message || "Password reset failed.";
+                        ? t("auth.errors.too_many_attempts")
+                        : error.message || t("auth.errors.password_reset_failed");
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -516,24 +428,19 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setLoading(true);
         try {
             const response = await requestPasswordReset({ email: forgotForm.email.toLowerCase().trim() });
-            setSuccessMessage(response.message || "New password reset code sent to your email.");
+            setSuccessMessage(response.message || t("auth.success.password_reset_sent"));
         } catch (error) {
             const errorMsg = error.message.includes("Too many password reset requests")
-                ? "Too many requests. Please wait 30 minutes and try again."
-                : error.message || "Failed to resend password reset code.";
+                ? t("auth.errors.too_many_requests")
+                : error.message || t("auth.errors.resend_code_failed");
             setError(errorMsg);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSocialLogin = async (provider) => {
-        if (provider === 'google') {
-            // Implement Google OAuth logic here
-            alert("Google login will be implemented here");
-        } else {
-            alert(`${provider} login will be implemented here`);
-        }
+    const handleSocialLogin = (provider) => {
+        alert(t("auth.social_login_dev", { provider }));
     };
 
     const resetRegisterForm = () => {
@@ -545,12 +452,10 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             password: "",
             confirm_password: "",
             country: "",
-            country_code: "",
         });
         setVerificationCode("");
         setCheckboxes({ personalData: false, terms: false, travelTips: false });
         setVerificationStep(false);
-        setExpiryTime(null);
         clearMessages();
     };
 
@@ -567,7 +472,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setVerificationStep(false);
         setForgotStep(false);
         setCountrySuggestions([]);
-        setExpiryTime(null);
         clearMessages();
         setLoginForm({ email: "", password: "" });
         setForgotForm({ email: "", code: "", new_password: "", confirm_password: "" });
@@ -582,72 +486,79 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     }, []);
 
     return (
-        <div className="authentication-overlay" onClick={closeModal}>
-            <div className="authentication-modal" onClick={(e) => e.stopPropagation()}>
-                <button className="authentication-close-btn" onClick={closeModal}>
-                    ×
+        <div className="auth-overlay" onClick={closeModal} role="dialog" aria-labelledby="auth-title" aria-modal="true">
+            <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
+                <button className="auth-close-btn" onClick={closeModal} aria-label={t("auth.close_aria")}>
+                    <FiX />
                 </button>
 
-                <div className="authentication-header">
-                    <h1 className="authentication-brand">TravMatch</h1>
-                    <p className="authentication-subtitle">Connect with local guides worldwide</p>
+                <div className="auth-header">
+                    <h1 className="auth-brand">{t("auth.title")}</h1>
+                    <p className="auth-subtitle">{t("auth.subtitle")}</p>
                 </div>
 
-                <div className="authentication-tabs">
+                <div className="auth-tabs">
                     <button
-                        className={`authentication-tab ${activeTab === "login" ? "authentication-tab-active" : ""}`}
+                        className={`auth-tab ${activeTab === "login" ? "auth-tab-active" : ""}`}
                         onClick={() => switchTab("login")}
+                        aria-selected={activeTab === "login"}
                         disabled={loading}
                     >
-                        Login
+                        <FiLogIn />
+                        {t("auth.tabs.login")}
                     </button>
                     <button
-                        className={`authentication-tab ${activeTab === "register" ? "authentication-tab-active" : ""}`}
+                        className={`auth-tab ${activeTab === "register" ? "auth-tab-active" : ""}`}
                         onClick={() => switchTab("register")}
+                        aria-selected={activeTab === "register"}
                         disabled={loading}
                     >
-                        Register
+                        <FiUser />
+                        {t("auth.tabs.register")}
                     </button>
                     <button
-                        className={`authentication-tab ${activeTab === "forgot" ? "authentication-tab-active" : ""}`}
+                        className={`auth-tab ${activeTab === "forgot" ? "auth-tab-active" : ""}`}
                         onClick={() => switchTab("forgot")}
+                        aria-selected={activeTab === "forgot"}
                         disabled={loading}
                     >
-                        Reset Password
+                        <FiRotateCcw />
+                        {t("auth.tabs.forgot")}
                     </button>
                 </div>
 
                 {error && (
-                    <div className="authentication-message authentication-error">
-                        <div className="authentication-message-icon">⚠️</div>
+                    <div className="auth-message auth-error" role="alert">
+                        <div className="auth-message-icon">⚠️</div>
                         <span>{error}</span>
                     </div>
                 )}
                 {successMessage && (
-                    <div className="authentication-message authentication-success">
-                        <div className="authentication-message-icon">✅</div>
+                    <div className="auth-message auth-success" role="alert">
+                        <div className="auth-message-icon">✅</div>
                         <span>{successMessage}</span>
                     </div>
                 )}
 
                 {loading && (
-                    <div className="authentication-loading">
-                        <div className="authentication-spinner"></div>
-                        <span>Processing...</span>
+                    <div className="auth-loading">
+                        <div className="spinner"></div>
+                        <span>{t("auth.loading")}</span>
                     </div>
                 )}
 
                 {activeTab === "login" && (
-                    <div className="authentication-content">
-                        <div className="authentication-form-header">
-                            <h2>Welcome Back</h2>
-                            <p>Sign in to your account</p>
+                    <div className="auth-content">
+                        <div className="auth-form-header">
+                            <h2 id="auth-title">{t("auth.login.title")}</h2>
+                            <p>{t("auth.login.subtitle")}</p>
                         </div>
 
-                        <form className="authentication-form" onSubmit={handleLoginSubmit}>
-                            <div className="authentication-form-group">
-                                <label htmlFor="login-email" className="authentication-label">
-                                    Email Address
+                        <form className="auth-form" onSubmit={handleLoginSubmit}>
+                            <div className="auth-form-group">
+                                <label htmlFor="login-email" className="auth-label">
+                                    <FiMail className="auth-label-icon" />
+                                    {t("auth.login.email_label")}
                                 </label>
                                 <input
                                     id="login-email"
@@ -655,103 +566,108 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     name="email"
                                     value={loginForm.email}
                                     onChange={handleLoginChange}
-                                    placeholder="Enter your email"
-                                    className="authentication-input"
-                                    required
+                                    placeholder={t("auth.login.email_placeholder")}
+                                    className="auth-input"
+                                    aria-required="true"
                                     disabled={loading}
                                     autoComplete="email"
                                 />
                             </div>
 
-                            <div className="authentication-form-group">
-                                <label htmlFor="login-password" className="authentication-label">
-                                    Password
+                            <div className="auth-form-group">
+                                <label htmlFor="login-password" className="auth-label">
+                                    <FiLock className="auth-label-icon" />
+                                    {t("auth.login.password_label")}
                                 </label>
-                                <div className="authentication-input-wrapper">
+                                <div className="auth-input-wrapper">
                                     <input
                                         id="login-password"
                                         type={showPassword ? "text" : "password"}
                                         name="password"
                                         value={loginForm.password}
                                         onChange={handleLoginChange}
-                                        placeholder="Enter your password"
-                                        className="authentication-input"
-                                        required
+                                        placeholder={t("auth.login.password_placeholder")}
+                                        className="auth-input"
+                                        aria-required="true"
                                         disabled={loading}
                                         autoComplete="current-password"
                                     />
                                     <button
                                         type="button"
-                                        className="authentication-toggle-password"
+                                        className="auth-toggle-password"
                                         onClick={toggleShowPassword}
+                                        aria-label={showPassword ? t("auth.login.hide_password_aria") : t("auth.login.show_password_aria")}
                                         disabled={loading}
                                     >
-                                        {showPassword ? "👁️" : "👁️‍🗨️"}
+                                        {showPassword ? <FiEyeOff /> : <FiEye />}
                                     </button>
                                 </div>
                             </div>
 
-                            <button type="submit" className="authentication-submit-btn" disabled={loading}>
-                                Sign In
+                            <button type="submit" className="auth-submit-btn" disabled={loading}>
+                                <FiLogIn />
+                                {t("auth.login.submit_button")}
                             </button>
                         </form>
 
-                        <div className="authentication-divider">
-                            <span>or continue with</span>
+                        <div className="auth-divider">
+                            <span>{t("auth.login.or")}</span>
                         </div>
 
-                        <div className="authentication-social">
+                        <div className="auth-social">
                             <button
-                                className="authentication-social-btn authentication-google-btn"
+                                className="auth-social-btn google-btn"
                                 onClick={() => handleSocialLogin("Google")}
                                 disabled={loading}
                             >
-                                <span>🔍</span>
-                                Google
+                                <FcGoogle />
+                                {t("auth.login.social.google")}
                             </button>
                             <button
-                                className="authentication-social-btn authentication-facebook-btn"
+                                className="auth-social-btn facebook-btn"
                                 onClick={() => handleSocialLogin("Facebook")}
                                 disabled={loading}
                             >
-                                <span>📘</span>
-                                Facebook
+                                <FaFacebook />
+                                {t("auth.login.social.facebook")}
                             </button>
                         </div>
                     </div>
                 )}
 
                 {activeTab === "register" && (
-                    <div className="authentication-content">
-                        <div className="authentication-form-header">
-                            <h2>Create Account</h2>
-                            <p>Join our community of travelers and guides</p>
+                    <div className="auth-content">
+                        <div className="auth-form-header">
+                            <h2 id="auth-title">{t("auth.register.title")}</h2>
+                            <p>{t("auth.register.subtitle")}</p>
                         </div>
 
                         {!verificationStep ? (
-                            <form className="authentication-form" onSubmit={handleRegisterSubmit}>
-                                <div className="authentication-form-group">
-                                    <label htmlFor="register-role" className="authentication-label">
-                                        Account Type
+                            <form className="auth-form" onSubmit={handleRegisterSubmit}>
+                                <div className="auth-form-group">
+                                    <label htmlFor="register-role" className="auth-label">
+                                        <FiUser className="auth-label-icon" />
+                                        {t("auth.register.role_label")}
                                     </label>
                                     <select
                                         id="register-role"
                                         name="role"
                                         value={registerForm.role}
                                         onChange={handleRegisterChange}
-                                        className="authentication-input"
-                                        required
+                                        className="auth-input"
+                                        aria-required="true"
                                         disabled={loading}
                                     >
-                                        <option value="Client">Client (Looking for guides)</option>
-                                        <option value="Customer">Guide (Offer services)</option>
+                                        <option value="Client">{t("auth.register.role_client")}</option>
+                                        <option value="Customer">{t("auth.register.role_customer")}</option>
                                     </select>
                                 </div>
 
-                                <div className="authentication-name-grid">
-                                    <div className="authentication-form-group">
-                                        <label htmlFor="register-first_name" className="authentication-label">
-                                            First Name
+                                <div className="auth-name-grid">
+                                    <div className="auth-form-group">
+                                        <label htmlFor="register-first_name" className="auth-label">
+                                            <FiUser className="auth-label-icon" />
+                                            {t("auth.register.first_name_label")}
                                         </label>
                                         <input
                                             id="register-first_name"
@@ -759,16 +675,17 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             name="first_name"
                                             value={registerForm.first_name}
                                             onChange={handleRegisterChange}
-                                            placeholder="John"
-                                            className="authentication-input"
-                                            required
+                                            placeholder={t("auth.register.first_name_placeholder")}
+                                            className="auth-input"
+                                            aria-required="true"
                                             disabled={loading}
                                             autoComplete="given-name"
                                         />
                                     </div>
-                                    <div className="authentication-form-group">
-                                        <label htmlFor="register-last_name" className="authentication-label">
-                                            Last Name
+                                    <div className="auth-form-group">
+                                        <label htmlFor="register-last_name" className="auth-label">
+                                            <FiUser className="auth-label-icon" />
+                                            {t("auth.register.last_name_label")}
                                         </label>
                                         <input
                                             id="register-last_name"
@@ -776,18 +693,19 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             name="last_name"
                                             value={registerForm.last_name}
                                             onChange={handleRegisterChange}
-                                            placeholder="Doe"
-                                            className="authentication-input"
-                                            required
+                                            placeholder={t("auth.register.last_name_placeholder")}
+                                            className="auth-input"
+                                            aria-required="true"
                                             disabled={loading}
                                             autoComplete="family-name"
                                         />
                                     </div>
                                 </div>
 
-                                <div className="authentication-form-group">
-                                    <label htmlFor="register-email" className="authentication-label">
-                                        Email Address
+                                <div className="auth-form-group">
+                                    <label htmlFor="register-email" className="auth-label">
+                                        <FiMail className="auth-label-icon" />
+                                        {t("auth.register.email_label")}
                                     </label>
                                     <input
                                         id="register-email"
@@ -795,97 +713,105 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         name="email"
                                         value={registerForm.email}
                                         onChange={handleRegisterChange}
-                                        placeholder="john.doe@example.com"
-                                        className="authentication-input"
-                                        required
+                                        placeholder={t("auth.register.email_placeholder")}
+                                        className="auth-input"
+                                        aria-required="true"
                                         disabled={loading}
                                         autoComplete="email"
                                     />
                                 </div>
 
-                                <div className="authentication-form-group">
-                                    <label htmlFor="register-password" className="authentication-label">
-                                        Password
+                                <div className="auth-form-group">
+                                    <label htmlFor="register-password" className="auth-label">
+                                        <FiLock className="auth-label-icon" />
+                                        {t("auth.register.password_label")}
                                     </label>
-                                    <div className="authentication-input-wrapper">
+                                    <div className="auth-input-wrapper">
                                         <input
                                             id="register-password"
                                             type={showPassword ? "text" : "password"}
                                             name="password"
                                             value={registerForm.password}
                                             onChange={handleRegisterChange}
-                                            placeholder="Create a strong password"
-                                            className="authentication-input"
-                                            required
+                                            placeholder={t("auth.register.password_placeholder")}
+                                            className="auth-input"
+                                            aria-required="true"
                                             disabled={loading}
                                             autoComplete="new-password"
                                         />
                                         <button
                                             type="button"
-                                            className="authentication-toggle-password"
+                                            className="auth-toggle-password"
                                             onClick={toggleShowPassword}
+                                            aria-label={showPassword ? t("auth.register.hide_password_aria") : t("auth.register.show_password_aria")}
                                             disabled={loading}
                                         >
-                                            {showPassword ? "👁️" : "👁️‍🗨️"}
+                                            {showPassword ? <FiEyeOff /> : <FiEye />}
                                         </button>
                                     </div>
                                 </div>
 
-                                <div className="authentication-form-group">
-                                    <label htmlFor="register-confirm_password" className="authentication-label">
-                                        Confirm Password
+                                <div className="auth-form-group">
+                                    <label htmlFor="register-confirm_password" className="auth-label">
+                                        <FiLock className="auth-label-icon" />
+                                        {t("auth.register.confirm_password_label")}
                                     </label>
-                                    <div className="authentication-input-wrapper">
+                                    <div className="auth-input-wrapper">
                                         <input
                                             id="register-confirm_password"
                                             type={showConfirmPassword ? "text" : "password"}
                                             name="confirm_password"
                                             value={registerForm.confirm_password}
                                             onChange={handleRegisterChange}
-                                            placeholder="Confirm your password"
-                                            className="authentication-input"
-                                            required
+                                            placeholder={t("auth.register.confirm_password_placeholder")}
+                                            className="auth-input"
+                                            aria-required="true"
                                             disabled={loading}
                                             autoComplete="new-password"
                                         />
                                         <button
                                             type="button"
-                                            className="authentication-toggle-password"
+                                            className="auth-toggle-password"
                                             onClick={toggleShowConfirmPassword}
+                                            aria-label={showConfirmPassword ? t("auth.register.hide_password_aria") : t("auth.register.show_password_aria")}
                                             disabled={loading}
                                         >
-                                            {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
+                                            {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
                                         </button>
                                     </div>
                                 </div>
 
-                                <div className="authentication-form-group">
-                                    <label htmlFor="register-country" className="authentication-label">
-                                        Country
+                                <div className="auth-form-group">
+                                    <label htmlFor="register-country" className="auth-label">
+                                        <FiGlobe className="auth-label-icon" />
+                                        {t("auth.register.country_label")}
                                     </label>
-                                    <div className="authentication-country-wrapper">
+                                    <div className="auth-country-wrapper">
                                         <input
                                             id="register-country"
                                             type="text"
                                             name="country"
                                             value={registerForm.country}
                                             onChange={handleRegisterChange}
-                                            placeholder="Type to search countries..."
-                                            className="authentication-input"
+                                            placeholder={t("auth.register.country_placeholder")}
+                                            className="auth-input"
                                             ref={countryInputRef}
-                                            required
+                                            aria-required="true"
                                             disabled={loading}
                                             autoComplete="country-name"
                                         />
                                         {countrySuggestions.length > 0 && (
-                                            <ul className="authentication-country-suggestions">
+                                            <ul className="auth-country-suggestions">
                                                 {countrySuggestions.map((country, index) => (
                                                     <li
                                                         key={index}
                                                         onClick={() => handleCountrySelect(country)}
-                                                        className="authentication-country-option"
+                                                        role="option"
+                                                        aria-selected="false"
+                                                        className="auth-country-option"
                                                     >
-                                                        🌍 {country.name}
+                                                        <FiGlobe className="auth-country-icon" />
+                                                        {country}
                                                     </li>
                                                 ))}
                                             </ul>
@@ -893,89 +819,88 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     </div>
                                 </div>
 
-                                <div className="authentication-checkbox-group">
-                                    <label className="authentication-checkbox-label">
+                                <div className="auth-checkbox-group">
+                                    <label className="auth-checkbox-label">
                                         <input
                                             type="checkbox"
                                             name="personalData"
                                             checked={checkboxes.personalData}
                                             onChange={handleCheckboxChange}
-                                            required
+                                            aria-required="true"
                                             disabled={loading}
-                                            className="authentication-checkbox-input"
+                                            className="auth-checkbox-input"
                                         />
-                                        <div className="authentication-checkbox-icon">
-                                            {checkboxes.personalData ? "✅" : "⬜"}
+                                        <div className="auth-checkbox-icon">
+                                            {checkboxes.personalData ? <FiCheckSquare /> : <FiSquare />}
                                         </div>
-                                        <span>I agree to the processing of personal data</span>
+                                        <span>{t("auth.register.checkboxes.personal_data")}</span>
                                     </label>
 
-                                    <label className="authentication-checkbox-label">
+                                    <label className="auth-checkbox-label">
                                         <input
                                             type="checkbox"
                                             name="terms"
                                             checked={checkboxes.terms}
                                             onChange={handleCheckboxChange}
-                                            required
+                                            aria-required="true"
                                             disabled={loading}
-                                            className="authentication-checkbox-input"
+                                            className="auth-checkbox-input"
                                         />
-                                        <div className="authentication-checkbox-icon">
-                                            {checkboxes.terms ? "✅" : "⬜"}
+                                        <div className="auth-checkbox-icon">
+                                            {checkboxes.terms ? <FiCheckSquare /> : <FiSquare />}
                                         </div>
-                                        <span>I agree to the Terms of Service</span>
+                                        <span>{t("auth.register.checkboxes.terms")}</span>
                                     </label>
 
-                                    <label className="authentication-checkbox-label">
+                                    <label className="auth-checkbox-label">
                                         <input
                                             type="checkbox"
                                             name="travelTips"
                                             checked={checkboxes.travelTips}
                                             onChange={handleCheckboxChange}
                                             disabled={loading}
-                                            className="authentication-checkbox-input"
+                                            className="auth-checkbox-input"
                                         />
-                                        <div className="authentication-checkbox-icon">
-                                            {checkboxes.travelTips ? "✅" : "⬜"}
+                                        <div className="auth-checkbox-icon">
+                                            {checkboxes.travelTips ? <FiCheckSquare /> : <FiSquare />}
                                         </div>
-                                        <span>Send me travel tips and updates (optional)</span>
+                                        <span>{t("auth.register.checkboxes.travel_tips")}</span>
                                     </label>
                                 </div>
 
-                                <button type="submit" className="authentication-submit-btn" disabled={loading}>
-                                    Create Account
+                                <button type="submit" className="auth-submit-btn" disabled={loading}>
+                                    <FiUser />
+                                    {t("auth.register.submit_button")}
                                 </button>
                             </form>
                         ) : (
-                            <div className="authentication-verification">
-                                <div className="authentication-verification-header">
-                                    <div className="authentication-verification-icon">
-                                        📧
+                            <div className="auth-verification">
+                                <div className="auth-verification-header">
+                                    <div className="auth-verification-icon">
+                                        <FiMail />
                                     </div>
-                                    <h3>Check Your Email</h3>
-                                    <p>
-                                        We've sent a verification code to <strong>{registerForm.email}</strong>
-                                    </p>
-                                    {expiryTime && (
-                                        <p className="authentication-expiry-timer">
-                                            Code expires in: {formatTime(getRemainingTime())}
-                                        </p>
-                                    )}
+                                    <h3>{t("auth.register.verification.title")}</h3>
+                                    <p
+                                        dangerouslySetInnerHTML={{
+                                            __html: t("auth.register.verification.subtitle", { email: registerForm.email }),
+                                        }}
+                                    />
                                 </div>
 
-                                <form className="authentication-form" onSubmit={handleVerifyCode}>
-                                    <div className="authentication-form-group">
-                                        <label htmlFor="verification-code" className="authentication-label">
-                                            Verification Code
+                                <form className="auth-form" onSubmit={handleVerifyCode}>
+                                    <div className="auth-form-group">
+                                        <label htmlFor="verification-code" className="auth-label">
+                                            <FiCheck className="auth-label-icon" />
+                                            {t("auth.register.verification.code_label")}
                                         </label>
                                         <input
                                             id="verification-code"
                                             type="text"
                                             value={verificationCode}
                                             onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                            placeholder="Enter 6-digit code"
-                                            className="authentication-input authentication-verification-input"
-                                            required
+                                            placeholder={t("auth.register.verification.code_placeholder")}
+                                            className="auth-input auth-verification-input"
+                                            aria-required="true"
                                             autoFocus
                                             maxLength="6"
                                             disabled={loading}
@@ -983,17 +908,19 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         />
                                     </div>
 
-                                    <button type="submit" className="authentication-submit-btn" disabled={loading}>
-                                        Verify & Create Account
+                                    <button type="submit" className="auth-submit-btn" disabled={loading}>
+                                        <FiCheck />
+                                        {t("auth.register.verification.submit_button")}
                                     </button>
 
                                     <button
                                         type="button"
-                                        className="authentication-resend-btn"
+                                        className="auth-resend-btn"
                                         onClick={handleResendCode}
-                                        disabled={loading || getRemainingTime() > 0}
+                                        disabled={loading}
                                     >
-                                        {getRemainingTime() > 0 ? `Resend in ${formatTime(getRemainingTime())}` : "Resend Code"}
+                                        <FiRotateCcw />
+                                        {t("auth.register.verification.resend_button")}
                                     </button>
                                 </form>
                             </div>
@@ -1002,21 +929,22 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                 )}
 
                 {activeTab === "forgot" && (
-                    <div className="authentication-content">
-                        <div className="authentication-form-header">
-                            <h2>Reset Password</h2>
-                            <p>Enter your email to receive a reset code</p>
+                    <div className="auth-content">
+                        <div className="auth-form-header">
+                            <h2 id="auth-title">{t("auth.forgot.title")}</h2>
+                            <p>{t("auth.forgot.subtitle")}</p>
                         </div>
 
                         {!forgotStep ? (
-                            <div className="authentication-forgot-step">
-                                <div className="authentication-forgot-icon">
-                                    📧
+                            <div className="auth-forgot-step">
+                                <div className="auth-forgot-icon">
+                                    <FiMail />
                                 </div>
-                                <form className="authentication-form" onSubmit={handleForgotSubmit}>
-                                    <div className="authentication-form-group">
-                                        <label htmlFor="forgot-email" className="authentication-label">
-                                            Email Address
+                                <form className="auth-form" onSubmit={handleForgotSubmit}>
+                                    <div className="auth-form-group">
+                                        <label htmlFor="forgot-email" className="auth-label">
+                                            <FiMail className="auth-label-icon" />
+                                            {t("auth.forgot.email_label")}
                                         </label>
                                         <input
                                             id="forgot-email"
@@ -1024,36 +952,40 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             name="email"
                                             value={forgotForm.email}
                                             onChange={handleForgotChange}
-                                            placeholder="Enter your email address"
-                                            className="authentication-input"
-                                            required
+                                            placeholder={t("auth.forgot.email_placeholder")}
+                                            className="auth-input"
+                                            aria-required="true"
                                             disabled={loading}
                                             autoComplete="email"
                                             autoFocus
                                         />
                                     </div>
 
-                                    <button type="submit" className="authentication-submit-btn" disabled={loading}>
-                                        Send Reset Code
+                                    <button type="submit" className="auth-submit-btn" disabled={loading}>
+                                        <FiMail />
+                                        {t("auth.forgot.submit_button")}
                                     </button>
                                 </form>
                             </div>
                         ) : (
-                            <div className="authentication-reset-step">
-                                <div className="authentication-reset-header">
-                                    <div className="authentication-reset-icon">
-                                        🔐
+                            <div className="auth-reset-step">
+                                <div className="auth-reset-header">
+                                    <div className="auth-reset-icon">
+                                        <FiLock />
                                     </div>
-                                    <h3>Enter Reset Code</h3>
-                                    <p>
-                                        We've sent a reset code to <strong>{forgotForm.email}</strong>
-                                    </p>
+                                    <h3>{t("auth.forgot.reset.title")}</h3>
+                                    <p
+                                        dangerouslySetInnerHTML={{
+                                            __html: t("auth.forgot.reset.subtitle", { email: forgotForm.email }),
+                                        }}
+                                    />
                                 </div>
 
-                                <form className="authentication-form" onSubmit={handleResetPassword}>
-                                    <div className="authentication-form-group">
-                                        <label htmlFor="forgot-code" className="authentication-label">
-                                            Reset Code
+                                <form className="auth-form" onSubmit={handleResetPassword}>
+                                    <div className="auth-form-group">
+                                        <label htmlFor="forgot-code" className="auth-label">
+                                            <FiCheck className="auth-label-icon" />
+                                            {t("auth.forgot.reset.code_label")}
                                         </label>
                                         <input
                                             id="forgot-code"
@@ -1061,9 +993,9 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             name="code"
                                             value={forgotForm.code}
                                             onChange={handleForgotChange}
-                                            placeholder="Enter 6-digit code"
-                                            className="authentication-input authentication-verification-input"
-                                            required
+                                            placeholder={t("auth.forgot.reset.code_placeholder")}
+                                            className="auth-input auth-verification-input"
+                                            aria-required="true"
                                             autoFocus
                                             maxLength="6"
                                             disabled={loading}
@@ -1071,73 +1003,79 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         />
                                     </div>
 
-                                    <div className="authentication-form-group">
-                                        <label htmlFor="forgot-new_password" className="authentication-label">
-                                            New Password
+                                    <div className="auth-form-group">
+                                        <label htmlFor="forgot-new_password" className="auth-label">
+                                            <FiLock className="auth-label-icon" />
+                                            {t("auth.forgot.reset.new_password_label")}
                                         </label>
-                                        <div className="authentication-input-wrapper">
+                                        <div className="auth-input-wrapper">
                                             <input
                                                 id="forgot-new_password"
                                                 type={showNewPassword ? "text" : "password"}
                                                 name="new_password"
                                                 value={forgotForm.new_password}
                                                 onChange={handleForgotChange}
-                                                placeholder="Enter new password"
-                                                className="authentication-input"
-                                                required
+                                                placeholder={t("auth.forgot.reset.new_password_placeholder")}
+                                                className="auth-input"
+                                                aria-required="true"
                                                 disabled={loading}
                                                 autoComplete="new-password"
                                             />
                                             <button
                                                 type="button"
-                                                className="authentication-toggle-password"
+                                                className="auth-toggle-password"
                                                 onClick={toggleShowNewPassword}
+                                                aria-label={showNewPassword ? t("auth.forgot.reset.hide_password_aria") : t("auth.forgot.reset.show_password_aria")}
                                                 disabled={loading}
                                             >
-                                                {showNewPassword ? "👁️" : "👁️‍🗨️"}
+                                                {showNewPassword ? <FiEyeOff /> : <FiEye />}
                                             </button>
                                         </div>
                                     </div>
 
-                                    <div className="authentication-form-group">
-                                        <label htmlFor="forgot-confirm_password" className="authentication-label">
-                                            Confirm New Password
+                                    <div className="auth-form-group">
+                                        <label htmlFor="forgot-confirm_password" className="auth-label">
+                                            <FiLock className="auth-label-icon" />
+                                            {t("auth.forgot.reset.confirm_password_label")}
                                         </label>
-                                        <div className="authentication-input-wrapper">
+                                        <div className="auth-input-wrapper">
                                             <input
                                                 id="forgot-confirm_password"
                                                 type={showConfirmNewPassword ? "text" : "password"}
                                                 name="confirm_password"
                                                 value={forgotForm.confirm_password}
                                                 onChange={handleForgotChange}
-                                                placeholder="Confirm new password"
-                                                className="authentication-input"
-                                                required
+                                                placeholder={t("auth.forgot.reset.confirm_password_placeholder")}
+                                                className="auth-input"
+                                                aria-required="true"
                                                 disabled={loading}
                                                 autoComplete="new-password"
                                             />
                                             <button
                                                 type="button"
-                                                className="authentication-toggle-password"
+                                                className="auth-toggle-password"
                                                 onClick={toggleShowConfirmNewPassword}
+                                                aria-label={showConfirmNewPassword ? t("auth.forgot.reset.hide_password_aria") : t("auth.forgot.reset.show_password_aria")}
                                                 disabled={loading}
                                             >
-                                                {showConfirmNewPassword ? "👁️" : "👁️‍🗨️"}
+                                                {showConfirmNewPassword ? <FiEyeOff /> : <FiEye />}
                                             </button>
                                         </div>
                                     </div>
 
-                                    <button type="submit" className="authentication-submit-btn" disabled={loading}>
-                                        Reset Password
+                                    <button type="submit" className="auth-submit-btn" disabled={loading}>
+                                        <FiCheck />
+                                        {t("auth.forgot.reset.submit_button")}
                                     </button>
 
                                     <button
                                         type="button"
-                                        className="authentication-resend-btn"
+                                        className="auth-resend-btn"
                                         onClick={handleResendResetCode}
                                         disabled={loading}
                                     >
-                                        Resend Reset Code
+                                        <FiRotateCcw />
+                                        {t("auth.forgot.reset.resend_button")}
                                     </button>
                                 </form>
                             </div>

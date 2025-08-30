@@ -1,15 +1,13 @@
 # apps/profiles/views.py
-from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.utils import extend_schema
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError, NotFound
-from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
-from .filters import CustomerProfileFilter
 from .models import (
     ClientProfile,
     CustomerProfile,
@@ -17,7 +15,6 @@ from .models import (
     Availability,
     VerificationDocument,
 )
-from .permissions import IsOwnerOrAdmin
 from .serializers import (
     ClientProfileSerializer,
     ClientProfileCreateUpdateSerializer,
@@ -26,13 +23,19 @@ from .serializers import (
     PortfolioSerializer,
     VerificationDocumentSerializer,
     AvailabilitySerializer,
-    CustomerPortfolioPublicSerializer,
 )
+from .permissions import IsOwnerOrAdmin
+from .filters import CustomerProfileFilter
 
 
+# ================== BASE PROFILE VIEWSET ==================
 class BaseProfileViewSet(viewsets.ModelViewSet):
+    """
+    Common logic for ClientProfile & CustomerProfile
+    Supports user_id lookup instead of profile_id.
+    """
 
-    lookup_field = "user_id"
+    lookup_field = "user_id"  # <-- Endi user_id orqali ishlaydi
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
@@ -55,6 +58,7 @@ class BaseProfileViewSet(viewsets.ModelViewSet):
             except self.model.DoesNotExist:
                 raise NotFound({"detail": "Profile not found."})
 
+        # user_id bo'yicha olish
         user_id = self.kwargs.get("user_id")
         try:
             return self.model.objects.get(user_id=user_id)
@@ -65,7 +69,9 @@ class BaseProfileViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get", "put", "patch"], url_path="my")
     def my_profile(self, request):
-
+        """
+        O'z profilini olish va yangilash
+        """
         profile = getattr(request.user, self.profile_attr, None)
         if not profile:
             raise NotFound({"detail": "Profile not found."})
@@ -100,6 +106,7 @@ class BaseProfileViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
+# ================== CLIENT PROFILE ==================
 @extend_schema(tags=["Client Profile"])
 class ClientProfileViewSet(BaseProfileViewSet):
     model = ClientProfile
@@ -110,6 +117,7 @@ class ClientProfileViewSet(BaseProfileViewSet):
     user_role = "client"
 
 
+# ================== CUSTOMER PROFILE ==================
 @extend_schema(tags=["Customer Profile"])
 class CustomerProfileViewSet(BaseProfileViewSet):
     model = CustomerProfile
@@ -126,54 +134,14 @@ class CustomerProfileViewSet(BaseProfileViewSet):
     ordering = ["-average_rating"]
 
     def get_queryset(self):
-        if self.action in ["list", "retrieve", "portfolio"]:
-            return (
-                CustomerProfile.objects.filter(is_available=True)
-                .select_related("user", "city", "city__country")
-                .prefetch_related("service_types", "languages", "portfolio_set")
-            )
+        if self.action in ["list", "retrieve"]:
+            # Public view
+            return CustomerProfile.objects.filter(is_available=True)
+        # Private: faqat o'z profili
         return CustomerProfile.objects.filter(user=self.request.user)
 
-    @extend_schema(
-        summary="Get customer public portfolio with reviews",
-        description="Get complete customer portfolio including all reviews, ratings, and portfolio items",
-        parameters=[
-            OpenApiParameter(
-                "review_limit",
-                int,
-                OpenApiParameter.QUERY,
-                description="Number of reviews to return (default: 10, max: 50)",
-            )
-        ],
-        responses={200: CustomerPortfolioPublicSerializer},
-    )
-    @action(
-        detail=True,
-        methods=["get"],
-        url_path="portfolio",
-        permission_classes=[AllowAny],
-    )
-    def portfolio(self, request, user_id=None):
-        try:
-            customer = (
-                CustomerProfile.objects.select_related("user", "city", "city__country")
-                .prefetch_related(
-                    "service_types",
-                    "languages",
-                    "portfolio_set",
-                    "received_reviews__client",
-                )
-                .get(user_id=user_id, is_available=True)
-            )
-        except CustomerProfile.DoesNotExist:
-            raise NotFound({"detail": "Customer portfolio not found or not available"})
 
-        serializer = CustomerPortfolioPublicSerializer(
-            customer, context={"request": request}
-        )
-        return Response(serializer.data)
-
-
+# ================== BASE CUSTOMER-OWNED VIEWSET ==================
 class CustomerOwnedModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
 
@@ -198,6 +166,7 @@ class CustomerOwnedModelViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+# ================== PORTFOLIO ==================
 @extend_schema(tags=["Portfolio"])
 class PortfolioViewSet(CustomerOwnedModelViewSet):
     serializer_class = PortfolioSerializer
@@ -210,6 +179,7 @@ class PortfolioViewSet(CustomerOwnedModelViewSet):
         return Portfolio.objects.filter(customer__user=user)
 
 
+# ================== VERIFICATION DOCUMENT ==================
 @extend_schema(tags=["VerificationDocument"])
 class VerificationDocumentViewSet(CustomerOwnedModelViewSet):
     serializer_class = VerificationDocumentSerializer
@@ -222,6 +192,7 @@ class VerificationDocumentViewSet(CustomerOwnedModelViewSet):
         return VerificationDocument.objects.filter(customer__user=user)
 
 
+# ================== AVAILABILITY ==================
 @extend_schema(tags=["Availability"])
 class AvailabilityViewSet(CustomerOwnedModelViewSet):
     serializer_class = AvailabilitySerializer

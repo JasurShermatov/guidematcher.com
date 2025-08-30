@@ -1,4 +1,4 @@
-# apps/bookings/models.py - YANGILANGAN
+# apps/bookings/models.py
 
 from datetime import timedelta
 from django.db import models
@@ -10,42 +10,10 @@ from apps.profiles.models import CustomerProfile, ClientProfile
 from apps.chat.models import Conversation
 
 
-class BookingManager(models.Manager):
-    """Custom manager for booking queries"""
-
-    def get_customer_busy_dates(self, customer_profile):
-        """Customer ning barcha band kunlarini olish"""
-        bookings = self.filter(
-            customer_profile=customer_profile,
-            status__in=[Booking.BookingStatus.ACCEPTED, Booking.BookingStatus.PENDING],
-        )
-
-        busy_dates = []
-        for booking in bookings:
-            current = booking.start_date
-            while current <= booking.end_date:
-                busy_dates.append(current)
-                current += timedelta(days=1)
-
-        return list(set(busy_dates))  # unique dates
-
-    def is_customer_available(self, customer_profile, start_date, end_date):
-        """Customer berilgan vaqtda bo'shmi tekshirish"""
-        busy_dates = self.get_customer_busy_dates(customer_profile)
-
-        current = start_date
-        while current <= end_date:
-            if current in busy_dates:
-                return False
-            current += timedelta(days=1)
-
-        return True
-
-
 class Booking(BaseModel):
     """
-    Booking modeli: client va customer o'rtasidagi kelishuv va band kunlarni boshqaradi.
-    Chat bilan to'liq integratsiyalangan.
+    Booking modeli: client va customer o‘rtasidagi kelishuv va band kunlarni boshqaradi.
+    Chat bilan integratsiyalangan.
     """
 
     class BookingStatus(models.TextChoices):
@@ -53,8 +21,7 @@ class Booking(BaseModel):
         ACCEPTED = "accepted", _("Accepted")  # confirmed / booked
         CANCELLED = "cancelled", _("Cancelled")
         COMPLETED = "completed", _("Completed")
-        EXPIRED = "expired", _("Expired")
-        UPDATED = "updated", _("Updated")  # vaqt o'zgartirilgan
+        EXPIRED = "expired", _("Expired")  # vaqt o‘tgan bo‘lsa
 
     # Client va Customer
     client_profile = models.ForeignKey(
@@ -87,11 +54,13 @@ class Booking(BaseModel):
     )
     description = models.TextField(blank=True, verbose_name=_("Description"))
 
+
     # Search uchun muhim fieldlar
     country = models.CharField(max_length=100, verbose_name=_("Country"), db_index=True)
     city = models.CharField(
         max_length=100, blank=True, verbose_name=_("City"), db_index=True
     )
+
 
     # Vaqt
     start_date = models.DateField(verbose_name=_("Start date"))
@@ -100,11 +69,6 @@ class Booking(BaseModel):
     duration_hours = models.PositiveIntegerField(
         null=True, blank=True, verbose_name=_("Duration (hours)")
     )
-
-    # Vaqt o'zgartirilganda eski vaqtlarni saqlash
-    previous_start_date = models.DateField(null=True, blank=True)
-    previous_end_date = models.DateField(null=True, blank=True)
-    updated_count = models.PositiveIntegerField(default=0)  # necha marta yangilangan
 
     # Location
     location = models.CharField(
@@ -146,7 +110,7 @@ class Booking(BaseModel):
         verbose_name=_("Status"),
     )
 
-    # Chat bilan bog'lanish
+    # Chat bilan bog‘lanish
     conversation = models.OneToOneField(
         Conversation,
         on_delete=models.SET_NULL,
@@ -156,22 +120,13 @@ class Booking(BaseModel):
         verbose_name=_("Conversation"),
     )
 
-    # Qo'shimcha maydonlar
+    # Qo‘shimcha maydonlar
     special_requirements = models.TextField(
         blank=True, verbose_name=_("Special requirements")
     )
     number_of_people = models.PositiveIntegerField(
         default=1, verbose_name=_("Number of people")
     )
-
-    # Chat orqali yaratilganmi
-    created_via_chat = models.BooleanField(default=False)
-
-    # Booking yaratilgan/yangilangan vaqt
-    accepted_at = models.DateTimeField(null=True, blank=True)
-    cancelled_at = models.DateTimeField(null=True, blank=True)
-
-    objects = BookingManager()
 
     class Meta:
         verbose_name = _("Booking")
@@ -181,7 +136,6 @@ class Booking(BaseModel):
             models.Index(fields=["customer_profile", "status"]),
             models.Index(fields=["start_date", "end_date"]),
             models.Index(fields=["status", "created_at"]),
-            models.Index(fields=["country", "city"]),  # search uchun
         ]
 
     def __str__(self):
@@ -213,23 +167,5 @@ class Booking(BaseModel):
         return self.status in [self.BookingStatus.ACCEPTED, self.BookingStatus.PENDING]
 
     @property
-    def can_update(self):
-        """Vaqtni o'zgartirish mumkinmi"""
-        return self.status == self.BookingStatus.ACCEPTED
-
-    @property
     def can_review(self):
         return self.status == self.BookingStatus.COMPLETED
-
-    def update_dates(self, new_start_date, new_end_date):
-        """Booking vaqtini yangilash"""
-        # Eski vaqtlarni saqlash
-        self.previous_start_date = self.start_date
-        self.previous_end_date = self.end_date
-
-        # Yangi vaqtlarni o'rnatish
-        self.start_date = new_start_date
-        self.end_date = new_end_date
-        self.updated_count += 1
-        self.status = self.BookingStatus.UPDATED
-        self.save()

@@ -1,43 +1,42 @@
+# urls.py
 from django.urls import path
-from .views import (
-    ConversationListCreateView,
-    ConversationDetailView,
-    MessageListView,
-    MessageCreateView,
-    accept_booking_in_chat,
-    update_booking_dates,  # ⚠️ bu sizning views.py da shunday nomlangan
-)
+from . import views
+
+app_name = "chat"
 
 urlpatterns = [
-    # Conversations
+    # Conversation endpoints
     path(
-        "conversations/", ConversationListCreateView.as_view(), name="conversation-list"
+        "conversations/",
+        views.ConversationListCreateView.as_view(),
+        name="conversation-list-create",
     ),
     path(
         "conversations/<int:pk>/",
-        ConversationDetailView.as_view(),
+        views.ConversationDetailView.as_view(),
         name="conversation-detail",
     ),
-    # Messages
+    # Message endpoints
     path(
         "conversations/<int:conversation_id>/messages/",
-        MessageListView.as_view(),
+        views.MessageListView.as_view(),
         name="message-list",
     ),
+    path("messages/send/", views.MessageCreateView.as_view(), name="message-create"),
     path(
-        "messages/send/",
-        MessageCreateView.as_view(),
-        name="message-create",
+        "messages/<int:message_id>/action/", views.message_action, name="message-action"
     ),
-    # Booking endpoints
+    # Message status endpoints
     path(
-        "conversations/<int:conversation_id>/bookings/<int:booking_id>/accept/",
-        accept_booking_in_chat,
-        name="accept-booking",
+        "conversations/<int:conversation_id>/mark-read/",
+        views.mark_messages_read,
+        name="mark-messages-read",
     ),
-    path(
-        "conversations/<int:conversation_id>/bookings/<int:booking_id>/update/",
-        update_booking_dates,
-        name="update-booking",
-    ),
+    path("unread-count/", views.unread_count, name="unread-count"),
+    # User blocking endpoints
+    path("block/", views.block_user, name="block-user"),
+    path("unblock/<int:user_id>/", views.unblock_user, name="unblock-user"),
+    path("blocked/", views.BlockedUserListView.as_view(), name="blocked-users"),
+    # Utility endpoints
+    path("users/search/", views.user_search, name="user-search"),
 ]

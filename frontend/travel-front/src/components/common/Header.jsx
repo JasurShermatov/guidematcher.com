@@ -239,26 +239,6 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                     </Link>
                 </div>
 
-                {!hideMenu && (
-                    <nav className="header-nav">
-                        <ul className="header-nav-list">
-                            {menuItems.map((item, index) => (
-                                <li key={index} className="header-nav-item">
-                                    {item.href.startsWith("/") ? (
-                                        <Link to={item.href} className="header-nav-link">
-                                            {item.label}
-                                        </Link>
-                                    ) : (
-                                        <a href={item.href} className="header-nav-link">
-                                            {item.label}
-                                        </a>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    </nav>
-                )}
-
                 <div className="header-controls">
                     {/* Language Dropdown */}
                     <div className="header-dropdown header-lang-dropdown" ref={langDropdownRef}>

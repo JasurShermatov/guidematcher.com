@@ -31,34 +31,6 @@ const Footer = () => {
 
     return (
         <footer className="footer-main">
-            {/* Newsletter Section */}
-            <section className="footer-newsletter-section">
-                <div className="footer-newsletter-content">
-                    <div className="footer-newsletter-text">
-                        <h3>{t("footer.newsletter.title")}</h3>
-                        <p>{t("footer.newsletter.subtitle")}</p>
-                    </div>
-                    <form className="footer-newsletter-form">
-                        <div className="footer-email-input-group">
-                            <FiMail className="footer-email-icon" />
-                            <input
-                                type="email"
-                                placeholder={t("footer.newsletter.email_placeholder")}
-                                className="footer-email-input"
-                                aria-label={t("footer.newsletter.email_aria")}
-                            />
-                            <button type="submit" className="footer-subscribe-btn">
-                                {t("footer.newsletter.subscribe_button")}
-                                <FiArrowRight />
-                            </button>
-                        </div>
-                        <div className="footer-newsletter-privacy">
-                            <FiShield className="footer-privacy-icon" />
-                            <span>{t("footer.newsletter.privacy")}</span>
-                        </div>
-                    </form>
-                </div>
-            </section>
 
             {/* Main Footer Content */}
             <div className="footer-content">

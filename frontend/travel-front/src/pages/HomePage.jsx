@@ -144,9 +144,9 @@ const HomePage = () => {
     ];
 
     const stats = [
-        { number: '25,000+', label: t('home.stats.verified_guides'), icon: <FiUsers /> },
-        { number: '150+', label: t('home.stats.countries'), icon: <FiGlobe /> },
-        { number: '100K+', label: t('home.stats.happy_travelers'), icon: <FiHeart /> },
+        { number: '1000+', label: t('home.stats.verified_guides'), icon: <FiUsers /> },
+        { number: '50+', label: t('home.stats.countries'), icon: <FiGlobe /> },
+        { number: '10K+', label: t('home.stats.happy_travelers'), icon: <FiHeart /> },
         { number: '4.8', label: t('home.stats.average_rating'), icon: <FiStar /> }
     ];
 
@@ -348,31 +348,6 @@ const HomePage = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="homepage-hero-visual">
-                        <div className="homepage-hero-card homepage-guide-card">
-                            <div className="homepage-guide-preview">
-                                <img src="https://randomuser.me/api/portraits/men/75.jpg" alt={t('home.hero.guide_alt')} className="homepage-guide-avatar" />
-                                <div className="homepage-guide-info">
-                                    <h4>{t('home.hero.guide_name')}</h4>
-                                    <p>{t('home.hero.guide_expert')}</p>
-                                    <div className="homepage-rating">
-                                        {[...Array(5)].map((_, i) => <FiStar key={i} className="homepage-star homepage-filled" />)}
-                                        <span>{t('home.hero.guide_rating')}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="homepage-hero-card homepage-booking-card">
-                            <div className="homepage-booking-preview">
-                                <h4>{t('home.hero.tour_name')}</h4>
-                                <div className="homepage-booking-details">
-                                    <span><FiCalendar /> {t('home.hero.tour_date')}</span>
-                                    <span><FiClock /> {t('home.hero.tour_duration')}</span>
-                                </div>
-                                <div className="homepage-booking-status"><FiCheck /> {t('home.hero.tour_status')}</div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </section>
 
@@ -409,16 +384,9 @@ const HomePage = () => {
                                             <FiArrowRight />
                                         </button>
                                     </div>
-                                    <div className="homepage-destination-badge">
-                                        <FiStar /> {destination.rating}
-                                    </div>
                                 </div>
                                 <div className="homepage-destination-content">
                                     <h3>{destination.name}</h3>
-                                    <p>{destination.price}</p>
-                                    <div className="homepage-destination-meta">
-                                        <FiUsers /> {t('home.destinations.guides_count', { count: destination.guides })}
-                                    </div>
                                     <div className="homepage-destination-highlights">
                                         {destination.highlights.map((highlight, idx) => (
                                             <span key={idx} className="homepage-highlight-tag">{highlight}</span>
@@ -499,61 +467,7 @@ const HomePage = () => {
                                 <div className="homepage-feature-icon">{feature.icon}</div>
                                 <h3>{feature.title}</h3>
                                 <p>{feature.description}</p>
-                                <div className="homepage-feature-stats">{feature.stats}</div>
                             </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* How It Works */}
-            <section className="homepage-how-it-works homepage-section">
-                <div className="homepage-container">
-                    <h2 className="homepage-section-title">{t('home.steps.title')}</h2>
-                    <p className="homepage-section-subtitle">{t('home.steps.subtitle')}</p>
-                    <div className="homepage-steps-grid">
-                        {steps.map((step, index) => (
-                            <div key={index} className="homepage-step-card">
-                                <div className={`homepage-step-icon bg-gradient-to-r ${step.color}`}>{step.icon}</div>
-                                <h3>{step.title}</h3>
-                                <p>{step.description}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Testimonials */}
-            <section className="homepage-testimonials-section homepage-section">
-                <div className="homepage-container">
-                    <h2 className="homepage-section-title">{t('home.testimonials.title')}</h2>
-                    <p className="homepage-section-subtitle">{t('home.testimonials.subtitle')}</p>
-                    <div className="homepage-testimonials-grid">
-                        {testimonials.map((testimonial, index) => (
-                            <div key={index} className={`homepage-testimonial-card ${index === activeTestimonial ? 'homepage-active' : ''}`}>
-                                <p>"{testimonial.text}"</p>
-                                <div className="homepage-testimonial-author">
-                                    <img src={testimonial.avatar} alt={testimonial.name} className="homepage-author-avatar" />
-                                    <div>
-                                        <h5>{testimonial.name}</h5>
-                                        <span>{testimonial.location}</span>
-                                        <div className="homepage-tour-info"><FiMapPin /> {testimonial.tour}</div>
-                                    </div>
-                                </div>
-                                <div className="homepage-testimonial-rating">
-                                    {[...Array(testimonial.rating)].map((_, i) => <FiStar key={i} className="homepage-star homepage-filled" />)}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="homepage-testimonial-dots">
-                        {testimonials.map((_, index) => (
-                            <button
-                                key={index}
-                                className={`homepage-dot ${index === activeTestimonial ? 'homepage-active' : ''}`}
-                                onClick={() => setActiveTestimonial(index)}
-                                aria-label={t('home.testimonials.dot_aria', { index: index + 1 })}
-                            />
                         ))}
                     </div>
                 </div>

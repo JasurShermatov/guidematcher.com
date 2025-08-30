@@ -17,7 +17,9 @@ import {
     reactToReview,
     removeReactionFromReview,
     getReviewReactions,
-    getReviewSummary
+    getReviewSummary,
+    getCities,
+    getCountries
 } from '../api/api';
 import ChatWidgets from './ChatWidgets';
 import './UserAccount.css';
@@ -30,6 +32,8 @@ const UserAccount = () => {
     const [guides, setGuides] = useState([]);
     const [languages, setLanguages] = useState([]);
     const [serviceTypes, setServiceTypes] = useState([]);
+    const [cities, setCities] = useState([]);
+    const [countries, setCountries] = useState([]);
     const [activeTab, setActiveTab] = useState('dashboard');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -50,6 +54,7 @@ const UserAccount = () => {
     const [guidesFilter, setGuidesFilter] = useState({
         search: '',
         service_type: '',
+        country: '',
         city: '',
         min_rating: '',
         is_available: true
@@ -97,12 +102,16 @@ const UserAccount = () => {
             setLoading(true);
             const userData = await getCurrentUser();
             setCurrentUser(userData);
-            const [languagesData, serviceTypesData] = await Promise.all([
+            const [languagesData, serviceTypesData, citiesData, countriesData] = await Promise.all([
                 getLanguages(),
-                getServiceTypes()
+                getServiceTypes(),
+                getCities(),
+                getCountries()
             ]);
             setLanguages(languagesData.results || languagesData);
             setServiceTypes(serviceTypesData.results || serviceTypesData);
+            setCities(citiesData.results || citiesData);
+            setCountries(countriesData.results || countriesData);
             try {
                 const profileData = await getClientProfile();
                 setProfile(profileData);
@@ -151,6 +160,7 @@ const UserAccount = () => {
             const params = {};
             if (guidesFilter.search) params.search = guidesFilter.search;
             if (guidesFilter.service_type) params.service_types = guidesFilter.service_type;
+            if (guidesFilter.country) params.country = guidesFilter.country;
             if (guidesFilter.city) params.city = guidesFilter.city;
             if (guidesFilter.min_rating) params.average_rating__gte = guidesFilter.min_rating;
             if (guidesFilter.is_available) params.is_available = guidesFilter.is_available;
@@ -428,8 +438,27 @@ const UserAccount = () => {
         setSelectedUserForChat(null);
     };
 
-    const handleFilterChange = (key, value) => {
-        setGuidesFilter({ ...guidesFilter, [key]: value });
+    const handleFilterChange = async (key, value) => {
+        if (key === 'country') {
+            setGuidesFilter({ ...guidesFilter, [key]: value, city: '' });
+            if (value) {
+                try {
+                    const citiesData = await getCities(value);
+                    setCities(citiesData.results || citiesData);
+                } catch (err) {
+                    console.error('Error loading cities:', err);
+                }
+            } else {
+                try {
+                    const allCitiesData = await getCities();
+                    setCities(allCitiesData.results || allCitiesData);
+                } catch (err) {
+                    console.error('Error loading all cities:', err);
+                }
+            }
+        } else {
+            setGuidesFilter({ ...guidesFilter, [key]: value });
+        }
     };
 
     const handleReviewFilterChange = (key, value) => {
@@ -576,7 +605,7 @@ const UserAccount = () => {
                                             )}
                                         </div>
                                         <div className="user-account-booking-actions">
-                                            {booking.status === 'pending' && (
+                                            {['pending', 'confirmed', 'accepted'].includes(booking.status) && (
                                                 <button
                                                     className="user-account-btn user-account-btn-cancel"
                                                     onClick={() => handleOpenCancelModal(booking)}
@@ -736,6 +765,26 @@ const UserAccount = () => {
                                 </select>
                                 <select
                                     className="user-account-filter-select"
+                                    value={guidesFilter.country}
+                                    onChange={(e) => handleFilterChange('country', e.target.value)}
+                                >
+                                    <option value="">All Countries</option>
+                                    {countries.map(country => (
+                                        <option key={country.id} value={country.id}>{country.name}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    className="user-account-filter-select"
+                                    value={guidesFilter.city}
+                                    onChange={(e) => handleFilterChange('city', e.target.value)}
+                                >
+                                    <option value="">All Cities</option>
+                                    {cities.map(city => (
+                                        <option key={city.id} value={city.id}>{city.name}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    className="user-account-filter-select"
                                     value={guidesFilter.min_rating}
                                     onChange={(e) => handleFilterChange('min_rating', e.target.value)}
                                 >
@@ -842,7 +891,7 @@ const UserAccount = () => {
                                         )}
                                     </div>
                                     <div className="user-account-booking-actions">
-                                        {booking.status === 'pending' && (
+                                        {['pending', 'confirmed', 'accepted'].includes(booking.status) && (
                                             <button
                                                 className="user-account-btn user-account-btn-cancel"
                                                 onClick={() => handleOpenCancelModal(booking)}
@@ -961,6 +1010,7 @@ const UserAccount = () => {
                             <div className="user-account-reviews-list">
                                 {filteredReviews.map(review => {
                                     const relatedBooking = bookings.find(b => b.id === review.booking);
+                                    const guideName = relatedBooking?.customer_profile?.user?.full_name || 'Unknown Guide';
                                     return (
                                         <div key={review.id} className="user-account-review-item">
                                             <div className="user-account-review-header">
@@ -974,7 +1024,7 @@ const UserAccount = () => {
                                                     {new Date(review.created_at).toLocaleDateString()}
                                                 </span>
                                             </div>
-                                            <h4 className="user-account-review-title">{review.title}</h4>
+                                            <h4 className="user-account-review-title">{review.title} - For Guide: {guideName}</h4>
                                             <p className="user-account-review-comment">{review.comment}</p>
                                             <div className="user-account-review-details">
                                                 <span className="user-account-review-detail">Communication: {review.communication_rating}/5</span>
@@ -1208,7 +1258,7 @@ const UserAccount = () => {
                     <div className="user-account-modal-content">
                         <div className="user-account-modal-header">
                             <h3 className="user-account-modal-title">
-                                {editingReview ? 'Edit Review' : 'Write Review'} for {selectedBookingForReview?.title}
+                                {editingReview ? 'Edit Review' : 'Write Review'} for Guide: {selectedBookingForReview?.customer_profile?.user?.full_name || 'Unknown'} - Booking: {selectedBookingForReview?.title}
                             </h3>
                             <button
                                 className="user-account-modal-close"
@@ -1309,7 +1359,7 @@ const UserAccount = () => {
                                     onChange={(e) => setReviewForm({...reviewForm, comment: e.target.value})}
                                     rows="4"
                                     required
-                                    placeholder="Share your experience..."
+                                    placeholder="Share your experience and feedback about the guide..."
                                 />
                             </div>
                             {error && (

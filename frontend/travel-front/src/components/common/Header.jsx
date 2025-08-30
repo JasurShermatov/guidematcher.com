@@ -12,17 +12,22 @@ import {
     FiLogIn,
     FiCheck,
     FiLogOut,
+    FiUserPlus,
 } from "react-icons/fi";
-import { useTranslation } from "react-i18next"; // i18next hook
-import { changeLanguage } from "../../i18n"; // Til o‘zgartirish funksiyasi
+import { useTranslation } from "react-i18next";
+import { changeLanguage } from "../../i18n";
 import { logoutUser } from "../../api/api";
 import "./Header.css";
 
-const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
-    const { t } = useTranslation(); // Tarjima uchun hook
+const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuthState }) => {
+    const { t } = useTranslation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [theme, setTheme] = useState("default");
-    const [language, setLanguage] = useState("en");
+    const [theme, setTheme] = useState(() => {
+        return localStorage.getItem("theme") || "default";
+    });
+    const [language, setLanguage] = useState(() => {
+        return localStorage.getItem("language") || "en";
+    });
     const [isThemeDropdownOpen, setIsThemeDropdownOpen] = useState(false);
     const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
     const [isAvatarDropdownOpen, setIsAvatarDropdownOpen] = useState(false);
@@ -35,28 +40,47 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
     const location = useLocation();
 
     const themeOptions = [
-        { value: "light", label: t("theme.light"), icon: <FiSun />, description: t("theme.light_desc") },
-        { value: "dark", label: t("theme.dark"), icon: <FiMoon />, description: t("theme.dark_desc") },
-        { value: "default", label: t("theme.default"), icon: <FiMonitor />, description: t("theme.default_desc") },
-        { value: "auto", label: t("theme.auto"), icon: <FiClock />, description: t("theme.auto_desc") },
+        { value: "light", label: t("theme.light") || "Light", icon: <FiSun />, description: t("theme.light_desc") || "Light theme" },
+        { value: "dark", label: t("theme.dark") || "Dark", icon: <FiMoon />, description: t("theme.dark_desc") || "Dark theme" },
+        { value: "default", label: t("theme.default") || "System", icon: <FiMonitor />, description: t("theme.default_desc") || "Follow system theme" },
+        { value: "auto", label: t("theme.auto") || "Auto", icon: <FiClock />, description: t("theme.auto_desc") || "Auto theme based on time" },
     ];
 
     const languageOptions = [
-        { value: "en", label: t("language.en"), nativeName: t("language.en_native"), flag: "🇺🇸", dir: "ltr" },
-        { value: "ru", label: t("language.ru"), nativeName: t("language.ru_native"), flag: "🇷🇺", dir: "ltr" },
-        { value: "uz", label: t("language.uz"), nativeName: t("language.uz_native"), flag: "🇺🇿", dir: "ltr" },
-        { value: "es", label: t("language.es"), nativeName: t("language.es_native"), flag: "🇪🇸", dir: "ltr" },
-        { value: "ar", label: t("language.ar"), nativeName: t("language.ar_native"), flag: "🇸🇦", dir: "rtl" },
+        { value: "en", label: t("language.en") || "English", nativeName: t("language.en_native") || "English", flag: "🇺🇸", dir: "ltr" },
+        { value: "ru", label: t("language.ru") || "Russian", nativeName: t("language.ru_native") || "Русский", flag: "🇷🇺", dir: "ltr" },
+        { value: "uz", label: t("language.uz") || "Uzbek", nativeName: t("language.uz_native") || "O'zbek", flag: "🇺🇿", dir: "ltr" },
+        { value: "es", label: t("language.es") || "Spanish", nativeName: t("language.es_native") || "Español", flag: "🇪🇸", dir: "ltr" },
+        { value: "ar", label: t("language.ar") || "Arabic", nativeName: t("language.ar_native") || "العربية", flag: "🇸🇦", dir: "rtl" },
     ];
 
     const currentLang = languageOptions.find((lang) => lang.value === language);
 
+    // Scroll hodisasini kuzatish
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 20);
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // Theme sozlamalarini yuklash va qo'llash
+    useEffect(() => {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme && savedTheme !== theme) {
+            setTheme(savedTheme);
+        }
+    }, [theme]);
+
+    // Language sozlamalarini yuklash
+    useEffect(() => {
+        const savedLanguage = localStorage.getItem("language");
+        if (savedLanguage && savedLanguage !== language) {
+            setLanguage(savedLanguage);
+            changeLanguage(savedLanguage);
+        }
+    }, [language]);
+
+    // Theme ni qo'llash
     useEffect(() => {
         const root = document.documentElement;
         const updateTheme = () => {
@@ -74,20 +98,26 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
         };
 
         updateTheme();
+        localStorage.setItem("theme", theme);
+
+        let cleanup;
 
         if (theme === "auto") {
             const interval = setInterval(updateTheme, 60000);
-            return () => clearInterval(interval);
+            cleanup = () => clearInterval(interval);
         }
 
         if (theme === "default") {
             const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
             const handler = (e) => root.setAttribute("data-theme", e.matches ? "dark" : "light");
             mediaQuery.addEventListener("change", handler);
-            return () => mediaQuery.removeEventListener("change", handler);
+            cleanup = () => mediaQuery.removeEventListener("change", handler);
         }
+
+        return cleanup;
     }, [theme]);
 
+    // Tashqariga bosilgan hodisani kuzatish
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (themeDropdownRef.current && !themeDropdownRef.current.contains(event.target)) {
@@ -104,6 +134,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    // Escape tugmasini bosish hodisasi
     useEffect(() => {
         const handleEscapeKey = (event) => {
             if (event.key === "Escape") {
@@ -117,42 +148,80 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
         return () => document.removeEventListener("keydown", handleEscapeKey);
     }, []);
 
-    const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
 
     const handleThemeChange = (newTheme) => {
         setTheme(newTheme);
+        localStorage.setItem("theme", newTheme);
         setIsThemeDropdownOpen(false);
     };
 
     const handleLanguageChange = (newLang) => {
         setLanguage(newLang);
-        changeLanguage(newLang); // i18n tilni o‘zgartirish
+        localStorage.setItem("language", newLang);
+        changeLanguage(newLang);
         setIsLangDropdownOpen(false);
     };
 
     const handleLogout = async () => {
         try {
             await logoutUser();
-            setIsAuthenticated(false);
-            setUser(null);
-            setIsAvatarDropdownOpen(false);
-            navigate("/");
         } catch (error) {
             console.error("Logout error:", error.message);
-            setIsAuthenticated(false);
-            setUser(null);
+        } finally {
+            // updateAuthState funksiyasini ishlatish (agar mavjud bo'lsa)
+            if (updateAuthState) {
+                updateAuthState(false, null);
+            } else {
+                // Fallback: eski usul
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("refresh_token");
+                localStorage.removeItem("user_data");
+                // Account-specific localStorage'larni ham tozalash
+                localStorage.removeItem("userAccount_isEditing");
+                localStorage.removeItem("userAccount_formData");
+                localStorage.removeItem("guideAccount_isEditing");
+                localStorage.removeItem("guideAccount_activeTab");
+                localStorage.removeItem("guideAccount_formData");
+                localStorage.removeItem("guideAccount_portfolioForm");
+                localStorage.removeItem("guideAccount_editingPortfolio");
+                localStorage.removeItem("guideAccount_availabilityForm");
+                localStorage.removeItem("guideAccount_editingAvailability");
+                localStorage.removeItem("guideAccount_documentForm");
+                setIsAuthenticated(false);
+                setUser(null);
+            }
             setIsAvatarDropdownOpen(false);
             navigate("/");
         }
     };
 
     const menuItems = [
-        { label: t("header.find_guides"), href: "/find-guides" },
-        { label: t("header.blog"), href: "#blog" },
+        { label: t("header.find_guides") || "Find Guides", href: "/find-guides" },
+        { label: t("header.blog") || "Blog", href: "#blog" },
     ];
 
     const hideMenu = isAuthenticated && location.pathname === "/account";
     const logoDestination = isAuthenticated ? "/account" : "/";
+
+    // Username ni aniqlash
+    const displayUsername = user?.username || user?.full_name || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || "User";
+    const avatarLetter = displayUsername.charAt(0).toUpperCase();
+
+    // User role'ini ko'rsatish uchun
+    const getUserRoleDisplay = () => {
+        if (!user?.role) return "Client";
+
+        const role = user.role.toLowerCase();
+        if (role === "customer") return "Guide";
+        if (role === "client") return "Client";
+        if (role === "guide") return "Guide";
+        if (role === "user") return "User";
+
+        return user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase();
+    };
 
     return (
         <header className={`header-main ${isScrolled ? "header-scrolled" : ""}`}>
@@ -164,8 +233,8 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                             <div className="header-logo-glow"></div>
                         </div>
                         <div className="header-logo-text-container">
-                            <span className="header-logo-text">{t("header.logo_text")}</span>
-                            <span className="header-logo-tagline">{t("header.tagline")}</span>
+                            <span className="header-logo-text">{t("header.logo_text") || "TourGuide"}</span>
+                            <span className="header-logo-tagline">{t("header.tagline") || "Explore Together"}</span>
                         </div>
                     </Link>
                 </div>
@@ -191,11 +260,13 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                 )}
 
                 <div className="header-controls">
+                    {/* Language Dropdown */}
                     <div className="header-dropdown header-lang-dropdown" ref={langDropdownRef}>
                         <button
+                            type="button"
                             className="header-control-btn header-lang-btn"
                             onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                            aria-label={t("header.select_language")}
+                            aria-label={t("header.select_language") || "Select Language"}
                             aria-expanded={isLangDropdownOpen}
                         >
                             <span className="header-flag">{currentLang?.flag}</span>
@@ -204,10 +275,11 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                         </button>
                         {isLangDropdownOpen && (
                             <div className="header-dropdown-menu header-lang-menu">
-                                <div className="header-dropdown-header">{t("header.select_language")}</div>
+                                <div className="header-dropdown-header">{t("header.select_language") || "Select Language"}</div>
                                 {languageOptions.map((option) => (
                                     <button
                                         key={option.value}
+                                        type="button"
                                         className={`header-dropdown-item ${language === option.value ? "header-active" : ""}`}
                                         onClick={() => handleLanguageChange(option.value)}
                                         dir={option.dir}
@@ -221,11 +293,13 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                         )}
                     </div>
 
+                    {/* Theme Dropdown */}
                     <div className="header-dropdown header-theme-dropdown" ref={themeDropdownRef}>
                         <button
+                            type="button"
                             className="header-control-btn header-theme-btn"
                             onClick={() => setIsThemeDropdownOpen(!isThemeDropdownOpen)}
-                            aria-label={t("header.choose_appearance")}
+                            aria-label={t("header.choose_appearance") || "Choose Appearance"}
                             aria-expanded={isThemeDropdownOpen}
                         >
                             {themeOptions.find((opt) => opt.value === theme)?.icon}
@@ -233,10 +307,11 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                         </button>
                         {isThemeDropdownOpen && (
                             <div className="header-dropdown-menu header-theme-menu">
-                                <div className="header-dropdown-header">{t("header.choose_appearance")}</div>
+                                <div className="header-dropdown-header">{t("header.choose_appearance") || "Choose Appearance"}</div>
                                 {themeOptions.map((option) => (
                                     <button
                                         key={option.value}
+                                        type="button"
                                         className={`header-dropdown-item ${theme === option.value ? "header-active" : ""}`}
                                         onClick={() => handleThemeChange(option.value)}
                                     >
@@ -249,36 +324,51 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                         )}
                     </div>
 
+                    {/* Authentication Controls */}
                     {isAuthenticated ? (
                         <div className="header-dropdown header-avatar-dropdown" ref={avatarDropdownRef}>
                             <button
+                                type="button"
                                 className="header-control-btn header-avatar-btn"
                                 onClick={() => setIsAvatarDropdownOpen(!isAvatarDropdownOpen)}
-                                aria-label={t("header.account")}
+                                aria-label={t("header.account") || "Account"}
                                 aria-expanded={isAvatarDropdownOpen}
                             >
-                                <span className="header-avatar">{user?.username ? user.username[0].toUpperCase() : "U"}</span>
-                                <span className="header-username">{user?.username || "User"}</span>
+                                <span className="header-avatar">{avatarLetter}</span>
+                                <span className="header-username">{displayUsername}</span>
                                 <FiChevronDown className={`header-dropdown-arrow ${isAvatarDropdownOpen ? "header-open" : ""}`} />
                             </button>
                             {isAvatarDropdownOpen && (
                                 <div className="header-dropdown-menu header-avatar-menu">
-                                    <div className="header-dropdown-header">{t("header.account")}</div>
-                                    <button className="header-dropdown-item" onClick={handleLogout}>
+                                    <div className="header-dropdown-header">{t("header.account") || "Account"}</div>
+                                    <div className="header-user-info">
+                                        {process.env.NODE_ENV === 'development' && (
+                                            <span className="header-user-debug">Debug: {user?.role}</span>
+                                        )}
+                                    </div>
+                                    <button type="button" className="header-dropdown-item" onClick={handleLogout}>
                                         <FiLogOut className="header-theme-icon" />
-                                        <span className="header-theme-name">{t("header.logout")}</span>
+                                        <span className="header-theme-name">{t("header.logout") || "Logout"}</span>
                                     </button>
                                 </div>
                             )}
                         </div>
                     ) : (
-                        <Link to="/login" className="header-btn header-auth-btn header-signin-btn">
-                            <FiLogIn />
-                            <span>{t("header.sign_in")}</span>
-                        </Link>
+                        <div className="header-auth-buttons">
+                            {/*<Link to="/register" className="header-btn header-auth-btn header-register-btn">*/}
+                            {/*    <FiUserPlus />*/}
+                            {/*    <span>{t("header.register") || "Register"}</span>*/}
+                            {/*</Link>*/}
+                            <Link to="/login" className="header-btn header-auth-btn header-signin-btn">
+                                <FiLogIn />
+                                <span>{t("header.sign_in") || "Sign In"}</span>
+                            </Link>
+                        </div>
                     )}
 
+                    {/* Mobile Menu Toggle */}
                     <button
+                        type="button"
                         className="header-mobile-menu-toggle"
                         onClick={toggleMenu}
                         aria-label="Toggle menu"
@@ -289,18 +379,20 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                 </div>
             </div>
 
+            {/* Mobile Menu */}
             {isMenuOpen && (
                 <div className="header-mobile-menu-overlay" onClick={toggleMenu}>
                     <div className="header-mobile-menu" onClick={(e) => e.stopPropagation()}>
                         <div className="header-mobile-menu-header">
                             <div className="header-mobile-logo">
                                 <FiGlobe />
-                                <span>{t("header.logo_text")}</span>
+                                <span>{t("header.logo_text") || "TourGuide"}</span>
                             </div>
-                            <button className="header-mobile-close-btn" onClick={toggleMenu}>
+                            <button type="button" className="header-mobile-close-btn" onClick={toggleMenu}>
                                 <FiX />
                             </button>
                         </div>
+
                         {!hideMenu && (
                             <nav className="header-mobile-nav">
                                 {menuItems.map((item, index) => (
@@ -315,13 +407,16 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                                 ))}
                             </nav>
                         )}
+
                         <div className="header-mobile-controls">
+                            {/* Mobile Theme Controls */}
                             <div className="header-mobile-control-group">
-                                <label>{t("header.choose_appearance")}</label>
+                                <label>{t("header.choose_appearance") || "Choose Appearance"}</label>
                                 <div className="header-theme-buttons">
                                     {themeOptions.map((option) => (
                                         <button
                                             key={option.value}
+                                            type="button"
                                             className={`header-btn header-theme-option ${theme === option.value ? "header-active" : ""}`}
                                             onClick={() => handleThemeChange(option.value)}
                                         >
@@ -331,12 +426,15 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Mobile Language Controls */}
                             <div className="header-mobile-control-group">
-                                <label>{t("header.select_language")}</label>
+                                <label>{t("header.select_language") || "Select Language"}</label>
                                 <div className="header-lang-buttons">
                                     {languageOptions.map((option) => (
                                         <button
                                             key={option.value}
+                                            type="button"
                                             className={`header-btn header-lang-option ${language === option.value ? "header-active" : ""}`}
                                             onClick={() => handleLanguageChange(option.value)}
                                         >
@@ -347,23 +445,42 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser }) => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Mobile Authentication */}
                         <div className="header-mobile-menu-footer">
                             {isAuthenticated ? (
-                                <button
-                                    className="header-btn header-mobile-auth-btn header-logout-btn"
-                                    onClick={handleLogout}
-                                >
-                                    {t("header.logout")}
-                                </button>
+                                <div className="header-mobile-auth-section">
+                                    <div className="header-mobile-user-info">
+                                        <div className="header-mobile-avatar">{avatarLetter}</div>
+                                        <div className="header-mobile-user-details">
+                                            <span className="header-mobile-username">{displayUsername}</span>
+                                            <span className="header-mobile-role">{getUserRoleDisplay()}</span>
+                                        </div>
+                                    </div>
+                                    <button type="button" className="header-btn header-mobile-logout-btn" onClick={handleLogout}>
+                                        <FiLogOut />
+                                        <span>{t("header.logout") || "Logout"}</span>
+                                    </button>
+                                </div>
                             ) : (
-                                <>
-                                    <Link to="/register" className="header-btn header-mobile-auth-btn header-register-btn">
-                                        Register
+                                <div className="header-mobile-auth-actions">
+                                    <Link
+                                        to="/register"
+                                        className="header-btn header-mobile-auth-btn header-mobile-register-btn"
+                                        onClick={toggleMenu}
+                                    >
+                                        <FiUserPlus />
+                                        <span>{t("header.register") || "Register"}</span>
                                     </Link>
-                                    <Link to="/login" className="header-btn header-mobile-auth-btn header-signin-btn">
-                                        {t("header.sign_in")}
+                                    <Link
+                                        to="/login"
+                                        className="header-btn header-mobile-auth-btn header-mobile-signin-btn"
+                                        onClick={toggleMenu}
+                                    >
+                                        <FiLogIn />
+                                        <span>{t("header.sign_in") || "Sign In"}</span>
                                     </Link>
-                                </>
+                                </div>
                             )}
                         </div>
                     </div>

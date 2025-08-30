@@ -1,35 +1,30 @@
-# ============================================
-# 3. apps/chat/views.py - PROFESSIONAL VERSION
-# ============================================
-
-from django.db import transaction
-from django.db.models import Prefetch
+# apps/chat/views.py
+from rest_framework import generics, status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
-from rest_framework import generics, status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from apps.bookings.models import Booking
 from apps.users.models import User
-from .models import Conversation, Message
+from .models import Conversation, Message, BlockedUser
 from .serializers import (
     ConversationSerializer,
-    MessageSerializer,
     MessageCreateSerializer,
+    MessageListSerializer,
+    BlockedUserSerializer,
     StartConversationSerializer,
-    BookingAcceptSerializer,
-    BookingShortSerializer,
+    BlockUserSerializer,
+    MessageActionSerializer,
+    UnreadCountSerializer,
 )
 
 
 class ChatPagination(PageNumberPagination):
-    """Custom pagination for chat"""
-
     page_size = 50
     page_size_query_param = "page_size"
     max_page_size = 100
@@ -37,32 +32,20 @@ class ChatPagination(PageNumberPagination):
 
 @extend_schema(tags=["Chat"])
 class ConversationListCreateView(generics.ListCreateAPIView):
-    """List conversations or create new one"""
-
+    serializer_class = ConversationSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
     pagination_class = ChatPagination
 
     def get_queryset(self):
-        """Get user conversations with optimized queries"""
-        return (
-            Conversation.objects.get_user_conversations(self.request.user)
-            .select_related("user1", "user2")
-            .prefetch_related(
-                Prefetch(
-                    "messages", queryset=Message.objects.select_related("sender")[:1]
-                )
-            )
-        )
+        return Conversation.objects.get_user_conversations(self.request.user)
 
     def get_serializer_class(self):
         if self.request.method == "POST":
             return StartConversationSerializer
         return ConversationSerializer
 
-    @transaction.atomic
     def create(self, request, *args, **kwargs):
-        """Create or get conversation and send initial message"""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -77,13 +60,15 @@ class ConversationListCreateView(generics.ListCreateAPIView):
         # Send initial message if provided
         initial_message = serializer.validated_data.get("message")
         if initial_message:
-            Message.objects.create(
-                conversation=conversation,
-                sender=request.user,
-                content=initial_message,
-                message_type="text",
+            message = Message.objects.create(
+                conversation=conversation, sender=request.user, content=initial_message
             )
 
+            # Update conversation timestamp
+            conversation.updated_at = timezone.now()
+            conversation.save()
+
+        # Return conversation data
         conversation_serializer = ConversationSerializer(
             conversation, context={"request": request}
         )
@@ -96,7 +81,7 @@ class ConversationListCreateView(generics.ListCreateAPIView):
 
 @extend_schema(tags=["Chat"])
 class ConversationDetailView(generics.RetrieveAPIView):
-    """Get single conversation details"""
+    """Get conversation details"""
 
     serializer_class = ConversationSerializer
     permission_classes = [IsAuthenticated]
@@ -108,9 +93,9 @@ class ConversationDetailView(generics.RetrieveAPIView):
 
 @extend_schema(tags=["Chat"])
 class MessageListView(generics.ListAPIView):
-    """List messages in conversation"""
+    """List messages in a conversation"""
 
-    serializer_class = MessageSerializer
+    serializer_class = MessageListSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
     pagination_class = ChatPagination
@@ -126,13 +111,12 @@ class MessageListView(generics.ListAPIView):
             Message.objects.visible_for_user(self.request.user)
             .filter(conversation=conversation)
             .select_related("sender")
-            .order_by("-created_at")
         )
 
 
 @extend_schema(tags=["Chat"])
 class MessageCreateView(generics.CreateAPIView):
-    """Send new message"""
+    """Send a new message"""
 
     serializer_class = MessageCreateSerializer
     permission_classes = [IsAuthenticated]
@@ -141,98 +125,198 @@ class MessageCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         message = serializer.save(sender=self.request.user)
 
-        # Mark conversation as updated
+        # Update conversation timestamp
         message.conversation.updated_at = timezone.now()
-        message.conversation.save(update_fields=["updated_at"])
+        message.conversation.save()
 
         return message
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        message = self.perform_create(serializer)
 
-# Booking integration endpoints
-@extend_schema(tags=["Chat", "Booking"])
+        # Return full message data
+        message_serializer = MessageListSerializer(
+            message, context={"request": request}
+        )
+        return Response(message_serializer.data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema(tags=["Chat"])
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-@transaction.atomic
-def accept_booking_in_chat(request, conversation_id: int, booking_id: int):
-    """Customer accepts booking and sets dates"""
+def mark_messages_read(request, conversation_id):
     conversation = get_object_or_404(
         Conversation.objects.get_user_conversations(request.user), id=conversation_id
     )
 
-    booking = get_object_or_404(
-        Booking.objects.filter(conversation=conversation), id=booking_id
+    # Mark all unread messages as read
+    updated_count = Message.objects.unread_for_user_in_conversation(
+        request.user, conversation
+    ).update(is_read=True, read_at=timezone.now())
+
+    return Response({"status": "success", "messages_marked_read": updated_count})
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def message_action(request, message_id):
+    """Perform action on message (delete/recover)"""
+    message = get_object_or_404(
+        Message.objects.filter(sender=request.user), id=message_id
     )
 
-    # Validate customer
-    if not hasattr(request.user, "customerprofile"):
-        return Response(
-            {"error": "Only customers can accept bookings"},
-            status=status.HTTP_403_FORBIDDEN,
-        )
-
-    if booking.customer_profile != request.user.customerprofile:
-        return Response(
-            {"error": "You cannot accept this booking"},
-            status=status.HTTP_403_FORBIDDEN,
-        )
-
-    if booking.status != "pending":
-        return Response(
-            {"error": "Booking is not pending"}, status=status.HTTP_400_BAD_REQUEST
-        )
-
-    # Validate dates
-    serializer = BookingAcceptSerializer(data=request.data)
+    serializer = MessageActionSerializer(
+        data=request.data, context={"request": request, "message": message}
+    )
     serializer.is_valid(raise_exception=True)
 
-    # Check availability
-    from apps.bookings.models import Booking as BookingModel
+    action = serializer.validated_data["action"]
+    success = False
+    action_text = None
+    if action == "delete_sender":
+        success = message.delete_for_sender(request.user)
+        action_text = "deleted for you"
+    elif action == "delete_both":
+        success = message.delete_for_both(request.user)
+        action_text = "deleted for everyone"
+    elif action == "recover":
+        success = message.recover_message(request.user)
+        action_text = "recovered"
 
-    if not BookingModel.objects.is_customer_available(
-        booking.customer_profile,
-        serializer.validated_data["start_date"],
-        serializer.validated_data["end_date"],
-    ):
+    if success:
         return Response(
-            {"error": "You are not available for these dates"},
-            status=status.HTTP_400_BAD_REQUEST,
+            {
+                "status": "success",
+                "message": f"Message {action_text} successfully",
+                "message_data": MessageListSerializer(
+                    message, context={"request": request}
+                ).data,
+            }
         )
 
-    # Update booking
-    booking.start_date = serializer.validated_data["start_date"]
-    booking.end_date = serializer.validated_data["end_date"]
-    booking.status = "accepted"
-    booking.accepted_at = timezone.now()
-    booking.save()
+    return Response(
+        {"status": "error", "message": "Action could not be performed"},
+        status=status.HTTP_400_BAD_REQUEST,
+    )
 
-    # Send system message
-    Message.objects.create(
-        conversation=conversation,
-        sender=request.user,
-        content=f"✅ Booking accepted!\nDates: {booking.start_date} to {booking.end_date}",
-        message_type="booking",
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def block_user(request):
+    """Block a user"""
+    serializer = BlockUserSerializer(data=request.data, context={"request": request})
+    serializer.is_valid(raise_exception=True)
+
+    blocked_user = User.objects.get(
+        email=serializer.validated_data["user_email"], is_active=True
+    )
+
+    blocked_obj, created = BlockedUser.objects.get_or_create(
+        blocker=request.user, blocked=blocked_user
     )
 
     return Response(
         {
             "status": "success",
-            "booking": BookingShortSerializer(
-                booking, context={"request": request}
-            ).data,
+            "message": f"User {blocked_user.full_name or blocked_user.email} blocked successfully",
+            "blocked_user": BlockedUserSerializer(blocked_obj).data,
         }
     )
 
 
-@extend_schema(tags=["Chat", "Booking"])
-@api_view(["POST"])
+@api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
-@transaction.atomic
-def update_booking_dates(request, conversation_id: int, booking_id: int):
-    """Update booking dates"""
-    conversation = get_object_or_404(
-        Conversation.objects.get_user_conversations(request.user), id=conversation_id
+def unblock_user(request, user_id):
+    """Unblock a user"""
+    blocked_user = get_object_or_404(User, id=user_id, is_active=True)
+
+    try:
+        blocked_obj = BlockedUser.objects.get(
+            blocker=request.user, blocked=blocked_user
+        )
+        blocked_obj.delete()
+
+        return Response(
+            {
+                "status": "success",
+                "message": f"User {blocked_user.full_name or blocked_user.email} unblocked successfully",
+            }
+        )
+    except BlockedUser.DoesNotExist:
+        return Response(
+            {"status": "error", "message": "User is not blocked"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+class BlockedUserListView(generics.ListAPIView):
+    """List blocked users"""
+
+    serializer_class = BlockedUserSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get_queryset(self):
+        return BlockedUser.objects.filter(blocker=self.request.user).select_related(
+            "blocked"
+        )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def unread_count(request):
+    """Get unread message counts"""
+    # Total unread count
+    total_unread = Conversation.objects.get_unread_count_for_user(request.user)
+
+    # Per conversation unread counts
+    conversations = Conversation.objects.get_user_conversations(request.user)
+    conversation_counts = {}
+
+    for conversation in conversations:
+        unread = Message.objects.unread_for_user_in_conversation(
+            request.user, conversation
+        ).count()
+        if unread > 0:
+            conversation_counts[str(conversation.id)] = unread
+
+    serializer = UnreadCountSerializer(
+        {"total_unread": total_unread, "conversations": conversation_counts}
     )
 
-    booking = get_object_or_404(
-        Booking.objects.filter(conversation=conversation), id=booking_id
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def user_search(request):
+    """Search users for starting conversations"""
+    query = request.GET.get("q", "").strip()
+
+    if not query or len(query) < 2:
+        return Response(
+            {"results": [], "message": "Query must be at least 2 characters"}
+        )
+
+    # Search by email, first name, last name
+    users = (
+        User.objects.filter(
+            Q(email__icontains=query)
+            | Q(first_name__icontains=query)
+            | Q(last_name__icontains=query)
+            | Q(full_name__icontains=query),
+            is_active=True,
+        )
+        .exclude(id=request.user.id)
+        .exclude(
+            Q(blocked_by__blocker=request.user) | Q(blocking__blocked=request.user)
+        )[:10]
     )
+
+    from .serializers import UserSerializer
+
+    serializer = UserSerializer(users, many=True, context={"request": request})
+
+    return Response({"results": serializer.data, "count": len(serializer.data)})

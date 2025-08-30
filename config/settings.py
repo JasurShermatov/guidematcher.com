@@ -29,7 +29,9 @@ environ.Env.read_env(BASE_DIR / ".env")  # .env ni o'qish
 # ─── Asosiy parol va debug ─────────────────────────────────────
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = env.bool("DEBUG")
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
+ALLOWED_HOSTS = env.list(
+    "ALLOWED_HOSTS", default=["localhost", "127.0.0.1", "backend"]
+)  # WebSocket uchun yangilandi
 
 # ─── Global lokallashuv ────────────────────────────────────────
 LANGUAGE_CODE = "en-us"
@@ -148,9 +150,17 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # ╭──────────────────────────────────────────────────────────────╮
-# | 7. CORS                                                     |
+# | 7. CORS - WebSocket uchun yangilandi                       |
 # ╰──────────────────────────────────────────────────────────────╯
-CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
+CORS_ALLOWED_ORIGINS = env.list(
+    "CORS_ALLOWED_ORIGINS",
+    default=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3003",
+        "http://127.0.0.1:3003",
+    ],
+)
 CORS_ALLOW_CREDENTIALS = True
 
 # ╭──────────────────────────────────────────────────────────────╮
@@ -272,18 +282,28 @@ if SENTRY_DSN and not DEBUG:
 # ↓ bor joyida
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
-ASGI_APPLICATION = "config.asgi.application"  # <-- uncomment / qo‘sh
+ASGI_APPLICATION = "config.asgi.application"  # <-- uncomment / qo'sh
 
-
+# ╭──────────────────────────────────────────────────────────────╮
+# | WebSocket / Channels - Yangilandi                           |
+# ╰──────────────────────────────────────────────────────────────╯
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [env("CHANNEL_REDIS_URL", default="redis://redis:6379/2")],
+            "capacity": 1500,  # Kanallar sonini cheklash
+            "expiry": 60,  # 60 soniya keyin tozalash
         },
     },
 }
 
+# WebSocket connection timeouts
+WEBSOCKET_TIMEOUT = 30  # 30 seconds
+
+# Development uchun async unsafe ruxsat etish
+if DEBUG:
+    os.environ.setdefault("DJANGO_ALLOW_ASYNC_UNSAFE", "true")
 
 FRONTEND_PASSWORD_RESET_URL = env.str(
     "FRONTEND_PASSWORD_RESET_URL",

@@ -18,36 +18,6 @@ import "./Footer.css";
 
 const Footer = () => {
     const { t } = useTranslation();
-    const footerLinks = {
-        platform: [
-            { label: t("footer.links.platform.how_it_works"), href: "#how" },
-            { label: t("footer.links.platform.find_guide"), href: "#find" },
-            { label: t("footer.links.platform.become_guide"), href: "#become" },
-            { label: t("footer.links.platform.safety_trust"), href: "#safety" },
-            { label: t("footer.links.platform.pricing"), href: "#pricing" },
-        ],
-        support: [
-            { label: t("footer.links.support.help_center"), href: "#help" },
-            { label: t("footer.links.support.contact_us"), href: "#contact" },
-            { label: t("footer.links.support.faqs"), href: "#faq" },
-            { label: t("footer.links.support.dispute_center"), href: "#dispute" },
-            { label: t("footer.links.support.report_issue"), href: "#report" },
-        ],
-        legal: [
-            { label: t("footer.links.legal.terms_of_service"), href: "#terms" },
-            { label: t("footer.links.legal.privacy_policy"), href: "#privacy" },
-            { label: t("footer.links.legal.cookie_policy"), href: "#cookies" },
-            { label: t("footer.links.legal.community_guidelines"), href: "#guidelines" },
-            { label: t("footer.links.legal.gdpr_compliance"), href: "#gdpr" },
-        ],
-        company: [
-            { label: t("footer.links.company.about_us"), href: "#about" },
-            { label: t("footer.links.company.careers"), href: "#careers" },
-            { label: t("footer.links.company.press_kit"), href: "#press" },
-            { label: t("footer.links.company.blog"), href: "#blog" },
-            { label: t("footer.links.company.investors"), href: "#investors" },
-        ],
-    };
 
     const socialLinks = [
         { icon: <FiFacebook />, href: "#facebook", label: t("footer.social.facebook") },
@@ -61,34 +31,34 @@ const Footer = () => {
 
     return (
         <footer className="footer-main">
-            {/* Newsletter Section (Commented Out) */}
-            {/* <section className="footer-newsletter-section">
-        <div className="footer-newsletter-content">
-          <div className="footer-newsletter-text">
-            <h3>{t("footer.newsletter.title")}</h3>
-            <p>{t("footer.newsletter.subtitle")}</p>
-          </div>
-          <form className="footer-newsletter-form">
-            <div className="footer-email-input-group">
-              <FiMail className="footer-email-icon" />
-              <input
-                type="email"
-                placeholder={t("footer.newsletter.email_placeholder")}
-                className="footer-email-input"
-                aria-label={t("footer.newsletter.email_aria")}
-              />
-              <button type="submit" className="footer-subscribe-btn">
-                {t("footer.newsletter.subscribe_button")}
-                <FiArrowRight />
-              </button>
-            </div>
-            <div className="footer-newsletter-privacy">
-              <FiShield className="footer-privacy-icon" />
-              <span>{t("footer.newsletter.privacy")}</span>
-            </div>
-          </form>
-        </div>
-      </section> */}
+            {/* Newsletter Section */}
+            <section className="footer-newsletter-section">
+                <div className="footer-newsletter-content">
+                    <div className="footer-newsletter-text">
+                        <h3>{t("footer.newsletter.title")}</h3>
+                        <p>{t("footer.newsletter.subtitle")}</p>
+                    </div>
+                    <form className="footer-newsletter-form">
+                        <div className="footer-email-input-group">
+                            <FiMail className="footer-email-icon" />
+                            <input
+                                type="email"
+                                placeholder={t("footer.newsletter.email_placeholder")}
+                                className="footer-email-input"
+                                aria-label={t("footer.newsletter.email_aria")}
+                            />
+                            <button type="submit" className="footer-subscribe-btn">
+                                {t("footer.newsletter.subscribe_button")}
+                                <FiArrowRight />
+                            </button>
+                        </div>
+                        <div className="footer-newsletter-privacy">
+                            <FiShield className="footer-privacy-icon" />
+                            <span>{t("footer.newsletter.privacy")}</span>
+                        </div>
+                    </form>
+                </div>
+            </section>
 
             {/* Main Footer Content */}
             <div className="footer-content">
@@ -131,59 +101,6 @@ const Footer = () => {
                                 </a>
                             ))}
                         </div>
-                    </div>
-
-                    {/* Footer Links */}
-                    <div className="footer-section">
-                        <h4 className="footer-title">{t("footer.links.platform.title")}</h4>
-                        <ul className="footer-links">
-                            {footerLinks.platform.map((link, index) => (
-                                <li key={index}>
-                                    <a href={link.href} className="footer-link">
-                                        {link.label}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div className="footer-section">
-                        <h4 className="footer-title">{t("footer.links.support.title")}</h4>
-                        <ul className="footer-links">
-                            {footerLinks.support.map((link, index) => (
-                                <li key={index}>
-                                    <a href={link.href} className="footer-link">
-                                        {link.label}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div className="footer-section">
-                        <h4 className="footer-title">{t("footer.links.legal.title")}</h4>
-                        <ul className="footer-links">
-                            {footerLinks.legal.map((link, index) => (
-                                <li key={index}>
-                                    <a href={link.href} className="footer-link">
-                                        {link.label}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div className="footer-section">
-                        <h4 className="footer-title">{t("footer.links.company.title")}</h4>
-                        <ul className="footer-links">
-                            {footerLinks.company.map((link, index) => (
-                                <li key={index}>
-                                    <a href={link.href} className="footer-link">
-                                        {link.label}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
                     </div>
 
                     {/* Mobile App Section */}

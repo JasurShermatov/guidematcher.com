@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     getConversations,
     getChatMessages,
@@ -19,6 +20,7 @@ import {
 import './ChatWidgets.css';
 
 const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'client' }) => {
+    const { t } = useTranslation();
     const [currentUser, setCurrentUser] = useState(null);
     const [conversations, setConversations] = useState([]);
     const [activeConversation, setActiveConversation] = useState(null);
@@ -73,7 +75,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
             ]);
         } catch (err) {
             console.error('Error initializing chat:', err);
-            setError(err.message);
+            setError(t('chat.errors.initialize_failed'));
         } finally {
             setLoading(false);
         }
@@ -85,6 +87,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
             setConversations(data.results || data);
         } catch (err) {
             console.error('Error loading conversations:', err);
+            setError(t('chat.errors.load_conversations_failed'));
         }
     };
 
@@ -96,6 +99,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
             loadUnreadCount();
         } catch (err) {
             console.error('Error loading messages:', err);
+            setError(t('chat.errors.load_messages_failed'));
         }
     };
 
@@ -105,6 +109,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
             setUnreadCount(data.total_unread || 0);
         } catch (err) {
             console.error('Error loading unread count:', err);
+            setError(t('chat.errors.load_unread_count_failed'));
         }
     };
 
@@ -114,6 +119,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
             setBlockedUsers(data.results || data);
         } catch (err) {
             console.error('Error loading blocked users:', err);
+            setError(t('chat.errors.load_blocked_users_failed'));
         }
     };
 
@@ -144,7 +150,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
             () => setWsStatus('connected'),
             () => setWsStatus('disconnected'),
             (err) => {
-                setError('WebSocket error: ' + err.message);
+                setError(t('chat.errors.websocket_error', { message: err.message }));
                 setWsStatus('error');
             }
         );
@@ -162,7 +168,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
             setNewMessage('');
             loadConversations();
         } catch (err) {
-            setError(err.message);
+            setError(t('chat.errors.send_message_failed'));
         }
     };
 
@@ -195,6 +201,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                     setSearchResults(data.results || []);
                 } catch (err) {
                     console.error('Error searching users:', err);
+                    setError(t('chat.errors.search_users_failed'));
                 }
             } else {
                 setSearchResults([]);
@@ -217,17 +224,17 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
             await loadMessages(conversationData.id);
             setupWebSocket(conversationData.id);
         } catch (err) {
-            setError(err.message);
+            setError(t('chat.errors.create_conversation_failed'));
         }
     };
 
     const handleBlockUser = async (userEmail) => {
         try {
             await blockUser({ user_email: userEmail });
-            setError('User blocked successfully');
+            setError(t('chat.success.user_blocked'));
             loadConversations();
         } catch (err) {
-            setError(err.message);
+            setError(t('chat.errors.block_user_failed'));
         }
     };
 
@@ -235,9 +242,9 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
         try {
             await unblockUser(userId);
             loadBlockedUsers();
-            setError('User unblocked successfully');
+            setError(t('chat.success.user_unblocked'));
         } catch (err) {
-            setError(err.message);
+            setError(t('chat.errors.unblock_user_failed'));
         }
     };
 
@@ -248,33 +255,29 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                 await loadMessages(activeConversation.id);
             }
         } catch (err) {
-            setError(err.message);
+            setError(t('chat.errors.message_action_failed'));
         }
     };
 
     const getLastMessagePreview = (lastMessage) => {
         if (!lastMessage) {
-            return 'No messages yet';
+            return t('chat.conversations.no_messages');
         }
 
-        // O'chirilgan xabarlar uchun ham asl mazmunni ko'rsatamiz
         if (lastMessage.delete_status && lastMessage.delete_status !== 'visible') {
-            // Agar xabar o'chirilgan bo'lsa, lekin content mavjud bo'lsa
             if (lastMessage.content) {
                 return lastMessage.content;
             }
-            return 'Message was deleted';
+            return t('chat.conversations.message_deleted');
         }
 
-        return lastMessage.content || 'No messages yet';
+        return lastMessage.content || t('chat.conversations.no_messages');
     };
 
     const getMessageDisplay = (message) => {
-        // Barcha xabarlar uchun asl mazmunni ko'rsatamiz
-        // Faqat delete statusni alohida belgilab qo'yamiz
         return {
             isDeleted: message.delete_status && message.delete_status !== 'visible',
-            content: message.content || 'No content',
+            content: message.content || t('chat.chat.no_content'),
             deleteStatus: message.delete_status,
             showDeletedInfo: message.delete_status && message.delete_status !== 'visible'
         };
@@ -285,13 +288,13 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
 
         switch (deleteStatus) {
             case 'deleted_sender':
-                return isMine ? '(You deleted this message)' : '(Sender deleted this message)';
+                return isMine ? t('chat.chat.deleted_by_sender_mine') : t('chat.chat.deleted_by_sender_other');
             case 'deleted_receiver':
-                return isMine ? '(Receiver deleted this message)' : '(You deleted this message)';
+                return isMine ? t('chat.chat.deleted_by_receiver_mine') : t('chat.chat.deleted_by_receiver_other');
             case 'deleted_both':
-                return '(This message was deleted for everyone)';
+                return t('chat.chat.deleted_for_everyone');
             default:
-                return '(This message was deleted)';
+                return t('chat.chat.message_deleted');
         }
     };
 
@@ -320,10 +323,10 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
             <div className="chat-widgets-main">
                 <div className="chat-widgets-header">
                     <h3 className="chat-widgets-title">
-                        {chatView === 'conversations' && 'Messages'}
+                        {chatView === 'conversations' && t('chat.title.messages')}
                         {chatView === 'chat' && activeConversation && activeConversation.other_user?.full_name}
-                        {chatView === 'search' && 'Find Users'}
-                        {chatView === 'blocked' && 'Blocked Users'}
+                        {chatView === 'search' && t('chat.title.search_users')}
+                        {chatView === 'blocked' && t('chat.title.blocked_users')}
                     </h3>
 
                     <div className="chat-widgets-header-actions">
@@ -337,7 +340,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                     setShowBlockedUsers(false);
                                 }}
                             >
-                                ← Back
+                                {t('chat.actions.back')}
                             </button>
                         )}
 
@@ -350,7 +353,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                         setShowUserSearch(true);
                                     }}
                                 >
-                                    + New
+                                    {t('chat.actions.new_conversation')}
                                 </button>
                                 <button
                                     className="chat-widgets-action-btn"
@@ -360,25 +363,25 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                         loadBlockedUsers();
                                     }}
                                 >
-                                    Blocked
+                                    {t('chat.actions.blocked_users')}
                                 </button>
                             </>
                         )}
 
                         {chatView === 'chat' && (
                             <span className={`chat-widgets-status ${wsStatus}`}>
-                                {wsStatus === 'connected' ? 'Online' : 'Offline'}
+                                {wsStatus === 'connected' ? t('chat.status.online') : t('chat.status.offline')}
                             </span>
                         )}
 
-                        <button className="chat-widgets-close-btn" onClick={onClose}>×</button>
+                        <button className="chat-widgets-close-btn" onClick={onClose}>{t('chat.actions.close')}</button>
                     </div>
                 </div>
 
                 {error && (
                     <div className="chat-widgets-error">
                         <p>{error}</p>
-                        <button onClick={() => setError(null)} className="chat-widgets-error-close">×</button>
+                        <button onClick={() => setError(null)} className="chat-widgets-error-close">{t('chat.actions.close_error')}</button>
                     </div>
                 )}
 
@@ -386,10 +389,10 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                     {chatView === 'conversations' && (
                         <div className="chat-widgets-conversations">
                             {loading ? (
-                                <div className="chat-widgets-loading">Loading conversations...</div>
+                                <div className="chat-widgets-loading">{t('chat.conversations.loading')}</div>
                             ) : conversations.length === 0 ? (
                                 <div className="chat-widgets-empty">
-                                    <p>No conversations yet</p>
+                                    <p>{t('chat.conversations.no_conversations')}</p>
                                     <button
                                         className="chat-widgets-btn chat-widgets-btn-primary"
                                         onClick={() => {
@@ -397,7 +400,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                             setShowUserSearch(true);
                                         }}
                                     >
-                                        Start a conversation
+                                        {t('chat.conversations.start_conversation')}
                                     </button>
                                 </div>
                             ) : (
@@ -417,7 +420,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                                     />
                                                 ) : (
                                                     <div className="chat-widgets-avatar-placeholder">
-                                                        {conversation.other_user?.full_name?.charAt(0) || 'U'}
+                                                        {conversation.other_user?.full_name?.charAt(0) || t('chat.conversations.unknown_user_initial')}
                                                     </div>
                                                 )}
                                             </div>
@@ -425,7 +428,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                             <div className="chat-widgets-conversation-info">
                                                 <div className="chat-widgets-conversation-header">
                                                     <h4 className="chat-widgets-conversation-name">
-                                                        {conversation.other_user?.full_name || 'Unknown User'}
+                                                        {conversation.other_user?.full_name || t('chat.conversations.unknown_user')}
                                                     </h4>
                                                     <span className="chat-widgets-conversation-time">
                                                         {formatTime(conversation.updated_at)}
@@ -453,8 +456,8 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                     {chatView === 'chat' && activeConversation && (
                         <div className="chat-widgets-chat">
                             <div className="chat-widgets-status-bar">
-                                {onlineUsers.length > 0 && <span>{onlineUsers.join(', ')} online</span>}
-                                {typingUsers.length > 0 && <span>{typingUsers.join(', ')} is typing...</span>}
+                                {onlineUsers.length > 0 && <span>{t('chat.chat.online_users', { users: onlineUsers.join(', ') })}</span>}
+                                {typingUsers.length > 0 && <span>{t('chat.chat.typing_users', { users: typingUsers.join(', ') })}</span>}
                             </div>
                             <div className="chat-widgets-messages">
                                 <div className="chat-widgets-messages-list">
@@ -486,14 +489,14 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                                                 <button
                                                                     className="chat-widgets-message-action"
                                                                     onClick={() => handleMessageAction(message.id, 'delete_sender')}
-                                                                    title="Delete for me"
+                                                                    title={t('chat.chat.actions.delete_for_me')}
                                                                 >
                                                                     🗑️
                                                                 </button>
                                                                 <button
                                                                     className="chat-widgets-message-action"
                                                                     onClick={() => handleMessageAction(message.id, 'delete_both')}
-                                                                    title="Delete for everyone"
+                                                                    title={t('chat.chat.actions.delete_for_everyone')}
                                                                 >
                                                                     🗑️🗑️
                                                                 </button>
@@ -503,12 +506,12 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                                             <button
                                                                 className="chat-widgets-message-action chat-widgets-recover-btn"
                                                                 onClick={() => handleMessageAction(message.id, 'recover')}
-                                                                title="Recover message"
+                                                                title={t('chat.chat.actions.recover')}
                                                             >
-                                                                ↶ Recover
+                                                                {t('chat.chat.actions.recover')}
                                                             </button>
                                                         )}
-                                                        {message.is_read && <span className="chat-widgets-read-status">Seen</span>}
+                                                        {message.is_read && <span className="chat-widgets-read-status">{t('chat.chat.read_status')}</span>}
                                                     </div>
                                                 </div>
                                             </div>
@@ -523,7 +526,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                     <input
                                         type="text"
                                         className="chat-widgets-input"
-                                        placeholder="Type a message..."
+                                        placeholder={t('chat.chat.input_placeholder')}
                                         value={newMessage}
                                         onChange={handleMessageChange}
                                     />
@@ -532,7 +535,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                         className="chat-widgets-send-btn"
                                         disabled={!newMessage.trim()}
                                     >
-                                        Send
+                                        {t('chat.chat.actions.send')}
                                     </button>
                                 </div>
                             </form>
@@ -546,7 +549,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                         }
                                     }}
                                 >
-                                    Block User
+                                    {t('chat.chat.actions.block_user')}
                                 </button>
                             </div>
                         </div>
@@ -558,7 +561,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                 <input
                                     type="text"
                                     className="chat-widgets-input"
-                                    placeholder="Search users by name or email..."
+                                    placeholder={t('chat.search.placeholder')}
                                     value={searchQuery}
                                     onChange={(e) => {
                                         setSearchQuery(e.target.value);
@@ -569,9 +572,9 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
 
                             <div className="chat-widgets-search-results">
                                 {searchQuery.length < 2 ? (
-                                    <p className="chat-widgets-search-hint">Enter at least 2 characters to search</p>
+                                    <p className="chat-widgets-search-hint">{t('chat.search.hint')}</p>
                                 ) : searchResults.length === 0 ? (
-                                    <p className="chat-widgets-no-results">No users found</p>
+                                    <p className="chat-widgets-no-results">{t('chat.search.no_results')}</p>
                                 ) : (
                                     <div className="chat-widgets-users-list">
                                         {searchResults.map(user => (
@@ -589,7 +592,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                                         />
                                                     ) : (
                                                         <div className="chat-widgets-avatar-placeholder">
-                                                            {user.full_name?.charAt(0) || 'U'}
+                                                            {user.full_name?.charAt(0) || t('chat.search.unknown_user_initial')}
                                                         </div>
                                                     )}
                                                 </div>
@@ -609,7 +612,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                     {chatView === 'blocked' && (
                         <div className="chat-widgets-blocked">
                             {blockedUsers.length === 0 ? (
-                                <p className="chat-widgets-no-blocked">No blocked users</p>
+                                <p className="chat-widgets-no-blocked">{t('chat.blocked.no_blocked_users')}</p>
                             ) : (
                                 <div className="chat-widgets-blocked-list">
                                     {blockedUsers.map(blockedUser => (
@@ -624,20 +627,20 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                                         />
                                                     ) : (
                                                         <div className="chat-widgets-avatar-placeholder">
-                                                            {blockedUser.blocked_user?.full_name?.charAt(0) || 'U'}
+                                                            {blockedUser.blocked_user?.full_name?.charAt(0) || t('chat.blocked.unknown_user_initial')}
                                                         </div>
                                                     )}
                                                 </div>
 
                                                 <div className="chat-widgets-user-info">
                                                     <h4 className="chat-widgets-user-name">
-                                                        {blockedUser.blocked_user?.full_name}
+                                                        {blockedUser.blocked_user?.full_name || t('chat.blocked.unknown_user')}
                                                     </h4>
                                                     <p className="chat-widgets-user-email">
                                                         {blockedUser.blocked_user?.email}
                                                     </p>
                                                     <span className="chat-widgets-blocked-date">
-                                                        Blocked on {formatDate(blockedUser.created_at)}
+                                                        {t('chat.blocked.blocked_on', { date: formatDate(blockedUser.created_at) })}
                                                     </span>
                                                 </div>
                                             </div>
@@ -646,7 +649,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
                                                 className="chat-widgets-btn chat-widgets-btn-unblock"
                                                 onClick={() => handleUnblockUser(blockedUser.blocked_user.id)}
                                             >
-                                                Unblock
+                                                {t('chat.blocked.actions.unblock')}
                                             </button>
                                         </div>
                                     ))}
@@ -658,7 +661,7 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
 
                 {unreadCount > 0 && chatView === 'conversations' && (
                     <div className="chat-widgets-unread-total">
-                        Total unread: {unreadCount}
+                        {t('chat.conversations.total_unread', { count: unreadCount })}
                     </div>
                 )}
             </div>

@@ -1,8 +1,10 @@
 // src/components/common/DebugHelper.jsx
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FiInfo, FiUser, FiSettings, FiX } from 'react-icons/fi';
 
 const DebugHelper = ({ user, isAuthenticated }) => {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
 
     // Only show in development
@@ -76,13 +78,13 @@ const DebugHelper = ({ user, isAuthenticated }) => {
 
                         <h2 style={{ marginBottom: '20px', color: '#333' }}>
                             <FiSettings style={{ marginRight: '10px' }} />
-                            Debug Information
+                            {t('debug.title')}
                         </h2>
 
                         <div style={{ marginBottom: '20px' }}>
                             <h3 style={{ color: '#667eea', marginBottom: '10px' }}>
                                 <FiUser style={{ marginRight: '8px' }} />
-                                Authentication Status
+                                {t('debug.auth_status')}
                             </h3>
                             <div style={{
                                 background: isAuthenticated ? '#e8f5e8' : '#ffe8e8',
@@ -90,29 +92,29 @@ const DebugHelper = ({ user, isAuthenticated }) => {
                                 borderRadius: '8px',
                                 border: `1px solid ${isAuthenticated ? '#4CAF50' : '#f44336'}`
                             }}>
-                                <p><strong>Is Authenticated:</strong> {isAuthenticated ? '✅ Yes' : '❌ No'}</p>
-                                <p><strong>Access Token:</strong> {localStorage.getItem('access_token') ? '✅ Present' : '❌ Missing'}</p>
-                                <p><strong>Refresh Token:</strong> {localStorage.getItem('refresh_token') ? '✅ Present' : '❌ Missing'}</p>
+                                <p><strong>{t('debug.is_authenticated')}</strong> {isAuthenticated ? '✅ Yes' : '❌ No'}</p>
+                                <p><strong>{t('debug.access_token')}</strong> {localStorage.getItem('access_token') ? '✅ Present' : '❌ Missing'}</p>
+                                <p><strong>{t('debug.refresh_token')}</strong> {localStorage.getItem('refresh_token') ? '✅ Present' : '❌ Missing'}</p>
                             </div>
                         </div>
 
                         <div style={{ marginBottom: '20px' }}>
-                            <h3 style={{ color: '#667eea', marginBottom: '10px' }}>Profile Data</h3>
+                            <h3 style={{ color: '#667eea', marginBottom: '10px' }}>{t('debug.profile_data')}</h3>
                             <div style={{
                                 background: '#f0f8ff',
                                 padding: '15px',
                                 borderRadius: '8px',
                                 border: '1px solid #667eea'
                             }}>
-                                <p><strong>Has Profile:</strong> {user?.profile_id ? '✅ Yes' : '❌ No'}</p>
-                                <p><strong>Profile ID:</strong> {user?.profile_id || 'Not set'}</p>
-                                <p><strong>Role:</strong> {user?.role || 'Not set'}</p>
-                                <p><strong>User ID:</strong> {user?.id || 'Not set'}</p>
+                                <p><strong>{t('debug.has_profile')}</strong> {user?.profile_id ? '✅ Yes' : '❌ No'}</p>
+                                <p><strong>{t('debug.profile_id')}</strong> {user?.profile_id || 'Not set'}</p>
+                                <p><strong>{t('debug.role')}</strong> {user?.role || 'Not set'}</p>
+                                <p><strong>{t('debug.user_id')}</strong> {user?.id || 'Not set'}</p>
                             </div>
                         </div>
 
                         <div style={{ marginBottom: '20px' }}>
-                            <h3 style={{ color: '#667eea', marginBottom: '10px' }}>User Data</h3>
+                            <h3 style={{ color: '#667eea', marginBottom: '10px' }}>{t('debug.user_data')}</h3>
                             <div style={{
                                 background: '#f5f5f5',
                                 padding: '15px',
@@ -129,27 +131,27 @@ const DebugHelper = ({ user, isAuthenticated }) => {
                                         {JSON.stringify(user, null, 2)}
                                     </pre>
                                 ) : (
-                                    <p style={{ margin: 0, color: '#666' }}>No user data available</p>
+                                    <p style={{ margin: 0, color: '#666' }}>{t('debug.no_user_data')}</p>
                                 )}
                             </div>
                         </div>
 
                         <div style={{ marginBottom: '20px' }}>
-                            <h3 style={{ color: '#667eea', marginBottom: '10px' }}>API Configuration</h3>
+                            <h3 style={{ color: '#667eea', marginBottom: '10px' }}>{t('debug.api_config')}</h3>
                             <div style={{
                                 background: '#f0f8ff',
                                 padding: '15px',
                                 borderRadius: '8px',
                                 border: '1px solid #667eea'
                             }}>
-                                <p><strong>API URL:</strong> {process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1/'}</p>
-                                <p><strong>Environment:</strong> {process.env.NODE_ENV}</p>
-                                <p><strong>Debug Mode:</strong> {process.env.REACT_APP_DEBUG || 'false'}</p>
+                                <p><strong>{t('debug.api_url')}</strong> {process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1/'}</p>
+                                <p><strong>{t('debug.environment')}</strong> {process.env.NODE_ENV}</p>
+                                <p><strong>{t('debug.debug_mode')}</strong> {process.env.REACT_APP_DEBUG || 'false'}</p>
                             </div>
                         </div>
 
                         <div style={{ marginBottom: '20px' }}>
-                            <h3 style={{ color: '#667eea', marginBottom: '10px' }}>Quick Actions</h3>
+                            <h3 style={{ color: '#667eea', marginBottom: '10px' }}>{t('debug.quick_actions')}</h3>
                             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                                 <button
                                     onClick={() => {
@@ -167,7 +169,7 @@ const DebugHelper = ({ user, isAuthenticated }) => {
                                         fontSize: '0.9rem'
                                     }}
                                 >
-                                    Clear Tokens
+                                    {t('debug.clear_tokens')}
                                 </button>
                                 <button
                                     onClick={() => window.location.reload()}
@@ -181,7 +183,7 @@ const DebugHelper = ({ user, isAuthenticated }) => {
                                         fontSize: '0.9rem'
                                     }}
                                 >
-                                    Reload Page
+                                    {t('debug.reload_page')}
                                 </button>
                                 <button
                                     onClick={() => console.log('User data:', user)}
@@ -195,7 +197,7 @@ const DebugHelper = ({ user, isAuthenticated }) => {
                                         fontSize: '0.9rem'
                                     }}
                                 >
-                                    Log to Console
+                                    {t('debug.log_console')}
                                 </button>
                             </div>
                         </div>
@@ -207,7 +209,7 @@ const DebugHelper = ({ user, isAuthenticated }) => {
                             borderTop: '1px solid #eee',
                             paddingTop: '15px'
                         }}>
-                            This debug panel is only visible in development mode
+                            {t('debug.note')}
                         </div>
                     </div>
                 </div>

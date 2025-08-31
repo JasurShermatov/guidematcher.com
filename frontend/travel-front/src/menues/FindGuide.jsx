@@ -1,6 +1,7 @@
 // FindGuide.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FiSearch, FiFilter, FiStar, FiMapPin, FiUsers, FiMessageCircle } from 'react-icons/fi';
 import { getCustomerProfiles, getCountries, getCities, getLanguages, createBooking } from '../api/api';
 import './FindGuide.css';
@@ -15,6 +16,7 @@ const debounce = (func, wait) => {
 };
 
 const FindGuide = ({ user }) => {
+    const { t } = useTranslation();
     const [guides, setGuides] = useState([]);
     const [countries, setCountries] = useState([]);
     const [cities, setCities] = useState([]);
@@ -56,7 +58,7 @@ const FindGuide = ({ user }) => {
                 setLanguages(Array.isArray(languagesData) ? languagesData : []);
             } catch (err) {
                 console.error('Error fetching initial data:', err);
-                setError(err.message || 'Failed to load countries or languages');
+                setError(err.message || t('find_guide.error'));
             } finally {
                 setIsLoading(false);
             }
@@ -76,7 +78,7 @@ const FindGuide = ({ user }) => {
                 })
                 .catch(err => {
                     console.error('Error fetching cities:', err);
-                    setError(err.message || 'Failed to fetch cities');
+                    setError(err.message || t('find_guide.error'));
                     setCities([]);
                 })
                 .finally(() => setIsLoading(false));
@@ -111,7 +113,7 @@ const FindGuide = ({ user }) => {
                 // Ensure data is an array
                 if (!Array.isArray(guidesData)) {
                     console.error('API response is not an array:', guidesData);
-                    setError('Invalid data format received from server');
+                    setError(t('find_guide.error'));
                     setGuides([]);
                     return;
                 }
@@ -144,13 +146,13 @@ const FindGuide = ({ user }) => {
                 console.log('Mapped guides:', mappedGuides);
                 setGuides(mappedGuides);
                 if (mappedGuides.length === 0) {
-                    setError('No guides found with the current filters');
+                    setError(t('find_guide.error'));
                 } else {
                     setError('');
                 }
             } catch (err) {
                 console.error('Error fetching guides:', err);
-                setError(err.message || 'Failed to fetch guides');
+                setError(err.message || t('find_guide.error'));
                 setGuides([]);
             } finally {
                 setIsLoading(false);
@@ -185,11 +187,11 @@ const FindGuide = ({ user }) => {
         try {
             console.log('Auto-booking guide with userId:', guideUserId);
             await createBooking({ customer: guideUserId });
-            alert('Guide booked successfully!');
+            alert(t('find_guide.book_success'));
             navigate('/my-bookings', { replace: true });
         } catch (err) {
             console.error('Auto-booking failed:', err);
-            setError(err.message || 'Failed to book guide automatically');
+            setError(err.message || t('find_guide.book_fail'));
         }
     };
 
@@ -202,11 +204,11 @@ const FindGuide = ({ user }) => {
         try {
             console.log('Booking guide with userId:', guide.userId);
             await createBooking({ customer: guide.userId });
-            alert('Guide booked successfully!');
+            alert(t('find_guide.book_success'));
             navigate('/my-bookings');
         } catch (err) {
             console.error('Booking failed:', err);
-            setError(err.message || 'Failed to book guide');
+            setError(err.message || t('find_guide.book_fail'));
         }
     };
 
@@ -224,15 +226,15 @@ const FindGuide = ({ user }) => {
         <div className="find-guide">
             <div className="find-guide-container">
                 <header className="find-guide-header">
-                    <h1 className="find-guide-title">Find Your Perfect Guide</h1>
-                    <p className="find-guide-subtitle">Explore local experts to make your trip unforgettable</p>
+                    <h1 className="find-guide-title">{t('find_guide.title')}</h1>
+                    <p className="find-guide-subtitle">{t('find_guide.subtitle')}</p>
                 </header>
                 <div className="find-guide-search-section">
                     <div className="find-guide-search-bar">
                         <FiSearch className="find-guide-search-icon" />
                         <input
                             type="text"
-                            placeholder="Search by name or location..."
+                            placeholder={t('find_guide.search_placeholder')}
                             value={searchQuery}
                             onChange={handleSearchChange}
                             className="find-guide-search-input"
@@ -240,16 +242,16 @@ const FindGuide = ({ user }) => {
                     </div>
                     <button className="find-guide-filter-toggle" onClick={toggleFilter}>
                         <FiFilter />
-                        <span>Filters</span>
+                        <span>{t('find_guide.filters')}</span>
                     </button>
                 </div>
                 {error && <p className="find-guide-error">{error}</p>}
-                {isLoading && <p className="find-guide-loading">Loading guides...</p>}
+                {isLoading && <p className="find-guide-loading">{t('find_guide.loading')}</p>}
                 {isFilterOpen && (
                     <div className="find-guide-filter-section">
                         <div className="find-guide-filter-grid">
                             <div className="find-guide-form-group">
-                                <label htmlFor="country">Country</label>
+                                <label htmlFor="country">{t('find_guide.country')}</label>
                                 <select
                                     id="country"
                                     name="country"
@@ -257,7 +259,7 @@ const FindGuide = ({ user }) => {
                                     onChange={handleFilterChange}
                                     className="find-guide-select"
                                 >
-                                    <option value="">All Countries</option>
+                                    <option value="">{t('find_guide.all_countries')}</option>
                                     {countries.map(country => (
                                         <option key={country.id} value={country.id}>
                                             {country.name}
@@ -266,7 +268,7 @@ const FindGuide = ({ user }) => {
                                 </select>
                             </div>
                             <div className="find-guide-form-group">
-                                <label htmlFor="city">City</label>
+                                <label htmlFor="city">{t('find_guide.city')}</label>
                                 <select
                                     id="city"
                                     name="city"
@@ -275,7 +277,7 @@ const FindGuide = ({ user }) => {
                                     className="find-guide-select"
                                     disabled={!filters.country}
                                 >
-                                    <option value="">All Cities</option>
+                                    <option value="">{t('find_guide.all_cities')}</option>
                                     {cities.map(city => (
                                         <option key={city.id} value={city.id}>
                                             {city.name}
@@ -284,7 +286,7 @@ const FindGuide = ({ user }) => {
                                 </select>
                             </div>
                             <div className="find-guide-form-group">
-                                <label htmlFor="language">Language</label>
+                                <label htmlFor="language">{t('find_guide.language')}</label>
                                 <select
                                     id="language"
                                     name="language"
@@ -292,7 +294,7 @@ const FindGuide = ({ user }) => {
                                     onChange={handleFilterChange}
                                     className="find-guide-select"
                                 >
-                                    <option value="">All Languages</option>
+                                    <option value="">{t('find_guide.all_languages')}</option>
                                     {languages.map(lang => (
                                         <option key={lang.id} value={lang.id}>
                                             {lang.name}
@@ -301,7 +303,7 @@ const FindGuide = ({ user }) => {
                                 </select>
                             </div>
                             <div className="find-guide-form-group">
-                                <label htmlFor="rating">Minimum Rating</label>
+                                <label htmlFor="rating">{t('find_guide.minimum_rating')}</label>
                                 <select
                                     id="rating"
                                     name="rating"
@@ -309,10 +311,10 @@ const FindGuide = ({ user }) => {
                                     onChange={handleFilterChange}
                                     className="find-guide-select"
                                 >
-                                    <option value={0}>All Ratings</option>
-                                    <option value={4}>4+ Stars</option>
-                                    <option value={4.5}>4.5+ Stars</option>
-                                    <option value={5}>5 Stars</option>
+                                    <option value={0}>{t('find_guide.all_ratings')}</option>
+                                    <option value={4}>{t('find_guide.stars_4')}</option>
+                                    <option value={4.5}>{t('find_guide.stars_45')}</option>
+                                    <option value={5}>{t('find_guide.stars_5')}</option>
                                 </select>
                             </div>
                         </div>
@@ -348,31 +350,31 @@ const FindGuide = ({ user }) => {
                                 </div>
                                 <div className="find-guide-details">
                                     <div className="find-guide-languages">
-                                        <strong>Languages:</strong>
+                                        <strong>{t('find_guide.languages')}</strong>
                                         <div className="find-guide-language-tags">
                                             {guide.languages.length > 0 ? (
                                                 guide.languages.map((lang, index) => (
                                                     <span key={index} className="find-guide-language-tag">{lang}</span>
                                                 ))
                                             ) : (
-                                                <span className="find-guide-language-tag">None</span>
+                                                <span className="find-guide-language-tag">{t('find_guide.none')}</span>
                                             )}
                                         </div>
                                     </div>
                                     <div className="find-guide-tours">
-                                        <strong>Tours:</strong>
+                                        <strong>{t('find_guide.tours')}</strong>
                                         <div className="find-guide-tour-tags">
                                             {guide.tours.length > 0 ? (
                                                 guide.tours.map((tour, index) => (
                                                     <span key={index} className="find-guide-tour-tag">{tour}</span>
                                                 ))
                                             ) : (
-                                                <span className="find-guide-tour-tag">None</span>
+                                                <span className="find-guide-tour-tag">{t('find_guide.none')}</span>
                                             )}
                                         </div>
                                     </div>
                                     <div className="find-guide-price">
-                                        <strong>Price:</strong> ${guide.price.toFixed(2)}/hour
+                                        <strong>{t('find_guide.price')}</strong> ${guide.price.toFixed(2)}/hour
                                     </div>
                                 </div>
                                 <div className="find-guide-actions">
@@ -381,7 +383,7 @@ const FindGuide = ({ user }) => {
                                         onClick={() => handleBookGuide(guide)}
                                         disabled={!guide.userId || isLoading}
                                     >
-                                        Book Now
+                                        {t('find_guide.book_now')}
                                     </button>
                                 </div>
                             </div>
@@ -389,8 +391,8 @@ const FindGuide = ({ user }) => {
                     ) : (
                         <div className="find-guide-empty-state">
                             <FiUsers size={48} />
-                            <h3>No Guides Found</h3>
-                            <p>Try adjusting your search or filters to find more guides.</p>
+                            <h3>{t('find_guide.no_guides_title')}</h3>
+                            <p>{t('find_guide.no_guides_description')}</p>
                         </div>
                     )}
                 </div>

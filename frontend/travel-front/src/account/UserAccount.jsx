@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     getClientProfile,
     createClientProfile,
@@ -25,6 +26,7 @@ import ChatWidgets from './ChatWidgets';
 import './UserAccount.css';
 
 const UserAccount = () => {
+    const { t } = useTranslation();
     const [currentUser, setCurrentUser] = useState(null);
     const [profile, setProfile] = useState(null);
     const [bookings, setBookings] = useState([]);
@@ -131,7 +133,7 @@ const UserAccount = () => {
             ]);
         } catch (err) {
             console.error('Error initializing data:', err);
-            setError(err.message);
+            setError(t('account.user_account.errors.required_fields'));
         } finally {
             setLoading(false);
         }
@@ -177,7 +179,7 @@ const UserAccount = () => {
             setReactions(data.results || data);
         } catch (err) {
             console.error('Error loading reactions:', err);
-            setError(err.message || 'Failed to load reactions');
+            setError(t('account.user_account.errors.load_reactions_failed'));
         }
     };
 
@@ -187,7 +189,7 @@ const UserAccount = () => {
             setReactionSummary(data);
         } catch (err) {
             console.error('Error loading review summary:', err);
-            setError(err.message || 'Failed to load review summary');
+            setError(t('account.user_account.errors.load_summary_failed'));
         }
     };
 
@@ -204,31 +206,31 @@ const UserAccount = () => {
             setShowProfileForm(false);
             setError(null);
         } catch (err) {
-            setError(err.message);
+            setError(t('account.user_account.errors.required_fields'));
         }
     };
 
     const handleBookingSubmit = async (e) => {
         e.preventDefault();
         if (!bookingForm.start_date) {
-            setError('Start date is required');
+            setError(t('account.user_account.errors.start_date_required'));
             return;
         }
         if (!bookingForm.end_date) {
-            setError('End date is required');
+            setError(t('account.user_account.errors.end_date_required'));
             return;
         }
         if (!bookingForm.title.trim()) {
-            setError('Title is required');
+            setError(t('account.user_account.errors.title_required'));
             return;
         }
         if (new Date(bookingForm.start_date) > new Date(bookingForm.end_date)) {
-            setError('Start date must be before end date');
+            setError(t('account.user_account.errors.start_date_before_end'));
             return;
         }
         const today = new Date().toISOString().split('T')[0];
         if (bookingForm.start_date < today) {
-            setError('Start date cannot be in the past');
+            setError(t('account.user_account.errors.start_date_past'));
             return;
         }
         try {
@@ -255,21 +257,21 @@ const UserAccount = () => {
                 customer_profile: ''
             });
             setError(null);
-            alert('Booking created successfully!');
+            alert(t('account.user_account.success.booking_created'));
         } catch (err) {
             console.error('Booking creation error:', err);
-            setError(err.message || 'Failed to create booking');
+            setError(t('account.user_account.errors.booking_failed'));
         }
     };
 
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
         if (!reviewForm.title.trim()) {
-            setError('Review title is required');
+            setError(t('account.user_account.errors.review_title_required'));
             return;
         }
         if (!reviewForm.comment.trim()) {
-            setError('Review comment is required');
+            setError(t('account.user_account.errors.review_comment_required'));
             return;
         }
         try {
@@ -298,9 +300,9 @@ const UserAccount = () => {
                 booking_id: ''
             });
             setError(null);
-            alert(editingReview ? 'Review updated successfully!' : 'Review submitted successfully!');
+            alert(t(editingReview ? 'account.user_account.success.review_updated' : 'account.user_account.success.review_submitted'));
         } catch (err) {
-            setError(err.message || 'Failed to submit review');
+            setError(t('account.user_account.errors.review_failed'));
         }
     };
 
@@ -311,15 +313,15 @@ const UserAccount = () => {
             loadReviews();
             loadBookings();
             setError(null);
-            alert('Review deleted successfully!');
+            alert(t('account.user_account.success.review_deleted'));
         } catch (err) {
-            setError(err.message || 'Failed to delete review');
+            setError(t('account.user_account.errors.delete_review_failed'));
         }
     };
 
     const handleReactToReview = async (reviewId) => {
         if (reactionForm.reaction_type === 'dislike' && !reactionForm.comment.trim()) {
-            setError('Comment is required for dislike');
+            setError(t('account.user_account.errors.dislike_comment_required'));
             return;
         }
         try {
@@ -328,9 +330,9 @@ const UserAccount = () => {
             loadReviewSummary(reviewId);
             setReactionForm({ reaction_type: 'like', comment: '' });
             setError(null);
-            alert('Reaction submitted successfully!');
+            alert(t('account.user_account.success.reaction_submitted'));
         } catch (err) {
-            setError(err.message || 'Failed to submit reaction');
+            setError(t('account.user_account.errors.reaction_failed'));
         }
     };
 
@@ -340,9 +342,9 @@ const UserAccount = () => {
             loadReviewReactions(reviewId);
             loadReviewSummary(reviewId);
             setError(null);
-            alert('Reaction removed successfully!');
+            alert(t('account.user_account.success.reaction_removed'));
         } catch (err) {
-            setError(err.message || 'Failed to remove reaction');
+            setError(t('account.user_account.errors.remove_reaction_failed'));
         }
     };
 
@@ -371,7 +373,7 @@ const UserAccount = () => {
 
     const handleCancelBooking = async () => {
         if (!cancelReason.trim()) {
-            setError('Cancellation reason is required');
+            setError(t('account.user_account.errors.cancel_reason_required'));
             return;
         }
         try {
@@ -381,9 +383,9 @@ const UserAccount = () => {
             setSelectedBookingForCancel(null);
             setCancelReason('');
             setError(null);
-            alert('Booking cancelled successfully!');
+            alert(t('account.user_account.success.booking_cancelled'));
         } catch (err) {
-            setError(err.message || 'Failed to cancel booking');
+            setError(t('account.user_account.errors.cancel_booking_failed'));
         }
     };
 
@@ -395,7 +397,7 @@ const UserAccount = () => {
         const nextWeek = new Date(today);
         nextWeek.setDate(nextWeek.getDate() + 7);
         setBookingForm({
-            title: `Tour with ${guide.user?.full_name || 'Guide'}`,
+            title: t('account.user_account.booking_form.title', { name: guide.user?.full_name || 'Guide' }),
             description: '',
             start_date: tomorrow.toISOString().split('T')[0],
             end_date: nextWeek.toISOString().split('T')[0],
@@ -415,7 +417,7 @@ const UserAccount = () => {
             service_rating: 5,
             punctuality_rating: 5,
             value_rating: 5,
-            title: `Review for ${booking.title}`,
+            title: t('account.user_account.review_form.title', { action: 'Write', guide: booking.customer_profile?.user?.full_name || 'Unknown', booking: booking.title }),
             comment: '',
             booking_id: booking.id
         });
@@ -465,7 +467,6 @@ const UserAccount = () => {
         setReviewFilter({ ...reviewFilter, [key]: value });
     };
 
-    // Filter and sort reviews
     const filteredReviews = reviews
         .filter(review => reviewFilter.minRating ? review.overall_rating >= parseInt(reviewFilter.minRating) : true)
         .sort((a, b) => {
@@ -489,7 +490,7 @@ const UserAccount = () => {
         return (
             <div className="user-account-loading">
                 <div className="user-account-spinner"></div>
-                <p>Loading...</p>
+                <p>{t('auth.loading')}</p>
             </div>
         );
     }
@@ -497,10 +498,12 @@ const UserAccount = () => {
     return (
         <div className="user-account-container">
             <div className="user-account-header">
-                <h1 className="user-account-title">My Account</h1>
+                <h1 className="user-account-title">{t('account.user_account.title')}</h1>
                 {currentUser && (
                     <div className="user-account-user-info">
-                        <span className="user-account-welcome">Welcome, {currentUser.full_name}</span>
+                        <span className="user-account-welcome">
+                            {t('account.user_account.welcome', { name: currentUser.full_name })}
+                        </span>
                         <button
                             className="user-account-chat-btn"
                             onClick={() => setShowChat(true)}
@@ -516,7 +519,7 @@ const UserAccount = () => {
                                 fontWeight: '500'
                             }}
                         >
-                            Messages
+                            {t('account.user_account.messages')}
                         </button>
                     </div>
                 )}
@@ -532,31 +535,31 @@ const UserAccount = () => {
                     className={`user-account-nav-btn ${activeTab === 'dashboard' ? 'user-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('dashboard')}
                 >
-                    Dashboard
+                    {t('account.user_account.tabs.dashboard')}
                 </button>
                 <button
                     className={`user-account-nav-btn ${activeTab === 'profile' ? 'user-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('profile')}
                 >
-                    Profile
+                    {t('account.user_account.tabs.profile')}
                 </button>
                 <button
                     className={`user-account-nav-btn ${activeTab === 'guides' ? 'user-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('guides')}
                 >
-                    Find Guides
+                    {t('account.user_account.tabs.guides')}
                 </button>
                 <button
                     className={`user-account-nav-btn ${activeTab === 'bookings' ? 'user-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('bookings')}
                 >
-                    My Bookings
+                    {t('account.user_account.tabs.bookings')}
                 </button>
                 <button
                     className={`user-account-nav-btn ${activeTab === 'reviews' ? 'user-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('reviews')}
                 >
-                    My Reviews
+                    {t('account.user_account.tabs.reviews')}
                 </button>
             </div>
             <div className="user-account-content">
@@ -564,43 +567,45 @@ const UserAccount = () => {
                     <div className="user-account-dashboard">
                         <div className="user-account-stats">
                             <div className="user-account-stat-card">
-                                <h3 className="user-account-stat-title">Total Bookings</h3>
+                                <h3 className="user-account-stat-title">{t('account.user_account.dashboard.stats.total_bookings')}</h3>
                                 <p className="user-account-stat-value">{bookings.length}</p>
                             </div>
                             <div className="user-account-stat-card">
-                                <h3 className="user-account-stat-title">Active Bookings</h3>
+                                <h3 className="user-account-stat-title">{t('account.user_account.dashboard.stats.active_bookings')}</h3>
                                 <p className="user-account-stat-value">
                                     {bookings.filter(b => b.status === 'confirmed' || b.status === 'accepted').length}
                                 </p>
                             </div>
                             <div className="user-account-stat-card">
-                                <h3 className="user-account-stat-title">Completed Trips</h3>
+                                <h3 className="user-account-stat-title">{t('account.user_account.dashboard.stats.completed_trips')}</h3>
                                 <p className="user-account-stat-value">
                                     {bookings.filter(b => b.status === 'completed').length}
                                 </p>
                             </div>
                             <div className="user-account-stat-card">
-                                <h3 className="user-account-stat-title">Reviews Written</h3>
+                                <h3 className="user-account-stat-title">{t('account.user_account.dashboard.stats.reviews_written')}</h3>
                                 <p className="user-account-stat-value">{reviews.length}</p>
                             </div>
                         </div>
                         <div className="user-account-recent">
-                            <h3 className="user-account-section-title">Recent Bookings</h3>
+                            <h3 className="user-account-section-title">{t('account.user_account.dashboard.recent_bookings')}</h3>
                             <div className="user-account-recent-bookings">
                                 {bookings.slice(0, 5).map(booking => (
                                     <div key={booking.id} className="user-account-booking-card">
                                         <div className="user-account-booking-info">
                                             <h4 className="user-account-booking-title">{booking.title}</h4>
                                             <p className="user-account-booking-date">
-                                                {new Date(booking.start_date).toLocaleDateString()} -
-                                                {new Date(booking.end_date).toLocaleDateString()}
+                                                {t('account.user_account.bookings.dates', {
+                                                    start_date: new Date(booking.start_date).toLocaleDateString(),
+                                                    end_date: new Date(booking.end_date).toLocaleDateString()
+                                                })}
                                             </p>
                                             <span className={`user-account-booking-status user-account-status-${booking.status}`}>
-                                                {booking.status}
+                                                {t(`account.user_account.dashboard.booking_status.${booking.status}`)}
                                             </span>
                                             {booking.status === 'cancelled' && booking.cancellation_reason && (
                                                 <p className="user-account-booking-cancel-reason" style={{ color: '#721c24', fontSize: '14px', marginTop: '8px' }}>
-                                                    Cancellation Reason: {booking.cancellation_reason}
+                                                    {t('account.user_account.dashboard.cancellation_reason', { reason: booking.cancellation_reason })}
                                                 </p>
                                             )}
                                         </div>
@@ -610,7 +615,7 @@ const UserAccount = () => {
                                                     className="user-account-btn user-account-btn-cancel"
                                                     onClick={() => handleOpenCancelModal(booking)}
                                                 >
-                                                    Cancel
+                                                    {t('account.user_account.dashboard.actions.cancel')}
                                                 </button>
                                             )}
                                             {booking.status === 'completed' && !reviews.find(r => r.booking === booking.id) && (
@@ -618,7 +623,7 @@ const UserAccount = () => {
                                                     className="user-account-btn user-account-btn-primary"
                                                     onClick={() => handleWriteReview(booking)}
                                                 >
-                                                    Write Review
+                                                    {t('account.user_account.dashboard.actions.write_review')}
                                                 </button>
                                             )}
                                             {booking.customer_profile?.user && (
@@ -631,7 +636,7 @@ const UserAccount = () => {
                                                         color: 'white'
                                                     }}
                                                 >
-                                                    Chat
+                                                    {t('account.user_account.dashboard.actions.chat_with_guide')}
                                                 </button>
                                             )}
                                         </div>
@@ -646,32 +651,32 @@ const UserAccount = () => {
                         {!profile || showProfileForm ? (
                             <div className="user-account-profile-form">
                                 <h3 className="user-account-section-title">
-                                    {profile ? 'Edit Profile' : 'Create Profile'}
+                                    {profile ? t('account.user_account.profile.edit_profile') : t('account.user_account.profile.create_profile')}
                                 </h3>
                                 <form onSubmit={handleProfileSubmit} className="user-account-form">
                                     <div className="user-account-form-group">
-                                        <label className="user-account-label">Date of Birth</label>
+                                        <label className="user-account-label">{t('account.user_account.profile.form.date_of_birth_label')}</label>
                                         <input
                                             type="date"
                                             className="user-account-input"
                                             value={profileForm.date_of_birth}
-                                            onChange={(e) => setProfileForm({...profileForm, date_of_birth: e.target.value})}
+                                            onChange={(e) => setProfileForm({ ...profileForm, date_of_birth: e.target.value })}
                                         />
                                     </div>
                                     <div className="user-account-form-group">
-                                        <label className="user-account-label">Preferred Contact Method</label>
+                                        <label className="user-account-label">{t('account.user_account.profile.form.preferred_contact_label')}</label>
                                         <select
                                             className="user-account-select"
                                             value={profileForm.preferred_contact}
-                                            onChange={(e) => setProfileForm({...profileForm, preferred_contact: e.target.value})}
+                                            onChange={(e) => setProfileForm({ ...profileForm, preferred_contact: e.target.value })}
                                         >
-                                            <option value="email">Email</option>
-                                            <option value="phone">Phone</option>
-                                            <option value="chat">Chat</option>
+                                            <option value="email">{t('account.user_account.profile.contact_methods.email')}</option>
+                                            <option value="phone">{t('account.user_account.profile.contact_methods.phone')}</option>
+                                            <option value="chat">{t('account.user_account.profile.contact_methods.chat')}</option>
                                         </select>
                                     </div>
                                     <div className="user-account-form-group">
-                                        <label className="user-account-label">Languages</label>
+                                        <label className="user-account-label">{t('account.user_account.profile.form.languages_label')}</label>
                                         <div className="user-account-checkbox-group">
                                             {languages.map(language => (
                                                 <label key={language.id} className="user-account-checkbox-label">
@@ -700,7 +705,7 @@ const UserAccount = () => {
                                     </div>
                                     <div className="user-account-form-actions">
                                         <button type="submit" className="user-account-btn user-account-btn-primary">
-                                            {profile ? 'Update Profile' : 'Create Profile'}
+                                            {profile ? t('account.user_account.profile.form.submit_update') : t('account.user_account.profile.form.submit_create')}
                                         </button>
                                         {profile && (
                                             <button
@@ -708,7 +713,7 @@ const UserAccount = () => {
                                                 className="user-account-btn user-account-btn-secondary"
                                                 onClick={() => setShowProfileForm(false)}
                                             >
-                                                Cancel
+                                                {t('account.user_account.profile.form.cancel')}
                                             </button>
                                         )}
                                     </div>
@@ -717,24 +722,32 @@ const UserAccount = () => {
                         ) : (
                             <div className="user-account-profile-view">
                                 <div className="user-account-profile-header">
-                                    <h3 className="user-account-section-title">Profile Information</h3>
+                                    <h3 className="user-account-section-title">{t('account.user_account.profile.profile_information')}</h3>
                                     <button
                                         className="user-account-btn user-account-btn-primary"
                                         onClick={() => setShowProfileForm(true)}
                                     >
-                                        Edit Profile
+                                        {t('account.user_account.profile.edit_profile')}
                                     </button>
                                 </div>
                                 <div className="user-account-profile-info">
                                     <div className="user-account-profile-field">
-                                        <label className="user-account-profile-label">Date of Birth:</label>
+                                        <label className="user-account-profile-label">{t('account.user_account.profile.date_of_birth')}</label>
                                         <p className="user-account-profile-value">
-                                            {profile.date_of_birth ? new Date(profile.date_of_birth).toLocaleDateString() : 'Not set'}
+                                            {profile.date_of_birth ? new Date(profile.date_of_birth).toLocaleDateString() : t('account.not_set')}
                                         </p>
                                     </div>
                                     <div className="user-account-profile-field">
-                                        <label className="user-account-profile-label">Preferred Contact:</label>
-                                        <p className="user-account-profile-value">{profile.preferred_contact}</p>
+                                        <label className="user-account-profile-label">{t('account.user_account.profile.preferred_contact')}</label>
+                                        <p className="user-account-profile-value">{t(`account.user_account.profile.contact_methods.${profile.preferred_contact}`)}</p>
+                                    </div>
+                                    <div className="user-account-profile-field">
+                                        <label className="user-account-profile-label">{t('account.user_account.profile.languages')}</label>
+                                        <p className="user-account-profile-value">
+                                            {profile.languages?.length > 0
+                                                ? profile.languages.map(id => languages.find(l => l.id === id)?.name).join(', ')
+                                                : t('account.not_set')}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -744,12 +757,12 @@ const UserAccount = () => {
                 {activeTab === 'guides' && (
                     <div className="user-account-guides">
                         <div className="user-account-guides-header">
-                            <h3 className="user-account-section-title">Find Guides</h3>
+                            <h3 className="user-account-section-title">{t('account.user_account.guides.title')}</h3>
                             <div className="user-account-guides-filters">
                                 <input
                                     type="text"
                                     className="user-account-filter-input"
-                                    placeholder="Search guides..."
+                                    placeholder={t('account.user_account.guides.filters.search_placeholder')}
                                     value={guidesFilter.search}
                                     onChange={(e) => handleFilterChange('search', e.target.value)}
                                 />
@@ -758,7 +771,7 @@ const UserAccount = () => {
                                     value={guidesFilter.service_type}
                                     onChange={(e) => handleFilterChange('service_type', e.target.value)}
                                 >
-                                    <option value="">All Services</option>
+                                    <option value="">{t('account.user_account.guides.filters.all_services')}</option>
                                     {serviceTypes.map(service => (
                                         <option key={service.id} value={service.id}>{service.name}</option>
                                     ))}
@@ -768,7 +781,7 @@ const UserAccount = () => {
                                     value={guidesFilter.country}
                                     onChange={(e) => handleFilterChange('country', e.target.value)}
                                 >
-                                    <option value="">All Countries</option>
+                                    <option value="">{t('account.user_account.guides.filters.all_countries')}</option>
                                     {countries.map(country => (
                                         <option key={country.id} value={country.id}>{country.name}</option>
                                     ))}
@@ -778,7 +791,7 @@ const UserAccount = () => {
                                     value={guidesFilter.city}
                                     onChange={(e) => handleFilterChange('city', e.target.value)}
                                 >
-                                    <option value="">All Cities</option>
+                                    <option value="">{t('account.user_account.guides.filters.all_cities')}</option>
                                     {cities.map(city => (
                                         <option key={city.id} value={city.id}>{city.name}</option>
                                     ))}
@@ -788,10 +801,10 @@ const UserAccount = () => {
                                     value={guidesFilter.min_rating}
                                     onChange={(e) => handleFilterChange('min_rating', e.target.value)}
                                 >
-                                    <option value="">Any Rating</option>
-                                    <option value="4">4+ Stars</option>
-                                    <option value="4.5">4.5+ Stars</option>
-                                    <option value="5">5 Stars</option>
+                                    <option value="">{t('account.user_account.guides.filters.any_rating')}</option>
+                                    <option value="4">{t('account.user_account.guides.filters.stars_4')}</option>
+                                    <option value="4.5">{t('account.user_account.guides.filters.stars_45')}</option>
+                                    <option value="5">{t('account.user_account.guides.filters.stars_5')}</option>
                                 </select>
                                 <label className="user-account-filter-checkbox">
                                     <input
@@ -799,7 +812,7 @@ const UserAccount = () => {
                                         checked={guidesFilter.is_available}
                                         onChange={(e) => handleFilterChange('is_available', e.target.checked)}
                                     />
-                                    Available only
+                                    {t('find_guide.available_only')}
                                 </label>
                             </div>
                         </div>
@@ -820,24 +833,24 @@ const UserAccount = () => {
                                         <p className="user-account-guide-bio">{guide.professional_bio}</p>
                                         <div className="user-account-guide-details">
                                             <span className="user-account-guide-experience">
-                                                {guide.years_of_experience} years experience
+                                                {t('account.user_account.guides.guide_card.years_experience', { years: guide.years_of_experience })}
                                             </span>
                                             <div className="user-account-guide-rating">
                                                 {'★'.repeat(Math.floor(guide.average_rating || 0))}
                                                 {'☆'.repeat(5 - Math.floor(guide.average_rating || 0))}
                                                 <span className="user-account-guide-rating-text">
-                                                    {guide.average_rating || 0}/5 ({guide.total_reviews || 0} reviews)
+                                                    {t('account.user_account.guides.guide_card.rating', { rating: guide.average_rating || 0, reviews: guide.total_reviews || 0 })}
                                                 </span>
                                             </div>
                                             <div className="user-account-guide-pricing">
                                                 {guide.hourly_rate && (
                                                     <span className="user-account-guide-price">
-                                                        ${guide.hourly_rate}/hour
+                                                        {t('account.user_account.guides.guide_card.hourly_rate', { rate: guide.hourly_rate })}
                                                     </span>
                                                 )}
                                                 {guide.daily_rate && (
                                                     <span className="user-account-guide-price">
-                                                        ${guide.daily_rate}/day
+                                                        {t('account.user_account.guides.guide_card.daily_rate', { rate: guide.daily_rate })}
                                                     </span>
                                                 )}
                                             </div>
@@ -848,7 +861,7 @@ const UserAccount = () => {
                                                 onClick={() => handleBookGuide(guide)}
                                                 disabled={!guide.is_available}
                                             >
-                                                {guide.is_available ? 'Book Now' : 'Unavailable'}
+                                                {guide.is_available ? t('account.user_account.guides.guide_card.book_now') : t('account.user_account.guides.guide_card.unavailable')}
                                             </button>
                                             <button
                                                 className="user-account-btn user-account-btn-secondary"
@@ -859,7 +872,7 @@ const UserAccount = () => {
                                                     color: 'white'
                                                 }}
                                             >
-                                                Chat
+                                                {t('account.user_account.guides.guide_card.chat')}
                                             </button>
                                         </div>
                                     </div>
@@ -870,23 +883,25 @@ const UserAccount = () => {
                 )}
                 {activeTab === 'bookings' && (
                     <div className="user-account-bookings">
-                        <h3 className="user-account-section-title">My Bookings</h3>
+                        <h3 className="user-account-section-title">{t('account.user_account.bookings.title')}</h3>
                         <div className="user-account-bookings-list">
                             {bookings.map(booking => (
                                 <div key={booking.id} className="user-account-booking-item">
                                     <div className="user-account-booking-details">
-                                        <h4 className="user-account-booking-title">{booking.title}</h4>
+                                        <h4 className="user-account-booking-title">{t('account.user_account.bookings.booking_title', { title: booking.title })}</h4>
                                         <p className="user-account-booking-dates">
-                                            {new Date(booking.start_date).toLocaleDateString()} -
-                                            {new Date(booking.end_date).toLocaleDateString()}
+                                            {t('account.user_account.bookings.dates', {
+                                                start_date: new Date(booking.start_date).toLocaleDateString(),
+                                                end_date: new Date(booking.end_date).toLocaleDateString()
+                                            })}
                                         </p>
-                                        <p className="user-account-booking-description">{booking.description}</p>
+                                        <p className="user-account-booking-description">{t('account.user_account.bookings.description', { description: booking.description || t('account.not_set') })}</p>
                                         <span className={`user-account-booking-status user-account-status-${booking.status}`}>
-                                            {booking.status}
+                                            {t(`account.user_account.dashboard.booking_status.${booking.status}`)}
                                         </span>
                                         {booking.status === 'cancelled' && booking.cancellation_reason && (
                                             <p className="user-account-booking-cancel-reason" style={{ color: '#721c24', fontSize: '14px', marginTop: '8px' }}>
-                                                Cancellation Reason: {booking.cancellation_reason}
+                                                {t('account.user_account.dashboard.cancellation_reason', { reason: booking.cancellation_reason })}
                                             </p>
                                         )}
                                     </div>
@@ -896,7 +911,7 @@ const UserAccount = () => {
                                                 className="user-account-btn user-account-btn-cancel"
                                                 onClick={() => handleOpenCancelModal(booking)}
                                             >
-                                                Cancel
+                                                {t('account.user_account.dashboard.actions.cancel')}
                                             </button>
                                         )}
                                         {booking.status === 'completed' && !reviews.find(r => r.booking === booking.id) && (
@@ -904,7 +919,7 @@ const UserAccount = () => {
                                                 className="user-account-btn user-account-btn-primary"
                                                 onClick={() => handleWriteReview(booking)}
                                             >
-                                                Write Review
+                                                {t('account.user_account.dashboard.actions.write_review')}
                                             </button>
                                         )}
                                         {booking.customer_profile?.user && (
@@ -917,7 +932,7 @@ const UserAccount = () => {
                                                     color: 'white'
                                                 }}
                                             >
-                                                Chat with Guide
+                                                {t('account.user_account.dashboard.actions.chat_with_guide')}
                                             </button>
                                         )}
                                     </div>
@@ -929,41 +944,41 @@ const UserAccount = () => {
                 {activeTab === 'reviews' && (
                     <div className="user-account-reviews">
                         <div className="user-account-reviews-header">
-                            <h3 className="user-account-section-title">My Reviews</h3>
+                            <h3 className="user-account-section-title">{t('account.user_account.reviews.title')}</h3>
                             <div className="user-account-reviews-filters">
                                 <select
                                     className="user-account-filter-select"
                                     value={reviewFilter.minRating}
                                     onChange={(e) => handleReviewFilterChange('minRating', e.target.value)}
                                 >
-                                    <option value="">All Ratings</option>
-                                    <option value="5">5 Stars</option>
-                                    <option value="4">4+ Stars</option>
-                                    <option value="3">3+ Stars</option>
-                                    <option value="2">2+ Stars</option>
-                                    <option value="1">1+ Stars</option>
+                                    <option value="">{t('account.user_account.reviews.filters.all_ratings')}</option>
+                                    <option value="5">{t('account.user_account.reviews.filters.stars_5')}</option>
+                                    <option value="4">{t('account.user_account.reviews.filters.stars_4')}</option>
+                                    <option value="3">{t('account.user_account.reviews.filters.stars_3')}</option>
+                                    <option value="2">{t('account.user_account.reviews.filters.stars_2')}</option>
+                                    <option value="1">{t('account.user_account.reviews.filters.stars_1')}</option>
                                 </select>
                                 <select
                                     className="user-account-filter-select"
                                     value={reviewFilter.sortBy}
                                     onChange={(e) => handleReviewFilterChange('sortBy', e.target.value)}
                                 >
-                                    <option value="date_desc">Newest First</option>
-                                    <option value="date_asc">Oldest First</option>
-                                    <option value="rating_desc">Highest Rating</option>
-                                    <option value="rating_asc">Lowest Rating</option>
+                                    <option value="date_desc">{t('account.user_account.reviews.filters.sort_newest')}</option>
+                                    <option value="date_asc">{t('account.user_account.reviews.filters.sort_oldest')}</option>
+                                    <option value="rating_desc">{t('account.user_account.reviews.filters.sort_highest')}</option>
+                                    <option value="rating_asc">{t('account.user_account.reviews.filters.sort_lowest')}</option>
                                 </select>
                             </div>
                         </div>
                         <div className="user-account-reviews-summary">
-                            <h4 className="user-account-section-subtitle">Review Summary</h4>
+                            <h4 className="user-account-section-subtitle">{t('account.user_account.reviews.summary.title')}</h4>
                             <div className="user-account-reviews-summary-grid">
                                 <div className="user-account-summary-item">
-                                    <span className="user-account-summary-label">Total Reviews:</span>
+                                    <span className="user-account-summary-label">{t('account.user_account.reviews.summary.total_reviews')}</span>
                                     <span className="user-account-summary-value">{reviews.length}</span>
                                 </div>
                                 <div className="user-account-summary-item">
-                                    <span className="user-account-summary-label">Average Overall Rating:</span>
+                                    <span className="user-account-summary-label">{t('account.user_account.reviews.summary.average_overall')}</span>
                                     <span className="user-account-summary-value">
                                         {reviews.length > 0
                                             ? (reviews.reduce((sum, r) => sum + r.overall_rating, 0) / reviews.length).toFixed(1)
@@ -971,7 +986,7 @@ const UserAccount = () => {
                                     </span>
                                 </div>
                                 <div className="user-account-summary-item">
-                                    <span className="user-account-summary-label">Average Communication:</span>
+                                    <span className="user-account-summary-label">{t('account.user_account.reviews.summary.average_communication')}</span>
                                     <span className="user-account-summary-value">
                                         {reviews.length > 0
                                             ? (reviews.reduce((sum, r) => sum + r.communication_rating, 0) / reviews.length).toFixed(1)
@@ -979,7 +994,7 @@ const UserAccount = () => {
                                     </span>
                                 </div>
                                 <div className="user-account-summary-item">
-                                    <span className="user-account-summary-label">Average Service:</span>
+                                    <span className="user-account-summary-label">{t('account.user_account.reviews.summary.average_service')}</span>
                                     <span className="user-account-summary-value">
                                         {reviews.length > 0
                                             ? (reviews.reduce((sum, r) => sum + r.service_rating, 0) / reviews.length).toFixed(1)
@@ -987,7 +1002,7 @@ const UserAccount = () => {
                                     </span>
                                 </div>
                                 <div className="user-account-summary-item">
-                                    <span className="user-account-summary-label">Average Punctuality:</span>
+                                    <span className="user-account-summary-label">{t('account.user_account.reviews.summary.average_punctuality')}</span>
                                     <span className="user-account-summary-value">
                                         {reviews.length > 0
                                             ? (reviews.reduce((sum, r) => sum + r.punctuality_rating, 0) / reviews.length).toFixed(1)
@@ -995,7 +1010,7 @@ const UserAccount = () => {
                                     </span>
                                 </div>
                                 <div className="user-account-summary-item">
-                                    <span className="user-account-summary-label">Average Value:</span>
+                                    <span className="user-account-summary-label">{t('account.user_account.reviews.summary.average_value')}</span>
                                     <span className="user-account-summary-value">
                                         {reviews.length > 0
                                             ? (reviews.reduce((sum, r) => sum + r.value_rating, 0) / reviews.length).toFixed(1)
@@ -1005,50 +1020,66 @@ const UserAccount = () => {
                             </div>
                         </div>
                         {filteredReviews.length === 0 ? (
-                            <p>No reviews match your current filters. Complete a booking to write a review!</p>
+                            <p>{t('account.user_account.reviews.no_reviews')}</p>
                         ) : (
                             <div className="user-account-reviews-list">
                                 {filteredReviews.map(review => {
                                     const relatedBooking = bookings.find(b => b.id === review.booking);
-                                    const guideName = relatedBooking?.customer_profile?.user?.full_name || 'Unknown Guide';
+                                    const guideName = relatedBooking?.customer_profile?.user?.full_name || 'Unknown';
                                     return (
                                         <div key={review.id} className="user-account-review-item">
                                             <div className="user-account-review-header">
                                                 <div className="user-account-review-rating">
                                                     {'★'.repeat(review.overall_rating)}{'☆'.repeat(5 - review.overall_rating)}
                                                     <span className="user-account-review-rating-text">
-                                                        ({review.overall_rating}/5)
+                                                        {t('account.user_account.reviews.review_item.rating', { rating: review.overall_rating })}
                                                     </span>
                                                 </div>
                                                 <span className="user-account-review-date">
                                                     {new Date(review.created_at).toLocaleDateString()}
                                                 </span>
                                             </div>
-                                            <h4 className="user-account-review-title">{review.title} - For Guide: {guideName}</h4>
+                                            <h4 className="user-account-review-title">
+                                                {t('account.user_account.reviews.review_item.for_guide', { name: guideName })}
+                                            </h4>
                                             <p className="user-account-review-comment">{review.comment}</p>
                                             <div className="user-account-review-details">
-                                                <span className="user-account-review-detail">Communication: {review.communication_rating}/5</span>
-                                                <span className="user-account-review-detail">Service: {review.service_rating}/5</span>
-                                                <span className="user-account-review-detail">Punctuality: {review.punctuality_rating}/5</span>
-                                                <span className="user-account-review-detail">Value: {review.value_rating}/5</span>
+                                                <span className="user-account-review-detail">
+                                                    {t('account.user_account.reviews.review_item.communication', { rating: review.communication_rating })}
+                                                </span>
+                                                <span className="user-account-review-detail">
+                                                    {t('account.user_account.reviews.review_item.service', { rating: review.service_rating })}
+                                                </span>
+                                                <span className="user-account-review-detail">
+                                                    {t('account.user_account.reviews.review_item.punctuality', { rating: review.punctuality_rating })}
+                                                </span>
+                                                <span className="user-account-review-detail">
+                                                    {t('account.user_account.reviews.review_item.value', { rating: review.value_rating })}
+                                                </span>
                                             </div>
                                             {relatedBooking && (
                                                 <div className="user-account-review-booking">
-                                                    <p>Booking: {relatedBooking.title} ({new Date(relatedBooking.start_date).toLocaleDateString()} - {new Date(relatedBooking.end_date).toLocaleDateString()})</p>
+                                                    <p>
+                                                        {t('account.user_account.reviews.review_item.booking', {
+                                                            title: relatedBooking.title,
+                                                            start_date: new Date(relatedBooking.start_date).toLocaleDateString(),
+                                                            end_date: new Date(relatedBooking.end_date).toLocaleDateString()
+                                                        })}
+                                                    </p>
                                                 </div>
                                             )}
                                             <div className="user-account-review-reactions">
                                                 <span className="user-account-review-reaction-count">
-                                                    👍 {review.like_count || 0}
+                                                    {t('account.user_account.reviews.review_item.likes', { count: review.like_count || 0 })}
                                                 </span>
                                                 <span className="user-account-review-reaction-count">
-                                                    👎 {review.dislike_count || 0}
+                                                    {t('account.user_account.reviews.review_item.dislikes', { count: review.dislike_count || 0 })}
                                                 </span>
                                                 <button
                                                     className="user-account-btn user-account-btn-small"
                                                     onClick={() => handleViewReactions(review)}
                                                 >
-                                                    View Reactions
+                                                    {t('account.user_account.reviews.review_item.view_reactions')}
                                                 </button>
                                             </div>
                                             <div className="user-account-review-actions">
@@ -1056,13 +1087,13 @@ const UserAccount = () => {
                                                     className="user-account-btn user-account-btn-small"
                                                     onClick={() => handleEditReview(review, relatedBooking)}
                                                 >
-                                                    Edit
+                                                    {t('account.user_account.reviews.review_item.edit')}
                                                 </button>
                                                 <button
                                                     className="user-account-btn user-account-btn-small user-account-btn-danger"
                                                     onClick={() => handleDeleteReview(review.id)}
                                                 >
-                                                    Delete
+                                                    {t('account.user_account.reviews.review_item.delete')}
                                                 </button>
                                                 <button
                                                     className="user-account-btn user-account-btn-small"
@@ -1071,45 +1102,55 @@ const UserAccount = () => {
                                                         setReactionForm({ reaction_type: 'like', comment: '' });
                                                     }}
                                                 >
-                                                    React
+                                                    {t('account.user_account.reviews.review_item.react')}
                                                 </button>
                                             </div>
                                             {selectedReviewForReactions?.id === review.id && (
                                                 <div className="user-account-reaction-form">
-                                                    <select
-                                                        className="user-account-select"
-                                                        value={reactionForm.reaction_type}
-                                                        onChange={(e) => setReactionForm({ ...reactionForm, reaction_type: e.target.value })}
-                                                    >
-                                                        <option value="like">Like</option>
-                                                        <option value="dislike">Dislike</option>
-                                                    </select>
-                                                    <textarea
-                                                        className="user-account-textarea"
-                                                        value={reactionForm.comment}
-                                                        onChange={(e) => setReactionForm({ ...reactionForm, comment: e.target.value })}
-                                                        placeholder={reactionForm.reaction_type === 'dislike' ? 'Comment (required for dislike)' : 'Comment (optional)'}
-                                                        rows="2"
-                                                    />
+                                                    <h4>{t('account.user_account.reactions.reaction_form.title')}</h4>
+                                                    <div className="user-account-form-group">
+                                                        <label className="user-account-label">{t('account.user_account.reactions.reaction_form.reaction_type_label')}</label>
+                                                        <select
+                                                            className="user-account-select"
+                                                            value={reactionForm.reaction_type}
+                                                            onChange={(e) => setReactionForm({ ...reactionForm, reaction_type: e.target.value })}
+                                                        >
+                                                            <option value="like">{t('account.user_account.reactions.reaction_form.reaction_like')}</option>
+                                                            <option value="dislike">{t('account.user_account.reactions.reaction_form.reaction_dislike')}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="user-account-form-group">
+                                                        <label className="user-account-label">{t('account.user_account.reactions.reaction_form.comment_label')}</label>
+                                                        <textarea
+                                                            className="user-account-textarea"
+                                                            placeholder={t('account.user_account.reactions.reaction_form.comment_placeholder', {
+                                                                type: reactionForm.reaction_type === 'like' ? t('account.user_account.reactions.reaction_form.reaction_like') : t('account.user_account.reactions.reaction_form.reaction_dislike')
+                                                            })}
+                                                            value={reactionForm.comment}
+                                                            onChange={(e) => setReactionForm({ ...reactionForm, comment: e.target.value })}
+                                                        />
+                                                    </div>
                                                     <div className="user-account-form-actions">
                                                         <button
-                                                            className="user-account-btn user-account-btn-small user-account-btn-primary"
+                                                            className="user-account-btn user-account-btn-primary"
                                                             onClick={() => handleReactToReview(review.id)}
                                                         >
-                                                            Submit Reaction
+                                                            {t('account.user_account.reactions.reaction_form.submit')}
                                                         </button>
                                                         <button
-                                                            className="user-account-btn user-account-btn-small user-account-btn-secondary"
+                                                            className="user-account-btn user-account-btn-secondary"
                                                             onClick={() => setSelectedReviewForReactions(null)}
                                                         >
-                                                            Cancel
+                                                            {t('account.user_account.reactions.reaction_form.cancel')}
                                                         </button>
-                                                        <button
-                                                            className="user-account-btn user-account-btn-small user-account-btn-danger"
-                                                            onClick={() => handleRemoveReaction(review.id)}
-                                                        >
-                                                            Remove My Reaction
-                                                        </button>
+                                                        {reactions.some(r => r.user === currentUser?.id && r.review === review.id) && (
+                                                            <button
+                                                                className="user-account-btn user-account-btn-danger"
+                                                                onClick={() => handleRemoveReaction(review.id)}
+                                                            >
+                                                                {t('account.user_account.reactions.reaction_form.remove_reaction')}
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </div>
                                             )}
@@ -1121,121 +1162,87 @@ const UserAccount = () => {
                     </div>
                 )}
             </div>
-            {showBookingForm && (
+
+            {/* Booking Form Modal */}
+            {showBookingForm && selectedGuide && (
                 <div className="user-account-modal">
                     <div className="user-account-modal-content">
-                        <div className="user-account-modal-header">
-                            <h3 className="user-account-modal-title">
-                                Book Guide: {selectedGuide?.user?.full_name}
-                            </h3>
-                            <button
-                                className="user-account-modal-close"
-                                onClick={() => {
-                                    setShowBookingForm(false);
-                                    setSelectedGuide(null);
-                                    setError(null);
-                                }}
-                            >
-                                ×
-                            </button>
-                        </div>
+                        <h3 className="user-account-modal-title">
+                            {t('account.user_account.booking_form.title', { name: selectedGuide.user?.full_name })}
+                        </h3>
                         <form onSubmit={handleBookingSubmit} className="user-account-form">
                             <div className="user-account-form-group">
-                                <label className="user-account-label">Title *</label>
+                                <label className="user-account-label">{t('account.user_account.booking_form.title_label')}</label>
                                 <input
                                     type="text"
                                     className="user-account-input"
+                                    placeholder={t('account.user_account.booking_form.title_placeholder')}
                                     value={bookingForm.title}
-                                    onChange={(e) => setBookingForm({...bookingForm, title: e.target.value})}
+                                    onChange={(e) => setBookingForm({ ...bookingForm, title: e.target.value })}
                                     required
-                                    placeholder="Enter booking title"
                                 />
                             </div>
                             <div className="user-account-form-group">
-                                <label className="user-account-label">Description</label>
+                                <label className="user-account-label">{t('account.user_account.booking_form.description_label')}</label>
                                 <textarea
                                     className="user-account-textarea"
+                                    placeholder={t('account.user_account.booking_form.description_placeholder')}
                                     value={bookingForm.description}
-                                    onChange={(e) => setBookingForm({...bookingForm, description: e.target.value})}
-                                    rows="3"
-                                    placeholder="Describe what kind of tour/service you need"
+                                    onChange={(e) => setBookingForm({ ...bookingForm, description: e.target.value })}
                                 />
                             </div>
-                            <div className="user-account-form-row">
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">Start Date *</label>
-                                    <input
-                                        type="date"
-                                        className="user-account-input"
-                                        value={bookingForm.start_date}
-                                        onChange={(e) => setBookingForm({...bookingForm, start_date: e.target.value})}
-                                        required
-                                        min={new Date().toISOString().split('T')[0]}
-                                    />
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">End Date *</label>
-                                    <input
-                                        type="date"
-                                        className="user-account-input"
-                                        value={bookingForm.end_date}
-                                        onChange={(e) => setBookingForm({...bookingForm, end_date: e.target.value})}
-                                        required
-                                        min={bookingForm.start_date || new Date().toISOString().split('T')[0]}
-                                    />
-                                </div>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">{t('account.user_account.booking_form.start_date_label')}</label>
+                                <input
+                                    type="date"
+                                    className="user-account-input"
+                                    value={bookingForm.start_date}
+                                    onChange={(e) => setBookingForm({ ...bookingForm, start_date: e.target.value })}
+                                    required
+                                />
                             </div>
                             <div className="user-account-form-group">
-                                <label className="user-account-label">Special Requirements</label>
+                                <label className="user-account-label">{t('account.user_account.booking_form.end_date_label')}</label>
+                                <input
+                                    type="date"
+                                    className="user-account-input"
+                                    value={bookingForm.end_date}
+                                    onChange={(e) => setBookingForm({ ...bookingForm, end_date: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">{t('account.user_account.booking_form.special_requirements_label')}</label>
                                 <textarea
                                     className="user-account-textarea"
+                                    placeholder={t('account.user_account.booking_form.special_requirements_placeholder')}
                                     value={bookingForm.special_requirements}
-                                    onChange={(e) => setBookingForm({...bookingForm, special_requirements: e.target.value})}
-                                    rows="2"
-                                    placeholder="Any special requests or requirements"
+                                    onChange={(e) => setBookingForm({ ...bookingForm, special_requirements: e.target.value })}
                                 />
                             </div>
                             <div className="user-account-form-group">
-                                <label className="user-account-label">Budget (USD)</label>
+                                <label className="user-account-label">{t('account.user_account.booking_form.budget_label')}</label>
                                 <input
                                     type="number"
                                     className="user-account-input"
+                                    placeholder={t('account.user_account.booking_form.budget_placeholder')}
                                     value={bookingForm.budget}
-                                    onChange={(e) => setBookingForm({...bookingForm, budget: e.target.value})}
-                                    placeholder="0"
-                                    step="0.01"
-                                    min="0"
+                                    onChange={(e) => setBookingForm({ ...bookingForm, budget: e.target.value })}
                                 />
-                                {selectedGuide?.daily_rate && (
-                                    <small style={{color: '#666', fontSize: '12px', display: 'block', marginTop: '4px'}}>
-                                        Guide's daily rate: ${selectedGuide.daily_rate}
-                                    </small>
+                                {selectedGuide.daily_rate && (
+                                    <p className="user-account-form-note">
+                                        {t('account.user_account.booking_form.guide_daily_rate', { rate: selectedGuide.daily_rate })}
+                                    </p>
                                 )}
-                                {selectedGuide?.hourly_rate && (
-                                    <small style={{color: '#666', fontSize: '12px', display: 'block', marginTop: '4px'}}>
-                                        Guide's hourly rate: ${selectedGuide.hourly_rate}
-                                    </small>
+                                {selectedGuide.hourly_rate && (
+                                    <p className="user-account-form-note">
+                                        {t('account.user_account.booking_form.guide_hourly_rate', { rate: selectedGuide.hourly_rate })}
+                                    </p>
                                 )}
                             </div>
-                            {error && (
-                                <div style={{
-                                    background: '#f8d7da',
-                                    color: '#721c24',
-                                    padding: '8px 12px',
-                                    borderRadius: '4px',
-                                    marginBottom: '16px',
-                                    fontSize: '14px'
-                                }}>
-                                    {error}
-                                </div>
-                            )}
                             <div className="user-account-form-actions">
-                                <button
-                                    type="submit"
-                                    className="user-account-btn user-account-btn-primary"
-                                    disabled={!bookingForm.title.trim() || !bookingForm.start_date || !bookingForm.end_date}
-                                >
-                                    Book Guide
+                                <button type="submit" className="user-account-btn user-account-btn-primary">
+                                    {t('account.user_account.booking_form.submit')}
                                 </button>
                                 <button
                                     type="button"
@@ -1243,140 +1250,117 @@ const UserAccount = () => {
                                     onClick={() => {
                                         setShowBookingForm(false);
                                         setSelectedGuide(null);
-                                        setError(null);
                                     }}
                                 >
-                                    Cancel
+                                    {t('account.user_account.booking_form.cancel')}
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
-            {showReviewForm && (
+
+            {/* Review Form Modal */}
+            {showReviewForm && selectedBookingForReview && (
                 <div className="user-account-modal">
                     <div className="user-account-modal-content">
-                        <div className="user-account-modal-header">
-                            <h3 className="user-account-modal-title">
-                                {editingReview ? 'Edit Review' : 'Write Review'} for Guide: {selectedBookingForReview?.customer_profile?.user?.full_name || 'Unknown'} - Booking: {selectedBookingForReview?.title}
-                            </h3>
-                            <button
-                                className="user-account-modal-close"
-                                onClick={() => {
-                                    setShowReviewForm(false);
-                                    setSelectedBookingForReview(null);
-                                    setEditingReview(null);
-                                    setError(null);
-                                }}
-                            >
-                                ×
-                            </button>
-                        </div>
+                        <h3 className="user-account-modal-title">
+                            {t('account.user_account.review_form.title', {
+                                action: editingReview ? 'Edit' : 'Write',
+                                guide: selectedBookingForReview.customer_profile?.user?.full_name || 'Unknown',
+                                booking: selectedBookingForReview.title
+                            })}
+                        </h3>
                         <form onSubmit={handleReviewSubmit} className="user-account-form">
-                            <div className="user-account-rating-group">
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">Overall Rating *</label>
-                                    <select
-                                        className="user-account-select"
-                                        value={reviewForm.overall_rating}
-                                        onChange={(e) => setReviewForm({...reviewForm, overall_rating: parseInt(e.target.value)})}
-                                        required
-                                    >
-                                        {[1,2,3,4,5].map(num => (
-                                            <option key={num} value={num}>{num} Star{num > 1 ? 's' : ''}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">Communication *</label>
-                                    <select
-                                        className="user-account-select"
-                                        value={reviewForm.communication_rating}
-                                        onChange={(e) => setReviewForm({...reviewForm, communication_rating: parseInt(e.target.value)})}
-                                        required
-                                    >
-                                        {[1,2,3,4,5].map(num => (
-                                            <option key={num} value={num}>{num}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">Service Quality *</label>
-                                    <select
-                                        className="user-account-select"
-                                        value={reviewForm.service_rating}
-                                        onChange={(e) => setReviewForm({...reviewForm, service_rating: parseInt(e.target.value)})}
-                                        required
-                                    >
-                                        {[1,2,3,4,5].map(num => (
-                                            <option key={num} value={num}>{num}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">Punctuality *</label>
-                                    <select
-                                        className="user-account-select"
-                                        value={reviewForm.punctuality_rating}
-                                        onChange={(e) => setReviewForm({...reviewForm, punctuality_rating: parseInt(e.target.value)})}
-                                        required
-                                    >
-                                        {[1,2,3,4,5].map(num => (
-                                            <option key={num} value={num}>{num}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">Value for Money *</label>
-                                    <select
-                                        className="user-account-select"
-                                        value={reviewForm.value_rating}
-                                        onChange={(e) => setReviewForm({...reviewForm, value_rating: parseInt(e.target.value)})}
-                                        required
-                                    >
-                                        {[1,2,3,4,5].map(num => (
-                                            <option key={num} value={num}>{num}</option>
-                                        ))}
-                                    </select>
-                                </div>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">{t('account.user_account.review_form.overall_rating_label')}</label>
+                                <select
+                                    className="user-account-select"
+                                    value={reviewForm.overall_rating}
+                                    onChange={(e) => setReviewForm({ ...reviewForm, overall_rating: parseInt(e.target.value) })}
+                                    required
+                                >
+                                    {[1, 2, 3, 4, 5].map(num => (
+                                        <option key={num} value={num}>{t('account.user_account.review_form.star', { count: num })}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="user-account-form-group">
-                                <label className="user-account-label">Title *</label>
+                                <label className="user-account-label">{t('account.user_account.review_form.communication_label')}</label>
+                                <select
+                                    className="user-account-select"
+                                    value={reviewForm.communication_rating}
+                                    onChange={(e) => setReviewForm({ ...reviewForm, communication_rating: parseInt(e.target.value) })}
+                                    required
+                                >
+                                    {[1, 2, 3, 4, 5].map(num => (
+                                        <option key={num} value={num}>{t('account.user_account.review_form.star', { count: num })}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">{t('account.user_account.review_form.service_label')}</label>
+                                <select
+                                    className="user-account-select"
+                                    value={reviewForm.service_rating}
+                                    onChange={(e) => setReviewForm({ ...reviewForm, service_rating: parseInt(e.target.value) })}
+                                    required
+                                >
+                                    {[1, 2, 3, 4, 5].map(num => (
+                                        <option key={num} value={num}>{t('account.user_account.review_form.star', { count: num })}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">{t('account.user_account.review_form.punctuality_label')}</label>
+                                <select
+                                    className="user-account-select"
+                                    value={reviewForm.punctuality_rating}
+                                    onChange={(e) => setReviewForm({ ...reviewForm, punctuality_rating: parseInt(e.target.value) })}
+                                    required
+                                >
+                                    {[1, 2, 3, 4, 5].map(num => (
+                                        <option key={num} value={num}>{t('account.user_account.review_form.star', { count: num })}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">{t('account.user_account.review_form.value_label')}</label>
+                                <select
+                                    className="user-account-select"
+                                    value={reviewForm.value_rating}
+                                    onChange={(e) => setReviewForm({ ...reviewForm, value_rating: parseInt(e.target.value) })}
+                                    required
+                                >
+                                    {[1, 2, 3, 4, 5].map(num => (
+                                        <option key={num} value={num}>{t('account.user_account.review_form.star', { count: num })}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="user-account-form-group">
+                                <label className="user-account-label">{t('account.user_account.review_form.title_label')}</label>
                                 <input
                                     type="text"
                                     className="user-account-input"
+                                    placeholder={t('account.user_account.review_form.title_placeholder')}
                                     value={reviewForm.title}
-                                    onChange={(e) => setReviewForm({...reviewForm, title: e.target.value})}
+                                    onChange={(e) => setReviewForm({ ...reviewForm, title: e.target.value })}
                                     required
-                                    placeholder="Enter review title"
                                 />
                             </div>
                             <div className="user-account-form-group">
-                                <label className="user-account-label">Comment *</label>
+                                <label className="user-account-label">{t('account.user_account.review_form.comment_label')}</label>
                                 <textarea
                                     className="user-account-textarea"
+                                    placeholder={t('account.user_account.review_form.comment_placeholder')}
                                     value={reviewForm.comment}
-                                    onChange={(e) => setReviewForm({...reviewForm, comment: e.target.value})}
-                                    rows="4"
+                                    onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
                                     required
-                                    placeholder="Share your experience and feedback about the guide..."
                                 />
                             </div>
-                            {error && (
-                                <div style={{
-                                    background: '#f8d7da',
-                                    color: '#721c24',
-                                    padding: '8px 12px',
-                                    borderRadius: '4px',
-                                    marginBottom: '16px',
-                                    fontSize: '14px'
-                                }}>
-                                    {error}
-                                </div>
-                            )}
                             <div className="user-account-form-actions">
                                 <button type="submit" className="user-account-btn user-account-btn-primary">
-                                    {editingReview ? 'Update Review' : 'Submit Review'}
+                                    {editingReview ? t('account.user_account.review_form.submit_update') : t('account.user_account.review_form.submit_create')}
                                 </button>
                                 <button
                                     type="button"
@@ -1385,60 +1369,35 @@ const UserAccount = () => {
                                         setShowReviewForm(false);
                                         setSelectedBookingForReview(null);
                                         setEditingReview(null);
-                                        setError(null);
                                     }}
                                 >
-                                    Cancel
+                                    {t('account.user_account.review_form.cancel')}
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
-            {showCancelModal && (
+
+            {/* Cancel Booking Modal */}
+            {showCancelModal && selectedBookingForCancel && (
                 <div className="user-account-modal">
                     <div className="user-account-modal-content">
-                        <div className="user-account-modal-header">
-                            <h3 className="user-account-modal-title">Cancel Booking</h3>
-                            <button
-                                className="user-account-modal-close"
-                                onClick={() => {
-                                    setShowCancelModal(false);
-                                    setSelectedBookingForCancel(null);
-                                    setCancelReason('');
-                                    setError(null);
-                                }}
-                            >
-                                ×
-                            </button>
-                        </div>
-                        <form onSubmit={(e) => { e.preventDefault(); handleCancelBooking(); }} className="user-account-form">
+                        <h3 className="user-account-modal-title">{t('account.user_account.cancel_booking.title')}</h3>
+                        <form onSubmit={handleCancelBooking} className="user-account-form">
                             <div className="user-account-form-group">
-                                <label className="user-account-label">Cancellation Reason *</label>
+                                <label className="user-account-label">{t('account.user_account.cancel_booking.reason_label')}</label>
                                 <textarea
                                     className="user-account-textarea"
+                                    placeholder={t('account.user_account.cancel_booking.reason_placeholder')}
                                     value={cancelReason}
                                     onChange={(e) => setCancelReason(e.target.value)}
-                                    rows="4"
                                     required
-                                    placeholder="Please provide a reason for cancellation"
                                 />
                             </div>
-                            {error && (
-                                <div style={{
-                                    background: '#f8d7da',
-                                    color: '#721c24',
-                                    padding: '8px 12px',
-                                    borderRadius: '4px',
-                                    marginBottom: '16px',
-                                    fontSize: '14px'
-                                }}>
-                                    {error}
-                                </div>
-                            )}
                             <div className="user-account-form-actions">
-                                <button type="submit" className="user-account-btn user-account-btn-danger">
-                                    Confirm Cancel
+                                <button type="submit" className="user-account-btn user-account-btn-primary">
+                                    {t('account.user_account.cancel_booking.submit')}
                                 </button>
                                 <button
                                     type="button"
@@ -1447,103 +1406,84 @@ const UserAccount = () => {
                                         setShowCancelModal(false);
                                         setSelectedBookingForCancel(null);
                                         setCancelReason('');
-                                        setError(null);
                                     }}
                                 >
-                                    Close
+                                    {t('account.user_account.cancel_booking.close')}
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
-            {showReactionsModal && (
+
+            {/* Reactions Modal */}
+            {showReactionsModal && selectedReviewForReactions && (
                 <div className="user-account-modal">
                     <div className="user-account-modal-content">
-                        <div className="user-account-modal-header">
-                            <h3 className="user-account-modal-title">Review Reactions</h3>
+                        <h3 className="user-account-modal-title">{t('account.user_account.reactions.title')}</h3>
+                        {reactionSummary && (
+                            <div className="user-account-reactions-summary">
+                                <h4 className="user-account-section-subtitle">{t('account.user_account.reactions.summary_title')}</h4>
+                                <p>{t('account.user_account.reactions.likes', { count: reactionSummary.like_count || 0 })}</p>
+                                <p>{t('account.user_account.reactions.dislikes', { count: reactionSummary.dislike_count || 0 })}</p>
+                            </div>
+                        )}
+                        <div className="user-account-reactions-list">
+                            <h4>{t('account.user_account.reactions.latest_likes')}</h4>
+                            {reactions.filter(r => r.reaction_type === 'like').length > 0 ? (
+                                reactions
+                                    .filter(r => r.reaction_type === 'like')
+                                    .slice(0, 5)
+                                    .map((reaction, index) => (
+                                        <div key={index} className="user-account-reaction-item">
+                                            <p>{reaction.comment || t('account.user_account.reactions.no_comments', { type: 'like' })}</p>
+                                            <span>{new Date(reaction.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                    ))
+                            ) : (
+                                <p>{t('account.user_account.reactions.no_comments', { type: 'like' })}</p>
+                            )}
+                            <h4>{t('account.user_account.reactions.latest_dislikes')}</h4>
+                            {reactions.filter(r => r.reaction_type === 'dislike').length > 0 ? (
+                                reactions
+                                    .filter(r => r.reaction_type === 'dislike')
+                                    .slice(0, 5)
+                                    .map((reaction, index) => (
+                                        <div key={index} className="user-account-reaction-item">
+                                            <p>{reaction.comment || t('account.user_account.reactions.no_comments', { type: 'dislike' })}</p>
+                                            <span>{new Date(reaction.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                    ))
+                            ) : (
+                                <p>{t('account.user_account.reactions.no_comments', { type: 'dislike' })}</p>
+                            )}
+                        </div>
+                        <div className="user-account-form-actions">
                             <button
-                                className="user-account-modal-close"
+                                className="user-account-btn user-account-btn-secondary"
                                 onClick={() => {
                                     setShowReactionsModal(false);
                                     setSelectedReviewForReactions(null);
                                     setReactions([]);
                                     setReactionSummary(null);
-                                    setError(null);
                                 }}
                             >
-                                ×
+                                {t('account.user_account.cancel_booking.close')}
                             </button>
                         </div>
-                        {reactionSummary && (
-                            <div className="user-account-reactions-summary">
-                                <h4 className="user-account-section-subtitle">Reaction Summary</h4>
-                                <div className="user-account-reactions-summary-grid">
-                                    <div className="user-account-summary-item">
-                                        <span className="user-account-summary-label">Likes:</span>
-                                        <span className="user-account-summary-value">{reactionSummary.like_count}</span>
-                                    </div>
-                                    <div className="user-account-summary-item">
-                                        <span className="user-account-summary-label">Dislikes:</span>
-                                        <span className="user-account-summary-value">{reactionSummary.dislike_count}</span>
-                                    </div>
-                                </div>
-                                <h4 className="user-account-section-subtitle">Latest Like Comments</h4>
-                                {reactionSummary.latest_likes.length > 0 ? (
-                                    <ul className="user-account-reactions-list">
-                                        {reactionSummary.latest_likes.map(like => (
-                                            <li key={like.id} className="user-account-reaction-item">
-                                                <span>{like.user__first_name} {like.user__last_name}: {like.comment}</span>
-                                                <span className="user-account-reaction-date">
-                                                    {new Date(like.created_at).toLocaleDateString()}
-                                                </span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <p>No like comments available.</p>
-                                )}
-                                <h4 className="user-account-section-subtitle">Latest Dislike Comments</h4>
-                                {reactionSummary.latest_dislikes.length > 0 ? (
-                                    <ul className="user-account-reactions-list">
-                                        {reactionSummary.latest_dislikes.map(dislike => (
-                                            <li key={dislike.id} className="user-account-reaction-item">
-                                                <span>{dislike.user__first_name} {dislike.user__last_name}: {dislike.comment}</span>
-                                                <span className="user-account-reaction-date">
-                                                    {new Date(dislike.created_at).toLocaleDateString()}
-                                                </span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <p>No dislike comments available.</p>
-                                )}
-                            </div>
-                        )}
-                        <h4 className="user-account-section-subtitle">All Reactions</h4>
-                        {reactions.length > 0 ? (
-                            <ul className="user-account-reactions-list">
-                                {reactions.map(reaction => (
-                                    <li key={reaction.id} className="user-account-reaction-item">
-                                        <span>{reaction.user.first_name} {reaction.user.last_name}: {reaction.reaction_type === 'like' ? '👍' : '👎'} {reaction.comment}</span>
-                                        <span className="user-account-reaction-date">
-                                            {new Date(reaction.created_at).toLocaleDateString()}
-                                        </span>
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p>No reactions available.</p>
-                        )}
                     </div>
                 </div>
             )}
-            <ChatWidgets
-                isOpen={showChat}
-                onClose={handleCloseChat}
-                selectedUserId={selectedUserForChat}
-                userRole="client"
-            />
+
+            {/* Chat Widget */}
+            {showChat && (
+                <div className="user-account-chat">
+                    <ChatWidgets
+                        user={selectedUserForChat}
+                        onClose={handleCloseChat}
+                    />
+                </div>
+            )}
         </div>
     );
 };

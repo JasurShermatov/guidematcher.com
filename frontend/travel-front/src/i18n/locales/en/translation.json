@@ -1,338 +1,166 @@
 {
-  "header": {
-    "logo_text": "TravMatch",
-    "tagline": "Explore with Locals",
-    "find_guides": "Find Guides",
-    "blog": "Blog",
-    "select_language": "Select Language",
-    "choose_appearance": "Choose Appearance",
-    "sign_in": "Sign In",
-    "logout": "Logout",
-    "account": "Account"
-  },
   "theme": {
-    "light": "Light Mode",
-    "dark": "Dark Mode",
+    "light": "Light",
+    "light_desc": "Light theme",
+    "dark": "Dark",
+    "dark_desc": "Dark theme",
     "default": "System",
-    "auto": "Auto Time",
-    "light_desc": "Bright and clean",
-    "dark_desc": "Sleek and modern",
-    "default_desc": "Matches your device",
-    "auto_desc": "Time-based theme"
+    "default_desc": "Follow system theme",
+    "auto": "Auto",
+    "auto_desc": "Auto theme based on time"
   },
   "language": {
     "en": "English",
-    "ru": "Russian",
-    "uz": "Uzbek",
-    "es": "Spanish",
-    "ar": "Arabic",
     "en_native": "English",
+    "ru": "Russian",
     "ru_native": "Русский",
+    "uz": "Uzbek",
     "uz_native": "O'zbek",
+    "es": "Spanish",
     "es_native": "Español",
+    "ar": "Arabic",
     "ar_native": "العربية"
   },
-  "guide": {
-    "loading": {
-      "data": "Loading data..."
-    },
-    "header": {
-      "tours": "tours"
-    },
-    "stats": {
-      "new_requests": "New requests",
-      "confirmed": "Confirmed",
-      "earnings": "Earnings",
-      "new_messages": "New messages"
-    },
-    "profile": {
-      "professional_profile": "Professional Profile",
-      "bio": "Bio",
-      "no_bio": "No bio added",
-      "experience": "Experience",
-      "no_experience": "No experience added",
-      "languages": "Languages",
-      "no_languages": "No languages added",
-      "pricing": "Pricing",
-      "hourly_rate": "${{rate}}/hour",
-      "daily_rate": "${{rate}}/day",
-      "no_hourly_rate": "No hourly rate set",
-      "no_daily_rate": "No daily rate set",
-      "portfolio": "Portfolio",
-      "portfolio_item": "Portfolio {{number}}",
-      "profile_picture_alt": "Profile picture",
-      "avatar_alt": "Avatar",
-      "form": {
-        "avatar": "Avatar image",
-        "upload_image": "Upload image",
-        "first_name": "First name",
-        "first_name_placeholder": "Enter your first name",
-        "last_name": "Last name",
-        "last_name_placeholder": "Enter your last name",
-        "email": "Email",
-        "email_placeholder": "Enter your email",
-        "phone": "Phone",
-        "phone_placeholder": "+998901234567",
-        "bio": "About yourself",
-        "bio_placeholder": "Brief information about yourself...",
-        "experience": "Work experience",
-        "experience_placeholder": "Describe your professional experience...",
-        "languages": "Languages",
-        "language_placeholder": "Language name",
-        "native_language": "Native",
-        "specializations": "Specialization areas",
-        "specializations_placeholder": "Enter your specialization and press Enter",
-        "hourly_rate": "Hourly rate ($)",
-        "daily_rate": "Daily rate ($)",
-        "work_hours": "Working hours",
-        "work_hours_placeholder": "Example: 08:00 - 18:00, Monday-Saturday",
-        "certificates": "Certificates",
-        "upload_certificate": "Upload certificate"
-      },
-      "validation": {
-        "required_fields": "Please fill in all required fields"
-      },
-      "success": {
-        "updated": "Profile successfully updated"
-      },
-      "errors": {
-        "update_failed": "Failed to update profile"
-      }
-    },
-    "statistics": {
-      "title": "Statistics",
-      "completed_tours": "Completed tours",
-      "average_rating": "Average rating",
-      "response_rate": "Response rate",
-      "total_earnings": "Total earnings"
-    },
-    "requests": {
-      "title": "Request Management",
-      "new": "New",
-      "confirmed": "Confirmed",
-      "history": "History",
-      "no_requests_title": "No requests yet",
-      "no_requests_desc": "You'll see new requests here when they arrive",
-      "anonymous_client": "Anonymous client",
-      "no_date": "Date not specified",
-      "no_duration": "Duration not specified",
-      "no_travelers": "Number of travelers not specified",
-      "no_service_type": "Service type not specified"
-    },
-    "status": {
-      "pending": "Pending",
-      "confirmed": "Confirmed",
-      "completed": "Completed",
-      "rejected": "Rejected"
-    },
-    "actions": {
-      "accept": "Accept",
-      "reject": "Reject",
-      "chat": "Chat",
-      "chat_with_client": "Chat with client",
-      "view_route": "View route",
-      "send_message": "Send message",
-      "retry": "Retry",
-      "cancel": "Cancel",
-      "save": "Save",
-      "change": "Change"
-    },
-    "modals": {
-      "edit_profile": "Edit profile",
-      "settings": "Settings",
-      "change_password": "Change password",
-      "portfolio": "Portfolio"
-    },
-    "settings": {
-      "profile_data": "Profile data",
-      "profile_data_desc": "Edit your personal information",
-      "change_password": "Change password",
-      "change_password_desc": "Ensure your account security",
-      "theme": "Theme"
-    },
-    "password": {
-      "form": {
-        "current_password": "Current password",
-        "current_password_placeholder": "Enter your current password",
-        "new_password": "New password",
-        "new_password_placeholder": "Enter your new password",
-        "confirm_password": "Confirm new password",
-        "confirm_password_placeholder": "Re-enter your new password"
-      },
-      "validation": {
-        "all_fields_required": "Fill in all fields",
-        "passwords_not_match": "New passwords do not match",
-        "min_length": "New password must be at least 8 characters long"
-      },
-      "success": {
-        "changed": "Password successfully changed"
-      },
-      "errors": {
-        "change_failed": "Failed to change password"
-      }
-    },
-    "portfolio": {
-      "add_new_image": "Add new image"
-    },
-    "errors": {
-      "stats_api_unavailable": "Guide stats API is currently unavailable",
-      "requests_api_unavailable": "Guide requests API is currently unavailable",
-      "chat_api_unavailable": "Guide chats API is currently unavailable",
-      "password_api_unavailable": "Password change API is currently unavailable",
-      "request_action_unavailable": "Request action API is currently unavailable",
-      "request_service_unavailable": "Request service is currently unavailable",
-      "general_error": "An error occurred",
-      "data_fetch_error": "Error loading data",
-      "data_loading_error": "Error loading data",
-      "requests_loading_error": "Error loading requests",
-      "requests_loading_error_title": "Error loading requests",
-      "requests_loading_error_desc": "Request service is currently unavailable or an error occurred",
-      "statistics_loading_error": "Error loading statistics data"
-    }
-  },
-  "user": {
-    "loading": {
-      "data": "Loading data from Accounts API..."
-    },
-    "profile": {
-      "title": "My Profile (Accounts API)",
-      "subtitle": "Personal information from Accounts API",
-      "user": "User",
-      "client": "Client",
-      "email": "Email",
-      "no_email": "No email provided",
-      "first_name": "First Name",
-      "no_first_name": "No first name provided",
-      "last_name": "Last Name",
-      "no_last_name": "No last name provided",
-      "role": "Role",
-      "country": "Country",
-      "no_country": "No country provided"
-    },
-    "stats": {
-      "total_bookings": "Total Bookings",
-      "active_chats": "Active Chats",
-      "accounts_api": "Accounts API"
-    },
-    "bookings": {
-      "title": "My Bookings",
-      "subtitle": "All my travel bookings"
-    },
-    "guides": {
-      "title": "Guides",
-      "subtitle": "Find the perfect guide for you",
-      "travel_date": "Travel Date",
-      "travelers_count": "Number of Travelers",
-      "adults": "Adults",
-      "children": "Children"
-    },
-    "tabs": {
-      "profile": "Profile",
-      "bookings": "Bookings",
-      "guides": "Guides"
-    },
-    "form": {
-      "first_name": "First Name",
-      "first_name_placeholder": "Enter your first name",
-      "last_name": "Last Name",
-      "last_name_placeholder": "Enter your last name",
-      "email": "Email",
-      "email_placeholder": "Enter your email",
-      "role": "Role",
-      "client": "Client",
-      "customer": "Customer",
-      "country": "Country",
-      "country_placeholder": "Enter your country"
-    },
-    "validation": {
-      "required_fields": "First name, last name, and email are required fields",
-      "invalid_email": "Invalid email format"
-    },
-    "success": {
-      "profile_updated": "Profile successfully updated! (Saved in localStorage)"
-    },
-    "errors": {
-      "no_access_token": "No access token found",
-      "user_data_not_found": "User data not found in localStorage",
-      "backend_not_connected_fallback": "Backend not connected. Showing current session data.",
-      "backend_and_user_data_missing": "Issue connecting to backend and no user data found.",
-      "no_profile_update_endpoint": "No profile update endpoint available in Accounts API",
-      "profile_update_failed": "Failed to update profile"
-    },
-    "alerts": {
-      "warning": "Warning",
-      "info": "Information",
-      "localstorage_notice": "No profile update endpoint in Accounts API. Data is saved in localStorage.",
-      "booking_api_unavailable": "⚠️ Booking API not yet connected. Will be available soon!",
-      "cancel_booking_api_unavailable": "⚠️ Cancel booking API not yet connected. Will be available soon!",
-      "chat_api_unavailable": "⚠️ Chat API not yet connected. Will be available soon!"
-    },
-    "api_not_connected": {
-      "title": "API Not Connected",
-      "soon_available": "Will be available soon",
-      "badge": "No API",
-      "bookings": "Booking API not yet connected. All booking details, booking, and management functions will be added soon.",
-      "guides": "Guides API not yet connected. Viewing, searching, and booking guides will be added soon."
-    },
-    "backend_status": {
-      "connected": "Accounts API Connected",
-      "disconnected": "Accounts API Disconnected"
-    },
-    "actions": {
-      "menu": "Menu",
-      "edit_profile": "Edit Profile",
-      "settings": "Settings",
-      "logout": "Logout (Accounts API)",
-      "retry_connection": "Retry Connection",
-      "close": "Close",
-      "cancel": "Cancel",
-      "save_localstorage": "Save (localStorage)",
-      "saving": "Saving...",
-      "filters": "Filters (No API)"
-    },
-    "confirm_logout": "Are you sure you want to log out?",
-    "console": {
-      "fetching_user_data": "Fetching user data from accounts API...",
-      "accounts_api_response": "Accounts API response:",
-      "retrieved_user_data": "Retrieved user data from localStorage:",
-      "attempting_fetch_user_data": "Attempting to fetch user data from accounts API...",
-      "using_saved_user_data": "Using saved user data:",
-      "user_data_loaded": "User data successfully loaded:",
-      "failed_fetch_user_data": "Failed to fetch user data:",
-      "using_fallback_user_data": "Using current user state as fallback:",
-      "attempting_update_profile": "Attempting to update profile via accounts API...",
-      "profile_updated_localstorage": "Profile updated in localStorage:",
-      "error_fetching_user": "Error fetching user from accounts:",
-      "error_updating_profile": "Error updating profile via accounts:",
-      "updating_profile_payload": "Updating profile with payload:",
-      "profile_update_response": "Profile update response:",
-      "profile_update_error": "Profile update error:",
-      "logout_success": "Logout successful via accounts API",
-      "logout_error": "Logout error:"
-    }
+  "header": {
+    "select_language": "Select Language",
+    "choose_appearance": "Choose Appearance",
+    "logout": "Logout",
+    "find_guides": "Find Guides",
+    "blog": "Blog",
+    "logo_text": "TourGuide",
+    "tagline": "Explore Together",
+    "account": "Account",
+    "register": "Register",
+    "sign_in": "Sign In"
   },
   "home": {
     "hero": {
       "title": "Discover the World with",
-      "title_highlight": "Trusted Guides",
-      "description": "Connect with verified local guides for authentic travel experiences in 150+ countries.",
-      "guide_name": "Ahmed K.",
-      "guide_expert": "Istanbul Expert",
-      "guide_rating": "4.9 (127)",
-      "guide_alt": "Guide",
-      "tour_name": "Istanbul Tour",
-      "tour_date": "Tomorrow, 10:00 AM",
-      "tour_duration": "4 hours",
-      "tour_status": "Confirmed"
+      "title_highlight": "Local Experts",
+      "description": "Connect with verified local guides for authentic travel experiences worldwide."
     },
     "search": {
-      "location_placeholder": "Where are you traveling?",
+      "location_placeholder": "Where are you going?",
+      "location_aria": "Search location",
       "service_placeholder": "What service do you need?",
-      "location_aria": "Search by city or country",
-      "service_aria": "Search by service type",
-      "results_aria": "Service type suggestions",
-      "button": "Find Your Guide",
-      "button_aria": "Find your guide with current search"
+      "service_aria": "Search service",
+      "button": "Find Guides",
+      "button_aria": "Search for guides",
+      "results_aria": "Search results"
+    },
+    "destinations": {
+      "title": "Popular Destinations",
+      "subtitle": "Discover top locations with our expert guides",
+      "view_all": "View All Destinations",
+      "view_all_aria": "View all popular destinations",
+      "explore_aria": "Explore {name}",
+      "guides_count": "{count} Guides",
+      "modal": {
+        "highlights": "Highlights",
+        "close_aria": "Close destination details",
+        "find_guides": "Find Guides Here",
+        "find_guides_aria": "Find guides in {name}"
+      },
+      "istanbul": {
+        "name": "Istanbul, Turkey",
+        "price": "From $50/day",
+        "highlights": [
+          "Hagia Sophia",
+          "Blue Mosque",
+          "Grand Bazaar"
+        ]
+      },
+      "barcelona": {
+        "name": "Barcelona, Spain",
+        "price": "From $60/day",
+        "highlights": [
+          "Sagrada Familia",
+          "Park Güell",
+          "La Rambla"
+        ]
+      },
+      "tokyo": {
+        "name": "Tokyo, Japan",
+        "price": "From $70/day",
+        "highlights": [
+          "Tokyo Tower",
+          "Shibuya Crossing",
+          "Asakusa Temple"
+        ]
+      },
+      "paris": {
+        "name": "Paris, France",
+        "price": "From $65/day",
+        "highlights": [
+          "Eiffel Tower",
+          "Louvre Museum",
+          "Seine River"
+        ]
+      },
+      "dubai": {
+        "name": "Dubai, UAE",
+        "price": "From $80/day",
+        "highlights": [
+          "Burj Khalifa",
+          "Dubai Mall",
+          "Desert Safari"
+        ]
+      },
+      "rome": {
+        "name": "Rome, Italy",
+        "price": "From $55/day",
+        "highlights": [
+          "Colosseum",
+          "Vatican City",
+          "Trevi Fountain"
+        ]
+      }
+    },
+    "services": {
+      "city_tours": {
+        "name": "City Tours",
+        "description": "Explore urban wonders with local insights",
+        "count": "500+ Guides"
+      },
+      "language_support": {
+        "name": "Language Support",
+        "description": "Break language barriers effortlessly",
+        "count": "300+ Guides"
+      },
+      "photography": {
+        "name": "Photography Tours",
+        "description": "Capture perfect moments",
+        "count": "200+ Guides"
+      },
+      "cultural_experiences": {
+        "name": "Cultural Experiences",
+        "description": "Immerse in local traditions",
+        "count": "400+ Guides"
+      }
+    },
+    "features": {
+      "title": "Why Choose Us",
+      "subtitle": "Experience travel like never before",
+      "verified_guides": {
+        "title": "Verified Guides",
+        "description": "All guides are background-checked and certified",
+        "stats": "100% Verified"
+      },
+      "top_quality": {
+        "title": "Top Quality",
+        "description": "Highly rated experiences",
+        "stats": "4.8/5 Average"
+      },
+      "global_reach": {
+        "title": "Global Reach",
+        "description": "Guides in 50+ countries",
+        "stats": "Worldwide"
+      },
+      "instant_booking": {
+        "title": "Instant Booking",
+        "description": "Book and confirm immediately",
+        "stats": "24/7 Availability"
+      }
     },
     "stats": {
       "verified_guides": "Verified Guides",
@@ -340,19 +168,79 @@
       "happy_travelers": "Happy Travelers",
       "average_rating": "Average Rating"
     },
-    "destinations": {
-      "title": "Popular Destinations",
-      "subtitle": "Explore top destinations with expert guides",
-      "view_all": "View All Destinations",
-      "view_all_aria": "View all popular destinations",
-      "guides_count": "{{count}} guides",
-      "explore_aria": "View details for {{name}}",
-      "modal": {
-        "highlights": "Highlights",
-        "find_guides": "Find Guides",
-        "find_guides_aria": "Find guides for {{name}}",
-        "close_aria": "Close destination details modal"
+    "testimonials": {
+      "sarah": {
+        "name": "Sarah Johnson",
+        "location": "New York, USA",
+        "text": "Amazing experience in Istanbul! Our guide showed us hidden gems we never would have found.",
+        "tour": "Historical Tour"
       },
+      "marco": {
+        "name": "Marco Rossi",
+        "location": "Milan, Italy",
+        "text": "The best way to explore Tokyo. Professional and fun!",
+        "tour": "City Exploration"
+      },
+      "emma": {
+        "name": "Emma Chen",
+        "location": "Shanghai, China",
+        "text": "Paris came alive with our local guide. Highly recommended!",
+        "tour": "Cultural Walk"
+      }
+    },
+    "steps": {
+      "search_browse": {
+        "title": "Search & Browse",
+        "description": "Find the perfect guide for your adventure"
+      },
+      "connect_plan": {
+        "title": "Connect & Plan",
+        "description": "Chat and customize your experience"
+      },
+      "experience": {
+        "title": "Experience",
+        "description": "Create lasting memories"
+      }
+    },
+    "cta": {
+      "title": "Ready for Your Next Adventure?",
+      "description": "Join thousands of travelers discovering the world authentically.",
+      "find_guide": "Find Your Guide",
+      "learn_more": "Learn More"
+    },
+    "learn_more": {
+      "title": "About TourGuide",
+      "description": "Connecting travelers with local experts for authentic experiences.",
+      "why_title": "Why Choose TourGuide?",
+      "vision_title": "Our Vision",
+      "vision_description": "To make every travel experience personal and memorable.",
+      "find_guide": "Find Guides Now",
+      "close": "Close",
+      "features": {
+        "verified_guides": {
+          "title": "Verified Guides",
+          "description": "Background-checked professionals"
+        },
+        "global_reach": {
+          "title": "Global Reach",
+          "description": "Worldwide coverage"
+        },
+        "custom_experiences": {
+          "title": "Custom Experiences",
+          "description": "Tailored to your needs"
+        },
+        "support": {
+          "title": "24/7 Support",
+          "description": "Always here to help"
+        }
+      }
+    },
+    "popular_destinations": {
+      "title": "All Popular Destinations",
+      "subtitle": "Discover all our top destinations with expert guides",
+      "back_to_home": "Back to Home",
+      "back_to_home_aria": "Back to home page",
+      "find_guides_aria": "Find guides for {name}",
       "istanbul": {
         "name": "Istanbul, Turkey",
         "price": "From $25/day",
@@ -408,312 +296,708 @@
         ]
       }
     },
-    "services": {
-      "city_tours": {
-        "name": "City Tours",
-        "description": "Expert-guided city exploration",
-        "count": "2.5k+ guides"
-      },
-      "language_support": {
-        "name": "Language Support",
-        "description": "Real-time translation services",
-        "count": "150+ languages"
-      },
-      "photography": {
-        "name": "Photography",
-        "description": "Professional travel photography",
-        "count": "800+ photographers"
-      },
-      "cultural_experiences": {
-        "name": "Cultural Experiences",
-        "description": "Authentic local activities",
-        "count": "1.2k+ experiences"
-      }
+    "find_guide": {
+      "title": "Find Your Perfect Guide",
+      "subtitle": "Explore local experts to make your trip unforgettable",
+      "search_placeholder": "Search by name or location...",
+      "filters": "Filters",
+      "country": "Country",
+      "all_countries": "All Countries",
+      "city": "City",
+      "all_cities": "All Cities",
+      "language": "Language",
+      "all_languages": "All Languages",
+      "minimum_rating": "Minimum Rating",
+      "all_ratings": "All Ratings",
+      "stars_4": "4+ Stars",
+      "stars_45": "4.5+ Stars",
+      "stars_5": "5 Stars",
+      "error": "Failed to fetch guides",
+      "loading": "Loading guides...",
+      "no_guides_title": "No Guides Found",
+      "no_guides_description": "Try adjusting your search or filters to find more guides.",
+      "languages": "Languages:",
+      "none": "None",
+      "tours": "Tours:",
+      "price": "Price:",
+      "book_now": "Book Now",
+      "book_success": "Guide booked successfully!",
+      "book_fail": "Failed to book guide",
+      "available_only": "Available only"
     },
-    "features": {
-      "title": "Why TravMatch?",
-      "subtitle": "Discover the benefits of traveling with us",
-      "verified_guides": {
-        "title": "Verified Guides",
-        "description": "All guides are thoroughly vetted for safety.",
-        "stats": "99.8% Safety"
-      },
-      "top_quality": {
-        "title": "Top Quality",
-        "description": "High-rated experiences with verified reviews.",
-        "stats": "4.8★ Rating"
-      },
-      "global_reach": {
-        "title": "Global Reach",
-        "description": "Connect with guides in 150+ countries.",
-        "stats": "150+ Countries"
-      },
-      "instant_booking": {
-        "title": "Instant Booking",
-        "description": "Book instantly with real-time availability.",
-        "stats": "24/7 Support"
-      }
-    },
-    "steps": {
-      "title": "How It Works",
-      "subtitle": "Get started in 3 simple steps",
-      "search_browse": {
-        "title": "Search & Browse",
-        "description": "Find verified local guides."
-      },
-      "connect_plan": {
-        "title": "Connect & Plan",
-        "description": "Chat with guides to plan your trip."
-      },
-      "experience": {
-        "title": "Experience",
-        "description": "Enjoy authentic local experiences."
-      }
-    },
-    "testimonials": {
-      "title": "What Travelers Say",
-      "subtitle": "Hear from our happy travelers",
-      "dot_aria": "Select testimonial {{index}}",
-      "sarah": {
-        "name": "Sarah Johnson",
-        "location": "New York, USA",
-        "text": "Incredible experience in Istanbul! The guide showed me hidden gems.",
-        "tour": "Historical Istanbul Tour"
-      },
-      "marco": {
-        "name": "Marco Rodriguez",
-        "location": "Madrid, Spain",
-        "text": "Tokyo photography tour was perfect! Amazing photos and cultural insights.",
-        "tour": "Tokyo Photography Tour"
-      },
-      "emma": {
-        "name": "Emma Wilson",
-        "location": "London, UK",
-        "text": "Solo trip to Barcelona was a blast thanks to TravMatch!",
-        "tour": "Barcelona Cultural Experience"
-      }
-    },
-    "cta": {
-      "title": "Start Your Adventure",
-      "description": "Join thousands of travelers for authentic experiences worldwide.",
-      "find_guide": "Find Your Guide",
-      "learn_more": "Learn More"
-    },
-    "learn_more": {
-      "title": "About TravMatch",
-      "description": "TravMatch connects travelers with verified local guides to create authentic, unforgettable experiences in over 150 countries. Our mission is to make travel accessible, safe, and immersive by partnering with passionate locals who know their destinations inside out.",
-      "why_title": "Why Choose TravMatch?",
-      "vision_title": "Our Vision",
-      "vision_description": "We believe travel is about connection, discovery, and stories. With TravMatch, you’re not just visiting a place—you’re living it through the eyes of a local.",
-      "find_guide": "Find Your Guide Now",
-      "close": "Close",
-      "features": {
-        "verified_guides": {
-          "title": "Verified Guides:",
-          "description": "All guides are vetted for safety and expertise."
+    "account": {
+      "please_login": "Please login.",
+      "my_profile": "My Profile",
+      "first_name": "First Name:",
+      "last_name": "Last Name:",
+      "email": "Email:",
+      "role": "Role:",
+      "country": "Country:",
+      "city": "City:",
+      "not_set": "Not set",
+      "user_account": {
+        "title": "My Account",
+        "welcome": "Welcome, {name}",
+        "messages": "Messages",
+        "tabs": {
+          "dashboard": "Dashboard",
+          "profile": "Profile",
+          "guides": "Find Guides",
+          "bookings": "My Bookings",
+          "reviews": "My Reviews"
         },
-        "global_reach": {
-          "title": "Global Reach:",
-          "description": "Explore 150+ countries with local experts."
+        "dashboard": {
+          "stats": {
+            "total_bookings": "Total Bookings",
+            "active_bookings": "Active Bookings",
+            "completed_trips": "Completed Trips",
+            "reviews_written": "Reviews Written"
+          },
+          "recent_bookings": "Recent Bookings",
+          "booking_status": {
+            "pending": "Pending",
+            "confirmed": "Confirmed",
+            "accepted": "Accepted",
+            "completed": "Completed",
+            "cancelled": "Cancelled"
+          },
+          "cancellation_reason": "Cancellation Reason: {reason}",
+          "actions": {
+            "cancel": "Cancel",
+            "write_review": "Write Review",
+            "chat": "Chat",
+            "chat_with_guide": "Chat with Guide"
+          }
         },
-        "custom_experiences": {
-          "title": "Custom Experiences:",
-          "description": "Tailor your trip with personalized tours."
+        "profile": {
+          "create_profile": "Create Profile",
+          "edit_profile": "Edit Profile",
+          "profile_information": "Profile Information",
+          "date_of_birth": "Date of Birth:",
+          "preferred_contact": "Preferred Contact:",
+          "contact_methods": {
+            "email": "Email",
+            "phone": "Phone",
+            "chat": "Chat"
+          },
+          "languages": "Languages:",
+          "form": {
+            "date_of_birth_label": "Date of Birth",
+            "preferred_contact_label": "Preferred Contact Method",
+            "languages_label": "Languages",
+            "submit_create": "Create Profile",
+            "submit_update": "Update Profile",
+            "cancel": "Cancel"
+          }
         },
-        "support": {
-          "title": "24/7 Support:",
-          "description": "Instant booking and round-the-clock assistance."
+        "guides": {
+          "title": "Find Guides",
+          "filters": {
+            "search_placeholder": "Search guides...",
+            "all_services": "All Services",
+            "all_countries": "All Countries",
+            "all_cities": "All Cities",
+            "any_rating": "Any Rating",
+            "stars_4": "4+ Stars",
+            "stars_45": "4.5+ Stars",
+            "stars_5": "5 Stars"
+          },
+          "guide_card": {
+            "years_experience": "{years} years experience",
+            "rating": "{rating}/5 ({reviews} reviews)",
+            "hourly_rate": "${rate}/hour",
+            "daily_rate": "${rate}/day",
+            "book_now": "Book Now",
+            "unavailable": "Unavailable",
+            "chat": "Chat"
+          }
+        },
+        "bookings": {
+          "title": "My Bookings",
+          "booking_title": "Booking: {title}",
+          "dates": "{start_date} - {end_date}",
+          "description": "Description: {description}"
+        },
+        "reviews": {
+          "title": "My Reviews",
+          "filters": {
+            "all_ratings": "All Ratings",
+            "stars_5": "5 Stars",
+            "stars_4": "4+ Stars",
+            "stars_3": "3+ Stars",
+            "stars_2": "2+ Stars",
+            "stars_1": "1+ Stars",
+            "sort_newest": "Newest First",
+            "sort_oldest": "Oldest First",
+            "sort_highest": "Highest Rating",
+            "sort_lowest": "Lowest Rating"
+          },
+          "summary": {
+            "title": "Review Summary",
+            "total_reviews": "Total Reviews: {count}",
+            "overall": "Overall: {rating}/5",
+            "communication": "Communication: {rating}/5",
+            "service": "Service: {rating}/5",
+            "punctuality": "Punctuality: {rating}/5",
+            "value": "Value: {rating}/5"
+          },
+          "review_item": {
+            "rating": "{rating}/5",
+            "for_guide": "For Guide: {name}",
+            "booking": "Booking: {title} ({start_date} - {end_date})",
+            "communication": "Communication: {rating}/5",
+            "service": "Service: {rating}/5",
+            "punctuality": "Punctuality: {rating}/5",
+            "value": "Value: {rating}/5",
+            "likes": "👍 {count}",
+            "dislikes": "👎 {count}",
+            "view_reactions": "View Reactions",
+            "edit": "Edit",
+            "delete": "Delete",
+            "react": "React"
+          },
+          "no_reviews": "No reviews match your current filters. Complete a booking to write a review!"
+        },
+        "booking_form": {
+          "title": "Book Guide: {name}",
+          "title_label": "Title *",
+          "title_placeholder": "Enter booking title",
+          "description_label": "Description",
+          "description_placeholder": "Describe what kind of tour/service you need",
+          "start_date_label": "Start Date *",
+          "end_date_label": "End Date *",
+          "special_requirements_label": "Special Requirements",
+          "special_requirements_placeholder": "Any special requests or requirements",
+          "budget_label": "Budget (USD)",
+          "budget_placeholder": "0",
+          "guide_daily_rate": "Guide's daily rate: ${rate}",
+          "guide_hourly_rate": "Guide's hourly rate: ${rate}",
+          "submit": "Book Guide",
+          "cancel": "Cancel"
+        },
+        "review_form": {
+          "title": "{action} Review for Guide: {guide} - Booking: {booking}",
+          "overall_rating_label": "Overall Rating *",
+          "communication_label": "Communication *",
+          "service_label": "Service Quality *",
+          "punctuality_label": "Punctuality *",
+          "value_label": "Value for Money *",
+          "title_label": "Title *",
+          "title_placeholder": "Enter review title",
+          "comment_label": "Comment *",
+          "comment_placeholder": "Share your experience and feedback about the guide...",
+          "submit_create": "Submit Review",
+          "submit_update": "Update Review",
+          "cancel": "Cancel",
+          "star": "{count} Star{count > 1 ? 's' : ''}"
+        },
+        "cancel_booking": {
+          "title": "Cancel Booking",
+          "reason_label": "Cancellation Reason *",
+          "reason_placeholder": "Please provide a reason for cancellation",
+          "submit": "Confirm Cancel",
+          "close": "Close"
+        },
+        "reactions": {
+          "title": "Review Reactions",
+          "summary_title": "Reaction Summary",
+          "likes": "Likes: {count}",
+          "dislikes": "Dislikes: {count}",
+          "latest_likes": "Latest Like Comments",
+          "latest_dislikes": "Latest Dislike Comments",
+          "no_comments": "No {type} comments available.",
+          "all_reactions": "All Reactions",
+          "no_reactions": "No reactions available.",
+          "reaction_form": {
+            "reaction_type_label": "Reaction Type",
+            "reaction_like": "Like",
+            "reaction_dislike": "Dislike",
+            "comment_label": "Comment",
+            "comment_placeholder": "{type} (required for dislike)",
+            "submit": "Submit Reaction",
+            "cancel": "Cancel",
+            "remove_reaction": "Remove My Reaction"
+          }
+        },
+        "errors": {
+          "required_fields": "Please fill in all required fields",
+          "start_date_required": "Start date is required",
+          "end_date_required": "End date is required",
+          "title_required": "Title is required",
+          "start_date_before_end": "Start date must be before end date",
+          "start_date_past": "Start date cannot be in the past",
+          "cancel_reason_required": "Cancellation reason is required",
+          "review_title_required": "Review title is required",
+          "review_comment_required": "Review comment is required",
+          "dislike_comment_required": "Comment is required for dislike",
+          "booking_failed": "Failed to create booking",
+          "review_failed": "Failed to submit review",
+          "delete_review_failed": "Failed to delete review",
+          "reaction_failed": "Failed to submit reaction",
+          "remove_reaction_failed": "Failed to remove reaction",
+          "cancel_booking_failed": "Failed to cancel booking",
+          "load_reactions_failed": "Failed to load reactions",
+          "load_summary_failed": "Failed to load review summary"
+        },
+        "success": {
+          "booking_created": "Booking created successfully!",
+          "review_submitted": "Review submitted successfully!",
+          "review_updated": "Review updated successfully!",
+          "review_deleted": "Review deleted successfully!",
+          "reaction_submitted": "Reaction submitted successfully!",
+          "reaction_removed": "Reaction removed successfully!",
+          "booking_cancelled": "Booking cancelled successfully!"
+        }
+      },
+      "guide_account": {
+        "title": "Guide Account",
+        "welcome": "Welcome, {name}",
+        "messages": "Messages",
+        "tabs": {
+          "dashboard": "Dashboard",
+          "profile": "Profile",
+          "bookings": "Bookings",
+          "portfolio": "Portfolio",
+          "availability": "Availability",
+          "reviews": "Reviews"
+        },
+        "dashboard": {
+          "stats": {
+            "total_bookings": "Total Bookings",
+            "active_bookings": "Active Bookings",
+            "total_reviews": "Total Reviews",
+            "average_rating": "Average Rating"
+          },
+          "recent_bookings": "Recent Bookings",
+          "booking_status": {
+            "pending": "Pending",
+            "confirmed": "Confirmed",
+            "accepted": "Accepted",
+            "completed": "Completed",
+            "cancelled": "Cancelled"
+          },
+          "actions": {
+            "accept": "Accept",
+            "decline": "Decline",
+            "chat_with_client": "Chat with Client"
+          }
+        },
+        "profile": {
+          "create_profile": "Create Profile",
+          "edit_profile": "Edit Profile",
+          "profile_information": "Profile Information",
+          "professional_bio": "Professional Bio",
+          "years_of_experience": "Years of Experience: {years}",
+          "availability": "Availability",
+          "available": "Available",
+          "not_available": "Not Available",
+          "form": {
+            "professional_bio_label": "Professional Bio",
+            "professional_bio_placeholder": "Describe your experience and expertise",
+            "years_of_experience_label": "Years of Experience",
+            "city_label": "City",
+            "city_placeholder": "Select your city",
+            "service_areas_label": "Service Areas",
+            "service_areas_placeholder": "e.g., Downtown, Historical District",
+            "service_types_label": "Service Types",
+            "hourly_rate_label": "Hourly Rate",
+            "hourly_rate_placeholder": "Enter hourly rate",
+            "daily_rate_label": "Daily Rate",
+            "daily_rate_placeholder": "Enter daily rate",
+            "currency_label": "Currency",
+            "languages_label": "Languages",
+            "is_available_label": "Available for Bookings",
+            "submit_create": "Create Profile",
+            "submit_update": "Update Profile",
+            "cancel": "Cancel"
+          }
+        },
+        "bookings": {
+          "title": "My Bookings",
+          "booking_title": "Booking: {title}",
+          "dates": "{start_date} - {end_date}",
+          "description": "Description: {description}"
+        },
+        "portfolio": {
+          "title": "Portfolio",
+          "add_item": "Add Portfolio Item",
+          "form": {
+            "title": "{action} Portfolio Item",
+            "title_label": "Title",
+            "title_placeholder": "Enter portfolio item title",
+            "description_label": "Description",
+            "description_placeholder": "Describe this portfolio item",
+            "image_label": "Image",
+            "order_label": "Order",
+            "order_placeholder": "Enter display order",
+            "submit_create": "Add Item",
+            "submit_update": "Update Item",
+            "cancel": "Cancel"
+          },
+          "item": {
+            "edit": "Edit",
+            "delete": "Delete"
+          }
+        },
+        "availability": {
+          "title": "Availability",
+          "add_availability": "Add Availability",
+          "form": {
+            "title": "{action} Availability",
+            "date_label": "Date",
+            "is_available_label": "Available",
+            "start_time_label": "Start Time",
+            "end_time_label": "End Time",
+            "note_label": "Note",
+            "note_placeholder": "Add any notes (optional)",
+            "submit_create": "Add Availability",
+            "submit_update": "Update Availability",
+            "cancel": "Cancel"
+          },
+          "item": {
+            "date": "Date: {date}",
+            "time": "{start_time} - {end_time}",
+            "all_day": "All Day",
+            "note": "Note: {note}",
+            "available": "Available",
+            "unavailable": "Unavailable",
+            "edit": "Edit",
+            "delete": "Delete"
+          }
+        },
+        "reviews": {
+          "title": "Reviews",
+          "filters": {
+            "all_ratings": "All Ratings",
+            "stars_5": "5 Stars",
+            "stars_4": "4+ Stars",
+            "stars_3": "3+ Stars",
+            "stars_2": "2+ Stars",
+            "stars_1": "1+ Stars",
+            "sort_newest": "Newest First",
+            "sort_oldest": "Oldest First",
+            "sort_highest": "Highest Rating",
+            "sort_lowest": "Lowest Rating"
+          },
+          "summary": {
+            "title": "Review Summary",
+            "overall": "Overall: {rating}/5",
+            "communication": "Communication: {rating}/5",
+            "service": "Service: {rating}/5",
+            "punctuality": "Punctuality: {rating}/5",
+            "value": "Value: {rating}/5",
+            "total_reviews": "Total Reviews: {count}"
+          },
+          "review_item": {
+            "rating": "{rating}/5",
+            "date": "Date: {date}",
+            "communication": "Communication: {rating}/5",
+            "service": "Service: {rating}/5",
+            "punctuality": "Punctuality: {rating}/5",
+            "value": "Value: {rating}/5",
+            "react": "React",
+            "remove_reaction": "Remove Reaction",
+            "my_reaction": "My Reaction: {type}",
+            "my_reaction_with_comment": "My Reaction: {type} - {comment}"
+          },
+          "no_reviews": "No reviews available."
+        },
+        "reaction_form": {
+          "reaction_type_label": "Reaction Type",
+          "reaction_like": "Like",
+          "reaction_comment": "Comment",
+          "reaction_report": "Report",
+          "comment_label": "Comment",
+          "comment_placeholder": "Add your comment",
+          "report_reason_label": "Reason for Report",
+          "report_reason_placeholder": "Please provide a reason for reporting",
+          "submit": "Submit",
+          "cancel": "Cancel"
+        },
+        "cancel_booking": {
+          "title": "Cancel Booking",
+          "reason_label": "Cancellation Reason",
+          "reason_placeholder": "Please provide a reason for cancellation",
+          "submit": "Confirm Cancel",
+          "close": "Close"
+        },
+        "errors": {
+          "required_fields": "Please fill in all required fields",
+          "profile_failed": "Failed to save profile",
+          "portfolio_failed": "Failed to save portfolio item",
+          "availability_failed": "Failed to save availability",
+          "cancel_reason_required": "Cancellation reason is required",
+          "reaction_required": "Please select a reaction or provide a comment",
+          "reaction_failed": "Failed to submit reaction",
+          "remove_reaction_failed": "Failed to remove reaction",
+          "cancel_booking_failed": "Failed to cancel booking"
+        },
+        "success": {
+          "profile_created": "Profile created successfully!",
+          "profile_updated": "Profile updated successfully!",
+          "portfolio_created": "Portfolio item created successfully!",
+          "portfolio_updated": "Portfolio item updated successfully!",
+          "portfolio_deleted": "Portfolio item deleted successfully!",
+          "availability_created": "Availability created successfully!",
+          "availability_updated": "Availability updated successfully!",
+          "availability_deleted": "Availability deleted successfully!",
+          "booking_accepted": "Booking accepted successfully!",
+          "booking_cancelled": "Booking cancelled successfully!",
+          "reaction_submitted": "Reaction submitted successfully!",
+          "reaction_removed": "Reaction removed successfully!"
         }
       }
-    }
-  },
-  "auth": {
-    "title": "TravMatch",
-    "subtitle": "Find your travel companion",
-    "tabs": {
-      "login": "Login",
-      "register": "Register",
-      "forgot": "Reset Password"
     },
-    "close_aria": "Close authentication modal",
-    "login": {
-      "title": "Sign in to TravMatch",
-      "subtitle": "Log in to your account and continue your journey",
-      "email_label": "Email address",
-      "email_placeholder": "Enter your email",
-      "password_label": "Password",
-      "password_placeholder": "Enter your password",
-      "submit_button": "Login",
-      "show_password_aria": "Show password",
-      "hide_password_aria": "Hide password",
-      "or": "or",
-      "social": {
-        "google": "Continue with Google",
-        "facebook": "Continue with Facebook"
+    "chat": {
+      "title": {
+        "messages": "Messages",
+        "search_users": "Search Users",
+        "blocked_users": "Blocked Users"
+      },
+      "actions": {
+        "back": "Back",
+        "new_conversation": "New Conversation",
+        "blocked_users": "Blocked Users",
+        "close": "Close",
+        "close_error": "Close",
+        "send": "Send",
+        "block_user": "Block User",
+        "unblock": "Unblock"
+      },
+      "status": {
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "conversations": {
+        "loading": "Loading conversations...",
+        "no_conversations": "No conversations yet.",
+        "start_conversation": "Start a Conversation",
+        "no_messages": "No messages yet",
+        "message_deleted": "Message deleted",
+        "unknown_user": "Unknown User",
+        "unknown_user_initial": "U",
+        "total_unread": "Unread Messages: {count}"
+      },
+      "chat": {
+        "input_placeholder": "Type a message...",
+        "no_content": "No content available",
+        "read_status": "Read",
+        "online_users": "{users} online",
+        "typing_users": "{users} typing...",
+        "deleted_by_sender_mine": "You deleted this message",
+        "deleted_by_sender_other": "This message was deleted by the sender",
+        "deleted_by_receiver_mine": "You deleted this message for yourself",
+        "deleted_by_receiver_other": "This message was deleted by the receiver",
+        "deleted_for_everyone": "This message was deleted for everyone",
+        "message_deleted": "Message deleted",
+        "actions": {
+          "delete_for_me": "Delete for me",
+          "delete_for_everyone": "Delete for everyone",
+          "recover": "Recover"
+        }
+      },
+      "search": {
+        "placeholder": "Search by name or email...",
+        "hint": "Type at least 2 characters to search",
+        "no_results": "No users found",
+        "unknown_user_initial": "U"
+      },
+      "blocked": {
+        "no_blocked_users": "No blocked users",
+        "unknown_user": "Unknown User",
+        "unknown_user_initial": "U",
+        "blocked_on": "Blocked on: {date}"
+      },
+      "success": {
+        "user_blocked": "User blocked successfully",
+        "user_unblocked": "User unblocked successfully"
+      },
+      "errors": {
+        "initialize_failed": "Failed to initialize chat",
+        "load_conversations_failed": "Failed to load conversations",
+        "load_messages_failed": "Failed to load messages",
+        "load_unread_count_failed": "Failed to load unread message count",
+        "load_blocked_users_failed": "Failed to load blocked users",
+        "websocket_error": "WebSocket error: {message}",
+        "send_message_failed": "Failed to send message",
+        "search_users_failed": "Failed to search users",
+        "create_conversation_failed": "Failed to start new conversation",
+        "block_user_failed": "Failed to block user",
+        "unblock_user_failed": "Failed to unblock user",
+        "message_action_failed": "Failed to perform message action"
       }
     },
-    "register": {
-      "title": "Sign up for TravMatch",
-      "subtitle": "Create a new account and find travel companions",
-      "role_label": "Role",
-      "role_client": "Client",
-      "role_customer": "Customer",
-      "first_name_label": "First name",
-      "first_name_placeholder": "Enter your first name",
-      "last_name_label": "Last name",
-      "last_name_placeholder": "Enter your last name",
-      "email_label": "Email address",
-      "email_placeholder": "Enter your email",
-      "password_label": "Password",
-      "password_placeholder": "Enter your password",
-      "confirm_password_label": "Confirm password",
-      "confirm_password_placeholder": "Re-enter your password",
-      "country_label": "Country",
-      "country_placeholder": "Enter your country",
-      "country_option_aria": "Select country {country}",
-      "checkboxes": {
-        "personal_data": "I agree to the processing of personal data",
-        "terms": "I agree to TravMatch terms",
-        "travel_tips": "I agree to receive travel tips and promotions"
-      },
-      "submit_button": "Register",
-      "verification": {
-        "title": "Email Verification",
-        "subtitle": "Enter the 6-digit verification code sent to <strong>{email}</strong>",
-        "code_label": "Verification code",
-        "code_placeholder": "000000",
-        "submit_button": "Verify",
-        "resend_button": "Resend Code"
-      }
-    },
-    "forgot": {
-      "title": "Reset Password",
-      "subtitle": "Reset your password via email",
-      "email_label": "Email address",
-      "email_placeholder": "Enter your email",
-      "submit_button": "Send Verification Code",
-      "reset": {
-        "title": "Update Password",
-        "subtitle": "Enter the verification code sent to <strong>{email}</strong> and your new password",
-        "code_label": "Verification code",
-        "code_placeholder": "000000",
-        "new_password_label": "New password",
-        "new_password_placeholder": "Enter your new password",
-        "confirm_password_label": "Confirm password",
-        "confirm_password_placeholder": "Re-enter your new password",
-        "submit_button": "Update Password",
-        "resend_button": "Resend Code",
-        "show_password_aria": "Show new password",
-        "hide_password_aria": "Hide new password"
-      }
-    },
-    "validation": {
-      "required_fields": "Please fill in all required fields",
-      "required_checkboxes": "You must agree to personal data processing and terms",
-      "required_code": "Please enter the verification code",
-      "invalid_email": "Invalid email format",
-      "passwords_not_match": "Passwords do not match",
-      "password_requirements": "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character (@$!%*?&)",
-      "invalid_code": "Verification code must be a 6-digit number"
-    },
-    "success": {
-      "verification_sent": "Verification code sent to your email",
-      "register_success": "Registration successful!",
-      "password_reset_sent": "Verification code sent to your email",
-      "password_reset_success": "Password successfully updated!"
-    },
-    "errors": {
-      "login_failed": "Login failed. Please check your email or password",
-      "email_exists": "This email is already registered. Please log in or use another email",
-      "code_request_failed": "Failed to request verification code",
-      "invalid_code": "Invalid verification code. Please check and try again",
-      "expired_code": "Verification code has expired. Please request a new code",
-      "register_failed": "Registration failed",
-      "password_reset_failed": "Failed to reset password",
-      "resend_code_failed": "Failed to resend verification code"
-    },
-    "loading": "Loading...",
-    "social_login_dev": "{provider} login is currently under development"
-  },
-  "footer": {
-    "newsletter": {
-      "title": "Stay Connected",
-      "subtitle": "Subscribe to our newsletter for travel tips, exclusive offers, and updates",
-      "email_placeholder": "Enter your email",
-      "email_aria": "Email for newsletter",
-      "subscribe_button": "Subscribe",
-      "privacy": "We respect your privacy"
-    },
-    "company": {
-      "logo": "TravMatch",
-      "description": "Connecting travelers with trusted local guides worldwide. Experience authentic travel with verified professionals in over 150 countries.",
-      "contact": {
-        "address": "Tashkent, Uzbekistan",
-        "email": "hello@travmatch.com",
-        "phone": "+998 (90) 123-45-67"
-      }
-    },
-    "social": {
-      "facebook": "Facebook",
-      "twitter": "Twitter",
-      "instagram": "Instagram",
-      "linkedin": "LinkedIn",
-      "youtube": "YouTube"
-    },
-    "links": {
-      "platform": {
-        "title": "Platform",
-        "how_it_works": "How it Works",
-        "find_guide": "Find a Guide",
-        "become_guide": "Become a Guide",
-        "safety_trust": "Safety & Trust",
-        "pricing": "Pricing"
-      },
-      "support": {
-        "title": "Support",
-        "help_center": "Help Center",
-        "contact_us": "Contact Us",
-        "faqs": "FAQs",
-        "dispute_center": "Dispute Center",
-        "report_issue": "Report Issue"
-      },
-      "legal": {
-        "title": "Legal",
-        "terms_of_service": "Terms of Service",
-        "privacy_policy": "Privacy Policy",
-        "cookie_policy": "Cookie Policy",
-        "community_guidelines": "Community Guidelines",
-        "gdpr_compliance": "GDPR Compliance"
-      },
+    "footer": {
       "company": {
-        "title": "Company",
-        "about_us": "About Us",
-        "careers": "Careers",
-        "press_kit": "Press Kit",
-        "blog": "Blog",
-        "investors": "Investors"
+        "logo": "TourGuide",
+        "description": "Your trusted partner for authentic travel experiences worldwide.",
+        "contact": {
+          "address": "123 Travel Street, Adventure City, World",
+          "email": "info@tourguide.com",
+          "phone": "+1 (555) 123-4567"
+        }
+      },
+      "social": {
+        "facebook": "Facebook",
+        "twitter": "Twitter",
+        "instagram": "Instagram",
+        "linkedin": "LinkedIn",
+        "youtube": "YouTube"
+      },
+      "app": {
+        "title": "Get Our Mobile App",
+        "description": "Download our app for the best experience on the go.",
+        "ios_label": "Download on the",
+        "ios_store": "App Store",
+        "android_label": "Get it on",
+        "android_store": "Google Play",
+        "trust": {
+          "ssl": "SSL Secure",
+          "gdpr": "GDPR Compliant"
+        }
+      },
+      "bottom": {
+        "copyright": "© {year} TourGuide. All rights reserved.",
+        "links": {
+          "terms": "Terms of Service",
+          "privacy": "Privacy Policy",
+          "cookies": "Cookie Policy",
+          "accessibility": "Accessibility"
+        }
       }
     },
-    "app": {
-      "title": "Get the App",
-      "description": "Download our mobile app for better experience",
-      "ios_label": "Download on the",
-      "ios_store": "App Store",
-      "android_label": "Get it on",
-      "android_store": "Google Play",
-      "trust": {
-        "ssl": "SSL Secured",
-        "gdpr": "GDPR Compliant"
-      }
+    "debug": {
+      "title": "Debug Information",
+      "auth_status": "Authentication Status",
+      "is_authenticated": "Is Authenticated:",
+      "access_token": "Access Token:",
+      "refresh_token": "Refresh Token:",
+      "profile_data": "Profile Data",
+      "has_profile": "Has Profile:",
+      "profile_id": "Profile ID:",
+      "role": "Role:",
+      "user_id": "User ID:",
+      "user_data": "User Data",
+      "no_user_data": "No user data available",
+      "api_config": "API Configuration",
+      "api_url": "API URL:",
+      "environment": "Environment:",
+      "debug_mode": "Debug Mode:",
+      "quick_actions": "Quick Actions",
+      "clear_tokens": "Clear Tokens",
+      "reload_page": "Reload Page",
+      "log_console": "Log to Console",
+      "note": "This debug panel is only visible in development mode"
     },
-    "bottom": {
-      "copyright": "© {year} TravMatch. All rights reserved.",
-      "links": {
-        "terms": "Terms",
-        "privacy": "Privacy",
-        "cookies": "Cookies",
-        "accessibility": "Accessibility"
-      }
+    "auth": {
+      "title": "TourGuide Authentication",
+      "subtitle": "Access your account to explore the world with local experts",
+      "close_aria": "Close authentication modal",
+      "tabs": {
+        "login": "Sign In",
+        "register": "Register",
+        "forgot": "Forgot Password"
+      },
+      "login": {
+        "title": "Sign In to TourGuide",
+        "subtitle": "Enter your credentials to access your account",
+        "email_label": "Email",
+        "email_placeholder": "Enter your email",
+        "password_label": "Password",
+        "password_placeholder": "Enter your password",
+        "show_password_aria": "Show password",
+        "hide_password_aria": "Hide password",
+        "submit_button": "Sign In",
+        "or": "Or sign in with",
+        "social": {
+          "google": "Sign in with Google",
+          "facebook": "Sign in with Facebook"
+        }
+      },
+      "register": {
+        "title": "Create Your TourGuide Account",
+        "subtitle": "Join us to discover authentic travel experiences",
+        "role_label": "Role",
+        "role_client": "Traveler",
+        "role_customer": "Guide",
+        "first_name_label": "First Name",
+        "first_name_placeholder": "Enter your first name",
+        "last_name_label": "Last Name",
+        "last_name_placeholder": "Enter your last name",
+        "email_label": "Email",
+        "email_placeholder": "Enter your email",
+        "password_label": "Password",
+        "password_placeholder": "Enter your password",
+        "confirm_password_label": "Confirm Password",
+        "confirm_password_placeholder": "Confirm your password",
+        "show_password_aria": "Show password",
+        "hide_password_aria": "Hide password",
+        "country_label": "Country",
+        "country_placeholder": "Enter your country",
+        "checkboxes": {
+          "personal_data": "I agree to the processing of my personal data",
+          "terms": "I accept the Terms of Service and Privacy Policy",
+          "travel_tips": "Send me travel tips and promotions"
+        },
+        "submit_button": "Register",
+        "verification": {
+          "title": "Verify Your Email",
+          "subtitle": "We sent a 6-digit code to <strong>{email}</strong>. Please enter it below.",
+          "code_label": "Verification Code",
+          "code_placeholder": "Enter 6-digit code",
+          "submit_button": "Verify",
+          "resend_button": "Resend Code"
+        }
+      },
+      "forgot": {
+        "title": "Reset Your Password",
+        "subtitle": "Enter your email to receive a password reset code",
+        "email_label": "Email",
+        "email_placeholder": "Enter your email",
+        "submit_button": "Send Reset Code",
+        "reset": {
+          "title": "Set New Password",
+          "subtitle": "Enter the code sent to <strong>{email}</strong> and your new password",
+          "code_label": "Reset Code",
+          "code_placeholder": "Enter 6-digit code",
+          "new_password_label": "New Password",
+          "new_password_placeholder": "Enter new password",
+          "confirm_password_label": "Confirm New Password",
+          "confirm_password_placeholder": "Confirm new password",
+          "show_password_aria": "Show password",
+          "hide_password_aria": "Hide password",
+          "submit_button": "Reset Password",
+          "resend_button": "Resend Code"
+        }
+      },
+      "validation": {
+        "required_fields": "Please fill in all required fields",
+        "passwords_not_match": "Passwords do not match",
+        "password_requirements": "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
+        "required_code": "Please enter the verification code",
+        "invalid_code": "Invalid or incorrect code",
+        "invalid_country": "Please select a valid country"
+      },
+      "success": {
+        "verification_sent": "Verification code sent to your email",
+        "register_success": "Account created successfully!",
+        "password_reset_sent": "Password reset code sent to your email",
+        "password_reset_success": "Password reset successfully!"
+      },
+      "errors": {
+        "login_failed": "Invalid email or password",
+        "email_exists": "An account with this email already exists",
+        "code_request_failed": "Failed to send verification code",
+        "resend_code_failed": "Failed to resend verification code",
+        "register_failed": "Registration failed. Please try again",
+        "invalid_code": "Invalid or incorrect verification code",
+        "expired_code": "Verification code has expired",
+        "too_many_requests": "Too many requests. Please try again later",
+        "password_reset_failed": "Failed to reset password. Please try again",
+        "too_many_attempts": "Too many failed attempts. Please request a new code"
+      },
+      "social_login_dev": "Social login with {provider} is under development",
+      "loading": "Loading..."
     }
   }
 }

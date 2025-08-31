@@ -361,7 +361,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="header-mobile-menu-overlay" onClick={toggleMenu}>
+                <div className="header-mobile-menu-overlay"onClick={toggleMenu}>
                     <div className="header-mobile-menu" onClick={(e) => e.stopPropagation()}>
                         <div className="header-mobile-menu-header">
                             <div className="header-mobile-logo">

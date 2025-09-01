@@ -8,7 +8,7 @@ from .models import (
     CustomerProfile,
     Portfolio,
     VerificationDocument,
-    Unavailability,  # ✅ Availability o‘rniga
+    Unavailability,
 )
 
 
@@ -48,7 +48,7 @@ class ClientProfileAdmin(admin.ModelAdmin):
         ),
         (
             "Profile Information",
-            {"fields": ("date_of_birth", "preferred_contact", "languages")},
+            {"fields": ("date_of_birth", "preferred_contact", "languages", "avatar")},
         ),
     )
     readonly_fields = ("get_user_details",)
@@ -133,6 +133,7 @@ class CustomerProfileAdmin(admin.ModelAdmin):
                     "years_of_experience",
                     "service_types",
                     "languages",
+                    "avatar",
                 )
             },
         ),

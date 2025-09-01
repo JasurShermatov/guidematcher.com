@@ -10,8 +10,7 @@ logs/
 bot.log
 bot_*.log
 
-# ─────────── Media / user uploads ───────────
-media/
+
 
 # ─────────── IDE fayllari ───────────
 .idea/

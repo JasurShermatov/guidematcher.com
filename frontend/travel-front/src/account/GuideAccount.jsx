@@ -394,8 +394,6 @@ const GuideAccount = () => {
                             style={{
                                 marginLeft: '16px',
                                 padding: '8px 16px',
-                                backgroundColor: '#667eea',
-                                color: 'white',
                                 border: 'none',
                                 borderRadius: '6px',
                                 cursor: 'pointer',
@@ -409,7 +407,7 @@ const GuideAccount = () => {
                 )}
             </div>
             {error && (
-                <div className="guide-account-error" style={{ background: '#f8d7da', color: '#721c24', padding: '8px 12px', borderRadius: '4px', marginBottom: '16px' }}>
+                <div className="guide-account-error">
                     <p>{error}</p>
                     <button onClick={() => setError(null)} className="guide-account-error-close">×</button>
                 </div>
@@ -517,11 +515,6 @@ const GuideAccount = () => {
                                                 <button
                                                     className="guide-account-btn guide-account-btn-secondary"
                                                     onClick={() => handleChatWithClient(booking)}
-                                                    style={{
-                                                        marginLeft: '8px',
-                                                        backgroundColor: '#6c757d',
-                                                        color: 'white'
-                                                    }}
                                                 >
                                                     {t('guideAccount.dashboard.chatWithClient')}
                                                 </button>
@@ -778,11 +771,6 @@ const GuideAccount = () => {
                                             <button
                                                 className="guide-account-btn guide-account-btn-secondary"
                                                 onClick={() => handleChatWithClient(booking)}
-                                                style={{
-                                                    marginLeft: '8px',
-                                                    backgroundColor: '#6c757d',
-                                                    color: 'white'
-                                                }}
                                             >
                                                 {t('guideAccount.bookings.chatWithClient')}
                                             </button>
@@ -1272,14 +1260,7 @@ const GuideAccount = () => {
                                 />
                             </div>
                             {error && (
-                                <div style={{
-                                    background: '#f8d7da',
-                                    color: '#721c24',
-                                    padding: '8px 12px',
-                                    borderRadius: '4px',
-                                    marginBottom: '16px',
-                                    fontSize: '14px'
-                                }}>
+                                <div className="guide-account-error">
                                     {error}
                                 </div>
                             )}

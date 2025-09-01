@@ -1,17 +1,16 @@
-// Authentication.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { useTranslation } from "react-i18next";
 import { FiX, FiMail, FiLock, FiUser, FiLogIn, FiCheckSquare, FiSquare, FiGlobe, FiCheck, FiEye, FiEyeOff, FiRotateCcw } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { loginUser, requestCode, registerUser, requestPasswordReset, confirmPasswordReset, getCurrentUserShort } from "../api/api";
 import "./Authentication.css";
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 const Authentication = ({ setIsAuthenticated, setUser }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation("translation");
     const [activeTab, setActiveTab] = useState("login");
     const [loginForm, setLoginForm] = useState({ email: "", password: "" });
     const [registerForm, setRegisterForm] = useState({
@@ -47,6 +46,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
     const countryInputRef = useRef(null);
     const navigate = useNavigate();
+
+    // Debugging: Log current language and translations
+    useEffect(() => {
+        console.log("Authentication language:", i18n.language);
+        console.log("Authentication translations:", i18n.getResourceBundle(i18n.language, "translation")?.authentication);
+    }, [i18n.language]);
 
     const countries = [
         "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
@@ -126,9 +131,11 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             const currentConfirmPassword = name === "confirm_password" ? value : registerForm.confirm_password;
 
             if (value && !passwordRegex.test(value)) {
-                setError(t("auth.validation.password_requirements"));
+                setError(t("authentication.errors.password_requirements", {
+                    defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
+                }));
             } else if (currentPassword && currentConfirmPassword && currentPassword !== currentConfirmPassword) {
-                setError(t("auth.validation.passwords_not_match"));
+                setError(t("authentication.errors.passwords_do_not_match", { defaultValue: "Passwords do not match" }));
             } else {
                 setError("");
             }
@@ -145,9 +152,11 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             const currentConfirmPassword = name === "confirm_password" ? value : forgotForm.confirm_password;
 
             if (value && !passwordRegex.test(value)) {
-                setError(t("auth.validation.password_requirements"));
+                setError(t("authentication.errors.password_requirements", {
+                    defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
+                }));
             } else if (currentNewPassword && currentConfirmPassword && currentNewPassword !== currentConfirmPassword) {
-                setError(t("auth.validation.passwords_not_match"));
+                setError(t("authentication.errors.passwords_do_not_match", { defaultValue: "Passwords do not match" }));
             } else {
                 setError("");
             }
@@ -176,13 +185,15 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setLoading(true);
 
         if (!loginForm.email || !loginForm.password) {
-            setError(t("auth.validation.required_fields"));
+            setError(t("authentication.errors.all_fields_required", { defaultValue: "All fields are required" }));
             setLoading(false);
             return;
         }
 
         if (!passwordRegex.test(loginForm.password)) {
-            setError(t("auth.validation.password_requirements"));
+            setError(t("authentication.errors.password_requirements", {
+                defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
+            }));
             setLoading(false);
             return;
         }
@@ -205,7 +216,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             }
             setLoginForm({ email: "", password: "" });
         } catch (error) {
-            setError(error.message || t("auth.errors.login_failed"));
+            setError(error.message || t("authentication.errors.login_failed", { defaultValue: "Login failed" }));
         } finally {
             setLoading(false);
         }
@@ -219,45 +230,47 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         const { role, first_name, last_name, email, password, confirm_password, country } = registerForm;
 
         if (!role || !first_name || !last_name || !email || !password || !confirm_password || !country) {
-            setError(t("auth.validation.required_fields"));
+            setError(t("authentication.errors.all_fields_required", { defaultValue: "All fields are required" }));
             setLoading(false);
             return;
         }
 
         if (password !== confirm_password) {
-            setError(t("auth.validation.passwords_not_match"));
+            setError(t("authentication.errors.passwords_do_not_match", { defaultValue: "Passwords do not match" }));
             setLoading(false);
             return;
         }
 
         if (!passwordRegex.test(password)) {
-            setError(t("auth.validation.password_requirements"));
+            setError(t("authentication.errors.password_requirements", {
+                defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
+            }));
             setLoading(false);
             return;
         }
 
         if (!checkboxes.personalData || !checkboxes.terms) {
-            setError(t("auth.validation.required_checkboxes"));
+            setError(t("authentication.errors.required_checkboxes", { defaultValue: "You must agree to the required checkboxes" }));
             setLoading(false);
             return;
         }
 
         if (!countries.includes(country)) {
-            setError(t("auth.validation.invalid_country"));
+            setError(t("authentication.errors.invalid_country", { defaultValue: "Invalid country selected" }));
             setLoading(false);
             return;
         }
 
         try {
             await requestCode({ email: email.toLowerCase().trim() });
-            setSuccessMessage(t("auth.success.verification_sent"));
+            setSuccessMessage(t("authentication.success.verification_code_sent", { defaultValue: "Verification code sent" }));
             setVerificationStep(true);
         } catch (error) {
             const errorMsg = error.message.includes("Too many verification code requests")
-                ? t("auth.errors.too_many_requests")
+                ? t("authentication.errors.too_many_requests", { defaultValue: "Too many requests. Please try again later" })
                 : error.message.includes("already exists")
-                    ? t("auth.errors.email_exists")
-                    : error.message || t("auth.errors.code_request_failed");
+                    ? t("authentication.errors.email_exists", { defaultValue: "Email already exists" })
+                    : error.message || t("authentication.errors.request_code_failed", { defaultValue: "Failed to request verification code" });
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -270,13 +283,13 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setLoading(true);
 
         if (!verificationCode) {
-            setError(t("auth.validation.required_code"));
+            setError(t("authentication.errors.verification_code_required", { defaultValue: "Verification code is required" }));
             setLoading(false);
             return;
         }
 
         if (!/^\d{6}$/.test(verificationCode)) {
-            setError(t("auth.validation.invalid_code"));
+            setError(t("authentication.errors.invalid_verification_code", { defaultValue: "Invalid verification code" }));
             setLoading(false);
             return;
         }
@@ -296,7 +309,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             localStorage.setItem("refresh_token", tokenResponse.refresh);
             setIsAuthenticated(true);
             setUser(tokenResponse.user);
-            setSuccessMessage(t("auth.success.register_success"));
+            setSuccessMessage(t("authentication.success.registration_successful", { defaultValue: "Registration successful" }));
             if (tokenResponse.user.role === "Client") {
                 navigate("/user-account");
             } else if (tokenResponse.user.role === "Customer") {
@@ -307,12 +320,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             resetRegisterForm();
         } catch (error) {
             const errorMsg = error.message.includes("already exists")
-                ? t("auth.errors.email_exists")
+                ? t("authentication.errors.email_exists", { defaultValue: "Email already exists" })
                 : error.message.includes("expired")
-                    ? t("auth.errors.expired_code")
+                    ? t("authentication.errors.code_expired", { defaultValue: "Verification code expired" })
                     : error.message.includes("Invalid or already used")
-                        ? t("auth.errors.invalid_code")
-                        : error.message || t("auth.errors.register_failed");
+                        ? t("authentication.errors.invalid_code", { defaultValue: "Invalid or already used code" })
+                        : error.message || t("authentication.errors.registration_failed", { defaultValue: "Registration failed" });
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -324,11 +337,11 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setLoading(true);
         try {
             await requestCode({ email: registerForm.email.toLowerCase().trim() });
-            setSuccessMessage(t("auth.success.verification_sent"));
+            setSuccessMessage(t("authentication.success.verification_code_sent", { defaultValue: "Verification code sent" }));
         } catch (error) {
             const errorMsg = error.message.includes("Too many verification code requests")
-                ? t("auth.errors.too_many_requests")
-                : error.message || t("auth.errors.resend_code_failed");
+                ? t("authentication.errors.too_many_requests", { defaultValue: "Too many requests. Please try again later" })
+                : error.message || t("authentication.errors.resend_code_failed", { defaultValue: "Failed to resend code" });
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -341,19 +354,19 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setLoading(true);
 
         if (!forgotForm.email) {
-            setError(t("auth.validation.required_fields"));
+            setError(t("authentication.errors.all_fields_required", { defaultValue: "All fields are required" }));
             setLoading(false);
             return;
         }
 
         try {
             const response = await requestPasswordReset({ email: forgotForm.email.toLowerCase().trim() });
-            setSuccessMessage(response.message || t("auth.success.password_reset_sent"));
+            setSuccessMessage(response.message || t("authentication.success.reset_code_sent", { defaultValue: "Password reset code sent" }));
             setForgotStep(true);
         } catch (error) {
             const errorMsg = error.message.includes("Too many password reset requests")
-                ? t("auth.errors.too_many_requests")
-                : error.message || t("auth.errors.code_request_failed");
+                ? t("authentication.errors.too_many_requests", { defaultValue: "Too many requests. Please try again later" })
+                : error.message || t("authentication.errors.request_code_failed", { defaultValue: "Failed to request code" });
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -368,25 +381,27 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         const { email, code, new_password, confirm_password } = forgotForm;
 
         if (!code || !new_password || !confirm_password) {
-            setError(t("auth.validation.required_fields"));
+            setError(t("authentication.errors.all_fields_required", { defaultValue: "All fields are required" }));
             setLoading(false);
             return;
         }
 
         if (new_password !== confirm_password) {
-            setError(t("auth.validation.passwords_not_match"));
+            setError(t("authentication.errors.passwords_do_not_match", { defaultValue: "Passwords do not match" }));
             setLoading(false);
             return;
         }
 
         if (!passwordRegex.test(new_password)) {
-            setError(t("auth.validation.password_requirements"));
+            setError(t("authentication.errors.password_requirements", {
+                defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
+            }));
             setLoading(false);
             return;
         }
 
         if (!/^\d{6}$/.test(code)) {
-            setError(t("auth.validation.invalid_code"));
+            setError(t("authentication.errors.invalid_code", { defaultValue: "Invalid code" }));
             setLoading(false);
             return;
         }
@@ -397,7 +412,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                 code,
                 new_password,
             });
-            setSuccessMessage(t("auth.success.password_reset_success"));
+            setSuccessMessage(t("authentication.success.password_reset_successful", { defaultValue: "Password reset successful" }));
             setTimeout(() => {
                 setActiveTab("login");
                 setForgotStep(false);
@@ -411,12 +426,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             }, 2000);
         } catch (error) {
             const errorMsg = error.message.includes("expired")
-                ? t("auth.errors.expired_code")
+                ? t("authentication.errors.code_expired", { defaultValue: "Code expired" })
                 : error.message.includes("Invalid")
-                    ? t("auth.errors.invalid_code")
+                    ? t("authentication.errors.invalid_code", { defaultValue: "Invalid code" })
                     : error.message.includes("Too many failed attempts")
-                        ? t("auth.errors.too_many_attempts")
-                        : error.message || t("auth.errors.password_reset_failed");
+                        ? t("authentication.errors.too_many_attempts", { defaultValue: "Too many failed attempts" })
+                        : error.message || t("authentication.errors.password_reset_failed", { defaultValue: "Password reset failed" });
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -428,11 +443,11 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setLoading(true);
         try {
             const response = await requestPasswordReset({ email: forgotForm.email.toLowerCase().trim() });
-            setSuccessMessage(response.message || t("auth.success.password_reset_sent"));
+            setSuccessMessage(response.message || t("authentication.success.reset_code_sent", { defaultValue: "Password reset code sent" }));
         } catch (error) {
             const errorMsg = error.message.includes("Too many password reset requests")
-                ? t("auth.errors.too_many_requests")
-                : error.message || t("auth.errors.resend_code_failed");
+                ? t("authentication.errors.too_many_requests", { defaultValue: "Too many requests. Please try again later" })
+                : error.message || t("authentication.errors.resend_code_failed", { defaultValue: "Failed to resend code" });
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -440,7 +455,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     };
 
     const handleSocialLogin = (provider) => {
-        alert(t("auth.social_login_dev", { provider }));
+        alert(t("authentication.social_login_under_development", { provider, defaultValue: `Social login with ${provider} is under development` }));
     };
 
     const resetRegisterForm = () => {
@@ -488,13 +503,13 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     return (
         <div className="auth-overlay" onClick={closeModal} role="dialog" aria-labelledby="auth-title" aria-modal="true">
             <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
-                <button className="auth-close-btn" onClick={closeModal} aria-label={t("auth.close_aria")}>
+                <button className="auth-close-btn" onClick={closeModal} aria-label={t("authentication.close", { defaultValue: "Close" })}>
                     <FiX />
                 </button>
 
                 <div className="auth-header">
-                    <h1 className="auth-brand">{t("auth.title")}</h1>
-                    <p className="auth-subtitle">{t("auth.subtitle")}</p>
+                    <h1 className="auth-brand">{t("authentication.brand", { defaultValue: "Authentication" })}</h1>
+                    <p className="auth-subtitle">{t("authentication.subtitle", { defaultValue: "Please sign in or register" })}</p>
                 </div>
 
                 <div className="auth-tabs">
@@ -505,7 +520,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                         disabled={loading}
                     >
                         <FiLogIn />
-                        {t("auth.tabs.login")}
+                        {t("authentication.tabs.login", { defaultValue: "Login" })}
                     </button>
                     <button
                         className={`auth-tab ${activeTab === "register" ? "auth-tab-active" : ""}`}
@@ -514,7 +529,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                         disabled={loading}
                     >
                         <FiUser />
-                        {t("auth.tabs.register")}
+                        {t("authentication.tabs.register", { defaultValue: "Register" })}
                     </button>
                     <button
                         className={`auth-tab ${activeTab === "forgot" ? "auth-tab-active" : ""}`}
@@ -523,7 +538,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                         disabled={loading}
                     >
                         <FiRotateCcw />
-                        {t("auth.tabs.forgot")}
+                        {t("authentication.tabs.forgot_password", { defaultValue: "Forgot Password" })}
                     </button>
                 </div>
 
@@ -543,22 +558,22 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                 {loading && (
                     <div className="auth-loading">
                         <div className="spinner"></div>
-                        <span>{t("auth.loading")}</span>
+                        <span>{t("authentication.loading", { defaultValue: "Loading..." })}</span>
                     </div>
                 )}
 
                 {activeTab === "login" && (
                     <div className="auth-content">
                         <div className="auth-form-header">
-                            <h2 id="auth-title">{t("auth.login.title")}</h2>
-                            <p>{t("auth.login.subtitle")}</p>
+                            <h2 id="auth-title">{t("authentication.login.title", { defaultValue: "Login" })}</h2>
+                            <p>{t("authentication.login.subtitle", { defaultValue: "Enter your credentials to access your account" })}</p>
                         </div>
 
                         <form className="auth-form" onSubmit={handleLoginSubmit}>
                             <div className="auth-form-group">
                                 <label htmlFor="login-email" className="auth-label">
                                     <FiMail className="auth-label-icon" />
-                                    {t("auth.login.email_label")}
+                                    {t("authentication.login.email_label", { defaultValue: "Email" })}
                                 </label>
                                 <input
                                     id="login-email"
@@ -566,7 +581,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     name="email"
                                     value={loginForm.email}
                                     onChange={handleLoginChange}
-                                    placeholder={t("auth.login.email_placeholder")}
+                                    placeholder={t("authentication.login.email_placeholder", { defaultValue: "Enter your email" })}
                                     className="auth-input"
                                     aria-required="true"
                                     disabled={loading}
@@ -577,7 +592,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                             <div className="auth-form-group">
                                 <label htmlFor="login-password" className="auth-label">
                                     <FiLock className="auth-label-icon" />
-                                    {t("auth.login.password_label")}
+                                    {t("authentication.login.password_label", { defaultValue: "Password" })}
                                 </label>
                                 <div className="auth-input-wrapper">
                                     <input
@@ -586,7 +601,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         name="password"
                                         value={loginForm.password}
                                         onChange={handleLoginChange}
-                                        placeholder={t("auth.login.password_placeholder")}
+                                        placeholder={t("authentication.login.password_placeholder", { defaultValue: "Enter your password" })}
                                         className="auth-input"
                                         aria-required="true"
                                         disabled={loading}
@@ -596,7 +611,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         type="button"
                                         className="auth-toggle-password"
                                         onClick={toggleShowPassword}
-                                        aria-label={showPassword ? t("auth.login.hide_password_aria") : t("auth.login.show_password_aria")}
+                                        aria-label={showPassword ? t("authentication.hide_password", { defaultValue: "Hide password" }) : t("authentication.show_password", { defaultValue: "Show password" })}
                                         disabled={loading}
                                     >
                                         {showPassword ? <FiEyeOff /> : <FiEye />}
@@ -606,12 +621,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
 
                             <button type="submit" className="auth-submit-btn" disabled={loading}>
                                 <FiLogIn />
-                                {t("auth.login.submit_button")}
+                                {t("authentication.login.submit", { defaultValue: "Login" })}
                             </button>
                         </form>
 
                         <div className="auth-divider">
-                            <span>{t("auth.login.or")}</span>
+                            <span>{t("authentication.login.or", { defaultValue: "or" })}</span>
                         </div>
 
                         <div className="auth-social">
@@ -621,7 +636,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                 disabled={loading}
                             >
                                 <FcGoogle />
-                                {t("auth.login.social.google")}
+                                {t("authentication.login.google", { defaultValue: "Continue with Google" })}
                             </button>
                             <button
                                 className="auth-social-btn facebook-btn"
@@ -629,7 +644,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                 disabled={loading}
                             >
                                 <FaFacebook />
-                                {t("auth.login.social.facebook")}
+                                {t("authentication.login.facebook", { defaultValue: "Continue with Facebook" })}
                             </button>
                         </div>
                     </div>
@@ -638,8 +653,8 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                 {activeTab === "register" && (
                     <div className="auth-content">
                         <div className="auth-form-header">
-                            <h2 id="auth-title">{t("auth.register.title")}</h2>
-                            <p>{t("auth.register.subtitle")}</p>
+                            <h2 id="auth-title">{t("authentication.register.title", { defaultValue: "Register" })}</h2>
+                            <p>{t("authentication.register.subtitle", { defaultValue: "Create a new account" })}</p>
                         </div>
 
                         {!verificationStep ? (
@@ -647,7 +662,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                 <div className="auth-form-group">
                                     <label htmlFor="register-role" className="auth-label">
                                         <FiUser className="auth-label-icon" />
-                                        {t("auth.register.role_label")}
+                                        {t("authentication.register.role_label", { defaultValue: "Role" })}
                                     </label>
                                     <select
                                         id="register-role"
@@ -658,8 +673,8 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         aria-required="true"
                                         disabled={loading}
                                     >
-                                        <option value="Client">{t("auth.register.role_client")}</option>
-                                        <option value="Customer">{t("auth.register.role_customer")}</option>
+                                        <option value="Client">{t("authentication.register.role_client", { defaultValue: "Client" })}</option>
+                                        <option value="Customer">{t("authentication.register.role_customer", { defaultValue: "Customer" })}</option>
                                     </select>
                                 </div>
 
@@ -667,7 +682,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     <div className="auth-form-group">
                                         <label htmlFor="register-first_name" className="auth-label">
                                             <FiUser className="auth-label-icon" />
-                                            {t("auth.register.first_name_label")}
+                                            {t("authentication.register.first_name_label", { defaultValue: "First Name" })}
                                         </label>
                                         <input
                                             id="register-first_name"
@@ -675,7 +690,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             name="first_name"
                                             value={registerForm.first_name}
                                             onChange={handleRegisterChange}
-                                            placeholder={t("auth.register.first_name_placeholder")}
+                                            placeholder={t("authentication.register.first_name_placeholder", { defaultValue: "Enter your first name" })}
                                             className="auth-input"
                                             aria-required="true"
                                             disabled={loading}
@@ -685,7 +700,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     <div className="auth-form-group">
                                         <label htmlFor="register-last_name" className="auth-label">
                                             <FiUser className="auth-label-icon" />
-                                            {t("auth.register.last_name_label")}
+                                            {t("authentication.register.last_name_label", { defaultValue: "Last Name" })}
                                         </label>
                                         <input
                                             id="register-last_name"
@@ -693,7 +708,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             name="last_name"
                                             value={registerForm.last_name}
                                             onChange={handleRegisterChange}
-                                            placeholder={t("auth.register.last_name_placeholder")}
+                                            placeholder={t("authentication.register.last_name_placeholder", { defaultValue: "Enter your last name" })}
                                             className="auth-input"
                                             aria-required="true"
                                             disabled={loading}
@@ -705,7 +720,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                 <div className="auth-form-group">
                                     <label htmlFor="register-email" className="auth-label">
                                         <FiMail className="auth-label-icon" />
-                                        {t("auth.register.email_label")}
+                                        {t("authentication.register.email_label", { defaultValue: "Email" })}
                                     </label>
                                     <input
                                         id="register-email"
@@ -713,7 +728,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         name="email"
                                         value={registerForm.email}
                                         onChange={handleRegisterChange}
-                                        placeholder={t("auth.register.email_placeholder")}
+                                        placeholder={t("authentication.register.email_placeholder", { defaultValue: "Enter your email" })}
                                         className="auth-input"
                                         aria-required="true"
                                         disabled={loading}
@@ -724,7 +739,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                 <div className="auth-form-group">
                                     <label htmlFor="register-password" className="auth-label">
                                         <FiLock className="auth-label-icon" />
-                                        {t("auth.register.password_label")}
+                                        {t("authentication.register.password_label", { defaultValue: "Password" })}
                                     </label>
                                     <div className="auth-input-wrapper">
                                         <input
@@ -733,7 +748,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             name="password"
                                             value={registerForm.password}
                                             onChange={handleRegisterChange}
-                                            placeholder={t("auth.register.password_placeholder")}
+                                            placeholder={t("authentication.register.password_placeholder", { defaultValue: "Enter your password" })}
                                             className="auth-input"
                                             aria-required="true"
                                             disabled={loading}
@@ -743,7 +758,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             type="button"
                                             className="auth-toggle-password"
                                             onClick={toggleShowPassword}
-                                            aria-label={showPassword ? t("auth.register.hide_password_aria") : t("auth.register.show_password_aria")}
+                                            aria-label={showPassword ? t("authentication.hide_password", { defaultValue: "Hide password" }) : t("authentication.show_password", { defaultValue: "Show password" })}
                                             disabled={loading}
                                         >
                                             {showPassword ? <FiEyeOff /> : <FiEye />}
@@ -754,7 +769,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                 <div className="auth-form-group">
                                     <label htmlFor="register-confirm_password" className="auth-label">
                                         <FiLock className="auth-label-icon" />
-                                        {t("auth.register.confirm_password_label")}
+                                        {t("authentication.register.confirm_password_label", { defaultValue: "Confirm Password" })}
                                     </label>
                                     <div className="auth-input-wrapper">
                                         <input
@@ -763,7 +778,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             name="confirm_password"
                                             value={registerForm.confirm_password}
                                             onChange={handleRegisterChange}
-                                            placeholder={t("auth.register.confirm_password_placeholder")}
+                                            placeholder={t("authentication.register.confirm_password_placeholder", { defaultValue: "Confirm your password" })}
                                             className="auth-input"
                                             aria-required="true"
                                             disabled={loading}
@@ -773,7 +788,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             type="button"
                                             className="auth-toggle-password"
                                             onClick={toggleShowConfirmPassword}
-                                            aria-label={showConfirmPassword ? t("auth.register.hide_password_aria") : t("auth.register.show_password_aria")}
+                                            aria-label={showConfirmPassword ? t("authentication.hide_password", { defaultValue: "Hide password" }) : t("authentication.show_password", { defaultValue: "Show password" })}
                                             disabled={loading}
                                         >
                                             {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
@@ -784,7 +799,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                 <div className="auth-form-group">
                                     <label htmlFor="register-country" className="auth-label">
                                         <FiGlobe className="auth-label-icon" />
-                                        {t("auth.register.country_label")}
+                                        {t("authentication.register.country_label", { defaultValue: "Country" })}
                                     </label>
                                     <div className="auth-country-wrapper">
                                         <input
@@ -793,7 +808,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             name="country"
                                             value={registerForm.country}
                                             onChange={handleRegisterChange}
-                                            placeholder={t("auth.register.country_placeholder")}
+                                            placeholder={t("authentication.register.country_placeholder", { defaultValue: "Enter your country" })}
                                             className="auth-input"
                                             ref={countryInputRef}
                                             aria-required="true"
@@ -833,7 +848,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         <div className="auth-checkbox-icon">
                                             {checkboxes.personalData ? <FiCheckSquare /> : <FiSquare />}
                                         </div>
-                                        <span>{t("auth.register.checkboxes.personal_data")}</span>
+                                        <span>{t("authentication.register.personal_data", { defaultValue: "I agree to the processing of personal data" })}</span>
                                     </label>
 
                                     <label className="auth-checkbox-label">
@@ -849,7 +864,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         <div className="auth-checkbox-icon">
                                             {checkboxes.terms ? <FiCheckSquare /> : <FiSquare />}
                                         </div>
-                                        <span>{t("auth.register.checkboxes.terms")}</span>
+                                        <span>{t("authentication.register.terms", { defaultValue: "I accept the terms and conditions" })}</span>
                                     </label>
 
                                     <label className="auth-checkbox-label">
@@ -864,13 +879,13 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         <div className="auth-checkbox-icon">
                                             {checkboxes.travelTips ? <FiCheckSquare /> : <FiSquare />}
                                         </div>
-                                        <span>{t("auth.register.checkboxes.travel_tips")}</span>
+                                        <span>{t("authentication.register.travel_tips", { defaultValue: "Subscribe to travel tips" })}</span>
                                     </label>
                                 </div>
 
                                 <button type="submit" className="auth-submit-btn" disabled={loading}>
                                     <FiUser />
-                                    {t("auth.register.submit_button")}
+                                    {t("authentication.register.submit", { defaultValue: "Register" })}
                                 </button>
                             </form>
                         ) : (
@@ -879,10 +894,13 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     <div className="auth-verification-icon">
                                         <FiMail />
                                     </div>
-                                    <h3>{t("auth.register.verification.title")}</h3>
+                                    <h3>{t("authentication.register.verify_email_title", { defaultValue: "Verify Your Email" })}</h3>
                                     <p
                                         dangerouslySetInnerHTML={{
-                                            __html: t("auth.register.verification.subtitle", { email: registerForm.email }),
+                                            __html: t("authentication.register.verify_email_message", {
+                                                email: `<strong>${registerForm.email}</strong>`,
+                                                defaultValue: `We have sent a verification code to <strong>${registerForm.email}</strong>`
+                                            }),
                                         }}
                                     />
                                 </div>
@@ -891,14 +909,14 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     <div className="auth-form-group">
                                         <label htmlFor="verification-code" className="auth-label">
                                             <FiCheck className="auth-label-icon" />
-                                            {t("auth.register.verification.code_label")}
+                                            {t("authentication.register.verification_code_label", { defaultValue: "Verification Code" })}
                                         </label>
                                         <input
                                             id="verification-code"
                                             type="text"
                                             value={verificationCode}
                                             onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                            placeholder={t("auth.register.verification.code_placeholder")}
+                                            placeholder={t("authentication.register.verification_code_placeholder", { defaultValue: "Enter 6-digit code" })}
                                             className="auth-input auth-verification-input"
                                             aria-required="true"
                                             autoFocus
@@ -910,7 +928,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
 
                                     <button type="submit" className="auth-submit-btn" disabled={loading}>
                                         <FiCheck />
-                                        {t("auth.register.verification.submit_button")}
+                                        {t("authentication.register.verify_submit", { defaultValue: "Verify" })}
                                     </button>
 
                                     <button
@@ -920,7 +938,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         disabled={loading}
                                     >
                                         <FiRotateCcw />
-                                        {t("auth.register.verification.resend_button")}
+                                        {t("authentication.register.resend_code", { defaultValue: "Resend Code" })}
                                     </button>
                                 </form>
                             </div>
@@ -931,8 +949,8 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                 {activeTab === "forgot" && (
                     <div className="auth-content">
                         <div className="auth-form-header">
-                            <h2 id="auth-title">{t("auth.forgot.title")}</h2>
-                            <p>{t("auth.forgot.subtitle")}</p>
+                            <h2 id="auth-title">{t("authentication.forgot.title", { defaultValue: "Forgot Password" })}</h2>
+                            <p>{t("authentication.forgot.subtitle", { defaultValue: "Reset your password" })}</p>
                         </div>
 
                         {!forgotStep ? (
@@ -944,7 +962,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     <div className="auth-form-group">
                                         <label htmlFor="forgot-email" className="auth-label">
                                             <FiMail className="auth-label-icon" />
-                                            {t("auth.forgot.email_label")}
+                                            {t("authentication.forgot.email_label", { defaultValue: "Email" })}
                                         </label>
                                         <input
                                             id="forgot-email"
@@ -952,7 +970,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             name="email"
                                             value={forgotForm.email}
                                             onChange={handleForgotChange}
-                                            placeholder={t("auth.forgot.email_placeholder")}
+                                            placeholder={t("authentication.forgot.email_placeholder", { defaultValue: "Enter your email" })}
                                             className="auth-input"
                                             aria-required="true"
                                             disabled={loading}
@@ -963,7 +981,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
 
                                     <button type="submit" className="auth-submit-btn" disabled={loading}>
                                         <FiMail />
-                                        {t("auth.forgot.submit_button")}
+                                        {t("authentication.forgot.submit", { defaultValue: "Send Reset Code" })}
                                     </button>
                                 </form>
                             </div>
@@ -973,10 +991,13 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     <div className="auth-reset-icon">
                                         <FiLock />
                                     </div>
-                                    <h3>{t("auth.forgot.reset.title")}</h3>
+                                    <h3>{t("authentication.forgot.reset_title", { defaultValue: "Reset Password" })}</h3>
                                     <p
                                         dangerouslySetInnerHTML={{
-                                            __html: t("auth.forgot.reset.subtitle", { email: forgotForm.email }),
+                                            __html: t("authentication.forgot.reset_message", {
+                                                email: `<strong>${forgotForm.email}</strong>`,
+                                                defaultValue: `We have sent a reset code to <strong>${forgotForm.email}</strong>`
+                                            }),
                                         }}
                                     />
                                 </div>
@@ -985,7 +1006,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     <div className="auth-form-group">
                                         <label htmlFor="forgot-code" className="auth-label">
                                             <FiCheck className="auth-label-icon" />
-                                            {t("auth.forgot.reset.code_label")}
+                                            {t("authentication.forgot.reset_code_label", { defaultValue: "Reset Code" })}
                                         </label>
                                         <input
                                             id="forgot-code"
@@ -993,7 +1014,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             name="code"
                                             value={forgotForm.code}
                                             onChange={handleForgotChange}
-                                            placeholder={t("auth.forgot.reset.code_placeholder")}
+                                            placeholder={t("authentication.forgot.reset_code_placeholder", { defaultValue: "Enter 6-digit code" })}
                                             className="auth-input auth-verification-input"
                                             aria-required="true"
                                             autoFocus
@@ -1006,7 +1027,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     <div className="auth-form-group">
                                         <label htmlFor="forgot-new_password" className="auth-label">
                                             <FiLock className="auth-label-icon" />
-                                            {t("auth.forgot.reset.new_password_label")}
+                                            {t("authentication.forgot.new_password_label", { defaultValue: "New Password" })}
                                         </label>
                                         <div className="auth-input-wrapper">
                                             <input
@@ -1015,7 +1036,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                                 name="new_password"
                                                 value={forgotForm.new_password}
                                                 onChange={handleForgotChange}
-                                                placeholder={t("auth.forgot.reset.new_password_placeholder")}
+                                                placeholder={t("authentication.forgot.new_password_placeholder", { defaultValue: "Enter new password" })}
                                                 className="auth-input"
                                                 aria-required="true"
                                                 disabled={loading}
@@ -1025,7 +1046,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                                 type="button"
                                                 className="auth-toggle-password"
                                                 onClick={toggleShowNewPassword}
-                                                aria-label={showNewPassword ? t("auth.forgot.reset.hide_password_aria") : t("auth.forgot.reset.show_password_aria")}
+                                                aria-label={showNewPassword ? t("authentication.hide_password", { defaultValue: "Hide password" }) : t("authentication.show_password", { defaultValue: "Show password" })}
                                                 disabled={loading}
                                             >
                                                 {showNewPassword ? <FiEyeOff /> : <FiEye />}
@@ -1036,7 +1057,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     <div className="auth-form-group">
                                         <label htmlFor="forgot-confirm_password" className="auth-label">
                                             <FiLock className="auth-label-icon" />
-                                            {t("auth.forgot.reset.confirm_password_label")}
+                                            {t("authentication.forgot.confirm_password_label", { defaultValue: "Confirm Password" })}
                                         </label>
                                         <div className="auth-input-wrapper">
                                             <input
@@ -1045,7 +1066,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                                 name="confirm_password"
                                                 value={forgotForm.confirm_password}
                                                 onChange={handleForgotChange}
-                                                placeholder={t("auth.forgot.reset.confirm_password_placeholder")}
+                                                placeholder={t("authentication.forgot.confirm_password_placeholder", { defaultValue: "Confirm new password" })}
                                                 className="auth-input"
                                                 aria-required="true"
                                                 disabled={loading}
@@ -1055,7 +1076,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                                 type="button"
                                                 className="auth-toggle-password"
                                                 onClick={toggleShowConfirmNewPassword}
-                                                aria-label={showConfirmNewPassword ? t("auth.forgot.reset.hide_password_aria") : t("auth.forgot.reset.show_password_aria")}
+                                                aria-label={showConfirmNewPassword ? t("authentication.hide_password", { defaultValue: "Hide password" }) : t("authentication.show_password", { defaultValue: "Show password" })}
                                                 disabled={loading}
                                             >
                                                 {showConfirmNewPassword ? <FiEyeOff /> : <FiEye />}
@@ -1065,7 +1086,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
 
                                     <button type="submit" className="auth-submit-btn" disabled={loading}>
                                         <FiCheck />
-                                        {t("auth.forgot.reset.submit_button")}
+                                        {t("authentication.forgot.reset_submit", { defaultValue: "Reset Password" })}
                                     </button>
 
                                     <button
@@ -1075,7 +1096,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         disabled={loading}
                                     >
                                         <FiRotateCcw />
-                                        {t("auth.forgot.reset.resend_button")}
+                                        {t("authentication.forgot.resend_code", { defaultValue: "Resend Code" })}
                                     </button>
                                 </form>
                             </div>

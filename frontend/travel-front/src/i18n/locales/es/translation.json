@@ -1,1003 +1,874 @@
 {
+  "header": {
+    "find_guides": "Encontrar Guías",
+    "blog": "Blog",
+    "logo_text": "TourGuide",
+    "tagline": "Explora Juntos",
+    "select_language": "Seleccionar Idioma",
+    "choose_appearance": "Elegir Apariencia",
+    "account": "Cuenta",
+    "logout": "Cerrar Sesión",
+    "register": "Registrarse",
+    "sign_in": "Iniciar Sesión"
+  },
   "theme": {
     "light": "Claro",
     "light_desc": "Tema claro",
     "dark": "Oscuro",
     "dark_desc": "Tema oscuro",
     "default": "Sistema",
-    "default_desc": "Seguir el tema del sistema",
-    "auto": "Automático",
-    "auto_desc": "Tema automático según la hora"
+    "default_desc": "Seguir tema del sistema",
+    "auto": "Auto",
+    "auto_desc": "Tema automático basado en el horario"
   },
   "language": {
-    "en": "Inglés",
+    "en": "English",
     "en_native": "English",
-    "ru": "Ruso",
+    "ru": "Russian",
     "ru_native": "Русский",
-    "uz": "Uzbeko",
+    "uz": "Uzbek",
     "uz_native": "O'zbek",
-    "es": "Español",
+    "es": "Spanish",
     "es_native": "Español",
-    "ar": "Árabe",
+    "ar": "Arabic",
     "ar_native": "العربية"
   },
-  "header": {
-    "select_language": "Seleccionar idioma",
-    "choose_appearance": "Elegir apariencia",
-    "logout": "Cerrar sesión",
-    "find_guides": "Encontrar guías",
-    "blog": "Blog",
-    "logo_text": "TourGuide",
-    "tagline": "Explora juntos",
-    "account": "Cuenta",
-    "register": "Registrarse",
-    "sign_in": "Iniciar sesión"
-  },
-  "home": {
+  "homepage": {
     "hero": {
-      "title": "Descubre el mundo con",
-      "title_highlight": "Expertos locales",
-      "description": "Conecta con guías locales verificados para experiencias de viaje auténticas en todo el mundo."
+      "title": "Descubre Tu Experiencia de Viaje Perfecta",
+      "gradient_text": "con Guías Locales",
+      "description": "Conéctate con guías locales expertos para tours personalizados y aventuras inolvidables."
     },
     "search": {
       "location_placeholder": "¿A dónde vas?",
-      "location_aria": "Buscar ubicación",
-      "service_placeholder": "¿Qué servicio necesitas?",
-      "service_aria": "Buscar servicio",
-      "button": "Encontrar guías",
-      "button_aria": "Buscar guías",
-      "results_aria": "Resultados de búsqueda"
+      "service_placeholder": "¿Qué tipo de tour?",
+      "find_guide": "Encontrar un Guía"
     },
-    "destinations": {
-      "title": "Destinos populares",
-      "subtitle": "Descubre los mejores lugares con nuestros guías expertos",
-      "view_all": "Ver todos los destinos",
-      "view_all_aria": "Ver todos los destinos populares",
-      "explore_aria": "Explorar {name}",
-      "guides_count": "{count} Guías",
-      "modal": {
-        "highlights": "Puntos destacados",
-        "close_aria": "Cerrar detalles del destino",
-        "find_guides": "Encontrar guías aquí",
-        "find_guides_aria": "Encontrar guías en {name}"
-      },
+    "stats": {
+      "verified_guides": "Guías Verificados",
+      "countries": "Países",
+      "happy_travelers": "Viajeros Felices",
+      "average_rating": "Calificación Promedio"
+    },
+    "popular_destinations": {
+      "title": "Destinos Populares",
+      "subtitle": "Explora los mejores destinos con expertos locales.",
+      "view_all": "Ver Todos los Destinos",
+      "explore": "Explorar",
+      "back_to_home": "Volver al Inicio",
+      "find_guides_in": "Encontrar guías en",
       "istanbul": {
         "name": "Estambul, Turquía",
-        "price": "Desde $50/día",
-        "highlights": [
-          "Santa Sofía",
-          "Mezquita Azul",
-          "Gran Bazar"
-        ]
+        "price": "Desde $30/hora",
+        "highlights": {
+          "hagia_sophia": "Santa Sofía",
+          "blue_mosque": "Mezquita Azul",
+          "bosphorus_cruise": "Crucero por el Bósforo",
+          "grand_bazaar": "Gran Bazar"
+        }
       },
       "barcelona": {
         "name": "Barcelona, España",
-        "price": "Desde $60/día",
-        "highlights": [
-          "Sagrada Familia",
-          "Parque Güell",
-          "La Rambla"
-        ]
+        "price": "Desde $35/hora",
+        "highlights": {
+          "sagrada_familia": "Sagrada Familia",
+          "park_guell": "Parque Güell",
+          "gothic_quarter": "Barrio Gótico",
+          "la_rambla": "La Rambla"
+        }
       },
       "tokyo": {
         "name": "Tokio, Japón",
-        "price": "Desde $70/día",
-        "highlights": [
-          "Torre de Tokio",
-          "Cruce de Shibuya",
-          "Templo Asakusa"
-        ]
+        "price": "Desde $40/hora",
+        "highlights": {
+          "shibuya_crossing": "Cruce de Shibuya",
+          "tokyo_skytree": "Tokyo Skytree",
+          "asakusa_temple": "Templo Asakusa",
+          "tsukiji_market": "Mercado Tsukiji"
+        }
       },
       "paris": {
         "name": "París, Francia",
-        "price": "Desde $65/día",
-        "highlights": [
-          "Torre Eiffel",
-          "Museo del Louvre",
-          "Río Sena"
-        ]
+        "price": "Desde $45/hora",
+        "highlights": {
+          "eiffel_tower": "Torre Eiffel",
+          "louvre_museum": "Museo del Louvre",
+          "notre_dame": "Notre-Dame",
+          "montmartre": "Montmartre"
+        }
       },
       "dubai": {
         "name": "Dubái, EAU",
-        "price": "Desde $80/día",
-        "highlights": [
-          "Burj Khalifa",
-          "Dubai Mall",
-          "Safari por el desierto"
-        ]
+        "price": "Desde $50/hora",
+        "highlights": {
+          "burj_khalifa": "Burj Khalifa",
+          "dubai_mall": "Dubai Mall",
+          "desert_safari": "Safari por el Desierto",
+          "palm_jumeirah": "Palm Jumeirah"
+        }
       },
       "rome": {
         "name": "Roma, Italia",
-        "price": "Desde $55/día",
-        "highlights": [
-          "Coliseo",
-          "Ciudad del Vaticano",
-          "Fontana di Trevi"
-        ]
+        "price": "Desde $38/hora",
+        "highlights": {
+          "colosseum": "Coliseo",
+          "roman_forum": "Foro Romano",
+          "pantheon": "Panteón",
+          "vatican_city": "Ciudad del Vaticano"
+        }
       }
     },
-    "services": {
+    "service_types": {
       "city_tours": {
-        "name": "Tours por la ciudad",
-        "description": "Explora maravillas urbanas con conocimientos locales",
-        "count": "Más de 500 guías"
+        "name": "Tours por la Ciudad",
+        "description": "Explora ciudades con guías locales expertos.",
+        "count": "500+ Tours"
       },
       "language_support": {
-        "name": "Soporte de idiomas",
-        "description": "Supera las barreras del idioma sin esfuerzo",
-        "count": "Más de 300 guías"
+        "name": "Soporte de Idioma",
+        "description": "Guías fluidos en múltiples idiomas.",
+        "count": "50+ Idiomas"
       },
-      "photography": {
-        "name": "Tours de fotografía",
-        "description": "Captura momentos perfectos",
-        "count": "Más de 200 guías"
+      "photography_tours": {
+        "name": "Tours de Fotografía",
+        "description": "Captura momentos impresionantes con guías profesionales.",
+        "count": "200+ Tours"
       },
       "cultural_experiences": {
-        "name": "Experiencias culturales",
-        "description": "Sumérgete en las tradiciones locales",
-        "count": "Más de 400 guías"
+        "name": "Experiencias Culturales",
+        "description": "Sumérgete en tradiciones e historia locales.",
+        "count": "300+ Experiencias"
       }
     },
     "features": {
-      "title": "¿Por qué elegirnos?",
-      "subtitle": "Vive el viaje como nunca antes",
+      "title": "Por Qué Elegirnos",
+      "subtitle": "Descubre los beneficios de viajar con nuestros guías expertos.",
       "verified_guides": {
-        "title": "Guías verificados",
-        "description": "Todos los guías están verificados y certificados",
-        "stats": "100% Verificados"
+        "title": "Guías Verificados",
+        "description": "Todos los guías son minuciosamente verificados para tu seguridad y confianza.",
+        "stats": "1000+ Guías Verificados"
       },
       "top_quality": {
-        "title": "Máxima calidad",
-        "description": "Experiencias altamente valoradas",
-        "stats": "Promedio 4.8/5"
+        "title": "Calidad Superior",
+        "description": "Guías altamente calificados con reseñas excepcionales.",
+        "stats": "4.8 Calificación Promedio"
       },
       "global_reach": {
-        "title": "Alcance global",
-        "description": "Guías en más de 50 países",
-        "stats": "A nivel mundial"
+        "title": "Alcance Global",
+        "description": "Explora destinos en todo el mundo con expertos locales.",
+        "stats": "50+ Países"
       },
       "instant_booking": {
-        "title": "Reserva instantánea",
-        "description": "Reserva y confirma de inmediato",
-        "stats": "Disponibilidad 24/7"
+        "title": "Reserva Instantánea",
+        "description": "Reserva tu guía instantáneamente con disponibilidad en tiempo real.",
+        "stats": "10K+ Reservas"
       }
-    },
-    "stats": {
-      "verified_guides": "Guías verificados",
-      "countries": "Países",
-      "happy_travelers": "Viajeros felices",
-      "average_rating": "Calificación promedio"
     },
     "testimonials": {
       "sarah": {
-        "name": "Sarah Johnson",
-        "location": "Nueva York, EE. UU.",
-        "text": "¡Experiencia increíble en Estambul! Nuestro guía nos mostró joyas ocultas que nunca hubiéramos encontrado.",
-        "tour": "Tour histórico"
+        "name": "Sarah M.",
+        "location": "París, Francia",
+        "text": "¡Una experiencia increíble! Nuestro guía era conocedor y hizo nuestro viaje inolvidable.",
+        "tour": "Tour Nocturno de la Torre Eiffel"
       },
       "marco": {
-        "name": "Marco Rossi",
-        "location": "Milán, Italia",
-        "text": "La mejor manera de explorar Tokio. ¡Profesional y divertido!",
-        "tour": "Exploración de la ciudad"
+        "name": "Marco P.",
+        "location": "Roma, Italia",
+        "text": "¡El tour del Coliseo fue fantástico, con tantas historias ocultas cobrando vida!",
+        "tour": "Tour de la Antigua Roma"
       },
       "emma": {
-        "name": "Emma Chen",
-        "location": "Shanghái, China",
-        "text": "París cobró vida con nuestro guía local. ¡Altamente recomendado!",
-        "tour": "Paseo cultural"
+        "name": "Emma L.",
+        "location": "Tokio, Japón",
+        "text": "¡Explorar Shibuya con un guía local fue lo más destacado de mi viaje!",
+        "tour": "Tour de la Vida Nocturna de Tokio"
       }
     },
     "steps": {
       "search_browse": {
-        "title": "Buscar y explorar",
-        "description": "Encuentra el guía perfecto para tu aventura"
+        "title": "Buscar y Navegar",
+        "description": "Encuentra guías por ubicación o tipo de servicio."
       },
       "connect_plan": {
-        "title": "Conectar y planificar",
-        "description": "Chatea y personaliza tu experiencia"
+        "title": "Conectar y Planificar",
+        "description": "Envía mensajes a guías para planificar tu viaje perfecto."
       },
       "experience": {
         "title": "Experiencia",
-        "description": "Crea recuerdos inolvidables"
+        "description": "Disfruta de aventuras inolvidables con guías expertos."
       }
     },
     "cta": {
-      "title": "¿Listo para tu próxima aventura?",
-      "description": "Únete a miles de viajeros descubriendo el mundo de manera auténtica.",
-      "find_guide": "Encuentra tu guía",
-      "learn_more": "Saber más"
+      "title": "¿Listo para Explorar?",
+      "description": "Únete a miles de viajeros y reserva tu guía hoy para una aventura inolvidable.",
+      "find_guide": "Encuentra Tu Guía",
+      "learn_more": "Aprende Más"
+    },
+    "destination_modal": {
+      "close": "Cerrar detalles del destino",
+      "guides": "Guías",
+      "highlights": "Destacados",
+      "find_guides": "Encontrar Guías",
+      "find_guides_in": "Encontrar guías en"
     },
     "learn_more": {
-      "title": "Acerca de TourGuide",
-      "description": "Conectamos a viajeros con expertos locales para experiencias auténticas.",
-      "why_title": "¿Por qué elegir TourGuide?",
-      "vision_title": "Nuestra visión",
-      "vision_description": "Hacer que cada experiencia de viaje sea personal e inolvidable.",
-      "find_guide": "Encuentra guías ahora",
-      "close": "Cerrar",
-      "features": {
-        "verified_guides": {
-          "title": "Guías verificados",
-          "description": "Profesionales verificados"
-        },
-        "global_reach": {
-          "title": "Alcance global",
-          "description": "Cobertura mundial"
-        },
-        "custom_experiences": {
-          "title": "Experiencias personalizadas",
-          "description": "Adaptadas a tus necesidades"
-        },
-        "support": {
-          "title": "Soporte 24/7",
-          "description": "Siempre aquí para ayudar"
-        }
-      }
+      "title": "Sobre Nuestra Plataforma",
+      "description": "Descubre un mundo de experiencias de viaje auténticas con nuestros guías locales confiables.",
+      "why_travel_with_us": "Por Qué Viajar Con Nosotros",
+      "verified_guides": "Guías Verificados",
+      "verified_guides_desc": "Todos los guías son verificados para seguridad y experiencia.",
+      "global_reach": "Alcance Global",
+      "global_reach_desc": "Explora más de 50 países con expertos locales.",
+      "custom_experiences": "Experiencias Personalizadas",
+      "custom_experiences_desc": "Adapta tu viaje con tours personalizados.",
+      "support": "Soporte 24/7",
+      "support_desc": "Obtén asistencia en cualquier momento durante tu viaje.",
+      "our_vision": "Nuestra Visión",
+      "our_vision_desc": "Nuestro objetivo es conectar viajeros con expertos locales para experiencias significativas e inmersivas en todo el mundo.",
+      "find_guide": "Encuentra Tu Guía",
+      "close": "Cerrar"
+    }
+  },
+  "find_guide": {
+    "title": "Encontrar un Guía",
+    "subtitle": "Descubre los mejores guías locales para tu próxima aventura",
+    "search_placeholder": "Busca guías por nombre o palabra clave",
+    "search_aria_label": "Buscar guías",
+    "filters": "Filtros",
+    "toggle_filters": "Alternar filtros",
+    "country": "País",
+    "select_country": "Seleccionar país",
+    "all_countries": "Todos los Países",
+    "city": "Ciudad",
+    "select_city": "Seleccionar ciudad",
+    "all_cities": "Todas las Ciudades",
+    "language": "Idioma",
+    "select_language": "Seleccionar idioma",
+    "all_languages": "Todos los Idiomas",
+    "minimum_rating": "Calificación Mínima",
+    "select_rating": "Seleccionar calificación mínima",
+    "all_ratings": "Todas las Calificaciones",
+    "4_stars": "4 Estrellas",
+    "4_5_stars": "4.5 Estrellas",
+    "5_stars": "5 Estrellas",
+    "languages": "Idiomas",
+    "tours": "Tours",
+    "price": "Precio",
+    "hour": "hora",
+    "book_now": "Reservar Ahora",
+    "message_guide": "Mensaje",
+    "no_guides": "No se Encontraron Guías",
+    "no_guides_description": "Intenta ajustar tu búsqueda o filtros para encontrar guías disponibles.",
+    "loading": "Cargando...",
+    "unknown_guide": "Guía Desconocido",
+    "unknown_location": "Ubicación Desconocida",
+    "unknown_language": "Desconocido",
+    "unknown_tour": "Desconocido",
+    "no_rating": "N/A",
+    "none": "Ninguno",
+    "success_booking": "Reserva creada con éxito",
+    "errors": {
+      "fetch_data": "Ocurrió un error al obtener datos",
+      "fetch_cities": "Ocurrió un error al obtener ciudades",
+      "fetch_guides": "Ocurrió un error al obtener guías",
+      "no_guides": "No se encontraron guías que coincidan con tus criterios",
+      "booking_failed": "No se pudo crear la reserva"
+    }
+  },
+  "footer": {
+    "logo_text": "GuíaTurística",
+    "company_description": "Tu plataforma confiable para encontrar los mejores guías turísticos y experiencias en todo el mundo.",
+    "contact": {
+      "address": "Calle Viajes 123, Ciudad Global, Mundo",
+      "email": "soporte@guiaturistica.com",
+      "phone": "+1-800-123-4567"
     },
-    "popular_destinations": {
-      "title": "Todos los destinos populares",
-      "subtitle": "Descubre todos nuestros destinos principales con guías expertos",
-      "back_to_home": "Volver al inicio",
-      "back_to_home_aria": "Volver a la página de inicio",
-      "find_guides_aria": "Encontrar guías para {name}",
-      "istanbul": {
-        "name": "Estambul, Turquía",
-        "price": "Desde $25/día",
-        "highlights": [
-          "Tours históricos",
-          "Cocina local",
-          "Guía de compras"
-        ]
-      },
-      "barcelona": {
-        "name": "Barcelona, España",
-        "price": "Desde $35/día",
-        "highlights": [
-          "Arquitectura",
-          "Tours por la playa",
-          "Arte y cultura"
-        ]
-      },
-      "tokyo": {
-        "name": "Tokio, Japón",
-        "price": "Desde $45/día",
-        "highlights": [
-          "Cultura moderna",
-          "Lugares tradicionales",
-          "Tours gastronómicos"
-        ]
-      },
-      "paris": {
-        "name": "París, Francia",
-        "price": "Desde $40/día",
-        "highlights": [
-          "Museos",
-          "Tours románticos",
-          "Distritos de moda"
-        ]
-      },
-      "dubai": {
-        "name": "Dubái, EAU",
-        "price": "Desde $50/día",
-        "highlights": [
-          "Tours de lujo",
-          "Safari por el desierto",
-          "Maravillas modernas"
-        ]
-      },
-      "rome": {
-        "name": "Roma, Italia",
-        "price": "Desde $30/día",
-        "highlights": [
-          "Historia antigua",
-          "Tours por el Vaticano",
-          "Tours culinarios"
-        ]
-      }
+    "social": {
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "youtube": "YouTube"
     },
-    "find_guide": {
-      "title": "Encuentra tu guía perfecto",
-      "subtitle": "Explora expertos locales para hacer tu viaje inolvidable",
-      "search_placeholder": "Buscar por nombre o ubicación...",
-      "filters": "Filtros",
-      "country": "País",
-      "all_countries": "Todos los países",
-      "city": "Ciudad",
-      "all_cities": "Todas las ciudades",
-      "language": "Idioma",
-      "all_languages": "Todos los idiomas",
-      "minimum_rating": "Calificación mínima",
-      "all_ratings": "Todas las calificaciones",
-      "stars_4": "4+ estrellas",
-      "stars_45": "4.5+ estrellas",
-      "stars_5": "5 estrellas",
-      "error": "No se pudieron cargar los guías",
-      "loading": "Cargando guías...",
-      "no_guides_title": "No se encontraron guías",
-      "no_guides_description": "Intenta ajustar tu búsqueda o filtros para encontrar más guías.",
-      "languages": "Idiomas:",
-      "none": "Ninguno",
-      "tours": "Tours:",
-      "price": "Precio:",
+    "app": {
+      "title": "Obtén Nuestra App",
+      "description": "Descarga nuestra aplicación para explorar destinos y reservar guías sobre la marcha.",
+      "download_label": "Descargar en",
+      "get_it_on": "Obtener en",
+      "app_store": "App Store",
+      "google_play": "Google Play"
+    },
+    "trust": {
+      "ssl_secure": "SSL Seguro",
+      "gdpr_compliant": "Cumple con GDPR"
+    },
+    "copyright": "© {{year}} GuíaTurística. Todos los derechos reservados.",
+    "links": {
+      "terms": "Términos de Servicio",
+      "privacy": "Política de Privacidad",
+      "cookies": "Cookies",
+      "accessibility": "Accesibilidad"
+    }
+  },
+  "authentication": {
+    "brand": "Autenticación",
+    "subtitle": "Por favor, inicia sesión o regístrate",
+    "close": "Cerrar",
+    "tabs": {
+      "login": "Iniciar sesión",
+      "register": "Registrarse",
+      "forgot_password": "Olvidé mi contraseña"
+    },
+    "login": {
+      "title": "Iniciar sesión",
+      "subtitle": "Ingresa tus credenciales para acceder a tu cuenta",
+      "email_label": "Correo electrónico",
+      "email_placeholder": "Ingresa tu correo electrónico",
+      "password_label": "Contraseña",
+      "password_placeholder": "Ingresa tu contraseña",
+      "submit": "Iniciar sesión",
+      "or": "o",
+      "google": "Continuar con Google",
+      "facebook": "Continuar con Facebook"
+    },
+    "register": {
+      "title": "Registrarse",
+      "subtitle": "Crear una nueva cuenta",
+      "role_label": "Rol",
+      "role_client": "Cliente",
+      "role_customer": "Guía",
+      "first_name_label": "Nombre",
+      "first_name_placeholder": "Ingresa tu nombre",
+      "last_name_label": "Apellido",
+      "last_name_placeholder": "Ingresa tu apellido",
+      "email_label": "Correo electrónico",
+      "email_placeholder": "Ingresa tu correo electrónico",
+      "password_label": "Contraseña",
+      "password_placeholder": "Ingresa tu contraseña",
+      "confirm_password_label": "Confirmar contraseña",
+      "confirm_password_placeholder": "Confirma tu contraseña",
+      "country_label": "País",
+      "country_placeholder": "Ingresa tu país",
+      "personal_data": "Acepto el procesamiento de datos personales",
+      "terms": "Acepto los términos y condiciones",
+      "travel_tips": "Suscribirse a consejos de viaje",
+      "submit": "Registrarse",
+      "verify_email_title": "Verifica tu correo electrónico",
+      "verify_email_message": "Hemos enviado un código de verificación a {{email}}",
+      "verification_code_label": "Código de verificación",
+      "verification_code_placeholder": "Ingresa el código de 6 dígitos",
+      "verify_submit": "Verificar",
+      "resend_code": "Reenviar código"
+    },
+    "forgot": {
+      "title": "Olvidé mi contraseña",
+      "subtitle": "Restablecer tu contraseña",
+      "email_label": "Correo electrónico",
+      "email_placeholder": "Ingresa tu correo electrónico",
+      "submit": "Enviar código de restablecimiento",
+      "reset_title": "Restablecer contraseña",
+      "reset_message": "Hemos enviado un código de restablecimiento a {{email}}",
+      "reset_code_label": "Código de restablecimiento",
+      "reset_code_placeholder": "Ingresa el código de 6 dígitos",
+      "new_password_label": "Nueva contraseña",
+      "new_password_placeholder": "Ingresa la nueva contraseña",
+      "confirm_password_label": "Confirmar contraseña",
+      "confirm_password_placeholder": "Confirma la nueva contraseña",
+      "reset_submit": "Restablecer contraseña",
+      "resend_code": "Reenviar código"
+    },
+    "show_password": "Mostrar contraseña",
+    "hide_password": "Ocultar contraseña",
+    "social_login_under_development": "El inicio de sesión social con {{provider}} está en desarrollo",
+    "errors": {
+      "all_fields_required": "Todos los campos son obligatorios",
+      "passwords_do_not_match": "Las contraseñas no coinciden",
+      "password_requirements": "La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial",
+      "invalid_country": "País seleccionado inválido",
+      "login_failed": "Inicio de sesión fallido",
+      "request_code_failed": "No se pudo solicitar el código de verificación",
+      "email_exists": "El correo electrónico ya existe",
+      "too_many_requests": "Demasiadas solicitudes. Por favor, intenta de nuevo más tarde",
+      "verification_code_required": "Se requiere el código de verificación",
+      "invalid_verification_code": "Código de verificación inválido",
+      "registration_failed": "Registro fallido",
+      "code_expired": "El código de verificación ha expirado",
+      "invalid_code": "Código inválido o ya utilizado",
+      "too_many_attempts": "Demasiados intentos fallidos",
+      "password_reset_failed": "Restablecimiento de contraseña fallido"
+    },
+    "success": {
+      "verification_code_sent": "Código de verificación enviado",
+      "registration_successful": "Registro exitoso",
+      "reset_code_sent": "Código de restablecimiento de contraseña enviado",
+      "password_reset_successful": "Restablecimiento de contraseña exitoso"
+    },
+    "loading": "Cargando..."
+  },
+  "user_account": {
+    "title": "Cuenta de usuario",
+    "welcome": "Bienvenido, {{name}}",
+    "loading": "Cargando...",
+    "buttons": {
+      "messages": "Mensajes",
+      "cancel": "Cancelar",
+      "write_review": "Escribir reseña",
+      "chat_with_guide": "Chatear con el guía",
       "book_now": "Reservar ahora",
-      "book_success": "¡Guía reservado con éxito!",
-      "book_fail": "No se pudo reservar el guía",
-      "available_only": "Solo disponible"
+      "unavailable": "No disponible",
+      "chat": "Chat",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "react": "Reaccionar",
+      "view_reactions": "Ver reacciones",
+      "submit_reaction": "Enviar reacción",
+      "remove_reaction": "Eliminar reacción",
+      "edit_profile": "Editar perfil",
+      "update_profile": "Actualizar perfil",
+      "create_profile": "Crear perfil",
+      "submit_booking": "Enviar reserva",
+      "submit_cancellation": "Enviar cancelación",
+      "submit_review": "Enviar reseña",
+      "update_review": "Actualizar reseña",
+      "close": "Cerrar"
     },
-    "account": {
-      "please_login": "Por favor, inicia sesión.",
-      "my_profile": "Mi perfil",
-      "first_name": "Nombre:",
-      "last_name": "Apellido:",
-      "email": "Correo electrónico:",
-      "role": "Rol:",
-      "country": "País:",
-      "city": "Ciudad:",
+    "navigation": {
+      "dashboard": "Panel de control",
+      "profile": "Perfil",
+      "guides": "Guías",
+      "bookings": "Reservas",
+      "reviews": "Reseñas"
+    },
+    "dashboard": {
+      "total_bookings": "Total de reservas",
+      "active_bookings": "Reservas activas",
+      "completed_trips": "Viajes completados",
+      "reviews_written": "Reseñas escritas",
+      "recent_bookings": "Reservas recientes"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "confirmed": "Confirmado",
+      "accepted": "Aceptado",
+      "completed": "Completado",
+      "cancelled": "Cancelado"
+    },
+    "profile": {
+      "edit_profile": "Editar perfil",
+      "create_profile": "Crear perfil",
+      "profile_information": "Información del perfil",
       "not_set": "No establecido",
-      "user_account": {
-        "title": "Mi cuenta",
-        "welcome": "Bienvenido, {name}",
-        "messages": "Mensajes",
-        "tabs": {
-          "dashboard": "Panel de control",
-          "profile": "Perfil",
-          "guides": "Encontrar guías",
-          "bookings": "Mis reservas",
-          "reviews": "Mis reseñas"
-        },
-        "dashboard": {
-          "stats": {
-            "total_bookings": "Reservas totales",
-            "active_bookings": "Reservas activas",
-            "completed_trips": "Viajes completados",
-            "reviews_written": "Reseñas escritas"
-          },
-          "recent_bookings": "Reservas recientes",
-          "booking_status": {
-            "pending": "Pendiente",
-            "confirmed": "Confirmado",
-            "accepted": "Aceptado",
-            "completed": "Completado",
-            "cancelled": "Cancelado"
-          },
-          "cancellation_reason": "Motivo de cancelación: {reason}",
-          "actions": {
-            "cancel": "Cancelar",
-            "write_review": "Escribir reseña",
-            "chat": "Chat",
-            "chat_with_guide": "Chatear con el guía"
-          }
-        },
+      "forms": {
         "profile": {
-          "create_profile": "Crear perfil",
-          "edit_profile": "Editar perfil",
-          "profile_information": "Información del perfil",
-          "date_of_birth": "Fecha de nacimiento:",
-          "preferred_contact": "Contacto preferido:",
-          "contact_methods": {
+          "date_of_birth": "Fecha de nacimiento",
+          "preferred_contact": "Método de contacto preferido",
+          "languages": "Idiomas",
+          "contact_options": {
             "email": "Correo electrónico",
             "phone": "Teléfono",
             "chat": "Chat"
-          },
-          "languages": "Idiomas:",
-          "form": {
-            "date_of_birth_label": "Fecha de nacimiento",
-            "preferred_contact_label": "Método de contacto preferido",
-            "languages_label": "Idiomas",
-            "submit_create": "Crear perfil",
-            "submit_update": "Actualizar perfil",
-            "cancel": "Cancelar"
           }
-        },
-        "guides": {
-          "title": "Encontrar guías",
-          "filters": {
-            "search_placeholder": "Buscar guías...",
-            "all_services": "Todos los servicios",
-            "all_countries": "Todos los países",
-            "all_cities": "Todas las ciudades",
-            "any_rating": "Cualquier calificación",
-            "stars_4": "4+ estrellas",
-            "stars_45": "4.5+ estrellas",
-            "stars_5": "5 estrellas"
-          },
-          "guide_card": {
-            "years_experience": "{years} años de experiencia",
-            "rating": "{rating}/5 ({reviews} reseñas)",
-            "hourly_rate": "${rate}/hora",
-            "daily_rate": "${rate}/día",
-            "book_now": "Reservar ahora",
-            "unavailable": "No disponible",
-            "chat": "Chat"
-          }
-        },
-        "bookings": {
-          "title": "Mis reservas",
-          "booking_title": "Reserva: {title}",
-          "dates": "{start_date} - {end_date}",
-          "description": "Descripción: {description}"
-        },
-        "reviews": {
-          "title": "Mis reseñas",
-          "filters": {
-            "all_ratings": "Todas las calificaciones",
-            "stars_5": "5 estrellas",
-            "stars_4": "4+ estrellas",
-            "stars_3": "3+ estrellas",
-            "stars_2": "2+ estrellas",
-            "stars_1": "1+ estrellas",
-            "sort_newest": "Más reciente primero",
-            "sort_oldest": "Más antiguo primero",
-            "sort_highest": "Calificación más alta",
-            "sort_lowest": "Calificación más baja"
-          },
-          "summary": {
-            "title": "Resumen de reseñas",
-            "total_reviews": "Reseñas totales: {count}",
-            "overall": "General: {rating}/5",
-            "communication": "Comunicación: {rating}/5",
-            "service": "Servicio: {rating}/5",
-            "punctuality": "Puntualidad: {rating}/5",
-            "value": "Valor: {rating}/5"
-          },
-          "review_item": {
-            "rating": "{rating}/5",
-            "for_guide": "Para el guía: {name}",
-            "booking": "Reserva: {title} ({start_date} - {end_date})",
-            "communication": "Comunicación: {rating}/5",
-            "service": "Servicio: {rating}/5",
-            "punctuality": "Puntualidad: {rating}/5",
-            "value": "Valor: {rating}/5",
-            "likes": "👍 {count}",
-            "dislikes": "👎 {count}",
-            "view_reactions": "Ver reacciones",
-            "edit": "Editar",
-            "delete": "Eliminar",
-            "react": "Reaccionar"
-          },
-          "no_reviews": "No hay reseñas que coincidan con tus filtros actuales. ¡Completa una reserva para escribir una reseña!"
-        },
-        "booking_form": {
-          "title": "Reservar guía: {name}",
-          "title_label": "Título *",
-          "title_placeholder": "Ingresa el título de la reserva",
-          "description_label": "Descripción",
-          "description_placeholder": "Describe qué tipo de tour/servicio necesitas",
-          "start_date_label": "Fecha de inicio *",
-          "end_date_label": "Fecha de fin *",
-          "special_requirements_label": "Requisitos especiales",
-          "special_requirements_placeholder": "Cualquier solicitud o requisito especial",
-          "budget_label": "Presupuesto (USD)",
-          "budget_placeholder": "0",
-          "guide_daily_rate": "Tarifa diaria del guía: ${rate}",
-          "guide_hourly_rate": "Tarifa por hora del guía: ${rate}",
-          "submit": "Reservar guía",
-          "cancel": "Cancelar"
-        },
-        "review_form": {
-          "title": "{action} Reseña para el guía: {guide} - Reserva: {booking}",
-          "overall_rating_label": "Calificación general *",
-          "communication_label": "Comunicación *",
-          "service_label": "Calidad del servicio *",
-          "punctuality_label": "Puntualidad *",
-          "value_label": "Valor por dinero *",
-          "title_label": "Título *",
-          "title_placeholder": "Ingresa el título de la reseña",
-          "comment_label": "Comentario *",
-          "comment_placeholder": "Comparte tu experiencia y comentarios sobre el guía...",
-          "submit_create": "Enviar reseña",
-          "submit_update": "Actualizar reseña",
-          "cancel": "Cancelar",
-          "star": "{count} Estrella{count > 1 ? 's' : ''}"
-        },
-        "cancel_booking": {
-          "title": "Cancelar reserva",
-          "reason_label": "Motivo de cancelación *",
-          "reason_placeholder": "Por favor, proporciona un motivo para la cancelación",
-          "submit": "Confirmar cancelación",
-          "close": "Cerrar"
-        },
-        "reactions": {
-          "title": "Reacciones a la reseña",
-          "summary_title": "Resumen de reacciones",
-          "likes": "Me gusta: {count}",
-          "dislikes": "No me gusta: {count}",
-          "latest_likes": "Últimos comentarios de 'Me gusta'",
-          "latest_dislikes": "Últimos comentarios de 'No me gusta'",
-          "no_comments": "No hay comentarios de {type} disponibles.",
-          "all_reactions": "Todas las reacciones",
-          "no_reactions": "No hay reacciones disponibles.",
-          "reaction_form": {
-            "reaction_type_label": "Tipo de reacción",
-            "reaction_like": "Me gusta",
-            "reaction_dislike": "No me gusta",
-            "comment_label": "Comentario",
-            "comment_placeholder": "{type} (requerido para 'No me gusta')",
-            "submit": "Enviar reacción",
-            "cancel": "Cancelar",
-            "remove_reaction": "Eliminar mi reacción"
-          }
-        },
-        "errors": {
-          "required_fields": "Por favor, completa todos los campos obligatorios",
-          "start_date_required": "La fecha de inicio es obligatoria",
-          "end_date_required": "La fecha de fin es obligatoria",
-          "title_required": "El título es obligatorio",
-          "start_date_before_end": "La fecha de inicio debe ser anterior a la fecha de fin",
-          "start_date_past": "La fecha de inicio no puede estar en el pasado",
-          "cancel_reason_required": "El motivo de cancelación es obligatorio",
-          "review_title_required": "El título de la reseña es obligatorio",
-          "review_comment_required": "El comentario de la reseña es obligatorio",
-          "dislike_comment_required": "El comentario es obligatorio para 'No me gusta'",
-          "booking_failed": "No se pudo crear la reserva",
-          "review_failed": "No se pudo enviar la reseña",
-          "delete_review_failed": "No se pudo eliminar la reseña",
-          "reaction_failed": "No se pudo enviar la reacción",
-          "remove_reaction_failed": "No se pudo eliminar la reacción",
-          "cancel_booking_failed": "No se pudo cancelar la reserva",
-          "load_reactions_failed": "No se pudieron cargar las reacciones",
-          "load_summary_failed": "No se pudo cargar el resumen de reseñas"
-        },
-        "success": {
-          "booking_created": "¡Reserva creada con éxito!",
-          "review_submitted": "¡Reseña enviada con éxito!",
-          "review_updated": "¡Reseña actualizada con éxito!",
-          "review_deleted": "¡Reseña eliminada con éxito!",
-          "reaction_submitted": "¡Reacción enviada con éxito!",
-          "reaction_removed": "¡Reacción eliminada con éxito!",
-          "booking_cancelled": "¡Reserva cancelada con éxito!"
-        }
-      },
-      "guide_account": {
-        "title": "Cuenta de guía",
-        "welcome": "Bienvenido, {name}",
-        "messages": "Mensajes",
-        "tabs": {
-          "dashboard": "Panel de control",
-          "profile": "Perfil",
-          "bookings": "Reservas",
-          "portfolio": "Portafolio",
-          "availability": "Disponibilidad",
-          "reviews": "Reseñas"
-        },
-        "dashboard": {
-          "stats": {
-            "total_bookings": "Reservas totales",
-            "active_bookings": "Reservas activas",
-            "total_reviews": "Reseñas totales",
-            "average_rating": "Calificación promedio"
-          },
-          "recent_bookings": "Reservas recientes",
-          "booking_status": {
-            "pending": "Pendiente",
-            "confirmed": "Confirmado",
-            "accepted": "Aceptado",
-            "completed": "Completado",
-            "cancelled": "Cancelado"
-          },
-          "actions": {
-            "accept": "Aceptar",
-            "decline": "Rechazar",
-            "chat_with_client": "Chatear con el cliente"
-          }
-        },
-        "profile": {
-          "create_profile": "Crear perfil",
-          "edit_profile": "Editar perfil",
-          "profile_information": "Información del perfil",
-          "professional_bio": "Biografía profesional",
-          "years_of_experience": "Años de experiencia: {years}",
-          "availability": "Disponibilidad",
-          "available": "Disponible",
-          "not_available": "No disponible",
-          "form": {
-            "professional_bio_label": "Biografía profesional",
-            "professional_bio_placeholder": "Describe tu experiencia y conocimientos",
-            "years_of_experience_label": "Años de experiencia",
-            "city_label": "Ciudad",
-            "city_placeholder": "Selecciona tu ciudad",
-            "service_areas_label": "Áreas de servicio",
-            "service_areas_placeholder": "Por ejemplo, Centro, Distrito histórico",
-            "service_types_label": "Tipos de servicio",
-            "hourly_rate_label": "Tarifa por hora",
-            "hourly_rate_placeholder": "Ingresa la tarifa por hora",
-            "daily_rate_label": "Tarifa diaria",
-            "daily_rate_placeholder": "Ingresa la tarifa diaria",
-            "currency_label": "Moneda",
-            "languages_label": "Idiomas",
-            "is_available_label": "Disponible para reservas",
-            "submit_create": "Crear perfil",
-            "submit_update": "Actualizar perfil",
-            "cancel": "Cancelar"
-          }
-        },
-        "bookings": {
-          "title": "Mis reservas",
-          "booking_title": "Reserva: {title}",
-          "dates": "{start_date} - {end_date}",
-          "description": "Descripción: {description}"
-        },
-        "portfolio": {
-          "title": "Portafolio",
-          "add_item": "Agregar elemento al portafolio",
-          "form": {
-            "title": "{action} Elemento del portafolio",
-            "title_label": "Título",
-            "title_placeholder": "Ingresa el título del elemento del portafolio",
-            "description_label": "Descripción",
-            "description_placeholder": "Describe este elemento del portafolio",
-            "image_label": "Imagen",
-            "order_label": "Orden",
-            "order_placeholder": "Ingresa el orden de visualización",
-            "submit_create": "Agregar elemento",
-            "submit_update": "Actualizar elemento",
-            "cancel": "Cancelar"
-          },
-          "item": {
-            "edit": "Editar",
-            "delete": "Eliminar"
-          }
-        },
-        "availability": {
-          "title": "Disponibilidad",
-          "add_availability": "Agregar disponibilidad",
-          "form": {
-            "title": "{action} Disponibilidad",
-            "date_label": "Fecha",
-            "is_available_label": "Disponible",
-            "start_time_label": "Hora de inicio",
-            "end_time_label": "Hora de fin",
-            "note_label": "Nota",
-            "note_placeholder": "Agrega cualquier nota (opcional)",
-            "submit_create": "Agregar disponibilidad",
-            "submit_update": "Actualizar disponibilidad",
-            "cancel": "Cancelar"
-          },
-          "item": {
-            "date": "Fecha: {date}",
-            "time": "{start_time} - {end_time}",
-            "all_day": "Todo el día",
-            "note": "Nota: {note}",
-            "available": "Disponible",
-            "unavailable": "No disponible",
-            "edit": "Editar",
-            "delete": "Eliminar"
-          }
-        },
-        "reviews": {
-          "title": "Reseñas",
-          "filters": {
-            "all_ratings": "Todas las calificaciones",
-            "stars_5": "5 estrellas",
-            "stars_4": "4+ estrellas",
-            "stars_3": "3+ estrellas",
-            "stars_2": "2+ estrellas",
-            "stars_1": "1+ estrellas",
-            "sort_newest": "Más reciente primero",
-            "sort_oldest": "Más antiguo primero",
-            "sort_highest": "Calificación más alta",
-            "sort_lowest": "Calificación más baja"
-          },
-          "summary": {
-            "title": "Resumen de reseñas",
-            "overall": "General: {rating}/5",
-            "communication": "Comunicación: {rating}/5",
-            "service": "Servicio: {rating}/5",
-            "punctuality": "Puntualidad: {rating}/5",
-            "value": "Valor: {rating}/5",
-            "total_reviews": "Reseñas totales: {count}"
-          },
-          "review_item": {
-            "rating": "{rating}/5",
-            "date": "Fecha: {date}",
-            "communication": "Comunicación: {rating}/5",
-            "service": "Servicio: {rating}/5",
-            "punctuality": "Puntualidad: {rating}/5",
-            "value": "Valor: {rating}/5",
-            "react": "Reaccionar",
-            "remove_reaction": "Eliminar reacción",
-            "my_reaction": "Mi reacción: {type}",
-            "my_reaction_with_comment": "Mi reacción: {type} - {comment}"
-          },
-          "no_reviews": "No hay reseñas disponibles."
-        },
-        "reaction_form": {
-          "reaction_type_label": "Tipo de reacción",
-          "reaction_like": "Me gusta",
-          "reaction_comment": "Comentario",
-          "reaction_report": "Reportar",
-          "comment_label": "Comentario",
-          "comment_placeholder": "Agrega tu comentario",
-          "report_reason_label": "Motivo del reporte",
-          "report_reason_placeholder": "Por favor, proporciona un motivo para el reporte",
-          "submit": "Enviar",
-          "cancel": "Cancelar"
-        },
-        "cancel_booking": {
-          "title": "Cancelar reserva",
-          "reason_label": "Motivo de cancelación",
-          "reason_placeholder": "Por favor, proporciona un motivo para la cancelación",
-          "submit": "Confirmar cancelación",
-          "close": "Cerrar"
-        },
-        "errors": {
-          "required_fields": "Por favor, completa todos los campos obligatorios",
-          "profile_failed": "No se pudo guardar el perfil",
-          "portfolio_failed": "No se pudo guardar el elemento del portafolio",
-          "availability_failed": "No se pudo guardar la disponibilidad",
-          "cancel_reason_required": "El motivo de cancelación es obligatorio",
-          "reaction_required": "Por favor, selecciona una reacción o proporciona un comentario",
-          "reaction_failed": "No se pudo enviar la reacción",
-          "remove_reaction_failed": "No se pudo eliminar la reacción",
-          "cancel_booking_failed": "No se pudo cancelar la reserva"
-        },
-        "success": {
-          "profile_created": "¡Perfil creado con éxito!",
-          "profile_updated": "¡Perfil actualizado con éxito!",
-          "portfolio_created": "¡Elemento del portafolio creado con éxito!",
-          "portfolio_updated": "¡Elemento del portafolio actualizado con éxito!",
-          "portfolio_deleted": "¡Elemento del portafolio eliminado con éxito!",
-          "availability_created": "¡Disponibilidad creada con éxito!",
-          "availability_updated": "¡Disponibilidad actualizada con éxito!",
-          "availability_deleted": "¡Disponibilidad eliminada con éxito!",
-          "booking_accepted": "¡Reserva aceptada con éxito!",
-          "booking_cancelled": "¡Reserva cancelada con éxito!",
-          "reaction_submitted": "¡Reacción enviada con éxito!",
-          "reaction_removed": "¡Reacción eliminada con éxito!"
         }
       }
+    },
+    "guides": {
+      "find_guides": "Encontrar guías",
+      "search_placeholder": "Buscar guías...",
+      "years_experience": "{{years}} años de experiencia",
+      "rating": "{{rating}} de {{count}} reseñas",
+      "hourly_rate": "${{rate}}/hora",
+      "daily_rate": "${{rate}}/día",
+      "filters": {
+        "all_services": "Todos los servicios",
+        "all_countries": "Todos los países",
+        "all_cities": "Todas las ciudades",
+        "any_rating": "Cualquier calificación",
+        "rating_4": "4+ estrellas",
+        "rating_4_5": "4.5+ estrellas",
+        "rating_5": "5 estrellas",
+        "available_only": "Solo disponibles"
+      }
+    },
+    "bookings": {
+      "title": "Mis reservas",
+      "booking_title": "Reserva: {{title}}",
+      "description": "Descripción: {{description}}",
+      "not_set": "No establecido",
+      "cancellation_reason": "Motivo de cancelación"
+    },
+    "reviews": {
+      "title": "Mis reseñas",
+      "summary_title": "Resumen de reseñas",
+      "no_reviews": "No se encontraron reseñas.",
+      "unknown": "Desconocido",
+      "review_for": "Reseña para {{guideName}}",
+      "rating": "({{rating}}/5)",
+      "communication": "Comunicación",
+      "service": "Servicio",
+      "punctuality": "Puntualidad",
+      "value": "Valor",
+      "booking_details": "Reserva: {{title}} ({{startDate}} - {{endDate}})",
+      "likes": "Me gusta: {{count}}",
+      "dislikes": "No me gusta: {{count}}",
+      "reactions_title": "Reacciones a la reseña",
+      "reaction_summary": "Resumen de reacciones",
+      "latest_likes": "Últimos me gusta",
+      "latest_dislikes": "Últimos no me gusta",
+      "no_likes": "Aún no hay me gusta",
+      "no_dislikes": "Aún no hay no me gusta",
+      "no_comment": "No se proporcionó comentario",
+      "add_reaction": "Añadir reacción",
+      "filters": {
+        "all_ratings": "Todas las calificaciones",
+        "rating_5": "5 estrellas",
+        "rating_4": "4 estrellas",
+        "rating_3": "3 estrellas",
+        "rating_2": "2 estrellas",
+        "rating_1": "1 estrella",
+        "newest_first": "Primero los más nuevos",
+        "oldest_first": "Primero los más antiguos",
+        "highest_rated": "Mejor calificados",
+        "lowest_rated": "Menos calificados"
+      },
+      "summary": {
+        "total_reviews": "Total de reseñas",
+        "avg_overall_rating": "Calificación general promedio",
+        "avg_communication": "Comunicación promedio",
+        "avg_service": "Servicio promedio",
+        "avg_punctuality": "Puntualidad promedio",
+        "avg_value": "Valor promedio"
+      }
+    },
+    "forms": {
+      "booking": {
+        "title": "Reservar {{guideName}}",
+        "title_label": "Título",
+        "title_placeholder": "Ingrese el título de la reserva",
+        "title_default": "Reserva con {{guideName}}",
+        "description": "Descripción",
+        "description_placeholder": "Describa su viaje",
+        "start_date": "Fecha de inicio",
+        "end_date": "Fecha de fin",
+        "special_requirements": "Requisitos especiales",
+        "special_requirements_placeholder": "¿Algún requisito especial?",
+        "budget": "Presupuesto",
+        "budget_placeholder": "Ingrese su presupuesto",
+        "daily_rate_note": "Tarifa diaria del guía: ${{rate}}",
+        "hourly_rate_note": "Tarifa por hora del guía: ${{rate}}"
+      },
+      "review": {
+        "write_title": "Escribir reseña para {{guideName}} - {{bookingTitle}}",
+        "edit_title": "Editar reseña para {{guideName}} - {{bookingTitle}}",
+        "title_default": "Reseña para {{guideName}} - {{bookingTitle}}",
+        "overall_rating": "Calificación general",
+        "communication_rating": "Calificación de comunicación",
+        "service_rating": "Calificación de servicio",
+        "punctuality_rating": "Calificación de puntualidad",
+        "value_rating": "Calificación de valor",
+        "title": "Título de la reseña",
+        "title_placeholder": "Ingrese el título de la reseña",
+        "comment": "Comentario",
+        "comment_placeholder": "Escriba su reseña...",
+        "star": "{{count}} estrella{{count > 1 ? 's' : ''}}"
+      },
+      "reaction": {
+        "reaction_type": "Tipo de reacción",
+        "like": "Me gusta",
+        "dislike": "No me gusta",
+        "comment": "Comentario",
+        "like_placeholder": "¿Por qué te gusta esta reseña?",
+        "dislike_placeholder": "¿Por qué no te gusta esta reseña?"
+      },
+      "cancel_booking": {
+        "title": "Cancelar reserva",
+        "reason": "Motivo de cancelación",
+        "reason_placeholder": "Por favor, proporcione un motivo de cancelación"
+      }
+    },
+    "errors": {
+      "fill_required_fields": "Por favor, complete todos los campos obligatorios",
+      "start_date_required": "La fecha de inicio es obligatoria",
+      "end_date_required": "La fecha de fin es obligatoria",
+      "title_required": "El título es obligatorio",
+      "start_date_before_end": "La fecha de inicio debe ser anterior a la fecha de fin",
+      "start_date_past": "La fecha de inicio no puede estar en el pasado",
+      "failed_create_booking": "No se pudo crear la reserva",
+      "review_title_required": "El título de la reseña es obligatorio",
+      "review_comment_required": "El comentario de la reseña es obligatorio",
+      "failed_submit_review": "No se pudo enviar la reseña",
+      "failed_delete_review": "No se pudo eliminar la reseña",
+      "dislike_comment_required": "Es obligatorio un comentario para la reacción de no me gusta",
+      "failed_submit_reaction": "No se pudo enviar la reacción",
+      "failed_remove_reaction": "No se pudo eliminar la reacción",
+      "failed_load_reactions": "No se pudieron cargar las reacciones",
+      "failed_load_review_summary": "No se pudo cargar el resumen de reseñas",
+      "failed_cancel_booking": "No se pudo cancelar la reserva",
+      "cancellation_reason_required": "El motivo de cancelación es obligatorio"
+    },
+    "success": {
+      "booking_created": "Reserva creada exitosamente",
+      "review_submitted": "Reseña enviada exitosamente",
+      "review_updated": "Reseña actualizada exitosamente",
+      "review_deleted": "Reseña eliminada exitosamente",
+      "reaction_submitted": "Reacción enviada exitosamente",
+      "reaction_removed": "Reacción eliminada exitosamente",
+      "booking_cancelled": "Reserva cancelada exitosamente"
+    },
+    "confirm": {
+      "delete_review": "¿Estás seguro de que quieres eliminar esta reseña?"
+    }
+  },
+  "guideAccount": {
+    "title": "Cuenta de Guía",
+    "welcome": "Bienvenido, {name}",
+    "messages": "Mensajes",
+    "loading": "Cargando...",
+    "error": {
+      "requiredFields": "Faltan campos obligatorios",
+      "noProfile": "No se encontró perfil, el usuario debe crear uno",
+      "failedToLoadBookings": "Error al cargar las reservas",
+      "failedToLoadReviews": "Error al cargar las reseñas",
+      "failedToLoadReviewSummary": "Error al cargar el resumen de reseñas",
+      "failedToLoadPortfolio": "Error al cargar el portafolio",
+      "failedToLoadAvailability": "Error al cargar la disponibilidad",
+      "profileRequired": "Se requiere biografía profesional y ciudad",
+      "portfolioTitleRequired": "Se requiere el título del portafolio",
+      "dateRequired": "Se requiere la fecha",
+      "failedToSaveProfile": "Error al guardar el perfil",
+      "failedToSavePortfolio": "Error al guardar el elemento del portafolio",
+      "failedToSaveAvailability": "Error al guardar la disponibilidad",
+      "failedToProcessBooking": "Error al procesar la acción de reserva",
+      "failedToDeletePortfolio": "Error al eliminar el elemento del portafolio",
+      "failedToDeleteAvailability": "Error al eliminar la disponibilidad",
+      "noClientEmail": "No hay correo electrónico del cliente disponible",
+      "reactionRequired": "Se requiere tipo de reacción o comentario",
+      "failedToSubmitReaction": "Error al enviar la reacción",
+      "failedToRemoveReaction": "Error al eliminar la reacción",
+      "cancelReasonRequired": "Se requiere motivo de cancelación"
+    },
+    "success": {
+      "profileCreated": "Perfil creado exitosamente",
+      "profileUpdated": "Perfil actualizado exitosamente",
+      "portfolioCreated": "Elemento del portafolio creado exitosamente",
+      "portfolioUpdated": "Elemento del portafolio actualizado exitosamente",
+      "availabilityCreated": "Disponibilidad creada exitosamente",
+      "availabilityUpdated": "Disponibilidad actualizada exitosamente",
+      "bookingAccepted": "Reserva aceptada exitosamente",
+      "bookingCancelled": "Reserva cancelada exitosamente",
+      "portfolioDeleted": "Elemento del portafolio eliminado exitosamente",
+      "availabilityDeleted": "Disponibilidad eliminada exitosamente",
+      "reactionSubmitted": "Reacción enviada exitosamente",
+      "reactionRemoved": "Reacción eliminada exitosamente"
+    },
+    "navigation": {
+      "dashboard": "Panel de Control",
+      "profile": "Perfil",
+      "bookings": "Reservas",
+      "portfolio": "Portafolio",
+      "availability": "Disponibilidad",
+      "reviews": "Reseñas"
+    },
+    "dashboard": {
+      "totalBookings": "Total de Reservas",
+      "activeBookings": "Reservas Activas",
+      "totalReviews": "Total de Reseñas",
+      "averageRating": "Calificación Promedio",
+      "recentBookings": "Reservas Recientes",
+      "bookingStatus": "{status}",
+      "accept": "Aceptar",
+      "decline": "Rechazar",
+      "chatWithClient": "Chatear con el Cliente"
+    },
+    "profile": {
+      "createProfile": "Crear Perfil",
+      "editProfile": "Editar Perfil",
+      "profileInformation": "Información del Perfil",
+      "professionalBio": "Biografía Profesional",
+      "bioPlaceholder": "Ingresa tu biografía profesional",
+      "yearsOfExperience": "Años de Experiencia",
+      "city": "Ciudad",
+      "selectCity": "Selecciona una ciudad",
+      "serviceAreas": "Áreas de Servicio",
+      "serviceAreasPlaceholder": "Ingresa áreas de servicio (por ejemplo, Taskent, Samarcanda)",
+      "serviceTypes": "Tipos de Servicio",
+      "hourlyRate": "Tarifa por Hora",
+      "hourlyRatePlaceholder": "Ingresa tarifa por hora",
+      "dailyRate": "Tarifa Diaria",
+      "dailyRatePlaceholder": "Ingresa tarifa diaria",
+      "currency": "Moneda",
+      "usd": "USD",
+      "eur": "EUR",
+      "uzs": "UZS",
+      "languages": "Idiomas",
+      "availableForBookings": "Disponible para Reservas",
+      "availability": "Disponibilidad",
+      "available": "Disponible",
+      "notAvailable": "No Disponible",
+      "updateProfile": "Actualizar Perfil",
+      "createProfileButton": "Crear Perfil",
+      "cancel": "Cancelar",
+      "editProfileButton": "Editar Perfil",
+      "years": "años"
+    },
+    "bookings": {
+      "myBookings": "Mis Reservas",
+      "dates": "{start} - {end}",
+      "accept": "Aceptar",
+      "decline": "Rechazar",
+      "chatWithClient": "Chatear con el Cliente"
+    },
+    "portfolio": {
+      "myPortfolio": "Mi Portafolio",
+      "addPortfolioItem": "Agregar Elemento al Portafolio",
+      "editPortfolioItem": "Editar Elemento del Portafolio",
+      "createPortfolioItem": "Crear Elemento del Portafolio",
+      "updatePortfolioItem": "Actualizar Elemento del Portafolio",
+      "title": "Título",
+      "titlePlaceholder": "Ingresa el título del elemento del portafolio",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Ingresa la descripción del elemento del portafolio",
+      "image": "Imagen",
+      "order": "Orden",
+      "orderPlaceholder": "Ingresa el orden de visualización",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "cancel": "Cancelar",
+      "deleteConfirm": "¿Estás seguro de que quieres eliminar este elemento del portafolio?"
+    },
+    "availability": {
+      "myAvailability": "Mi Disponibilidad",
+      "addAvailability": "Agregar Disponibilidad",
+      "editAvailability": "Editar Disponibilidad",
+      "createAvailability": "Crear Disponibilidad",
+      "updateAvailability": "Actualizar Disponibilidad",
+      "date": "Fecha",
+      "available": "Disponible",
+      "unavailable": "No Disponible",
+      "startTime": "Hora de Inicio",
+      "endTime": "Hora de Fin",
+      "note": "Nota",
+      "notePlaceholder": "Ingresa notas adicionales",
+      "allDay": "Todo el Día",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "cancel": "Cancelar",
+      "deleteConfirm": "¿Estás seguro de que quieres eliminar esta disponibilidad?"
+    },
+    "reviews": {
+      "myReviews": "Mis Reseñas",
+      "reviewSummary": "Resumen de Reseñas",
+      "overallRating": "Calificación General",
+      "communication": "Comunicación",
+      "service": "Servicio",
+      "punctuality": "Puntualidad",
+      "value": "Valor",
+      "totalReviews": "Total de Reseñas",
+      "allRatings": "Todas las Calificaciones",
+      "stars": {
+        "5": "5 Estrellas",
+        "4": "4 Estrellas",
+        "3": "3 Estrellas",
+        "2": "2 Estrellas",
+        "1": "1 Estrella"
+      },
+      "sortBy": {
+        "newestFirst": "Más Recientes Primero",
+        "oldestFirst": "Más Antiguos Primero",
+        "highestRated": "Más Altos Primero",
+        "lowestRated": "Más Bajos Primero"
+      },
+      "noReviews": "No hay reseñas disponibles",
+      "react": "Reaccionar",
+      "removeReaction": "Eliminar Reacción",
+      "reactionType": "Tipo de Reacción",
+      "like": "Me Gusta",
+      "comment": "Comentario",
+      "report": "Reportar",
+      "commentPlaceholder": "Ingresa tu comentario",
+      "reportReasonPlaceholder": "Ingresa la razón para reportar",
+      "submitReaction": "Enviar Reacción",
+      "cancel": "Cancelar",
+      "yourReaction": "Tu reacción: {type} - {comment}",
+      "yourReactionNoComment": "Tu reacción: {type}"
+    },
+    "cancelModal": {
+      "cancelBooking": "Cancelar Reserva",
+      "reasonForCancellation": "Motivo de Cancelación",
+      "reasonPlaceholder": "Ingresa el motivo de cancelación",
+      "cancelBookingButton": "Cancelar Reserva",
+      "close": "Cerrar"
+    }
+  },
+  "chatWidgets": {
+    "header": {
+      "messages": "Mensajes",
+      "searchUsers": "Buscar Usuarios",
+      "blockedUsers": "Usuarios Bloqueados",
+      "back": "Atrás",
+      "newConversation": "Nueva Conversación",
+      "close": "Cerrar"
+    },
+    "error": {
+      "initializeChat": "Error al inicializar el chat",
+      "loadConversations": "Error al cargar las conversaciones",
+      "loadMessages": "Error al cargar los mensajes",
+      "loadUnreadCount": "Error al cargar el conteo de mensajes no leídos",
+      "loadBlockedUsers": "Error al cargar los usuarios bloqueados",
+      "webSocket": "Error de WebSocket: {message}",
+      "sendMessage": "Error al enviar el mensaje",
+      "searchUsers": "Error al buscar usuarios",
+      "startConversation": "Error al iniciar la conversación",
+      "blockUser": "Error al bloquear al usuario",
+      "unblockUser": "Error al desbloquear al usuario",
+      "messageAction": "Error al realizar la acción del mensaje",
+      "close": "Cerrar"
+    },
+    "success": {
+      "blockUser": "Usuario bloqueado exitosamente",
+      "unblockUser": "Usuario desbloqueado exitosamente"
+    },
+    "conversations": {
+      "loading": "Cargando...",
+      "noConversations": "No se encontraron conversaciones",
+      "startConversation": "Iniciar una Conversación",
+      "noMessages": "No hay mensajes",
+      "messageDeleted": "Mensaje eliminado",
+      "unknownUser": "Usuario Desconocido",
+      "unknownUserInitial": "U",
+      "unreadMessages": "{count, plural, one {# mensaje no leído} other {# mensajes no leídos}}"
     },
     "chat": {
-      "title": {
-        "messages": "Mensajes",
-        "search_users": "Buscar usuarios",
-        "blocked_users": "Usuarios bloqueados"
-      },
-      "actions": {
-        "back": "Volver",
-        "new_conversation": "Nueva conversación",
-        "blocked_users": "Usuarios bloqueados",
-        "close": "Cerrar",
-        "close_error": "Cerrar",
-        "send": "Enviar",
-        "block_user": "Bloquear usuario",
-        "unblock": "Desbloquear"
-      },
-      "status": {
-        "online": "En línea",
-        "offline": "Fuera de línea"
-      },
-      "conversations": {
-        "loading": "Cargando conversaciones...",
-        "no_conversations": "Aún no hay conversaciones.",
-        "start_conversation": "Iniciar una conversación",
-        "no_messages": "Aún no hay mensajes",
-        "message_deleted": "Mensaje eliminado",
-        "unknown_user": "Usuario desconocido",
-        "unknown_user_initial": "U",
-        "total_unread": "Mensajes no leídos: {count}"
-      },
-      "chat": {
-        "input_placeholder": "Escribe un mensaje...",
-        "no_content": "No hay contenido disponible",
-        "read_status": "Leído",
-        "online_users": "{users} en línea",
-        "typing_users": "{users} escribiendo...",
-        "deleted_by_sender_mine": "Tú eliminaste este mensaje",
-        "deleted_by_sender_other": "Este mensaje fue eliminado por el remitente",
-        "deleted_by_receiver_mine": "Tú eliminaste este mensaje para ti",
-        "deleted_by_receiver_other": "Este mensaje fue eliminado por el receptor",
-        "deleted_for_everyone": "Este mensaje fue eliminado para todos",
-        "message_deleted": "Mensaje eliminado",
-        "actions": {
-          "delete_for_me": "Eliminar para mí",
-          "delete_for_everyone": "Eliminar para todos",
-          "recover": "Recuperar"
-        }
-      },
-      "search": {
-        "placeholder": "Buscar por nombre o correo electrónico...",
-        "hint": "Escribe al menos 2 caracteres para buscar",
-        "no_results": "No se encontraron usuarios",
-        "unknown_user_initial": "U"
-      },
-      "blocked": {
-        "no_blocked_users": "No hay usuarios bloqueados",
-        "unknown_user": "Usuario desconocido",
-        "unknown_user_initial": "U",
-        "blocked_on": "Bloqueado el: {date}"
-      },
-      "success": {
-        "user_blocked": "Usuario bloqueado con éxito",
-        "user_unblocked": "Usuario desbloqueado con éxito"
-      },
-      "errors": {
-        "initialize_failed": "No se pudo inicializar el chat",
-        "load_conversations_failed": "No se pudieron cargar las conversaciones",
-        "load_messages_failed": "No se pudieron cargar los mensajes",
-        "load_unread_count_failed": "No se pudo cargar el conteo de mensajes no leídos",
-        "load_blocked_users_failed": "No se pudieron cargar los usuarios bloqueados",
-        "websocket_error": "Error de WebSocket: {message}",
-        "send_message_failed": "No se pudo enviar el mensaje",
-        "search_users_failed": "No se pudo buscar usuarios",
-        "create_conversation_failed": "No se pudo iniciar una nueva conversación",
-        "block_user_failed": "No se pudo bloquear al usuario",
-        "unblock_user_failed": "No se pudo desbloquear al usuario",
-        "message_action_failed": "No se pudo realizar la acción del mensaje"
-      }
+      "online": "En línea",
+      "offline": "Fuera de línea",
+      "onlineUsers": "{users} en línea",
+      "typingUsers": "{users} escribiendo...",
+      "noContent": "Sin contenido",
+      "messagePlaceholder": "Escribe tu mensaje...",
+      "send": "Enviar",
+      "blockUser": "Bloquear Usuario",
+      "deleteForMe": "Eliminar para mí",
+      "deleteForEveryone": "Eliminar para todos",
+      "recover": "Recuperar",
+      "read": "Leído",
+      "deletedByYou": "Eliminado por ti",
+      "deletedBySender": "Eliminado por el remitente",
+      "deletedForYou": "Eliminado para ti",
+      "deletedByReceiver": "Eliminado por el receptor",
+      "deletedForEveryone": "Eliminado para todos",
+      "messageDeleted": "Mensaje eliminado"
     },
-    "footer": {
-      "company": {
-        "logo": "TourGuide",
-        "description": "Tu socio de confianza para experiencias de viaje auténticas en todo el mundo.",
-        "contact": {
-          "address": "Calle del Viaje 123, Ciudad de la Aventura, Mundo",
-          "email": "info@tourguide.com",
-          "phone": "+1 (555) 123-4567"
-        }
-      },
-      "social": {
-        "facebook": "Facebook",
-        "twitter": "Twitter",
-        "instagram": "Instagram",
-        "linkedin": "LinkedIn",
-        "youtube": "YouTube"
-      },
-      "app": {
-        "title": "Obtén nuestra aplicación móvil",
-        "description": "Descarga nuestra aplicación para la mejor experiencia sobre la marcha.",
-        "ios_label": "Descargar en",
-        "ios_store": "App Store",
-        "android_label": "Obtener en",
-        "android_store": "Google Play",
-        "trust": {
-          "ssl": "SSL Seguro",
-          "gdpr": "Cumple con GDPR"
-        }
-      },
-      "bottom": {
-        "copyright": "© {year} TourGuide. Todos los derechos reservados.",
-        "links": {
-          "terms": "Términos de servicio",
-          "privacy": "Política de privacidad",
-          "cookies": "Política de cookies",
-          "accessibility": "Accesibilidad"
-        }
-      }
+    "search": {
+      "placeholder": "Buscar usuarios por nombre o correo electrónico",
+      "minCharacters": "Ingresa al menos 2 caracteres para buscar",
+      "noResults": "No se encontraron usuarios",
+      "unknownUserInitial": "U"
     },
-    "debug": {
-      "title": "Información de depuración",
-      "auth_status": "Estado de autenticación",
-      "is_authenticated": "Está autenticado:",
-      "access_token": "Token de acceso:",
-      "refresh_token": "Token de actualización:",
-      "profile_data": "Datos del perfil",
-      "has_profile": "Tiene perfil:",
-      "profile_id": "ID del perfil:",
-      "role": "Rol:",
-      "user_id": "ID del usuario:",
-      "user_data": "Datos del usuario",
-      "no_user_data": "No hay datos de usuario disponibles",
-      "api_config": "Configuración de API",
-      "api_url": "URL de API:",
-      "environment": "Entorno:",
-      "debug_mode": "Modo de depuración:",
-      "quick_actions": "Acciones rápidas",
-      "clear_tokens": "Borrar tokens",
-      "reload_page": "Recargar página",
-      "log_console": "Registrar en consola",
-      "note": "Este panel de depuración solo es visible en modo de desarrollo"
-    },
-    "auth": {
-      "title": "Autenticación de TourGuide",
-      "subtitle": "Accede a tu cuenta para explorar el mundo con expertos locales",
-      "close_aria": "Cerrar modal de autenticación",
-      "tabs": {
-        "login": "Iniciar sesión",
-        "register": "Registrarse",
-        "forgot": "Olvidé mi contraseña"
-      },
-      "login": {
-        "title": "Inicia sesión en TourGuide",
-        "subtitle": "Ingresa tus credenciales para acceder a tu cuenta",
-        "email_label": "Correo electrónico",
-        "email_placeholder": "Ingresa tu correo electrónico",
-        "password_label": "Contraseña",
-        "password_placeholder": "Ingresa tu contraseña",
-        "show_password_aria": "Mostrar contraseña",
-        "hide_password_aria": "Ocultar contraseña",
-        "submit_button": "Iniciar sesión",
-        "or": "O inicia sesión con",
-        "social": {
-          "google": "Iniciar sesión con Google",
-          "facebook": "Iniciar sesión con Facebook"
-        }
-      },
-      "register": {
-        "title": "Crea tu cuenta de TourGuide",
-        "subtitle": "Únete a nosotros para descubrir experiencias de viaje auténticas",
-        "role_label": "Rol",
-        "role_client": "Viajero",
-        "role_customer": "Guía",
-        "first_name_label": "Nombre",
-        "first_name_placeholder": "Ingresa tu nombre",
-        "last_name_label": "Apellido",
-        "last_name_placeholder": "Ingresa tu apellido",
-        "email_label": "Correo electrónico",
-        "email_placeholder": "Ingresa tu correo electrónico",
-        "password_label": "Contraseña",
-        "password_placeholder": "Ingresa tu contraseña",
-        "confirm_password_label": "Confirmar contraseña",
-        "confirm_password_placeholder": "Confirma tu contraseña",
-        "show_password_aria": "Mostrar contraseña",
-        "hide_password_aria": "Ocultar contraseña",
-        "country_label": "País",
-        "country_placeholder": "Ingresa tu país",
-        "checkboxes": {
-          "personal_data": "Acepto el procesamiento de mis datos personales",
-          "terms": "Acepto los Términos de Servicio y la Política de Privacidad",
-          "travel_tips": "Enviarme consejos de viaje y promociones"
-        },
-        "submit_button": "Registrarse",
-        "verification": {
-          "title": "Verifica tu correo electrónico",
-          "subtitle": "Hemos enviado un código de 6 dígitos a <strong>{email}</strong>. Por favor, ingrésalo a continuación.",
-          "code_label": "Código de verificación",
-          "code_placeholder": "Ingresa el código de 6 dígitos",
-          "submit_button": "Verificar",
-          "resend_button": "Reenviar código"
-        }
-      },
-      "forgot": {
-        "title": "Restablecer tu contraseña",
-        "subtitle": "Ingresa tu correo electrónico para recibir un código de restablecimiento de contraseña",
-        "email_label": "Correo electrónico",
-        "email_placeholder": "Ingresa tu correo electrónico",
-        "submit_button": "Enviar código de restablecimiento",
-        "reset": {
-          "title": "Establecer nueva contraseña",
-          "subtitle": "Ingresa el código enviado a <strong>{email}</strong> y tu nueva contraseña",
-          "code_label": "Código de restablecimiento",
-          "code_placeholder": "Ingresa el código de 6 dígitos",
-          "new_password_label": "Nueva contraseña",
-          "new_password_placeholder": "Ingresa la nueva contraseña",
-          "confirm_password_label": "Confirmar nueva contraseña",
-          "confirm_password_placeholder": "Confirma la nueva contraseña",
-          "show_password_aria": "Mostrar contraseña",
-          "hide_password_aria": "Ocultar contraseña",
-          "submit_button": "Restablecer contraseña",
-          "resend_button": "Reenviar código"
-        }
-      },
-      "validation": {
-        "required_fields": "Por favor, completa todos los campos obligatorios",
-        "passwords_not_match": "Las contraseñas no coinciden",
-        "password_requirements": "La contraseña debe tener al menos 8 caracteres e incluir letras mayúsculas, minúsculas, números y caracteres especiales",
-        "required_code": "Por favor, ingresa el código de verificación",
-        "invalid_code": "Código inválido o incorrecto",
-        "invalid_country": "Por favor, selecciona un país válido"
-      },
-      "success": {
-        "verification_sent": "Código de verificación enviado a tu correo electrónico",
-        "register_success": "¡Cuenta creada con éxito!",
-        "password_reset_sent": "Código de restablecimiento de contraseña enviado a tu correo electrónico",
-        "password_reset_success": "¡Contraseña restablecida con éxito!"
-      },
-      "errors": {
-        "login_failed": "Correo electrónico o contraseña inválidos",
-        "email_exists": "Ya existe una cuenta con este correo electrónico",
-        "code_request_failed": "No se pudo enviar el código de verificación",
-        "resend_code_failed": "No se pudo reenviar el código de verificación",
-        "register_failed": "No se pudo registrar. Por favor, intenta de nuevo",
-        "invalid_code": "Código de verificación inválido o incorrecto",
-        "expired_code": "El código de verificación ha expirado",
-        "too_many_requests": "Demasiadas solicitudes. Por favor, intenta de nuevo más tarde",
-        "password_reset_failed": "No se pudo restablecer la contraseña. Por favor, intenta de nuevo",
-        "too_many_attempts": "Demasiados intentos fallidos. Por favor, solicita un nuevo código"
-      },
-      "social_login_dev": "El inicio de sesión social con {provider} está en desarrollo",
-      "loading": "Cargando..."
+    "blocked": {
+      "noBlockedUsers": "No hay usuarios bloqueados",
+      "unknownUser": "Usuario Desconocido",
+      "unknownUserInitial": "U",
+      "blockedOn": "Bloqueado el {date}",
+      "unblock": "Desbloquear"
     }
   }
 }

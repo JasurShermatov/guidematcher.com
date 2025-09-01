@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next'; // Import useTranslation hook
+import { useTranslation } from 'react-i18next';
 import {
     FiSearch,
     FiMapPin,
@@ -12,12 +12,9 @@ import {
     FiMessageCircle,
     FiHeart,
     FiArrowRight,
-    FiCalendar,
     FiCheck,
     FiClock,
-    FiMail,
-    FiCompass,
-    FiX
+    FiX, FiCompass
 } from 'react-icons/fi';
 import './HomePage.css';
 import desktopImage1 from '../images/desktop-image-1.jpeg';
@@ -27,7 +24,7 @@ import desktopImage4 from '../images/desktop-image-4.jpg';
 import desktopImage5 from '../images/desktop-image-5.avif';
 
 const HomePage = () => {
-    const { t } = useTranslation(); // Initialize translation hook
+    const { t } = useTranslation();
     const [searchLocation, setSearchLocation] = useState('');
     const [searchService, setSearchService] = useState('');
     const [activeTestimonial, setActiveTestimonial] = useState(0);
@@ -40,162 +37,192 @@ const HomePage = () => {
 
     const popularDestinations = [
         {
-            name: t('home.destinations.istanbul.name'),
+            name: t('homepage.popular_destinations.istanbul.name'),
             guides: 234,
             image: 'https://images.unsplash.com/photo-1602751584581-2e4f8243cc6d',
             rating: 4.8,
-            price: t('home.destinations.istanbul.price'),
-            highlights: t('home.destinations.istanbul.highlights', { returnObjects: true })
+            price: t('homepage.popular_destinations.istanbul.price'),
+            highlights: [
+                t('homepage.popular_destinations.istanbul.highlights.hagia_sophia'),
+                t('homepage.popular_destinations.istanbul.highlights.blue_mosque'),
+                t('homepage.popular_destinations.istanbul.highlights.bosphorus_cruise'),
+                t('homepage.popular_destinations.istanbul.highlights.grand_bazaar')
+            ]
         },
         {
-            name: t('home.destinations.barcelona.name'),
+            name: t('homepage.popular_destinations.barcelona.name'),
             guides: 189,
             image: 'https://images.unsplash.com/photo-1549972890-1e9d1e0e9e38',
             rating: 4.9,
-            price: t('home.destinations.barcelona.price'),
-            highlights: t('home.destinations.barcelona.highlights', { returnObjects: true })
+            price: t('homepage.popular_destinations.barcelona.price'),
+            highlights: [
+                t('homepage.popular_destinations.barcelona.highlights.sagrada_familia'),
+                t('homepage.popular_destinations.barcelona.highlights.park_guell'),
+                t('homepage.popular_destinations.barcelona.highlights.gothic_quarter'),
+                t('homepage.popular_destinations.barcelona.highlights.la_rambla')
+            ]
         },
         {
-            name: t('home.destinations.tokyo.name'),
+            name: t('homepage.popular_destinations.tokyo.name'),
             guides: 156,
             image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf',
             rating: 4.7,
-            price: t('home.destinations.tokyo.price'),
-            highlights: t('home.destinations.tokyo.highlights', { returnObjects: true })
+            price: t('homepage.popular_destinations.tokyo.price'),
+            highlights: [
+                t('homepage.popular_destinations.tokyo.highlights.shibuya_crossing'),
+                t('homepage.popular_destinations.tokyo.highlights.tokyo_skytree'),
+                t('homepage.popular_destinations.tokyo.highlights.asakusa_temple'),
+                t('homepage.popular_destinations.tokyo.highlights.tsukiji_market')
+            ]
         },
         {
-            name: t('home.destinations.paris.name'),
+            name: t('homepage.popular_destinations.paris.name'),
             guides: 298,
             image: 'https://images.unsplash.com/photo-1502602898650-2c301a4391b1',
             rating: 4.8,
-            price: t('home.destinations.paris.price'),
-            highlights: t('home.destinations.paris.highlights', { returnObjects: true })
+            price: t('homepage.popular_destinations.paris.price'),
+            highlights: [
+                t('homepage.popular_destinations.paris.highlights.eiffel_tower'),
+                t('homepage.popular_destinations.paris.highlights.louvre_museum'),
+                t('homepage.popular_destinations.paris.highlights.notre_dame'),
+                t('homepage.popular_destinations.paris.highlights.montmartre')
+            ]
         },
         {
-            name: t('home.destinations.dubai.name'),
+            name: t('homepage.popular_destinations.dubai.name'),
             guides: 145,
             image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c',
             rating: 4.6,
-            price: t('home.destinations.dubai.price'),
-            highlights: t('home.destinations.dubai.highlights', { returnObjects: true })
+            price: t('homepage.popular_destinations.dubai.price'),
+            highlights: [
+                t('homepage.popular_destinations.dubai.highlights.burj_khalifa'),
+                t('homepage.popular_destinations.dubai.highlights.dubai_mall'),
+                t('homepage.popular_destinations.dubai.highlights.desert_safari'),
+                t('homepage.popular_destinations.dubai.highlights.palm_jumeirah')
+            ]
         },
         {
-            name: t('home.destinations.rome.name'),
+            name: t('homepage.popular_destinations.rome.name'),
             guides: 167,
             image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5',
             rating: 4.9,
-            price: t('home.destinations.rome.price'),
-            highlights: t('home.destinations.rome.highlights', { returnObjects: true })
+            price: t('homepage.popular_destinations.rome.price'),
+            highlights: [
+                t('homepage.popular_destinations.rome.highlights.colosseum'),
+                t('homepage.popular_destinations.rome.highlights.roman_forum'),
+                t('homepage.popular_destinations.rome.highlights.pantheon'),
+                t('homepage.popular_destinations.rome.highlights.vatican_city')
+            ]
         }
     ];
 
     const serviceTypes = [
         {
-            name: t('home.services.city_tours.name'),
+            name: t('homepage.service_types.city_tours.name'),
             icon: <FiCompass />,
-            description: t('home.services.city_tours.description'),
-            count: t('home.services.city_tours.count')
+            description: t('homepage.service_types.city_tours.description'),
+            count: t('homepage.service_types.city_tours.count')
         },
         {
-            name: t('home.services.language_support.name'),
+            name: t('homepage.service_types.language_support.name'),
             icon: <FiMessageCircle />,
-            description: t('home.services.language_support.description'),
-            count: t('home.services.language_support.count')
+            description: t('homepage.service_types.language_support.description'),
+            count: t('homepage.service_types.language_support.count')
         },
         {
-            name: t('home.services.photography.name'),
+            name: t('homepage.service_types.photography_tours.name'),
             icon: <FiCamera />,
-            description: t('home.services.photography.description'),
-            count: t('home.services.photography.count')
+            description: t('homepage.service_types.photography_tours.description'),
+            count: t('homepage.service_types.photography_tours.count')
         },
         {
-            name: t('home.services.cultural_experiences.name'),
+            name: t('homepage.service_types.cultural_experiences.name'),
             icon: <FiGlobe />,
-            description: t('home.services.cultural_experiences.description'),
-            count: t('home.services.cultural_experiences.count')
+            description: t('homepage.service_types.cultural_experiences.description'),
+            count: t('homepage.service_types.cultural_experiences.count')
         }
     ];
 
     const features = [
         {
             icon: <FiShield />,
-            title: t('home.features.verified_guides.title'),
-            description: t('home.features.verified_guides.description'),
-            stats: t('home.features.verified_guides.stats')
+            title: t('homepage.features.verified_guides.title'),
+            description: t('homepage.features.verified_guides.description'),
+            stats: t('homepage.features.verified_guides.stats')
         },
         {
             icon: <FiStar />,
-            title: t('home.features.top_quality.title'),
-            description: t('home.features.top_quality.description'),
-            stats: t('home.features.top_quality.stats')
+            title: t('homepage.features.top_quality.title'),
+            description: t('homepage.features.top_quality.description'),
+            stats: t('homepage.features.top_quality.stats')
         },
         {
             icon: <FiGlobe />,
-            title: t('home.features.global_reach.title'),
-            description: t('home.features.global_reach.description'),
-            stats: t('home.features.global_reach.stats')
+            title: t('homepage.features.global_reach.title'),
+            description: t('homepage.features.global_reach.description'),
+            stats: t('homepage.features.global_reach.stats')
         },
         {
             icon: <FiClock />,
-            title: t('home.features.instant_booking.title'),
-            description: t('home.features.instant_booking.description'),
-            stats: t('home.features.instant_booking.stats')
+            title: t('homepage.features.instant_booking.title'),
+            description: t('homepage.features.instant_booking.description'),
+            stats: t('homepage.features.instant_booking.stats')
         }
     ];
 
     const stats = [
-        { number: '1000+', label: t('home.stats.verified_guides'), icon: <FiUsers /> },
-        { number: '50+', label: t('home.stats.countries'), icon: <FiGlobe /> },
-        { number: '10K+', label: t('home.stats.happy_travelers'), icon: <FiHeart /> },
-        { number: '4.8', label: t('home.stats.average_rating'), icon: <FiStar /> }
+        { number: '1000+', label: t('homepage.stats.verified_guides'), icon: <FiUsers /> },
+        { number: '50+', label: t('homepage.stats.countries'), icon: <FiGlobe /> },
+        { number: '10K+', label: t('homepage.stats.happy_travelers'), icon: <FiHeart /> },
+        { number: '4.8', label: t('homepage.stats.average_rating'), icon: <FiStar /> }
     ];
 
     const testimonials = [
         {
-            name: t('home.testimonials.sarah.name'),
-            location: t('home.testimonials.sarah.location'),
+            name: t('homepage.testimonials.sarah.name'),
+            location: t('homepage.testimonials.sarah.location'),
             avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
             rating: 5,
-            text: t('home.testimonials.sarah.text'),
-            tour: t('home.testimonials.sarah.tour')
+            text: t('homepage.testimonials.sarah.text'),
+            tour: t('homepage.testimonials.sarah.tour')
         },
         {
-            name: t('home.testimonials.marco.name'),
-            location: t('home.testimonials.marco.location'),
+            name: t('homepage.testimonials.marco.name'),
+            location: t('homepage.testimonials.marco.location'),
             avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
             rating: 5,
-            text: t('home.testimonials.marco.text'),
-            tour: t('home.testimonials.marco.tour')
+            text: t('homepage.testimonials.marco.text'),
+            tour: t('homepage.testimonials.marco.tour')
         },
         {
-            name: t('home.testimonials.emma.name'),
-            location: t('home.testimonials.emma.location'),
+            name: t('homepage.testimonials.emma.name'),
+            location: t('homepage.testimonials.emma.location'),
             avatar: 'https://randomuser.me/api/portraits/women/65.jpg',
             rating: 5,
-            text: t('home.testimonials.emma.text'),
-            tour: t('home.testimonials.emma.tour')
+            text: t('homepage.testimonials.emma.text'),
+            tour: t('homepage.testimonials.emma.tour')
         }
     ];
 
     const steps = [
         {
             number: 1,
-            title: t('home.steps.search_browse.title'),
-            description: t('home.steps.search_browse.description'),
+            title: t('homepage.steps.search_browse.title'),
+            description: t('homepage.steps.search_browse.description'),
             icon: <FiSearch />,
             color: 'from-blue-500 to-cyan-500'
         },
         {
             number: 2,
-            title: t('home.steps.connect_plan.title'),
-            description: t('home.steps.connect_plan.description'),
+            title: t('homepage.steps.connect_plan.title'),
+            description: t('homepage.steps.connect_plan.description'),
             icon: <FiMessageCircle />,
             color: 'from-purple-500 to-pink-500'
         },
         {
             number: 3,
-            title: t('home.steps.experience.title'),
-            description: t('home.steps.experience.description'),
+            title: t('homepage.steps.experience.title'),
+            description: t('homepage.steps.experience.description'),
             icon: <FiHeart />,
             color: 'from-green-500 to-teal-500'
         }
@@ -276,9 +303,9 @@ const HomePage = () => {
                 <div className="homepage-container homepage-hero-content">
                     <div className="homepage-hero-text">
                         <h1 className="homepage-hero-title">
-                            {t('home.hero.title')} <span className="homepage-gradient-text">{t('home.hero.title_highlight')}</span>
+                            {t('homepage.hero.title')} <span className="homepage-gradient-text">{t('homepage.hero.gradient_text')}</span>
                         </h1>
-                        <p className="homepage-hero-description">{t('home.hero.description')}</p>
+                        <p className="homepage-hero-description">{t('homepage.hero.description')}</p>
                         <div className="homepage-search-section">
                             <div className="homepage-search-container">
                                 <div className="homepage-search-inputs">
@@ -286,28 +313,28 @@ const HomePage = () => {
                                         <FiMapPin className="homepage-search-icon" />
                                         <input
                                             type="text"
-                                            placeholder={t('home.search.location_placeholder')}
+                                            placeholder={t('homepage.search.location_placeholder')}
                                             value={searchLocation}
                                             onChange={(e) => setSearchLocation(e.target.value)}
                                             className="homepage-search-input"
-                                            aria-label={t('home.search.location_aria')}
+                                            aria-label="Search by location"
                                         />
                                     </div>
                                     <div className="homepage-search-input-group">
                                         <FiUsers className="homepage-search-icon" />
                                         <input
                                             type="text"
-                                            placeholder={t('home.search.service_placeholder')}
+                                            placeholder={t('homepage.search.service_placeholder')}
                                             value={searchService}
                                             onChange={(e) => setSearchService(e.target.value)}
                                             className="homepage-search-input"
-                                            aria-label={t('home.search.service_aria')}
+                                            aria-label="Search by service type"
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') handleFindGuide();
                                             }}
                                         />
                                         {searchService && (
-                                            <ul className="homepage-search-results" role="listbox" aria-label={t('home.search.results_aria')}>
+                                            <ul className="homepage-search-results" role="listbox" aria-label="Service type suggestions">
                                                 {serviceTypes
                                                     .filter((service) =>
                                                         service.name.toLowerCase().includes(searchService.toLowerCase())
@@ -340,9 +367,9 @@ const HomePage = () => {
                                     <button
                                         className="homepage-search-btn"
                                         onClick={handleFindGuide}
-                                        aria-label={t('home.search.button_aria')}
+                                        aria-label="Find a guide"
                                     >
-                                        {t('home.search.button')}
+                                        {t('homepage.search.find_guide')}
                                     </button>
                                 </div>
                             </div>
@@ -369,8 +396,8 @@ const HomePage = () => {
             {/* Popular Destinations */}
             <section className="homepage-destinations-section homepage-section">
                 <div className="homepage-container">
-                    <h2 className="homepage-section-title">{t('home.destinations.title')}</h2>
-                    <p className="homepage-section-subtitle">{t('home.destinations.subtitle')}</p>
+                    <h2 className="homepage-section-title">{t('homepage.popular_destinations.title')}</h2>
+                    <p className="homepage-section-subtitle">{t('homepage.popular_destinations.subtitle')}</p>
                     <div className="homepage-destinations-grid">
                         {popularDestinations.map((destination, index) => (
                             <div key={index} className="homepage-destination-card">
@@ -379,7 +406,7 @@ const HomePage = () => {
                                         <button
                                             className="homepage-explore-btn"
                                             onClick={() => handleViewDestination(destination)}
-                                            aria-label={t('home.destinations.explore_aria', { name: destination.name })}
+                                            aria-label={`${t('homepage.popular_destinations.explore')} ${destination.name}`}
                                         >
                                             <FiArrowRight />
                                         </button>
@@ -399,9 +426,9 @@ const HomePage = () => {
                     <button
                         className="homepage-btn homepage-btn-outline"
                         onClick={() => navigate('/popular-destinations')}
-                        aria-label={t('home.destinations.view_all_aria')}
+                        aria-label={t('homepage.popular_destinations.view_all')}
                     >
-                        {t('home.destinations.view_all')}
+                        {t('homepage.popular_destinations.view_all')}
                     </button>
                     {isDestinationModalOpen && selectedDestination && (
                         <div
@@ -415,7 +442,7 @@ const HomePage = () => {
                                 <button
                                     className="homepage-destination-modal-close-btn"
                                     onClick={closeDestinationModal}
-                                    aria-label={t('home.destinations.modal.close_aria')}
+                                    aria-label={t('homepage.destination_modal.close')}
                                 >
                                     <FiX />
                                 </button>
@@ -428,10 +455,10 @@ const HomePage = () => {
                                     <h2 id="destination-modal-title">{selectedDestination.name}</h2>
                                     <p className="homepage-destination-modal-price">{selectedDestination.price}</p>
                                     <div className="homepage-destination-modal-meta">
-                                        <FiStar /> {selectedDestination.rating} • <FiUsers /> {t('home.destinations.guides_count', { count: selectedDestination.guides })}
+                                        <FiStar /> {selectedDestination.rating} • <FiUsers /> {selectedDestination.guides} {t('homepage.destination_modal.guides')}
                                     </div>
                                     <div className="homepage-destination-modal-highlights">
-                                        <h3>{t('home.destinations.modal.highlights')}</h3>
+                                        <h3>{t('homepage.destination_modal.highlights')}</h3>
                                         <ul>
                                             {selectedDestination.highlights.map((highlight, idx) => (
                                                 <li key={idx}>{highlight}</li>
@@ -445,9 +472,9 @@ const HomePage = () => {
                                             navigate('/find-guides', { state: { location: selectedDestination.name.split(',')[0].trim(), service: '' } });
                                             closeDestinationModal();
                                         }}
-                                        aria-label={t('home.destinations.modal.find_guides_aria', { name: selectedDestination.name })}
+                                        aria-label={`${t('homepage.destination_modal.find_guides_in')} ${selectedDestination.name}`}
                                     >
-                                        {t('home.destinations.modal.find_guides')}
+                                        {t('homepage.destination_modal.find_guides')}
                                     </button>
                                 </div>
                             </div>
@@ -459,8 +486,8 @@ const HomePage = () => {
             {/* Features Section */}
             <section className="homepage-features-section homepage-section">
                 <div className="homepage-container">
-                    <h2 className="homepage-section-title">{t('home.features.title')}</h2>
-                    <p className="homepage-section-subtitle">{t('home.features.subtitle')}</p>
+                    <h2 className="homepage-section-title">{t('homepage.features.title')}</h2>
+                    <p className="homepage-section-subtitle">{t('homepage.features.subtitle')}</p>
                     <div className="homepage-features-grid">
                         {features.map((feature, index) => (
                             <div key={index} className="homepage-feature-card">
@@ -478,14 +505,14 @@ const HomePage = () => {
                 <div className="homepage-cta-background"></div>
                 <div className="homepage-container">
                     <div className="homepage-cta-content">
-                        <h2>{t('home.cta.title')}</h2>
-                        <p>{t('home.cta.description')}</p>
+                        <h2>{t('homepage.cta.title')}</h2>
+                        <p>{t('homepage.cta.description')}</p>
                         <div className="homepage-cta-buttons">
                             <button className="homepage-btn homepage-btn-primary" onClick={handleFindGuide}>
-                                {t('home.cta.find_guide')}
+                                {t('homepage.cta.find_guide')}
                             </button>
                             <button className="homepage-btn homepage-btn-outline" onClick={handleLearnMore}>
-                                {t('home.cta.learn_more')}
+                                {t('homepage.cta.learn_more')}
                             </button>
                         </div>
                     </div>
@@ -503,29 +530,29 @@ const HomePage = () => {
                 >
                     <div className="homepage-learn-more-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="homepage-learn-more-content">
-                            <h2 id="learn-more-title">{t('home.learn_more.title')}</h2>
-                            <p>{t('home.learn_more.description')}</p>
-                            <h3>{t('home.learn_more.why_title')}</h3>
+                            <h2 id="learn-more-title">{t('homepage.learn_more.title')}</h2>
+                            <p>{t('homepage.learn_more.description')}</p>
+                            <h3>{t('homepage.learn_more.why_travel_with_us')}</h3>
                             <ul className="homepage-learn-more-list">
-                                <li><FiCheck /> <strong>{t('home.learn_more.features.verified_guides.title')}</strong> {t('home.learn_more.features.verified_guides.description')}</li>
-                                <li><FiCheck /> <strong>{t('home.learn_more.features.global_reach.title')}</strong> {t('home.learn_more.features.global_reach.description')}</li>
-                                <li><FiCheck /> <strong>{t('home.learn_more.features.custom_experiences.title')}</strong> {t('home.learn_more.features.custom_experiences.description')}</li>
-                                <li><FiCheck /> <strong>{t('home.learn_more.features.support.title')}</strong> {t('home.learn_more.features.support.description')}</li>
+                                <li><FiCheck /> <strong>{t('homepage.learn_more.verified_guides')}</strong> {t('homepage.learn_more.verified_guides_desc')}</li>
+                                <li><FiCheck /> <strong>{t('homepage.learn_more.global_reach')}</strong> {t('homepage.learn_more.global_reach_desc')}</li>
+                                <li><FiCheck /> <strong>{t('homepage.learn_more.custom_experiences')}</strong> {t('homepage.learn_more.custom_experiences_desc')}</li>
+                                <li><FiCheck /> <strong>{t('homepage.learn_more.support')}</strong> {t('homepage.learn_more.support_desc')}</li>
                             </ul>
-                            <h3>{t('home.learn_more.vision_title')}</h3>
-                            <p>{t('home.learn_more.vision_description')}</p>
+                            <h3>{t('homepage.learn_more.our_vision')}</h3>
+                            <p>{t('homepage.learn_more.our_vision_desc')}</p>
                             <div className="homepage-learn-more-actions">
                                 <button
                                     className="homepage-btn homepage-btn-primary"
                                     onClick={handleFindGuide}
                                 >
-                                    {t('home.learn_more.find_guide')}
+                                    {t('homepage.learn_more.find_guide')}
                                 </button>
                                 <button
                                     className="homepage-btn homepage-btn-outline"
                                     onClick={closeLearnMore}
                                 >
-                                    {t('home.learn_more.close')}
+                                    {t('homepage.learn_more.close')}
                                 </button>
                             </div>
                         </div>

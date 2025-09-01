@@ -5,8 +5,8 @@ from apps.profiles.views import (
     ClientProfileViewSet,
     CustomerProfileViewSet,
     PortfolioViewSet,
-    AvailabilityViewSet,
     VerificationDocumentViewSet,
+    UnavailabilityViewSet,  # 👈 Yangi viewset import qilamiz
 )
 
 # REST Framework Router
@@ -18,9 +18,11 @@ router.register(r"customers", CustomerProfileViewSet, basename="customer-profile
 
 # Customer-related endpoints - grouped logically
 router.register(r"portfolios", PortfolioViewSet, basename="portfolio")
-router.register(r"availabilities", AvailabilityViewSet, basename="availability")
 router.register(
     r"verifications", VerificationDocumentViewSet, basename="verification-document"
+)
+router.register(  # 👈 Yangi route qo‘shamiz
+    r"unavailabilities", UnavailabilityViewSet, basename="unavailability"
 )
 
 # Main URL patterns

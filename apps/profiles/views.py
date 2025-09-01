@@ -1,20 +1,22 @@
 # apps/profiles/views.py
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError, NotFound
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework.filters import SearchFilter, OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend
 
+from .filters import CustomerProfileFilter
 from .models import (
     ClientProfile,
     CustomerProfile,
     Portfolio,
-    Availability,
+    Unavailability,
     VerificationDocument,
 )
+from .permissions import IsOwnerOrAdmin
 from .serializers import (
     ClientProfileSerializer,
     ClientProfileCreateUpdateSerializer,
@@ -22,10 +24,8 @@ from .serializers import (
     CustomerProfileCreateUpdateSerializer,
     PortfolioSerializer,
     VerificationDocumentSerializer,
-    AvailabilitySerializer,
+    UnavailabilitySerializer,
 )
-from .permissions import IsOwnerOrAdmin
-from .filters import CustomerProfileFilter
 
 
 # ================== BASE PROFILE VIEWSET ==================
@@ -192,27 +192,35 @@ class VerificationDocumentViewSet(CustomerOwnedModelViewSet):
         return VerificationDocument.objects.filter(customer__user=user)
 
 
-# ================== AVAILABILITY ==================
-@extend_schema(tags=["Availability"])
-class AvailabilityViewSet(CustomerOwnedModelViewSet):
-    serializer_class = AvailabilitySerializer
-    queryset = Availability.objects.all()
+# ================== UNAVAILABILITY VIEWS ==================
+@extend_schema(tags=["Unavailability"])
+class UnavailabilityViewSet(CustomerOwnedModelViewSet):
+    serializer_class = UnavailabilitySerializer
+    queryset = Unavailability.objects.all()
 
     def get_queryset(self):
         user = self.request.user
         if getattr(user, "is_admin", False):
-            return Availability.objects.all()
-        return Availability.objects.filter(customer__user=user)
+            return Unavailability.objects.all()
+        return Unavailability.objects.filter(customer__user=user)
 
     def perform_create(self, serializer):
         customer_profile = self.get_customer_profile()
         if not customer_profile:
             raise ValidationError({"detail": "You don't have a customer profile yet."})
 
-        date = serializer.validated_data.get("date")
-        if Availability.objects.filter(customer=customer_profile, date=date).exists():
+        start_date = serializer.validated_data.get("start_date")
+        end_date = serializer.validated_data.get("end_date")
+
+        if Unavailability.objects.filter(
+            customer=customer_profile,
+            start_date__lte=end_date,
+            end_date__gte=start_date,
+        ).exists():
             raise ValidationError(
-                {"detail": f"Availability for {date} already exists."}
+                {
+                    "detail": "You already have an unavailability period overlapping this date range."
+                }
             )
 
         serializer.save(customer=customer_profile)

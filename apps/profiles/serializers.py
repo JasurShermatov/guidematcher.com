@@ -1,14 +1,15 @@
 # apps/profiles/serializers.py
 from rest_framework import serializers
+
+from apps.common.models import Language, ServiceType
 from apps.users.serializers import UserShortSerializer
 from .models import (
     ClientProfile,
     CustomerProfile,
     Portfolio,
     VerificationDocument,
-    Availability,
+    Unavailability,
 )
-from apps.common.models import Language, ServiceType
 
 
 # ================== CLIENT SERIALIZERS ==================
@@ -256,38 +257,51 @@ class VerificationDocumentSerializer(serializers.ModelSerializer):
         ]
 
 
-# ================== AVAILABILITY SERIALIZERS ==================
-class AvailabilitySerializer(serializers.ModelSerializer):
+# ================== UNAVAILABILITY SERIALIZERS ==================
+class UnavailabilitySerializer(serializers.ModelSerializer):
     customer_name = serializers.CharField(
         source="customer.user.full_name", read_only=True
     )
 
     class Meta:
-        model = Availability
+        model = Unavailability
         fields = [
             "id",
             "customer",
             "customer_name",
-            "date",
-            "is_available",
-            "start_time",
-            "end_time",
-            "note",
+            "start_date",
+            "end_date",
+            "reason",
             "created_at",
         ]
         read_only_fields = ["id", "customer", "customer_name", "created_at"]
 
-    def validate_date(self, value):
+    def validate(self, data):
         user = self.context["request"].user
         try:
             customer = user.customerprofile
         except CustomerProfile.DoesNotExist:
             raise serializers.ValidationError("You don't have a customer profile yet.")
-        if Availability.objects.filter(customer=customer, date=value).exists():
+
+        start_date = data.get("start_date")
+        end_date = data.get("end_date")
+
+        if end_date < start_date:
             raise serializers.ValidationError(
-                f"Availability for {value} already exists."
+                {"end_date": "End date cannot be earlier than start date."}
             )
-        return value
+
+        # Overlap check
+        if Unavailability.objects.filter(
+            customer=customer,
+            start_date__lte=end_date,
+            end_date__gte=start_date,
+        ).exists():
+            raise serializers.ValidationError(
+                "You already have an unavailability period overlapping this date range."
+            )
+
+        return data
 
     def create(self, validated_data):
         user = self.context["request"].user

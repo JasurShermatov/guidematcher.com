@@ -182,7 +182,6 @@ class ReviewReaction(BaseModel):
         verbose_name=_("Optional comment (reason or feedback)"),
     )
 
-
     class Meta:
         verbose_name = _("Review reaction")
         verbose_name_plural = _("Review reactions")
@@ -198,7 +197,6 @@ class ReviewReaction(BaseModel):
     def clean(self):
         if not self.rating and not self.comment:
             raise ValidationError(_("Please provide either a rating or comment"))
-
 
     def save(self, *args, **kwargs):
         """

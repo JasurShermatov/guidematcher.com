@@ -8,7 +8,7 @@ from .models import (
     CustomerProfile,
     Portfolio,
     VerificationDocument,
-    Availability,
+    Unavailability,  # ✅ Availability o‘rniga
 )
 
 
@@ -16,12 +16,12 @@ from .models import (
 @admin.register(ClientProfile)
 class ClientProfileAdmin(admin.ModelAdmin):
     list_display = (
-        "get_user_email",  # User email
-        "get_user_full_name",  # User full name
-        "get_user_country",  # User country
+        "get_user_email",
+        "get_user_full_name",
+        "get_user_country",
         "date_of_birth",
         "preferred_contact",
-        "get_user_role",  # User role
+        "get_user_role",
     )
     search_fields = (
         "user__first_name",
@@ -38,15 +38,11 @@ class ClientProfileAdmin(admin.ModelAdmin):
     autocomplete_fields = ["user", "languages"]
     ordering = ("user__first_name",)
 
-    # Fieldsets - User ma'lumotlarini ham ko'rsatish
     fieldsets = (
         (
             "User Information",
             {
-                "fields": (
-                    "user",  # User tanlash
-                    "get_user_details",  # User ma'lumotlarini ko'rsatish
-                ),
+                "fields": ("user", "get_user_details"),
                 "description": "Basic user information",
             },
         ),
@@ -58,7 +54,6 @@ class ClientProfileAdmin(admin.ModelAdmin):
     readonly_fields = ("get_user_details",)
     filter_horizontal = ("languages",)
 
-    # Custom metodlar - User ma'lumotlarini ko'rsatish uchun
     def get_user_email(self, obj):
         return obj.user.email
 
@@ -84,7 +79,6 @@ class ClientProfileAdmin(admin.ModelAdmin):
     get_user_role.admin_order_field = "user__role"
 
     def get_user_details(self, obj):
-        """User ning barcha ma'lumotlarini ko'rsatadi"""
         if obj.user:
             return format_html(
                 """
@@ -112,7 +106,7 @@ class ClientProfileAdmin(admin.ModelAdmin):
     get_user_details.short_description = "User Details"
 
 
-# --- Customer Profile Admin (yaxshilangan) ---
+# --- Customer Profile Admin ---
 @admin.register(CustomerProfile)
 class CustomerProfileAdmin(admin.ModelAdmin):
     list_display = (
@@ -130,13 +124,7 @@ class CustomerProfileAdmin(admin.ModelAdmin):
     ordering = ("-average_rating",)
 
     fieldsets = (
-        (
-            "User Information",
-            {
-                "fields": ("user", "get_user_details"),
-                "description": "Basic user information",
-            },
-        ),
+        ("User Information", {"fields": ("user", "get_user_details")}),
         (
             "Professional Information",
             {
@@ -173,24 +161,16 @@ class CustomerProfileAdmin(admin.ModelAdmin):
         ),
         (
             "Statistics",
-            {
-                "fields": (
-                    "total_bookings",
-                    "total_reviews",
-                    "average_rating",
-                )
-            },
+            {"fields": ("total_bookings", "total_reviews", "average_rating")},
         ),
     )
     readonly_fields = ("get_user_details",)
     filter_horizontal = ("languages", "service_types")
 
-    # User ma'lumotlarini ko'rsatish
     def get_user_email(self, obj):
         return obj.user.email
 
     get_user_email.short_description = "Email"
-    get_user_email.admin_order_field = "user__email"
 
     def get_user_full_name(self, obj):
         return obj.user.full_name
@@ -198,7 +178,6 @@ class CustomerProfileAdmin(admin.ModelAdmin):
     get_user_full_name.short_description = "Full Name"
 
     def get_user_details(self, obj):
-        """User ning barcha ma'lumotlarini ko'rsatadi"""
         if obj.user:
             return format_html(
                 """
@@ -226,7 +205,7 @@ class CustomerProfileAdmin(admin.ModelAdmin):
     get_user_details.short_description = "User Details"
 
 
-# --- Qolgan admin klasslar (o'zgarishsiz) ---
+# --- Portfolio Admin ---
 @admin.register(Portfolio)
 class PortfolioAdmin(admin.ModelAdmin):
     list_display = ("linked_customer", "title", "order")
@@ -242,6 +221,7 @@ class PortfolioAdmin(admin.ModelAdmin):
     linked_customer.short_description = "Customer"
 
 
+# --- VerificationDocument Admin ---
 @admin.register(VerificationDocument)
 class VerificationDocumentAdmin(admin.ModelAdmin):
     list_display = (
@@ -271,10 +251,11 @@ class VerificationDocumentAdmin(admin.ModelAdmin):
     linked_verified_by.short_description = "Verified By"
 
 
-@admin.register(Availability)
-class AvailabilityAdmin(admin.ModelAdmin):
-    list_display = ("customer", "date", "is_available", "start_time", "end_time")
-    search_fields = ("customer__user__first_name",)
-    list_filter = ("is_available", "date")
+# --- Unavailability Admin (yangi) ---
+@admin.register(Unavailability)
+class UnavailabilityAdmin(admin.ModelAdmin):
+    list_display = ("customer", "start_date", "end_date", "reason")
+    search_fields = ("customer__user__first_name", "customer__user__last_name")
+    list_filter = ("start_date", "end_date")
     autocomplete_fields = ["customer"]
-    ordering = ("-date",)
+    ordering = ("-start_date",)

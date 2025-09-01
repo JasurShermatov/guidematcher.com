@@ -68,10 +68,8 @@ class CustomerProfile(AbstractProfile):
     city = models.ForeignKey(
         "common.City",
         on_delete=models.PROTECT,
-
         null=True,  # 👈 NULL qiymatga ruxsat
         blank=True,  # 👈 Formada bo'sh bo'lishi mumkin
-
         verbose_name=_("Service city"),
     )
 
@@ -191,16 +189,13 @@ class VerificationDocument(AbstractCustomerRelatedModel):
         ordering = ["-created_at"]
 
 
-class Availability(AbstractCustomerRelatedModel):
-    date = models.DateField(verbose_name=_("Date"))
-    is_available = models.BooleanField(default=True)
-    start_time = models.TimeField(null=True, blank=True)
-    end_time = models.TimeField(null=True, blank=True)
-    note = models.CharField(max_length=255, blank=True)
+class Unavailability(AbstractCustomerRelatedModel):
+    start_date = models.DateField(verbose_name=_("Start date"))
+    end_date = models.DateField(verbose_name=_("End date"))
+    reason = models.CharField(max_length=255, blank=True, verbose_name=_("Reason"))
 
     class Meta:
-        verbose_name = _("Availability")
-        verbose_name_plural = _("Availabilities")
-        unique_together = [["customer", "date"]]
-        ordering = ["date"]
-        indexes = [models.Index(fields=["customer", "date", "is_available"])]
+        verbose_name = _("Unavailability period")
+        verbose_name_plural = _("Unavailability periods")
+        ordering = ["start_date"]
+        indexes = [models.Index(fields=["customer", "start_date", "end_date"])]

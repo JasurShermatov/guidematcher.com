@@ -31,7 +31,6 @@ from .serializers import (
 # ================== BASE PROFILE VIEWSET ==================
 class BaseProfileViewSet(viewsets.ModelViewSet):
 
-
     lookup_field = "user_id"
 
     def get_permissions(self):
@@ -197,7 +196,6 @@ class UnavailabilityViewSet(CustomerOwnedModelViewSet):
 
         start_date = serializer.validated_data.get("start_date")
         end_date = serializer.validated_data.get("end_date")
-
 
         if Unavailability.objects.filter(
             customer=customer_profile,

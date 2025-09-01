@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { FiStar, FiUsers, FiArrowLeft, FiArrowRight } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import './HomePage.css';
 
 const PopularDestination = () => {
@@ -10,52 +10,82 @@ const PopularDestination = () => {
 
     const popularDestinations = [
         {
-            name: t('popular_destinations.istanbul.name'),
+            name: t('homepage.popular_destinations.istanbul.name'),
             guides: 234,
             image: 'https://images.unsplash.com/photo-1602751584581-2e4f8243cc6d',
             rating: 4.8,
-            price: t('popular_destinations.istanbul.price'),
-            highlights: t('popular_destinations.istanbul.highlights', { returnObjects: true })
+            price: t('homepage.popular_destinations.istanbul.price'),
+            highlights: [
+                t('homepage.popular_destinations.istanbul.highlights.hagia_sophia'),
+                t('homepage.popular_destinations.istanbul.highlights.blue_mosque'),
+                t('homepage.popular_destinations.istanbul.highlights.bosphorus_cruise'),
+                t('homepage.popular_destinations.istanbul.highlights.grand_bazaar')
+            ]
         },
         {
-            name: t('popular_destinations.barcelona.name'),
+            name: t('homepage.popular_destinations.barcelona.name'),
             guides: 189,
             image: 'https://images.unsplash.com/photo-1549972890-1e9d1e0e9e38',
             rating: 4.9,
-            price: t('popular_destinations.barcelona.price'),
-            highlights: t('popular_destinations.barcelona.highlights', { returnObjects: true })
+            price: t('homepage.popular_destinations.barcelona.price'),
+            highlights: [
+                t('homepage.popular_destinations.barcelona.highlights.sagrada_familia'),
+                t('homepage.popular_destinations.barcelona.highlights.park_guell'),
+                t('homepage.popular_destinations.barcelona.highlights.gothic_quarter'),
+                t('homepage.popular_destinations.barcelona.highlights.la_rambla')
+            ]
         },
         {
-            name: t('popular_destinations.tokyo.name'),
+            name: t('homepage.popular_destinations.tokyo.name'),
             guides: 156,
             image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf',
             rating: 4.7,
-            price: t('popular_destinations.tokyo.price'),
-            highlights: t('popular_destinations.tokyo.highlights', { returnObjects: true })
+            price: t('homepage.popular_destinations.tokyo.price'),
+            highlights: [
+                t('homepage.popular_destinations.tokyo.highlights.shibuya_crossing'),
+                t('homepage.popular_destinations.tokyo.highlights.tokyo_skytree'),
+                t('homepage.popular_destinations.tokyo.highlights.asakusa_temple'),
+                t('homepage.popular_destinations.tokyo.highlights.tsukiji_market')
+            ]
         },
         {
-            name: t('popular_destinations.paris.name'),
+            name: t('homepage.popular_destinations.paris.name'),
             guides: 298,
             image: 'https://images.unsplash.com/photo-1502602898650-2c301a4391b1',
             rating: 4.8,
-            price: t('popular_destinations.paris.price'),
-            highlights: t('popular_destinations.paris.highlights', { returnObjects: true })
+            price: t('homepage.popular_destinations.paris.price'),
+            highlights: [
+                t('homepage.popular_destinations.paris.highlights.eiffel_tower'),
+                t('homepage.popular_destinations.paris.highlights.louvre_museum'),
+                t('homepage.popular_destinations.paris.highlights.notre_dame'),
+                t('homepage.popular_destinations.paris.highlights.montmartre')
+            ]
         },
         {
-            name: t('popular_destinations.dubai.name'),
+            name: t('homepage.popular_destinations.dubai.name'),
             guides: 145,
             image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c',
             rating: 4.6,
-            price: t('popular_destinations.dubai.price'),
-            highlights: t('popular_destinations.dubai.highlights', { returnObjects: true })
+            price: t('homepage.popular_destinations.dubai.price'),
+            highlights: [
+                t('homepage.popular_destinations.dubai.highlights.burj_khalifa'),
+                t('homepage.popular_destinations.dubai.highlights.dubai_mall'),
+                t('homepage.popular_destinations.dubai.highlights.desert_safari'),
+                t('homepage.popular_destinations.dubai.highlights.palm_jumeirah')
+            ]
         },
         {
-            name: t('popular_destinations.rome.name'),
+            name: t('homepage.popular_destinations.rome.name'),
             guides: 167,
             image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5',
             rating: 4.9,
-            price: t('popular_destinations.rome.price'),
-            highlights: t('popular_destinations.rome.highlights', { returnObjects: true })
+            price: t('homepage.popular_destinations.rome.price'),
+            highlights: [
+                t('homepage.popular_destinations.rome.highlights.colosseum'),
+                t('homepage.popular_destinations.rome.highlights.roman_forum'),
+                t('homepage.popular_destinations.rome.highlights.pantheon'),
+                t('homepage.popular_destinations.rome.highlights.vatican_city')
+            ]
         }
     ];
 
@@ -63,8 +93,8 @@ const PopularDestination = () => {
         <div className="homepage">
             <section className="homepage-destinations-section homepage-section">
                 <div className="homepage-container">
-                    <h2 className="homepage-section-title">{t('popular_destinations.title')}</h2>
-                    <p className="homepage-section-subtitle">{t('popular_destinations.subtitle')}</p>
+                    <h2 className="homepage-section-title">{t('homepage.popular_destinations.title')}</h2>
+                    <p className="homepage-section-subtitle">{t('homepage.popular_destinations.subtitle')}</p>
                     <div className="homepage-destinations-grid">
                         {popularDestinations.map((destination, index) => (
                             <div key={index} className="homepage-destination-card">
@@ -73,7 +103,7 @@ const PopularDestination = () => {
                                         <button
                                             className="homepage-explore-btn"
                                             onClick={() => navigate('/find-guides', { state: { location: destination.name.split(',')[0].trim(), service: '' } })}
-                                            aria-label={t('popular_destinations.find_guides_aria', { name: destination.name })}
+                                            aria-label={`${t('homepage.popular_destinations.find_guides_in')} ${destination.name}`}
                                         >
                                             <FiArrowRight />
                                         </button>
@@ -86,7 +116,7 @@ const PopularDestination = () => {
                                     <h3>{destination.name}</h3>
                                     <p>{destination.price}</p>
                                     <div className="homepage-destination-meta">
-                                        <FiUsers /> {destination.guides} guides
+                                        <FiUsers /> {destination.guides} {t('homepage.destination_modal.guides')}
                                     </div>
                                     <div className="homepage-destination-highlights">
                                         {destination.highlights.map((highlight, idx) => (
@@ -100,9 +130,9 @@ const PopularDestination = () => {
                     <button
                         className="homepage-btn homepage-btn-outline"
                         onClick={() => navigate('/')}
-                        aria-label={t('popular_destinations.back_to_home_aria')}
+                        aria-label={t('homepage.popular_destinations.back_to_home')}
                     >
-                        <FiArrowLeft /> {t('popular_destinations.back_to_home')}
+                        <FiArrowLeft /> {t('homepage.popular_destinations.back_to_home')}
                     </button>
                 </div>
             </section>

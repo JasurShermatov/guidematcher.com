@@ -61,7 +61,6 @@ const GuideAccount = () => {
         reactionType: 'like',
         comment: ''
     });
-
     const [profileForm, setProfileForm] = useState({
         professional_bio: '',
         years_of_experience: 0,
@@ -74,14 +73,12 @@ const GuideAccount = () => {
         languages: [],
         is_available: true
     });
-
     const [portfolioForm, setPortfolioForm] = useState({
         title: '',
         description: '',
         image: null,
         order: 0
     });
-
     const [availabilityForm, setAvailabilityForm] = useState({
         date: '',
         is_available: true,
@@ -130,12 +127,12 @@ const GuideAccount = () => {
                     loadReviewSummary()
                 ]);
             } catch (profileError) {
-                console.log('No profile found, user needs to create one');
+                console.log(t('guideAccount.error.noProfile'));
                 setShowProfileForm(true);
             }
         } catch (err) {
             console.error('Error initializing data:', err);
-            setError(t('account.guide_account.errors.required_fields'));
+            setError(t('guideAccount.error.requiredFields'));
         } finally {
             setLoading(false);
         }
@@ -147,6 +144,7 @@ const GuideAccount = () => {
             setBookings(data.results || data);
         } catch (err) {
             console.error('Error loading bookings:', err);
+            setError(t('guideAccount.error.failedToLoadBookings'));
         }
     };
 
@@ -156,6 +154,7 @@ const GuideAccount = () => {
             setReviews(data.results || data);
         } catch (err) {
             console.error('Error loading reviews:', err);
+            setError(t('guideAccount.error.failedToLoadReviews'));
         }
     };
 
@@ -167,6 +166,7 @@ const GuideAccount = () => {
             }
         } catch (err) {
             console.error('Error loading review summary:', err);
+            setError(t('guideAccount.error.failedToLoadReviewSummary'));
         }
     };
 
@@ -176,6 +176,7 @@ const GuideAccount = () => {
             setPortfolio(data.results || data);
         } catch (err) {
             console.error('Error loading portfolio:', err);
+            setError(t('guideAccount.error.failedToLoadPortfolio'));
         }
     };
 
@@ -185,11 +186,16 @@ const GuideAccount = () => {
             setAvailability(data.results || data);
         } catch (err) {
             console.error('Error loading availability:', err);
+            setError(t('guideAccount.error.failedToLoadAvailability'));
         }
     };
 
     const handleProfileSubmit = async (e) => {
         e.preventDefault();
+        if (!profileForm.professional_bio.trim() || !profileForm.city) {
+            setError(t('guideAccount.error.profileRequired'));
+            return;
+        }
         try {
             let result;
             if (profile) {
@@ -200,14 +206,18 @@ const GuideAccount = () => {
             setProfile(result);
             setShowProfileForm(false);
             setError(null);
-            alert(t(profile ? 'account.guide_account.success.profile_updated' : 'account.guide_account.success.profile_created'));
+            alert(profile ? t('guideAccount.success.profileUpdated') : t('guideAccount.success.profileCreated'));
         } catch (err) {
-            setError(t('account.guide_account.errors.profile_failed'));
+            setError(t('guideAccount.error.failedToSaveProfile'));
         }
     };
 
     const handlePortfolioSubmit = async (e) => {
         e.preventDefault();
+        if (!portfolioForm.title.trim()) {
+            setError(t('guideAccount.error.portfolioTitleRequired'));
+            return;
+        }
         try {
             if (editingPortfolioItem) {
                 await updatePortfolioItem(editingPortfolioItem.id, portfolioForm);
@@ -219,14 +229,18 @@ const GuideAccount = () => {
             setEditingPortfolioItem(null);
             setPortfolioForm({ title: '', description: '', image: null, order: 0 });
             setError(null);
-            alert(t(editingPortfolioItem ? 'account.guide_account.success.portfolio_updated' : 'account.guide_account.success.portfolio_created'));
+            alert(editingPortfolioItem ? t('guideAccount.success.portfolioUpdated') : t('guideAccount.success.portfolioCreated'));
         } catch (err) {
-            setError(t('account.guide_account.errors.portfolio_failed'));
+            setError(t('guideAccount.error.failedToSavePortfolio'));
         }
     };
 
     const handleAvailabilitySubmit = async (e) => {
         e.preventDefault();
+        if (!availabilityForm.date) {
+            setError(t('guideAccount.error.dateRequired'));
+            return;
+        }
         try {
             if (editingAvailability) {
                 await updateAvailability(editingAvailability.id, availabilityForm);
@@ -238,9 +252,9 @@ const GuideAccount = () => {
             setEditingAvailability(null);
             setAvailabilityForm({ date: '', is_available: true, start_time: '', end_time: '', note: '' });
             setError(null);
-            alert(t(editingAvailability ? 'account.guide_account.success.availability_updated' : 'account.guide_account.success.availability_created'));
+            alert(editingAvailability ? t('guideAccount.success.availabilityUpdated') : t('guideAccount.success.availabilityCreated'));
         } catch (err) {
-            setError(t('account.guide_account.errors.availability_failed'));
+            setError(t('guideAccount.error.failedToSaveAvailability'));
         }
     };
 
@@ -248,33 +262,22 @@ const GuideAccount = () => {
         try {
             if (action === 'accept') {
                 await acceptBooking(bookingId);
-                alert(t('account.guide_account.success.booking_accepted'));
+                alert(t('guideAccount.success.bookingAccepted'));
             } else if (action === 'cancel') {
-                await cancelBooking(bookingId, cancelReason || t('account.guide_account.cancel_booking.reason_placeholder'));
-                alert(t('account.guide_account.success.booking_cancelled'));
+                if (!cancelReason.trim()) {
+                    setError(t('guideAccount.error.cancelReasonRequired'));
+                    return;
+                }
+                await cancelBooking(bookingId, cancelReason);
+                alert(t('guideAccount.success.bookingCancelled'));
             }
-            loadBookings();
-            setError(null);
-        } catch (err) {
-            setError(t('account.guide_account.errors.cancel_booking_failed'));
-        }
-    };
-
-    const handleCancelBooking = async () => {
-        if (!cancelReason.trim()) {
-            setError(t('account.guide_account.errors.cancel_reason_required'));
-            return;
-        }
-        try {
-            await cancelBooking(selectedBookingForCancel.id, cancelReason);
             loadBookings();
             setShowCancelModal(false);
             setSelectedBookingForCancel(null);
             setCancelReason('');
             setError(null);
-            alert(t('account.guide_account.success.booking_cancelled'));
         } catch (err) {
-            setError(t('account.guide_account.errors.cancel_booking_failed'));
+            setError(t('guideAccount.error.failedToProcessBooking'));
         }
     };
 
@@ -285,24 +288,26 @@ const GuideAccount = () => {
     };
 
     const handleDeletePortfolio = async (id) => {
+        if (!window.confirm(t('guideAccount.portfolio.deleteConfirm'))) return;
         try {
             await deletePortfolioItem(id);
             loadPortfolio();
             setError(null);
-            alert(t('account.guide_account.success.portfolio_deleted'));
+            alert(t('guideAccount.success.portfolioDeleted'));
         } catch (err) {
-            setError(t('account.guide_account.errors.portfolio_failed'));
+            setError(t('guideAccount.error.failedToDeletePortfolio'));
         }
     };
 
     const handleDeleteAvailability = async (id) => {
+        if (!window.confirm(t('guideAccount.availability.deleteConfirm'))) return;
         try {
             await deleteAvailability(id);
             loadAvailability();
             setError(null);
-            alert(t('account.guide_account.success.availability_deleted'));
+            alert(t('guideAccount.success.availabilityDeleted'));
         } catch (err) {
-            setError(t('account.guide_account.errors.availability_failed'));
+            setError(t('guideAccount.error.failedToDeleteAvailability'));
         }
     };
 
@@ -310,6 +315,8 @@ const GuideAccount = () => {
         if (booking.client?.user?.email) {
             setSelectedUserForChat(booking.client.user.email);
             setShowChat(true);
+        } else {
+            setError(t('guideAccount.error.noClientEmail'));
         }
     };
 
@@ -324,7 +331,7 @@ const GuideAccount = () => {
 
     const handleReactToReview = async (reviewId) => {
         if (!reactionForm.reactionType || (reactionForm.reactionType === 'comment' && !reactionForm.comment.trim()) || (reactionForm.reactionType === 'report' && !reactionForm.comment.trim())) {
-            setError(t('account.guide_account.errors.reaction_required'));
+            setError(t('guideAccount.error.reactionRequired'));
             return;
         }
         try {
@@ -333,9 +340,9 @@ const GuideAccount = () => {
             setShowReactionForm(null);
             setReactionForm({ reactionType: 'like', comment: '' });
             setError(null);
-            alert(t('account.guide_account.success.reaction_submitted'));
+            alert(t('guideAccount.success.reactionSubmitted'));
         } catch (err) {
-            setError(t('account.guide_account.errors.reaction_failed'));
+            setError(t('guideAccount.error.failedToSubmitReaction'));
         }
     };
 
@@ -344,9 +351,9 @@ const GuideAccount = () => {
             await removeReactionFromReview(reviewId);
             loadReviews();
             setError(null);
-            alert(t('account.guide_account.success.reaction_removed'));
+            alert(t('guideAccount.success.reactionRemoved'));
         } catch (err) {
-            setError(t('account.guide_account.errors.remove_reaction_failed'));
+            setError(t('guideAccount.error.failedToRemoveReaction'));
         }
     };
 
@@ -369,7 +376,7 @@ const GuideAccount = () => {
         return (
             <div className="guide-account-loading">
                 <div className="guide-account-spinner"></div>
-                <p>{t('auth.loading')}</p>
+                <p>{t('guideAccount.loading')}</p>
             </div>
         );
     }
@@ -377,18 +384,16 @@ const GuideAccount = () => {
     return (
         <div className="guide-account-container">
             <div className="guide-account-header">
-                <h1 className="guide-account-title">{t('account.guide_account.title')}</h1>
+                <h1 className="guide-account-title">{t('guideAccount.title')}</h1>
                 {currentUser && (
                     <div className="guide-account-user-info">
-                        <span className="guide-account-welcome">{t('account.guide_account.welcome', { name: currentUser.full_name })}</span>
+                        <span className="guide-account-welcome">{t('guideAccount.welcome', { name: currentUser.full_name })}</span>
                         <button
                             className="guide-account-chat-btn"
                             onClick={() => setShowChat(true)}
                             style={{
                                 marginLeft: '16px',
                                 padding: '8px 16px',
-                                backgroundColor: '#667eea',
-                                color: 'white',
                                 border: 'none',
                                 borderRadius: '6px',
                                 cursor: 'pointer',
@@ -396,78 +401,75 @@ const GuideAccount = () => {
                                 fontWeight: '500'
                             }}
                         >
-                            {t('account.guide_account.messages')}
+                            {t('guideAccount.messages')}
                         </button>
                     </div>
                 )}
             </div>
-
             {error && (
-                <div className="guide-account-error" style={{ background: '#f8d7da', color: '#721c24', padding: '8px 12px', borderRadius: '4px', marginBottom: '16px' }}>
+                <div className="guide-account-error">
                     <p>{error}</p>
                     <button onClick={() => setError(null)} className="guide-account-error-close">×</button>
                 </div>
             )}
-
             <div className="guide-account-navigation">
                 <button
                     className={`guide-account-nav-btn ${activeTab === 'dashboard' ? 'guide-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('dashboard')}
                 >
-                    {t('account.guide_account.tabs.dashboard')}
+                    {t('guideAccount.navigation.dashboard')}
                 </button>
                 <button
                     className={`guide-account-nav-btn ${activeTab === 'profile' ? 'guide-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('profile')}
                 >
-                    {t('account.guide_account.tabs.profile')}
+                    {t('guideAccount.navigation.profile')}
                 </button>
                 <button
                     className={`guide-account-nav-btn ${activeTab === 'bookings' ? 'guide-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('bookings')}
                 >
-                    {t('account.guide_account.tabs.bookings')}
+                    {t('guideAccount.navigation.bookings')}
                 </button>
                 <button
                     className={`guide-account-nav-btn ${activeTab === 'portfolio' ? 'guide-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('portfolio')}
                 >
-                    {t('account.guide_account.tabs.portfolio')}
+                    {t('guideAccount.navigation.portfolio')}
                 </button>
                 <button
                     className={`guide-account-nav-btn ${activeTab === 'availability' ? 'guide-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('availability')}
                 >
-                    {t('account.guide_account.tabs.availability')}
+                    {t('guideAccount.navigation.availability')}
                 </button>
                 <button
                     className={`guide-account-nav-btn ${activeTab === 'reviews' ? 'guide-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('reviews')}
                 >
-                    {t('account.guide_account.tabs.reviews')}
+                    {t('guideAccount.navigation.reviews')}
                 </button>
             </div>
-
             <div className="guide-account-content">
                 {activeTab === 'dashboard' && (
                     <div className="guide-account-dashboard">
                         <div className="guide-account-stats">
                             <div className="guide-account-stat-card">
-                                <h3 className="guide-account-stat-title">{t('account.guide_account.dashboard.stats.total_bookings')}</h3>
+                                <h3 className="guide-account-stat-title">{t('guideAccount.dashboard.totalBookings')}</h3>
                                 <p className="guide-account-stat-value">{bookings.length}</p>
                             </div>
                             <div className="guide-account-stat-card">
-                                <h3 className="guide-account-stat-title">{t('account.guide_account.dashboard.stats.active_bookings')}</h3>
+                                <h3 className="guide-account-stat-title">{t('guideAccount.dashboard.activeBookings')}</h3>
                                 <p className="guide-account-stat-value">
                                     {bookings.filter(b => b.status === 'confirmed' || b.status === 'accepted').length}
                                 </p>
                             </div>
                             <div className="guide-account-stat-card">
-                                <h3 className="guide-account-stat-title">{t('account.guide_account.dashboard.stats.total_reviews')}</h3>
+                                <h3 className="guide-account-stat-title">{t('guideAccount.dashboard.totalReviews')}</h3>
                                 <p className="guide-account-stat-value">{reviews.length}</p>
                             </div>
                             <div className="guide-account-stat-card">
-                                <h3 className="guide-account-stat-title">{t('account.guide_account.dashboard.stats.average_rating')}</h3>
+                                <h3 className="guide-account-stat-title">{t('guideAccount.dashboard.averageRating')}</h3>
                                 <p className="guide-account-stat-value">
                                     {typeof profile?.average_rating === 'number' && !isNaN(profile.average_rating)
                                         ? profile.average_rating.toFixed(1)
@@ -476,20 +478,20 @@ const GuideAccount = () => {
                             </div>
                         </div>
                         <div className="guide-account-recent">
-                            <h3 className="guide-account-section-title">{t('account.guide_account.dashboard.recent_bookings')}</h3>
+                            <h3 className="guide-account-section-title">{t('guideAccount.dashboard.recentBookings')}</h3>
                             <div className="guide-account-recent-bookings">
                                 {bookings.slice(0, 5).map(booking => (
                                     <div key={booking.id} className="guide-account-booking-card">
                                         <div className="guide-account-booking-info">
-                                            <h4 className="guide-account-booking-title">{t('account.guide_account.bookings.booking_title', { title: booking.title })}</h4>
+                                            <h4 className="guide-account-booking-title">{booking.title}</h4>
                                             <p className="guide-account-booking-date">
-                                                {t('account.guide_account.bookings.dates', {
-                                                    start_date: new Date(booking.start_date).toLocaleDateString(),
-                                                    end_date: new Date(booking.end_date).toLocaleDateString()
+                                                {t('guideAccount.bookings.dates', {
+                                                    start: new Date(booking.start_date).toLocaleDateString(),
+                                                    end: new Date(booking.end_date).toLocaleDateString()
                                                 })}
                                             </p>
                                             <span className={`guide-account-booking-status guide-account-status-${booking.status}`}>
-                                                {t(`account.guide_account.dashboard.booking_status.${booking.status}`)}
+                                                {t('guideAccount.dashboard.bookingStatus', { status: booking.status.charAt(0).toUpperCase() + booking.status.slice(1) })}
                                             </span>
                                         </div>
                                         <div className="guide-account-booking-actions">
@@ -499,13 +501,13 @@ const GuideAccount = () => {
                                                         className="guide-account-btn guide-account-btn-accept"
                                                         onClick={() => handleBookingAction(booking.id, 'accept')}
                                                     >
-                                                        {t('account.guide_account.dashboard.actions.accept')}
+                                                        {t('guideAccount.dashboard.accept')}
                                                     </button>
                                                     <button
                                                         className="guide-account-btn guide-account-btn-cancel"
                                                         onClick={() => handleOpenCancelModal(booking)}
                                                     >
-                                                        {t('account.guide_account.dashboard.actions.decline')}
+                                                        {t('guideAccount.dashboard.decline')}
                                                     </button>
                                                 </>
                                             )}
@@ -513,13 +515,8 @@ const GuideAccount = () => {
                                                 <button
                                                     className="guide-account-btn guide-account-btn-secondary"
                                                     onClick={() => handleChatWithClient(booking)}
-                                                    style={{
-                                                        marginLeft: '8px',
-                                                        backgroundColor: '#6c757d',
-                                                        color: 'white'
-                                                    }}
                                                 >
-                                                    {t('account.guide_account.dashboard.actions.chat_with_client')}
+                                                    {t('guideAccount.dashboard.chatWithClient')}
                                                 </button>
                                             )}
                                         </div>
@@ -534,38 +531,40 @@ const GuideAccount = () => {
                         {!profile || showProfileForm ? (
                             <div className="guide-account-profile-form">
                                 <h3 className="guide-account-section-title">
-                                    {t(profile ? 'account.guide_account.profile.edit_profile' : 'account.guide_account.profile.create_profile')}
+                                    {profile ? t('guideAccount.profile.editProfile') : t('guideAccount.profile.createProfile')}
                                 </h3>
                                 <form onSubmit={handleProfileSubmit} className="guide-account-form">
                                     <div className="guide-account-form-group">
-                                        <label className="guide-account-label">{t('account.guide_account.profile.form.professional_bio_label')}</label>
+                                        <label className="guide-account-label">{t('guideAccount.profile.professionalBio')}</label>
                                         <textarea
                                             className="guide-account-textarea"
                                             value={profileForm.professional_bio}
                                             onChange={(e) => setProfileForm({ ...profileForm, professional_bio: e.target.value })}
-                                            placeholder={t('account.guide_account.profile.form.professional_bio_placeholder')}
+                                            placeholder={t('guideAccount.profile.bioPlaceholder')}
                                             rows="4"
+                                            required
                                         />
                                     </div>
                                     <div className="guide-account-form-row">
                                         <div className="guide-account-form-group">
-                                            <label className="guide-account-label">{t('account.guide_account.profile.form.years_of_experience_label')}</label>
+                                            <label className="guide-account-label">{t('guideAccount.profile.yearsOfExperience')}</label>
                                             <input
                                                 type="number"
                                                 className="guide-account-input"
                                                 value={profileForm.years_of_experience}
-                                                onChange={(e) => setProfileForm({ ...profileForm, years_of_experience: parseInt(e.target.value) })}
+                                                onChange={(e) => setProfileForm({ ...profileForm, years_of_experience: parseInt(e.target.value) || 0 })}
                                                 min="0"
                                             />
                                         </div>
                                         <div className="guide-account-form-group">
-                                            <label className="guide-account-label">{t('account.guide_account.profile.form.city_label')}</label>
+                                            <label className="guide-account-label">{t('guideAccount.profile.city')}</label>
                                             <select
                                                 className="guide-account-select"
                                                 value={profileForm.city}
                                                 onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
+                                                required
                                             >
-                                                <option value="">{t('account.guide_account.profile.form.city_placeholder')}</option>
+                                                <option value="">{t('guideAccount.profile.selectCity')}</option>
                                                 {cities.map(city => (
                                                     <option key={city.id} value={city.id}>{city.name}</option>
                                                 ))}
@@ -573,17 +572,17 @@ const GuideAccount = () => {
                                         </div>
                                     </div>
                                     <div className="guide-account-form-group">
-                                        <label className="guide-account-label">{t('account.guide_account.profile.form.service_areas_label')}</label>
+                                        <label className="guide-account-label">{t('guideAccount.profile.serviceAreas')}</label>
                                         <input
                                             type="text"
                                             className="guide-account-input"
                                             value={profileForm.service_areas}
                                             onChange={(e) => setProfileForm({ ...profileForm, service_areas: e.target.value })}
-                                            placeholder={t('account.guide_account.profile.form.service_areas_placeholder')}
+                                            placeholder={t('guideAccount.profile.serviceAreasPlaceholder')}
                                         />
                                     </div>
                                     <div className="guide-account-form-group">
-                                        <label className="guide-account-label">{t('account.guide_account.profile.form.service_types_label')}</label>
+                                        <label className="guide-account-label">{t('guideAccount.profile.serviceTypes')}</label>
                                         <div className="guide-account-checkbox-group">
                                             {serviceTypes.map(service => (
                                                 <label key={service.id} className="guide-account-checkbox-label">
@@ -612,42 +611,42 @@ const GuideAccount = () => {
                                     </div>
                                     <div className="guide-account-form-row">
                                         <div className="guide-account-form-group">
-                                            <label className="guide-account-label">{t('account.guide_account.profile.form.hourly_rate_label')}</label>
+                                            <label className="guide-account-label">{t('guideAccount.profile.hourlyRate')}</label>
                                             <input
                                                 type="number"
                                                 className="guide-account-input"
                                                 value={profileForm.hourly_rate}
                                                 onChange={(e) => setProfileForm({ ...profileForm, hourly_rate: e.target.value })}
-                                                placeholder={t('account.guide_account.profile.form.hourly_rate_placeholder')}
+                                                placeholder={t('guideAccount.profile.hourlyRatePlaceholder')}
                                                 step="0.01"
                                             />
                                         </div>
                                         <div className="guide-account-form-group">
-                                            <label className="guide-account-label">{t('account.guide_account.profile.form.daily_rate_label')}</label>
+                                            <label className="guide-account-label">{t('guideAccount.profile.dailyRate')}</label>
                                             <input
                                                 type="number"
                                                 className="guide-account-input"
                                                 value={profileForm.daily_rate}
                                                 onChange={(e) => setProfileForm({ ...profileForm, daily_rate: e.target.value })}
-                                                placeholder={t('account.guide_account.profile.form.daily_rate_placeholder')}
+                                                placeholder={t('guideAccount.profile.dailyRatePlaceholder')}
                                                 step="0.01"
                                             />
                                         </div>
                                         <div className="guide-account-form-group">
-                                            <label className="guide-account-label">{t('account.guide_account.profile.form.currency_label')}</label>
+                                            <label className="guide-account-label">{t('guideAccount.profile.currency')}</label>
                                             <select
                                                 className="guide-account-select"
                                                 value={profileForm.currency}
                                                 onChange={(e) => setProfileForm({ ...profileForm, currency: e.target.value })}
                                             >
-                                                <option value="USD">USD</option>
-                                                <option value="EUR">EUR</option>
-                                                <option value="UZS">UZS</option>
+                                                <option value="USD">{t('guideAccount.profile.usd')}</option>
+                                                <option value="EUR">{t('guideAccount.profile.eur')}</option>
+                                                <option value="UZS">{t('guideAccount.profile.uzs')}</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div className="guide-account-form-group">
-                                        <label className="guide-account-label">{t('account.guide_account.profile.form.languages_label')}</label>
+                                        <label className="guide-account-label">{t('guideAccount.profile.languages')}</label>
                                         <div className="guide-account-checkbox-group">
                                             {languages.map(language => (
                                                 <label key={language.id} className="guide-account-checkbox-label">
@@ -682,12 +681,12 @@ const GuideAccount = () => {
                                                 checked={profileForm.is_available}
                                                 onChange={(e) => setProfileForm({ ...profileForm, is_available: e.target.checked })}
                                             />
-                                            {t('account.guide_account.profile.form.is_available_label')}
+                                            {t('guideAccount.profile.availableForBookings')}
                                         </label>
                                     </div>
                                     <div className="guide-account-form-actions">
                                         <button type="submit" className="guide-account-btn guide-account-btn-primary">
-                                            {t(profile ? 'account.guide_account.profile.form.submit_update' : 'account.guide_account.profile.form.submit_create')}
+                                            {profile ? t('guideAccount.profile.updateProfile') : t('guideAccount.profile.createProfileButton')}
                                         </button>
                                         {profile && (
                                             <button
@@ -695,7 +694,7 @@ const GuideAccount = () => {
                                                 className="guide-account-btn guide-account-btn-secondary"
                                                 onClick={() => setShowProfileForm(false)}
                                             >
-                                                {t('account.guide_account.profile.form.cancel')}
+                                                {t('guideAccount.profile.cancel')}
                                             </button>
                                         )}
                                     </div>
@@ -704,27 +703,27 @@ const GuideAccount = () => {
                         ) : (
                             <div className="guide-account-profile-view">
                                 <div className="guide-account-profile-header">
-                                    <h3 className="guide-account-section-title">{t('account.guide_account.profile.profile_information')}</h3>
+                                    <h3 className="guide-account-section-title">{t('guideAccount.profile.profileInformation')}</h3>
                                     <button
                                         className="guide-account-btn guide-account-btn-primary"
                                         onClick={() => setShowProfileForm(true)}
                                     >
-                                        {t('account.guide_account.profile.edit_profile')}
+                                        {t('guideAccount.profile.editProfileButton')}
                                     </button>
                                 </div>
                                 <div className="guide-account-profile-info">
                                     <div className="guide-account-profile-field">
-                                        <label className="guide-account-profile-label">{t('account.guide_account.profile.professional_bio')}</label>
+                                        <label className="guide-account-profile-label">{t('guideAccount.profile.professionalBio')}</label>
                                         <p className="guide-account-profile-value">{profile.professional_bio}</p>
                                     </div>
                                     <div className="guide-account-profile-field">
-                                        <label className="guide-account-profile-label">{t('account.guide_account.profile.years_of_experience', { years: profile.years_of_experience })}</label>
-                                        <p className="guide-account-profile-value">{profile.years_of_experience} years</p>
+                                        <label className="guide-account-profile-label">{t('guideAccount.profile.yearsOfExperience')}</label>
+                                        <p className="guide-account-profile-value">{profile.years_of_experience} {t('guideAccount.profile.yearsOfExperience').toLowerCase()}</p>
                                     </div>
                                     <div className="guide-account-profile-field">
-                                        <label className="guide-account-profile-label">{t('account.guide_account.profile.availability')}</label>
+                                        <label className="guide-account-profile-label">{t('guideAccount.profile.availability')}</label>
                                         <p className="guide-account-profile-value">
-                                            {profile.is_available ? t('account.guide_account.profile.available') : t('account.guide_account.profile.not_available')}
+                                            {profile.is_available ? t('guideAccount.profile.available') : t('guideAccount.profile.notAvailable')}
                                         </p>
                                     </div>
                                 </div>
@@ -734,21 +733,21 @@ const GuideAccount = () => {
                 )}
                 {activeTab === 'bookings' && (
                     <div className="guide-account-bookings">
-                        <h3 className="guide-account-section-title">{t('account.guide_account.bookings.title')}</h3>
+                        <h3 className="guide-account-section-title">{t('guideAccount.bookings.myBookings')}</h3>
                         <div className="guide-account-bookings-list">
                             {bookings.map(booking => (
                                 <div key={booking.id} className="guide-account-booking-item">
                                     <div className="guide-account-booking-details">
-                                        <h4 className="guide-account-booking-title">{t('account.guide_account.bookings.booking_title', { title: booking.title })}</h4>
+                                        <h4 className="guide-account-booking-title">{booking.title}</h4>
                                         <p className="guide-account-booking-dates">
-                                            {t('account.guide_account.bookings.dates', {
-                                                start_date: new Date(booking.start_date).toLocaleDateString(),
-                                                end_date: new Date(booking.end_date).toLocaleDateString()
+                                            {t('guideAccount.bookings.dates', {
+                                                start: new Date(booking.start_date).toLocaleDateString(),
+                                                end: new Date(booking.end_date).toLocaleDateString()
                                             })}
                                         </p>
-                                        <p className="guide-account-booking-description">{t('account.guide_account.bookings.description', { description: booking.description })}</p>
+                                        <p className="guide-account-booking-description">{booking.description}</p>
                                         <span className={`guide-account-booking-status guide-account-status-${booking.status}`}>
-                                            {t(`account.guide_account.dashboard.booking_status.${booking.status}`)}
+                                            {t('guideAccount.dashboard.bookingStatus', { status: booking.status.charAt(0).toUpperCase() + booking.status.slice(1) })}
                                         </span>
                                     </div>
                                     <div className="guide-account-booking-actions">
@@ -758,13 +757,13 @@ const GuideAccount = () => {
                                                     className="guide-account-btn guide-account-btn-accept"
                                                     onClick={() => handleBookingAction(booking.id, 'accept')}
                                                 >
-                                                    {t('account.guide_account.dashboard.actions.accept')}
+                                                    {t('guideAccount.bookings.accept')}
                                                 </button>
                                                 <button
                                                     className="guide-account-btn guide-account-btn-cancel"
                                                     onClick={() => handleOpenCancelModal(booking)}
                                                 >
-                                                    {t('account.guide_account.dashboard.actions.decline')}
+                                                    {t('guideAccount.bookings.decline')}
                                                 </button>
                                             </>
                                         )}
@@ -772,13 +771,8 @@ const GuideAccount = () => {
                                             <button
                                                 className="guide-account-btn guide-account-btn-secondary"
                                                 onClick={() => handleChatWithClient(booking)}
-                                                style={{
-                                                    marginLeft: '8px',
-                                                    backgroundColor: '#6c757d',
-                                                    color: 'white'
-                                                }}
                                             >
-                                                {t('account.guide_account.dashboard.actions.chat_with_client')}
+                                                {t('guideAccount.bookings.chatWithClient')}
                                             </button>
                                         )}
                                     </div>
@@ -790,43 +784,43 @@ const GuideAccount = () => {
                 {activeTab === 'portfolio' && (
                     <div className="guide-account-portfolio">
                         <div className="guide-account-portfolio-header">
-                            <h3 className="guide-account-section-title">{t('account.guide_account.portfolio.title')}</h3>
+                            <h3 className="guide-account-section-title">{t('guideAccount.portfolio.myPortfolio')}</h3>
                             <button
                                 className="guide-account-btn guide-account-btn-primary"
                                 onClick={() => setShowPortfolioForm(true)}
                             >
-                                {t('account.guide_account.portfolio.add_item')}
+                                {t('guideAccount.portfolio.addPortfolioItem')}
                             </button>
                         </div>
                         {showPortfolioForm && (
                             <div className="guide-account-portfolio-form">
                                 <h4 className="guide-account-form-title">
-                                    {t('account.guide_account.portfolio.form.title', { action: editingPortfolioItem ? t('account.guide_account.profile.edit_profile') : t('account.guide_account.portfolio.add_item') })}
+                                    {editingPortfolioItem ? t('guideAccount.portfolio.editPortfolioItem') : t('guideAccount.portfolio.createPortfolioItem')}
                                 </h4>
                                 <form onSubmit={handlePortfolioSubmit} className="guide-account-form">
                                     <div className="guide-account-form-group">
-                                        <label className="guide-account-label">{t('account.guide_account.portfolio.form.title_label')}</label>
+                                        <label className="guide-account-label">{t('guideAccount.portfolio.title')}</label>
                                         <input
                                             type="text"
                                             className="guide-account-input"
                                             value={portfolioForm.title}
                                             onChange={(e) => setPortfolioForm({ ...portfolioForm, title: e.target.value })}
-                                            placeholder={t('account.guide_account.portfolio.form.title_placeholder')}
+                                            placeholder={t('guideAccount.portfolio.titlePlaceholder')}
                                             required
                                         />
                                     </div>
                                     <div className="guide-account-form-group">
-                                        <label className="guide-account-label">{t('account.guide_account.portfolio.form.description_label')}</label>
+                                        <label className="guide-account-label">{t('guideAccount.portfolio.description')}</label>
                                         <textarea
                                             className="guide-account-textarea"
                                             value={portfolioForm.description}
                                             onChange={(e) => setPortfolioForm({ ...portfolioForm, description: e.target.value })}
-                                            placeholder={t('account.guide_account.portfolio.form.description_placeholder')}
+                                            placeholder={t('guideAccount.portfolio.descriptionPlaceholder')}
                                             rows="3"
                                         />
                                     </div>
                                     <div className="guide-account-form-group">
-                                        <label className="guide-account-label">{t('account.guide_account.portfolio.form.image_label')}</label>
+                                        <label className="guide-account-label">{t('guideAccount.portfolio.image')}</label>
                                         <input
                                             type="file"
                                             className="guide-account-file-input"
@@ -835,19 +829,19 @@ const GuideAccount = () => {
                                         />
                                     </div>
                                     <div className="guide-account-form-group">
-                                        <label className="guide-account-label">{t('account.guide_account.portfolio.form.order_label')}</label>
+                                        <label className="guide-account-label">{t('guideAccount.portfolio.order')}</label>
                                         <input
                                             type="number"
                                             className="guide-account-input"
                                             value={portfolioForm.order}
-                                            onChange={(e) => setPortfolioForm({ ...portfolioForm, order: parseInt(e.target.value) })}
-                                            placeholder={t('account.guide_account.portfolio.form.order_placeholder')}
+                                            onChange={(e) => setPortfolioForm({ ...portfolioForm, order: parseInt(e.target.value) || 0 })}
+                                            placeholder={t('guideAccount.portfolio.orderPlaceholder')}
                                             min="0"
                                         />
                                     </div>
                                     <div className="guide-account-form-actions">
                                         <button type="submit" className="guide-account-btn guide-account-btn-primary">
-                                            {t(editingPortfolioItem ? 'account.guide_account.portfolio.form.submit_update' : 'account.guide_account.portfolio.form.submit_create')}
+                                            {editingPortfolioItem ? t('guideAccount.portfolio.updatePortfolioItem') : t('guideAccount.portfolio.createPortfolioItem')}
                                         </button>
                                         <button
                                             type="button"
@@ -858,7 +852,7 @@ const GuideAccount = () => {
                                                 setPortfolioForm({ title: '', description: '', image: null, order: 0 });
                                             }}
                                         >
-                                            {t('account.guide_account.portfolio.form.cancel')}
+                                            {t('guideAccount.portfolio.cancel')}
                                         </button>
                                     </div>
                                 </form>
@@ -891,13 +885,13 @@ const GuideAccount = () => {
                                                     setShowPortfolioForm(true);
                                                 }}
                                             >
-                                                {t('account.guide_account.portfolio.item.edit')}
+                                                {t('guideAccount.portfolio.edit')}
                                             </button>
                                             <button
                                                 className="guide-account-btn guide-account-btn-small guide-account-btn-danger"
                                                 onClick={() => handleDeletePortfolio(item.id)}
                                             >
-                                                {t('account.guide_account.portfolio.item.delete')}
+                                                {t('guideAccount.portfolio.delete')}
                                             </button>
                                         </div>
                                     </div>
@@ -909,23 +903,23 @@ const GuideAccount = () => {
                 {activeTab === 'availability' && (
                     <div className="guide-account-availability">
                         <div className="guide-account-availability-header">
-                            <h3 className="guide-account-section-title">{t('account.guide_account.availability.title')}</h3>
+                            <h3 className="guide-account-section-title">{t('guideAccount.availability.myAvailability')}</h3>
                             <button
                                 className="guide-account-btn guide-account-btn-primary"
                                 onClick={() => setShowAvailabilityForm(true)}
                             >
-                                {t('account.guide_account.availability.add_availability')}
+                                {t('guideAccount.availability.addAvailability')}
                             </button>
                         </div>
                         {showAvailabilityForm && (
                             <div className="guide-account-availability-form">
                                 <h4 className="guide-account-form-title">
-                                    {t('account.guide_account.availability.form.title', { action: editingAvailability ? t('account.guide_account.profile.edit_profile') : t('account.guide_account.availability.add_availability') })}
+                                    {editingAvailability ? t('guideAccount.availability.editAvailability') : t('guideAccount.availability.createAvailability')}
                                 </h4>
                                 <form onSubmit={handleAvailabilitySubmit} className="guide-account-form">
                                     <div className="guide-account-form-row">
                                         <div className="guide-account-form-group">
-                                            <label className="guide-account-label">{t('account.guide_account.availability.form.date_label')}</label>
+                                            <label className="guide-account-label">{t('guideAccount.availability.date')}</label>
                                             <input
                                                 type="date"
                                                 className="guide-account-input"
@@ -942,13 +936,13 @@ const GuideAccount = () => {
                                                     checked={availabilityForm.is_available}
                                                     onChange={(e) => setAvailabilityForm({ ...availabilityForm, is_available: e.target.checked })}
                                                 />
-                                                {t('account.guide_account.availability.form.is_available_label')}
+                                                {t('guideAccount.availability.available')}
                                             </label>
                                         </div>
                                     </div>
                                     <div className="guide-account-form-row">
                                         <div className="guide-account-form-group">
-                                            <label className="guide-account-label">{t('account.guide_account.availability.form.start_time_label')}</label>
+                                            <label className="guide-account-label">{t('guideAccount.availability.startTime')}</label>
                                             <input
                                                 type="time"
                                                 className="guide-account-input"
@@ -957,7 +951,7 @@ const GuideAccount = () => {
                                             />
                                         </div>
                                         <div className="guide-account-form-group">
-                                            <label className="guide-account-label">{t('account.guide_account.availability.form.end_time_label')}</label>
+                                            <label className="guide-account-label">{t('guideAccount.availability.endTime')}</label>
                                             <input
                                                 type="time"
                                                 className="guide-account-input"
@@ -967,18 +961,18 @@ const GuideAccount = () => {
                                         </div>
                                     </div>
                                     <div className="guide-account-form-group">
-                                        <label className="guide-account-label">{t('account.guide_account.availability.form.note_label')}</label>
+                                        <label className="guide-account-label">{t('guideAccount.availability.note')}</label>
                                         <input
                                             type="text"
                                             className="guide-account-input"
                                             value={availabilityForm.note}
                                             onChange={(e) => setAvailabilityForm({ ...availabilityForm, note: e.target.value })}
-                                            placeholder={t('account.guide_account.availability.form.note_placeholder')}
+                                            placeholder={t('guideAccount.availability.notePlaceholder')}
                                         />
                                     </div>
                                     <div className="guide-account-form-actions">
                                         <button type="submit" className="guide-account-btn guide-account-btn-primary">
-                                            {t(editingAvailability ? 'account.guide_account.availability.form.submit_update' : 'account.guide_account.availability.form.submit_create')}
+                                            {editingAvailability ? t('guideAccount.availability.updateAvailability') : t('guideAccount.availability.createAvailability')}
                                         </button>
                                         <button
                                             type="button"
@@ -989,7 +983,7 @@ const GuideAccount = () => {
                                                 setAvailabilityForm({ date: '', is_available: true, start_time: '', end_time: '', note: '' });
                                             }}
                                         >
-                                            {t('account.guide_account.availability.form.cancel')}
+                                            {t('guideAccount.availability.cancel')}
                                         </button>
                                     </div>
                                 </form>
@@ -1000,17 +994,18 @@ const GuideAccount = () => {
                                 <div key={item.id} className="guide-account-availability-item">
                                     <div className="guide-account-availability-info">
                                         <h4 className="guide-account-availability-date">
-                                            {t('account.guide_account.availability.item.date', { date: new Date(item.date).toLocaleDateString() })}
+                                            {t('guideAccount.availability.date')}: {new Date(item.date).toLocaleDateString()}
                                         </h4>
                                         <p className="guide-account-availability-time">
-                                            {item.start_time && item.end_time ?
-                                                t('account.guide_account.availability.item.time', { start_time: item.start_time, end_time: item.end_time }) :
-                                                t('account.guide_account.availability.item.all_day')
-                                            }
+                                            {item.start_time && item.end_time
+                                                ? `${item.start_time} - ${item.end_time}`
+                                                : t('guideAccount.availability.allDay')}
                                         </p>
-                                        <p className="guide-account-availability-note">{t('account.guide_account.availability.item.note', { note: item.note || t('account.guide_account.find_guide.none') })}</p>
+                                        <p className="guide-account-availability-note">
+                                            {t('guideAccount.availability.note')}: {item.note || 'None'}
+                                        </p>
                                         <span className={`guide-account-availability-status ${item.is_available ? 'guide-account-available' : 'guide-account-unavailable'}`}>
-                                            {item.is_available ? t('account.guide_account.availability.item.available') : t('account.guide_account.availability.item.unavailable')}
+                                            {item.is_available ? t('guideAccount.availability.available') : t('guideAccount.availability.unavailable')}
                                         </span>
                                     </div>
                                     <div className="guide-account-availability-actions">
@@ -1028,13 +1023,13 @@ const GuideAccount = () => {
                                                 setShowAvailabilityForm(true);
                                             }}
                                         >
-                                            {t('account.guide_account.availability.item.edit')}
+                                            {t('guideAccount.availability.edit')}
                                         </button>
                                         <button
                                             className="guide-account-btn guide-account-btn-small guide-account-btn-danger"
                                             onClick={() => handleDeleteAvailability(item.id)}
                                         >
-                                            {t('account.guide_account.availability.item.delete')}
+                                            {t('guideAccount.availability.delete')}
                                         </button>
                                     </div>
                                 </div>
@@ -1045,70 +1040,70 @@ const GuideAccount = () => {
                 {activeTab === 'reviews' && (
                     <div className="guide-account-reviews">
                         <div className="guide-account-reviews-header">
-                            <h3 className="guide-account-section-title">{t('account.guide_account.reviews.title')}</h3>
+                            <h3 className="guide-account-section-title">{t('guideAccount.reviews.myReviews')}</h3>
                             <div className="guide-account-reviews-filters">
                                 <select
                                     className="guide-account-filter-select"
                                     value={reviewFilter.minRating}
                                     onChange={(e) => handleReviewFilterChange('minRating', e.target.value)}
                                 >
-                                    <option value="">{t('account.guide_account.reviews.filters.all_ratings')}</option>
-                                    <option value="5">{t('account.guide_account.reviews.filters.stars_5')}</option>
-                                    <option value="4">{t('account.guide_account.reviews.filters.stars_4')}</option>
-                                    <option value="3">{t('account.guide_account.reviews.filters.stars_3')}</option>
-                                    <option value="2">{t('account.guide_account.reviews.filters.stars_2')}</option>
-                                    <option value="1">{t('account.guide_account.reviews.filters.stars_1')}</option>
+                                    <option value="">{t('guideAccount.reviews.allRatings')}</option>
+                                    <option value="5">{t('guideAccount.reviews.stars.5')}</option>
+                                    <option value="4">{t('guideAccount.reviews.stars.4')}</option>
+                                    <option value="3">{t('guideAccount.reviews.stars.3')}</option>
+                                    <option value="2">{t('guideAccount.reviews.stars.2')}</option>
+                                    <option value="1">{t('guideAccount.reviews.stars.1')}</option>
                                 </select>
                                 <select
                                     className="guide-account-filter-select"
                                     value={reviewFilter.sortBy}
                                     onChange={(e) => handleReviewFilterChange('sortBy', e.target.value)}
                                 >
-                                    <option value="date_desc">{t('account.guide_account.reviews.filters.sort_newest')}</option>
-                                    <option value="date_asc">{t('account.guide_account.reviews.filters.sort_oldest')}</option>
-                                    <option value="rating_desc">{t('account.guide_account.reviews.filters.sort_highest')}</option>
-                                    <option value="rating_asc">{t('account.guide_account.reviews.filters.sort_lowest')}</option>
+                                    <option value="date_desc">{t('guideAccount.reviews.sortBy.newestFirst')}</option>
+                                    <option value="date_asc">{t('guideAccount.reviews.sortBy.oldestFirst')}</option>
+                                    <option value="rating_desc">{t('guideAccount.reviews.sortBy.highestRated')}</option>
+                                    <option value="rating_asc">{t('guideAccount.reviews.sortBy.lowestRated')}</option>
                                 </select>
                             </div>
                         </div>
                         {reviewSummary && (
                             <div className="guide-account-reviews-summary">
-                                <h4 className="guide-account-section-subtitle">{t('account.guide_account.reviews.summary.title')}</h4>
+                                <h4 className="guide-account-section-subtitle">{t('guideAccount.reviews.reviewSummary')}</h4>
                                 <div className="guide-account-reviews-summary-grid">
                                     <div className="guide-account-summary-item">
-                                        <span className="guide-account-summary-label">{t('account.guide_account.reviews.summary.overall')}</span>
+                                        <span className="guide-account-summary-label">{t('guideAccount.reviews.overallRating')}</span>
                                         <span className="guide-account-summary-value">
-                                            {t('account.guide_account.reviews.summary.overall', { rating: reviewSummary.overall_rating?.toFixed(1) || 0 })}
+                                            {reviewSummary.overall_rating?.toFixed(1) || 0}/5
                                         </span>
                                     </div>
                                     <div className="guide-account-summary-item">
-                                        <span className="guide-account-summary-label">{t('account.guide_account.reviews.summary.communication')}</span>
+                                        <span className="guide-account-summary-label">{t('guideAccount.reviews.communication')}</span>
                                         <span className="guide-account-summary-value">
-                                            {t('account.guide_account.reviews.summary.communication', { rating: reviewSummary.communication_rating?.toFixed(1) || 0 })}
+                                            {reviewSummary.communication_rating?.toFixed(1) || 0}/5
                                         </span>
                                     </div>
                                     <div className="guide-account-summary-item">
-                                        <span className="guide-account-summary-label">{t('account.guide_account.reviews.summary.service')}</span>
+                                        <span className="guide-account-summary-label">{t('guideAccount.reviews.service')}</span>
                                         <span className="guide-account-summary-value">
-                                            {t('account.guide_account.reviews.summary.service', { rating: reviewSummary.service_rating?.toFixed(1) || 0 })}
+                                            {reviewSummary.service_rating?.toFixed(1) || 0}/5
                                         </span>
                                     </div>
                                     <div className="guide-account-summary-item">
-                                        <span className="guide-account-summary-label">{t('account.guide_account.reviews.summary.punctuality')}</span>
+                                        <span className="guide-account-summary-label">{t('guideAccount.reviews.punctuality')}</span>
                                         <span className="guide-account-summary-value">
-                                            {t('account.guide_account.reviews.summary.punctuality', { rating: reviewSummary.punctuality_rating?.toFixed(1) || 0 })}
+                                            {reviewSummary.punctuality_rating?.toFixed(1) || 0}/5
                                         </span>
                                     </div>
                                     <div className="guide-account-summary-item">
-                                        <span className="guide-account-summary-label">{t('account.guide_account.reviews.summary.value')}</span>
+                                        <span className="guide-account-summary-label">{t('guideAccount.reviews.value')}</span>
                                         <span className="guide-account-summary-value">
-                                            {t('account.guide_account.reviews.summary.value', { rating: reviewSummary.value_rating?.toFixed(1) || 0 })}
+                                            {reviewSummary.value_rating?.toFixed(1) || 0}/5
                                         </span>
                                     </div>
                                     <div className="guide-account-summary-item">
-                                        <span className="guide-account-summary-label">{t('account.guide_account.reviews.summary.total_reviews')}</span>
+                                        <span className="guide-account-summary-label">{t('guideAccount.reviews.totalReviews')}</span>
                                         <span className="guide-account-summary-value">
-                                            {t('account.guide_account.reviews.summary.total_reviews', { count: reviewSummary.total_reviews || 0 })}
+                                            {reviewSummary.total_reviews || 0}
                                         </span>
                                     </div>
                                 </div>
@@ -1116,7 +1111,7 @@ const GuideAccount = () => {
                         )}
                         <div className="guide-account-reviews-list">
                             {filteredReviews.length === 0 ? (
-                                <p>{t('account.guide_account.reviews.no_reviews')}</p>
+                                <p>{t('guideAccount.reviews.noReviews')}</p>
                             ) : (
                                 filteredReviews.map(review => (
                                     <div key={review.id} className="guide-account-review-item">
@@ -1124,20 +1119,20 @@ const GuideAccount = () => {
                                             <div className="guide-account-review-rating">
                                                 {'★'.repeat(review.overall_rating)}{'☆'.repeat(5 - review.overall_rating)}
                                                 <span className="guide-account-review-rating-text">
-                                                    {t('account.guide_account.reviews.review_item.rating', { rating: review.overall_rating })}
+                                                    {review.overall_rating}/5
                                                 </span>
                                             </div>
                                             <span className="guide-account-review-date">
-                                                {t('account.guide_account.reviews.review_item.date', { date: new Date(review.created_at).toLocaleDateString() })}
+                                                {t('guideAccount.availability.date')}: {new Date(review.created_at).toLocaleDateString()}
                                             </span>
                                         </div>
                                         <h4 className="guide-account-review-title">{review.title}</h4>
                                         <p className="guide-account-review-comment">{review.comment}</p>
                                         <div className="guide-account-review-details">
-                                            <span className="guide-account-review-detail">{t('account.guide_account.reviews.review_item.communication', { rating: review.communication_rating })}</span>
-                                            <span className="guide-account-review-detail">{t('account.guide_account.reviews.review_item.service', { rating: review.service_rating })}</span>
-                                            <span className="guide-account-review-detail">{t('account.guide_account.reviews.review_item.punctuality', { rating: review.punctuality_rating })}</span>
-                                            <span className="guide-account-review-detail">{t('account.guide_account.reviews.review_item.value', { rating: review.value_rating })}</span>
+                                            <span className="guide-account-review-detail">{t('guideAccount.reviews.communication')}: {review.communication_rating}/5</span>
+                                            <span className="guide-account-review-detail">{t('guideAccount.reviews.service')}: {review.service_rating}/5</span>
+                                            <span className="guide-account-review-detail">{t('guideAccount.reviews.punctuality')}: {review.punctuality_rating}/5</span>
+                                            <span className="guide-account-review-detail">{t('guideAccount.reviews.value')}: {review.value_rating}/5</span>
                                         </div>
                                         <div className="guide-account-review-actions">
                                             <button
@@ -1147,14 +1142,14 @@ const GuideAccount = () => {
                                                     setReactionForm({ reactionType: 'like', comment: '' });
                                                 }}
                                             >
-                                                {t('account.guide_account.reviews.review_item.react')}
+                                                {t('guideAccount.reviews.react')}
                                             </button>
                                             {review.my_reaction && (
                                                 <button
                                                     className="guide-account-btn guide-account-btn-small guide-account-btn-danger"
                                                     onClick={() => handleRemoveReaction(review.id)}
                                                 >
-                                                    {t('account.guide_account.reviews.review_item.remove_reaction')}
+                                                    {t('guideAccount.reviews.removeReaction')}
                                                 </button>
                                             )}
                                         </div>
@@ -1168,52 +1163,52 @@ const GuideAccount = () => {
                                                     className="guide-account-form"
                                                 >
                                                     <div className="guide-account-form-group">
-                                                        <label className="guide-account-label">{t('account.guide_account.reaction_form.reaction_type_label')}</label>
+                                                        <label className="guide-account-label">{t('guideAccount.reviews.reactionType')}</label>
                                                         <select
                                                             className="guide-account-select"
                                                             value={reactionForm.reactionType}
                                                             onChange={(e) => setReactionForm({ ...reactionForm, reactionType: e.target.value })}
                                                         >
-                                                            <option value="like">{t('account.guide_account.reaction_form.reaction_like')}</option>
-                                                            <option value="comment">{t('account.guide_account.reaction_form.reaction_comment')}</option>
-                                                            <option value="report">{t('account.guide_account.reaction_form.reaction_report')}</option>
+                                                            <option value="like">{t('guideAccount.reviews.like')}</option>
+                                                            <option value="comment">{t('guideAccount.reviews.comment')}</option>
+                                                            <option value="report">{t('guideAccount.reviews.report')}</option>
                                                         </select>
                                                     </div>
                                                     {reactionForm.reactionType === 'comment' && (
                                                         <div className="guide-account-form-group">
-                                                            <label className="guide-account-label">{t('account.guide_account.reaction_form.comment_label')}</label>
+                                                            <label className="guide-account-label">{t('guideAccount.reviews.comment')}</label>
                                                             <textarea
                                                                 className="guide-account-textarea"
                                                                 value={reactionForm.comment}
                                                                 onChange={(e) => setReactionForm({ ...reactionForm, comment: e.target.value })}
                                                                 rows="3"
-                                                                placeholder={t('account.guide_account.reaction_form.comment_placeholder')}
+                                                                placeholder={t('guideAccount.reviews.commentPlaceholder')}
                                                             />
                                                         </div>
                                                     )}
                                                     {reactionForm.reactionType === 'report' && (
                                                         <div className="guide-account-form-group">
-                                                            <label className="guide-account-label">{t('account.guide_account.reaction_form.report_reason_label')}</label>
+                                                            <label className="guide-account-label">{t('guideAccount.reviews.report')}</label>
                                                             <textarea
                                                                 className="guide-account-textarea"
                                                                 value={reactionForm.comment}
                                                                 onChange={(e) => setReactionForm({ ...reactionForm, comment: e.target.value })}
                                                                 rows="3"
-                                                                placeholder={t('account.guide_account.reaction_form.report_reason_placeholder')}
+                                                                placeholder={t('guideAccount.reviews.reportReasonPlaceholder')}
                                                                 required
                                                             />
                                                         </div>
                                                     )}
                                                     <div className="guide-account-form-actions">
                                                         <button type="submit" className="guide-account-btn guide-account-btn-primary">
-                                                            {t('account.guide_account.reaction_form.submit')}
+                                                            {t('guideAccount.reviews.submitReaction')}
                                                         </button>
                                                         <button
                                                             type="button"
                                                             className="guide-account-btn guide-account-btn-secondary"
                                                             onClick={() => setShowReactionForm(null)}
                                                         >
-                                                            {t('account.guide_account.reaction_form.cancel')}
+                                                            {t('guideAccount.reviews.cancel')}
                                                         </button>
                                                     </div>
                                                 </form>
@@ -1222,12 +1217,9 @@ const GuideAccount = () => {
                                         {review.my_reaction && (
                                             <div className="guide-account-reaction-display">
                                                 <p>
-                                                    {review.my_reaction.comment ?
-                                                        t('account.guide_account.reviews.review_item.my_reaction_with_comment', {
-                                                            type: review.my_reaction.reaction_type,
-                                                            comment: review.my_reaction.comment
-                                                        }) :
-                                                        t('account.guide_account.reviews.review_item.my_reaction', { type: review.my_reaction.reaction_type })}
+                                                    {review.my_reaction.comment
+                                                        ? t('guideAccount.reviews.yourReaction', { type: review.my_reaction.reaction_type, comment: review.my_reaction.comment })
+                                                        : t('guideAccount.reviews.yourReactionNoComment', { type: review.my_reaction.reaction_type })}
                                                 </p>
                                             </div>
                                         )}
@@ -1242,7 +1234,7 @@ const GuideAccount = () => {
                 <div className="guide-account-modal">
                     <div className="guide-account-modal-content">
                         <div className="guide-account-modal-header">
-                            <h3 className="guide-account-modal-title">{t('account.guide_account.cancel_booking.title')}</h3>
+                            <h3 className="guide-account-modal-title">{t('guideAccount.cancelModal.cancelBooking')}</h3>
                             <button
                                 className="guide-account-modal-close"
                                 onClick={() => {
@@ -1255,33 +1247,26 @@ const GuideAccount = () => {
                                 ×
                             </button>
                         </div>
-                        <form onSubmit={(e) => { e.preventDefault(); handleCancelBooking(); }} className="guide-account-form">
+                        <form onSubmit={(e) => { e.preventDefault(); handleBookingAction(selectedBookingForCancel.id, 'cancel'); }} className="guide-account-form">
                             <div className="guide-account-form-group">
-                                <label className="guide-account-label">{t('account.guide_account.cancel_booking.reason_label')}</label>
+                                <label className="guide-account-label">{t('guideAccount.cancelModal.reasonForCancellation')}</label>
                                 <textarea
                                     className="guide-account-textarea"
                                     value={cancelReason}
                                     onChange={(e) => setCancelReason(e.target.value)}
                                     rows="4"
                                     required
-                                    placeholder={t('account.guide_account.cancel_booking.reason_placeholder')}
+                                    placeholder={t('guideAccount.cancelModal.reasonPlaceholder')}
                                 />
                             </div>
                             {error && (
-                                <div style={{
-                                    background: '#f8d7da',
-                                    color: '#721c24',
-                                    padding: '8px 12px',
-                                    borderRadius: '4px',
-                                    marginBottom: '16px',
-                                    fontSize: '14px'
-                                }}>
+                                <div className="guide-account-error">
                                     {error}
                                 </div>
                             )}
                             <div className="guide-account-form-actions">
                                 <button type="submit" className="guide-account-btn guide-account-btn-danger">
-                                    {t('account.guide_account.cancel_booking.submit')}
+                                    {t('guideAccount.cancelModal.cancelBookingButton')}
                                 </button>
                                 <button
                                     type="button"
@@ -1293,7 +1278,7 @@ const GuideAccount = () => {
                                         setError(null);
                                     }}
                                 >
-                                    {t('account.guide_account.cancel_booking.close')}
+                                    {t('guideAccount.cancelModal.close')}
                                 </button>
                             </div>
                         </form>

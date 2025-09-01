@@ -1,4 +1,16 @@
 {
+  "header": {
+    "find_guides": "Найти гида",
+    "blog": "Блог",
+    "logo_text": "TourGuide",
+    "tagline": "Исследуйте вместе",
+    "select_language": "Выбрать язык",
+    "choose_appearance": "Выбрать внешний вид",
+    "account": "Аккаунт",
+    "logout": "Выйти",
+    "register": "Регистрация",
+    "sign_in": "Войти"
+  },
   "theme": {
     "light": "Светлая",
     "light_desc": "Светлая тема",
@@ -6,998 +18,857 @@
     "dark_desc": "Тёмная тема",
     "default": "Системная",
     "default_desc": "Следовать системной теме",
-    "auto": "Автоматическая",
-    "auto_desc": "Автоматическая тема в зависимости от времени"
+    "auto": "Авто",
+    "auto_desc": "Авто тема на основе времени"
   },
   "language": {
-    "en": "Английский",
+    "en": "English",
     "en_native": "English",
-    "ru": "Русский",
+    "ru": "Russian",
     "ru_native": "Русский",
-    "uz": "Узбекский",
+    "uz": "Uzbek",
     "uz_native": "O'zbek",
-    "es": "Испанский",
+    "es": "Spanish",
     "es_native": "Español",
-    "ar": "Арабский",
+    "ar": "Arabic",
     "ar_native": "العربية"
   },
-  "header": {
-    "select_language": "Выбрать язык",
-    "choose_appearance": "Выбрать оформление",
-    "logout": "Выйти",
-    "find_guides": "Найти гидов",
-    "blog": "Блог",
-    "logo_text": "TourGuide",
-    "tagline": "Исследуйте вместе",
-    "account": "Аккаунт",
-    "register": "Зарегистрироваться",
-    "sign_in": "Войти"
-  },
-  "home": {
+  "homepage": {
     "hero": {
-      "title": "Откройте мир с",
-      "title_highlight": "местными экспертами",
-      "description": "Свяжитесь с проверенными местными гидами для аутентичных путешествий по всему миру."
+      "title": "Откройте для себя идеальный опыт путешествий",
+      "gradient_text": "с местными гидами",
+      "description": "Свяжитесь с экспертами-местными гидами для персонализированных туров и незабываемых приключений."
     },
     "search": {
       "location_placeholder": "Куда вы направляетесь?",
-      "location_aria": "Поиск местоположения",
-      "service_placeholder": "Какая услуга вам нужна?",
-      "service_aria": "Поиск услуги",
-      "button": "Найти гидов",
-      "button_aria": "Поиск гидов",
-      "results_aria": "Результаты поиска"
-    },
-    "destinations": {
-      "title": "Популярные направления",
-      "subtitle": "Откройте лучшие места с нашими экспертными гидами",
-      "view_all": "Посмотреть все направления",
-      "view_all_aria": "Посмотреть все популярные направления",
-      "explore_aria": "Исследовать {name}",
-      "guides_count": "{count} гидов",
-      "modal": {
-        "highlights": "Основные достопримечательности",
-        "close_aria": "Закрыть детали направления",
-        "find_guides": "Найти гидов здесь",
-        "find_guides_aria": "Найти гидов в {name}"
-      },
-      "istanbul": {
-        "name": "Стамбул, Турция",
-        "price": "От $50/день",
-        "highlights": [
-          "Айя-София",
-          "Голубая мечеть",
-          "Гранд-базар"
-        ]
-      },
-      "barcelona": {
-        "name": "Барселона, Испания",
-        "price": "От $60/день",
-        "highlights": [
-          "Саграда Фамилия",
-          "Парк Гуэль",
-          "Ла Рамбла"
-        ]
-      },
-      "tokyo": {
-        "name": "Токио, Япония",
-        "price": "От $70/день",
-        "highlights": [
-          "Токийская башня",
-          "Перекрёсток Сибуя",
-          "Храм Асакуса"
-        ]
-      },
-      "paris": {
-        "name": "Париж, Франция",
-        "price": "От $65/день",
-        "highlights": [
-          "Эйфелева башня",
-          "Музей Лувр",
-          "Река Сена"
-        ]
-      },
-      "dubai": {
-        "name": "Дубай, ОАЭ",
-        "price": "От $80/день",
-        "highlights": [
-          "Бурдж-Халифа",
-          "Дубай Молл",
-          "Пустынное сафари"
-        ]
-      },
-      "rome": {
-        "name": "Рим, Италия",
-        "price": "От $55/день",
-        "highlights": [
-          "Колизей",
-          "Ватикан",
-          "Фонтан Треви"
-        ]
-      }
-    },
-    "services": {
-      "city_tours": {
-        "name": "Городские туры",
-        "description": "Исследуйте городские чудеса с местными знаниями",
-        "count": "500+ гидов"
-      },
-      "language_support": {
-        "name": "Языковая поддержка",
-        "description": "Преодолейте языковые барьеры без усилий",
-        "count": "300+ гидов"
-      },
-      "photography": {
-        "name": "Фототуры",
-        "description": "Запечатлейте идеальные моменты",
-        "count": "200+ гидов"
-      },
-      "cultural_experiences": {
-        "name": "Культурные впечатления",
-        "description": "Погрузитесь в местные традиции",
-        "count": "400+ гидов"
-      }
-    },
-    "features": {
-      "title": "Почему выбирают нас",
-      "subtitle": "Путешествуйте как никогда раньше",
-      "verified_guides": {
-        "title": "Проверенные гиды",
-        "description": "Все гиды проверены и сертифицированы",
-        "stats": "100% проверено"
-      },
-      "top_quality": {
-        "title": "Высокое качество",
-        "description": "Высоко оценённые впечатления",
-        "stats": "Средняя оценка 4.8/5"
-      },
-      "global_reach": {
-        "title": "Глобальный охват",
-        "description": "Гиды в более чем 50 странах",
-        "stats": "По всему миру"
-      },
-      "instant_booking": {
-        "title": "Мгновенное бронирование",
-        "description": "Бронируйте и подтверждайте моментально",
-        "stats": "Доступность 24/7"
-      }
+      "service_placeholder": "Какой тип тура?",
+      "find_guide": "Найти гида"
     },
     "stats": {
       "verified_guides": "Проверенные гиды",
       "countries": "Страны",
-      "happy_travelers": "Довольные путешественники",
-      "average_rating": "Средняя оценка"
+      "happy_travelers": "Счастливые путешественники",
+      "average_rating": "Средний рейтинг"
+    },
+    "popular_destinations": {
+      "title": "Популярные направления",
+      "subtitle": "Исследуйте топ-направления с местными экспертами.",
+      "view_all": "Посмотреть все направления",
+      "explore": "Исследовать",
+      "back_to_home": "Вернуться на главную",
+      "find_guides_in": "Найти гидов в",
+      "istanbul": {
+        "name": "Стамбул, Турция",
+        "price": "От $30/час",
+        "highlights": {
+          "hagia_sophia": "Собор Святой Софии",
+          "blue_mosque": "Голубая мечеть",
+          "bosphorus_cruise": "Круиз по Босфору",
+          "grand_bazaar": "Гранд-базар"
+        }
+      },
+      "barcelona": {
+        "name": "Барселона, Испания",
+        "price": "От $35/час",
+        "highlights": {
+          "sagrada_familia": "Саграда Фамилия",
+          "park_guell": "Парк Гуэль",
+          "gothic_quarter": "Готический квартал",
+          "la_rambla": "Ла Рамбла"
+        }
+      },
+      "tokyo": {
+        "name": "Токио, Япония",
+        "price": "От $40/час",
+        "highlights": {
+          "shibuya_crossing": "Перекрёсток Сибуя",
+          "tokyo_skytree": "Токийская небесная башня",
+          "asakusa_temple": "Храм Асакуса",
+          "tsukiji_market": "Рынок Цукидзи"
+        }
+      },
+      "paris": {
+        "name": "Париж, Франция",
+        "price": "От $45/час",
+        "highlights": {
+          "eiffel_tower": "Эйфелева башня",
+          "louvre_museum": "Лувр",
+          "notre_dame": "Нотр-Дам",
+          "montmartre": "Монмартр"
+        }
+      },
+      "dubai": {
+        "name": "Дубай, ОАЭ",
+        "price": "От $50/час",
+        "highlights": {
+          "burj_khalifa": "Бурдж-Халифа",
+          "dubai_mall": "Дубай Молл",
+          "desert_safari": "Сафари по пустыне",
+          "palm_jumeirah": "Пальма Джумейра"
+        }
+      },
+      "rome": {
+        "name": "Рим, Италия",
+        "price": "От $38/час",
+        "highlights": {
+          "colosseum": "Колизей",
+          "roman_forum": "Римский форум",
+          "pantheon": "Пантеон",
+          "vatican_city": "Ватикан"
+        }
+      }
+    },
+    "service_types": {
+      "city_tours": {
+        "name": "Городские туры",
+        "description": "Исследуйте города с экспертами-местными гидами.",
+        "count": "500+ Туров"
+      },
+      "language_support": {
+        "name": "Языковая поддержка",
+        "description": "Гиды, владеющие несколькими языками.",
+        "count": "50+ Языков"
+      },
+      "photography_tours": {
+        "name": "Фототуры",
+        "description": "Запечатлите потрясающие моменты с профессиональными гидами.",
+        "count": "200+ Туров"
+      },
+      "cultural_experiences": {
+        "name": "Культурные опыты",
+        "description": "Погрузитесь в местные традиции и историю.",
+        "count": "300+ Опытов"
+      }
+    },
+    "features": {
+      "title": "Почему выбрать нас",
+      "subtitle": "Откройте преимущества путешествий с нашими экспертами-гидами.",
+      "verified_guides": {
+        "title": "Проверенные гиды",
+        "description": "Все гиды тщательно проверены для вашей безопасности и доверия.",
+        "stats": "1000+ Проверенных гидов"
+      },
+      "top_quality": {
+        "title": "Высокое качество",
+        "description": "Высокооцененные гиды с исключительными отзывами.",
+        "stats": "4.8 Средний рейтинг"
+      },
+      "global_reach": {
+        "title": "Глобальный охват",
+        "description": "Исследуйте направления по всему миру с местными экспертами.",
+        "stats": "50+ Страны"
+      },
+      "instant_booking": {
+        "title": "Мгновенное бронирование",
+        "description": "Бронируйте гида мгновенно с реальным временем доступности.",
+        "stats": "10K+ Бронирований"
+      }
     },
     "testimonials": {
       "sarah": {
-        "name": "Сара Джонсон",
-        "location": "Нью-Йорк, США",
-        "text": "Невероятный опыт в Стамбуле! Наш гид показал нам скрытые жемчужины, которые мы бы никогда не нашли.",
-        "tour": "Исторический тур"
+        "name": "Сара М.",
+        "location": "Париж, Франция",
+        "text": "Невероятный опыт! Наш гид был знающим и сделал нашу поездку незабываемой.",
+        "tour": "Ночной тур Эйфелевой башни"
       },
       "marco": {
-        "name": "Марко Росси",
-        "location": "Милан, Италия",
-        "text": "Лучший способ исследовать Токио. Профессионально и весело!",
-        "tour": "Городское исследование"
+        "name": "Марко П.",
+        "location": "Рим, Италия",
+        "text": "Тур Колизея был фантастическим, с так многими скрытыми историями, ожившими!",
+        "tour": "Тур Древнего Рима"
       },
       "emma": {
-        "name": "Эмма Чен",
-        "location": "Шанхай, Китай",
-        "text": "Париж ожил с нашим местным гидом. Настоятельно рекомендую!",
-        "tour": "Культурная прогулка"
+        "name": "Эмма Л.",
+        "location": "Токио, Япония",
+        "text": "Исследование Сибуи с местным гидом было изюминкой моей поездки!",
+        "tour": "Тур ночной жизни Токио"
       }
     },
     "steps": {
       "search_browse": {
         "title": "Поиск и просмотр",
-        "description": "Найдите идеального гида для вашего приключения"
+        "description": "Найдите гидов по месту или типу услуги."
       },
       "connect_plan": {
         "title": "Связь и планирование",
-        "description": "Общайтесь и настраивайте свой опыт"
+        "description": "Сообщите гидам, чтобы спланировать идеальную поездку."
       },
       "experience": {
-        "title": "Впечатления",
-        "description": "Создавайте незабываемые воспоминания"
+        "title": "Опыт",
+        "description": "Наслаждайтесь незабываемыми приключениями с экспертами-гидами."
       }
     },
     "cta": {
-      "title": "Готовы к следующему приключению?",
-      "description": "Присоединяйтесь к тысячам путешественников, открывающих мир аутентично.",
+      "title": "Готовы исследовать?",
+      "description": "Присоединяйтесь к тысячам путешественников и забронируйте гида сегодня для незабываемого приключения.",
       "find_guide": "Найти вашего гида",
       "learn_more": "Узнать больше"
     },
+    "destination_modal": {
+      "close": "Закрыть детали направления",
+      "guides": "Гиды",
+      "highlights": "Основные моменты",
+      "find_guides": "Найти гидов",
+      "find_guides_in": "Найти гидов в"
+    },
     "learn_more": {
-      "title": "О TourGuide",
-      "description": "Соединяем путешественников с местными экспертами для аутентичных впечатлений.",
-      "why_title": "Почему выбирают TourGuide?",
-      "vision_title": "Наше видение",
-      "vision_description": "Сделать каждое путешествие личным и запоминающимся.",
-      "find_guide": "Найти гидов сейчас",
-      "close": "Закрыть",
-      "features": {
-        "verified_guides": {
-          "title": "Проверенные гиды",
-          "description": "Профессионалы с проверенным прошлым"
-        },
-        "global_reach": {
-          "title": "Глобальный охват",
-          "description": "Покрытие по всему миру"
-        },
-        "custom_experiences": {
-          "title": "Индивидуальные впечатления",
-          "description": "Адаптированы под ваши потребности"
-        },
-        "support": {
-          "title": "Поддержка 24/7",
-          "description": "Всегда готовы помочь"
-        }
-      }
+      "title": "О нашей платформе",
+      "description": "Откройте мир аутентичных путешествий с нашими доверенными местными гидами.",
+      "why_travel_with_us": "Почему путешествовать с нами",
+      "verified_guides": "Проверенные гиды",
+      "verified_guides_desc": "Все гиды проверены на безопасность и экспертизу.",
+      "global_reach": "Глобальный охват",
+      "global_reach_desc": "Исследуйте 50+ стран с местными экспертами.",
+      "custom_experiences": "Персонализированные опыты",
+      "custom_experiences_desc": "Адаптируйте поездку с персонализированными турами.",
+      "support": "Поддержка 24/7",
+      "support_desc": "Получите помощь в любое время во время вашего путешествия.",
+      "our_vision": "Наше видение",
+      "our_vision_desc": "Мы стремимся соединить путешественников с местными экспертами для значимых, immersive опытов по всему миру.",
+      "find_guide": "Найти вашего гида",
+      "close": "Закрыть"
+    }
+  },
+  "find_guide": {
+    "title": "Найти гида",
+    "subtitle": "Откройте для себя лучших местных гидов для вашего следующего приключения",
+    "search_placeholder": "Поиск гидов по имени или ключевому слову",
+    "search_aria_label": "Поиск гидов",
+    "filters": "Фильтры",
+    "toggle_filters": "Переключить фильтры",
+    "country": "Страна",
+    "select_country": "Выбрать страну",
+    "all_countries": "Все страны",
+    "city": "Город",
+    "select_city": "Выбрать город",
+    "all_cities": "Все города",
+    "language": "Язык",
+    "select_language": "Выбрать язык",
+    "all_languages": "Все языки",
+    "minimum_rating": "Минимальный рейтинг",
+    "select_rating": "Выбрать минимальный рейтинг",
+    "all_ratings": "Все рейтинги",
+    "4_stars": "4 звезды",
+    "4_5_stars": "4.5 звезды",
+    "5_stars": "5 звезд",
+    "languages": "Языки",
+    "tours": "Туры",
+    "price": "Цена",
+    "hour": "час",
+    "book_now": "Забронировать сейчас",
+    "message_guide": "Сообщение",
+    "no_guides": "Гиды не найдены",
+    "no_guides_description": "Попробуйте изменить поиск или фильтры, чтобы найти доступных гидов.",
+    "loading": "Загрузка...",
+    "unknown_guide": "Неизвестный гид",
+    "unknown_location": "Неизвестное местоположение",
+    "unknown_language": "Неизвестный",
+    "unknown_tour": "Неизвестный",
+    "no_rating": "Нет рейтинга",
+    "none": "Нет",
+    "success_booking": "Бронирование успешно создано",
+    "errors": {
+      "fetch_data": "Произошла ошибка при загрузке данных",
+      "fetch_cities": "Произошла ошибка при загрузке городов",
+      "fetch_guides": "Произошла ошибка при загрузке гидов",
+      "no_guides": "Гиды не найдены по вашим критериям",
+      "booking_failed": "Не удалось создать бронирование"
+    }
+  },
+  "footer": {
+    "logo_text": "ТурГид",
+    "company_description": "Ваша надежная платформа для поиска лучших гидов и впечатлений по всему миру.",
+    "contact": {
+      "address": "ул. Путешествий, 123, Глобальный город, Мир",
+      "email": "podderzhka@turgid.com",
+      "phone": "+1-800-123-4567"
     },
-    "popular_destinations": {
-      "title": "Все популярные направления",
-      "subtitle": "Откройте все наши лучшие направления с экспертными гидами",
-      "back_to_home": "Вернуться на главную",
-      "back_to_home_aria": "Вернуться на главную страницу",
-      "find_guides_aria": "Найти гидов для {name}",
-      "istanbul": {
-        "name": "Стамбул, Турция",
-        "price": "От $25/день",
-        "highlights": [
-          "Исторические туры",
-          "Местная кухня",
-          "Гид по магазинам"
-        ]
-      },
-      "barcelona": {
-        "name": "Барселона, Испания",
-        "price": "От $35/день",
-        "highlights": [
-          "Архитектура",
-          "Пляжные туры",
-          "Искусство и культура"
-        ]
-      },
-      "tokyo": {
-        "name": "Токио, Япония",
-        "price": "От $45/день",
-        "highlights": [
-          "Современная культура",
-          "Традиционные места",
-          "Гастрономические туры"
-        ]
-      },
-      "paris": {
-        "name": "Париж, Франция",
-        "price": "От $40/день",
-        "highlights": [
-          "Музеи",
-          "Романтические туры",
-          "Модные районы"
-        ]
-      },
-      "dubai": {
-        "name": "Дубай, ОАЭ",
-        "price": "От $50/день",
-        "highlights": [
-          "Роскошные туры",
-          "Пустынное сафари",
-          "Современные чудеса"
-        ]
-      },
-      "rome": {
-        "name": "Рим, Италия",
-        "price": "От $30/день",
-        "highlights": [
-          "Древняя история",
-          "Туры по Ватикану",
-          "Кулинарные туры"
-        ]
-      }
+    "social": {
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "youtube": "YouTube"
     },
-    "find_guide": {
-      "title": "Найдите идеального гида",
-      "subtitle": "Исследуйте местных экспертов, чтобы сделать ваше путешествие незабываемым",
-      "search_placeholder": "Поиск по имени или местоположению...",
-      "filters": "Фильтры",
-      "country": "Страна",
-      "all_countries": "Все страны",
-      "city": "Город",
-      "all_cities": "Все города",
-      "language": "Язык",
-      "all_languages": "Все языки",
-      "minimum_rating": "Минимальный рейтинг",
-      "all_ratings": "Все рейтинги",
-      "stars_4": "4+ звезды",
-      "stars_45": "4.5+ звезды",
-      "stars_5": "5 звезд",
-      "error": "Не удалось загрузить гидов",
-      "loading": "Загрузка гидов...",
-      "no_guides_title": "Гиды не найдены",
-      "no_guides_description": "Попробуйте изменить поиск или фильтры, чтобы найти больше гидов.",
-      "languages": "Языки:",
-      "none": "Нет",
-      "tours": "Туры:",
-      "price": "Цена:",
+    "app": {
+      "title": "Скачайте наше приложение",
+      "description": "Скачайте наше приложение, чтобы исследовать направления и бронировать гидов на ходу.",
+      "download_label": "Скачать в",
+      "get_it_on": "Доступно в",
+      "app_store": "App Store",
+      "google_play": "Google Play"
+    },
+    "trust": {
+      "ssl_secure": "SSL Безопасность",
+      "gdpr_compliant": "Соответствует GDPR"
+    },
+    "copyright": "© {{year}} ТурГид. Все права защищены.",
+    "links": {
+      "terms": "Условия обслуживания",
+      "privacy": "Политика конфиденциальности",
+      "cookies": "Куки",
+      "accessibility": "Доступность"
+    }
+  },
+  "authentication": {
+    "brand": "Аутентификация",
+    "subtitle": "Пожалуйста, войдите или зарегистрируйтесь",
+    "close": "Закрыть",
+    "tabs": {
+      "login": "Войти",
+      "register": "Регистрация",
+      "forgot_password": "Забыли пароль"
+    },
+    "login": {
+      "title": "Войти",
+      "subtitle": "Введите свои учетные данные для доступа к аккаунту",
+      "email_label": "Электронная почта",
+      "email_placeholder": "Введите вашу электронную почту",
+      "password_label": "Пароль",
+      "password_placeholder": "Введите ваш пароль",
+      "submit": "Войти",
+      "or": "или",
+      "google": "Продолжить с Google",
+      "facebook": "Продолжить с Facebook"
+    },
+    "register": {
+      "title": "Регистрация",
+      "subtitle": "Создать новый аккаунт",
+      "role_label": "Роль",
+      "role_client": "Клиент",
+      "role_customer": "Гид",
+      "first_name_label": "Имя",
+      "first_name_placeholder": "Введите ваше имя",
+      "last_name_label": "Фамилия",
+      "last_name_placeholder": "Введите вашу фамилию",
+      "email_label": "Электронная почта",
+      "email_placeholder": "Введите вашу электронную почту",
+      "password_label": "Пароль",
+      "password_placeholder": "Введите ваш пароль",
+      "confirm_password_label": "Подтверждение пароля",
+      "confirm_password_placeholder": "Подтвердите ваш пароль",
+      "country_label": "Страна",
+      "country_placeholder": "Введите вашу страну",
+      "personal_data": "Я согласен на обработку персональных данных",
+      "terms": "Я принимаю условия использования",
+      "travel_tips": "Подписаться на советы по путешествиям",
+      "submit": "Зарегистрироваться",
+      "verify_email_title": "Подтвердите вашу электронную почту",
+      "verify_email_message": "Мы отправили код подтверждения на {{email}}",
+      "verification_code_label": "Код подтверждения",
+      "verification_code_placeholder": "Введите 6-значный код",
+      "verify_submit": "Подтвердить",
+      "resend_code": "Отправить код повторно"
+    },
+    "forgot": {
+      "title": "Забыли пароль",
+      "subtitle": "Сбросить пароль",
+      "email_label": "Электронная почта",
+      "email_placeholder": "Введите вашу электронную почту",
+      "submit": "Отправить код сброса",
+      "reset_title": "Сброс пароля",
+      "reset_message": "Мы отправили код сброса на {{email}}",
+      "reset_code_label": "Код сброса",
+      "reset_code_placeholder": "Введите 6-значный код",
+      "new_password_label": "Новый пароль",
+      "new_password_placeholder": "Введите новый пароль",
+      "confirm_password_label": "Подтверждение пароля",
+      "confirm_password_placeholder": "Подтвердите новый пароль",
+      "reset_submit": "Сбросить пароль",
+      "resend_code": "Отправить код повторно"
+    },
+    "show_password": "Показать пароль",
+    "hide_password": "Скрыть пароль",
+    "social_login_under_development": "Социальный вход через {{provider}} находится в разработке",
+    "errors": {
+      "all_fields_required": "Все поля обязательны",
+      "passwords_do_not_match": "Пароли не совпадают",
+      "password_requirements": "Пароль должен содержать не менее 8 символов, одну заглавную букву, одну строчную букву, одну цифру и один специальный символ",
+      "invalid_country": "Выбрана недопустимая страна",
+      "login_failed": "Вход не удался",
+      "request_code_failed": "Не удалось запросить код подтверждения",
+      "email_exists": "Электронная почта уже существует",
+      "too_many_requests": "Слишком много запросов. Пожалуйста, попробуйте позже",
+      "verification_code_required": "Требуется код подтверждения",
+      "invalid_verification_code": "Недопустимый код подтверждения",
+      "registration_failed": "Регистрация не удалась",
+      "code_expired": "Код подтверждения истек",
+      "invalid_code": "Недопустимый или уже использованный код",
+      "too_many_attempts": "Слишком много неудачных попыток",
+      "password_reset_failed": "Сброс пароля не удался"
+    },
+    "success": {
+      "verification_code_sent": "Код подтверждения отправлен",
+      "registration_successful": "Регистрация успешна",
+      "reset_code_sent": "Код сброса пароля отправлен",
+      "password_reset_successful": "Сброс пароля успешен"
+    },
+    "loading": "Загрузка..."
+  },
+  "user_account": {
+    "title": "Личный кабинет",
+    "welcome": "Добро пожаловать, {{name}}",
+    "loading": "Загрузка...",
+    "buttons": {
+      "messages": "Сообщения",
+      "cancel": "Отмена",
+      "write_review": "Написать отзыв",
+      "chat_with_guide": "Чат с гидом",
       "book_now": "Забронировать сейчас",
-      "book_success": "Гид успешно забронирован!",
-      "book_fail": "Не удалось забронировать гида",
-      "available_only": "Только доступные"
+      "unavailable": "Недоступен",
+      "chat": "Чат",
+      "edit": "Редактировать",
+      "delete": "Удалить",
+      "react": "Реагировать",
+      "view_reactions": "Просмотреть реакции",
+      "submit_reaction": "Отправить реакцию",
+      "remove_reaction": "Удалить реакцию",
+      "edit_profile": "Редактировать профиль",
+      "update_profile": "Обновить профиль",
+      "create_profile": "Создать профиль",
+      "submit_booking": "Отправить бронирование",
+      "submit_cancellation": "Отправить отмену",
+      "submit_review": "Отправить отзыв",
+      "update_review": "Обновить отзыв",
+      "close": "Закрыть"
     },
-    "account": {
-      "please_login": "Пожалуйста, войдите.",
-      "my_profile": "Мой профиль",
-      "first_name": "Имя:",
-      "last_name": "Фамилия:",
-      "email": "Электронная почта:",
-      "role": "Роль:",
-      "country": "Страна:",
-      "city": "Город:",
+    "navigation": {
+      "dashboard": "Панель управления",
+      "profile": "Профиль",
+      "guides": "Гиды",
+      "bookings": "Бронирования",
+      "reviews": "Отзывы"
+    },
+    "dashboard": {
+      "total_bookings": "Всего бронирований",
+      "active_bookings": "Активные бронирования",
+      "completed_trips": "Завершённые поездки",
+      "reviews_written": "Написанные отзывы",
+      "recent_bookings": "Недавние бронирования"
+    },
+    "status": {
+      "pending": "В ожидании",
+      "confirmed": "Подтверждено",
+      "accepted": "Принято",
+      "completed": "Завершено",
+      "cancelled": "Отменено"
+    },
+    "profile": {
+      "edit_profile": "Редактировать профиль",
+      "create_profile": "Создать профиль",
+      "profile_information": "Информация о профиле",
       "not_set": "Не указано",
-      "user_account": {
-        "title": "Мой аккаунт",
-        "welcome": "Добро пожаловать, {name}",
-        "messages": "Сообщения",
-        "tabs": {
-          "dashboard": "Панель управления",
-          "profile": "Профиль",
-          "guides": "Найти гидов",
-          "bookings": "Мои бронирования",
-          "reviews": "Мои отзывы"
-        },
-        "dashboard": {
-          "stats": {
-            "total_bookings": "Всего бронирований",
-            "active_bookings": "Активные бронирования",
-            "completed_trips": "Завершённые поездки",
-            "reviews_written": "Написано отзывов"
-          },
-          "recent_bookings": "Недавние бронирования",
-          "booking_status": {
-            "pending": "Ожидает",
-            "confirmed": "Подтверждено",
-            "accepted": "Принято",
-            "completed": "Завершено",
-            "cancelled": "Отменено"
-          },
-          "cancellation_reason": "Причина отмены: {reason}",
-          "actions": {
-            "cancel": "Отменить",
-            "write_review": "Написать отзыв",
-            "chat": "Чат",
-            "chat_with_guide": "Чат с гидом"
-          }
-        },
+      "forms": {
         "profile": {
-          "create_profile": "Создать профиль",
-          "edit_profile": "Редактировать профиль",
-          "profile_information": "Информация о профиле",
-          "date_of_birth": "Дата рождения:",
-          "preferred_contact": "Предпочитаемый способ связи:",
-          "contact_methods": {
+          "date_of_birth": "Дата рождения",
+          "preferred_contact": "Предпочитаемый способ связи",
+          "languages": "Языки",
+          "contact_options": {
             "email": "Электронная почта",
             "phone": "Телефон",
             "chat": "Чат"
-          },
-          "languages": "Языки:",
-          "form": {
-            "date_of_birth_label": "Дата рождения",
-            "preferred_contact_label": "Предпочитаемый способ связи",
-            "languages_label": "Языки",
-            "submit_create": "Создать профиль",
-            "submit_update": "Обновить профиль",
-            "cancel": "Отменить"
           }
-        },
-        "guides": {
-          "title": "Найти гидов",
-          "filters": {
-            "search_placeholder": "Поиск гидов...",
-            "all_services": "Все услуги",
-            "all_countries": "Все страны",
-            "all_cities": "Все города",
-            "any_rating": "Любой рейтинг",
-            "stars_4": "4+ звезды",
-            "stars_45": "4.5+ звезды",
-            "stars_5": "5 звезд"
-          },
-          "guide_card": {
-            "years_experience": "{years} лет опыта",
-            "rating": "{rating}/5 ({reviews} отзывов)",
-            "hourly_rate": "${rate}/час",
-            "daily_rate": "${rate}/день",
-            "book_now": "Забронировать сейчас",
-            "unavailable": "Недоступен",
-            "chat": "Чат"
-          }
-        },
-        "bookings": {
-          "title": "Мои бронирования",
-          "booking_title": "Бронирование: {title}",
-          "dates": "{start_date} - {end_date}",
-          "description": "Описание: {description}"
-        },
-        "reviews": {
-          "title": "Мои отзывы",
-          "filters": {
-            "all_ratings": "Все рейтинги",
-            "stars_5": "5 звезд",
-            "stars_4": "4+ звезды",
-            "stars_3": "3+ звезды",
-            "stars_2": "2+ звезды",
-            "stars_1": "1+ звезда",
-            "sort_newest": "Сначала новые",
-            "sort_oldest": "Сначала старые",
-            "sort_highest": "Высший рейтинг",
-            "sort_lowest": "Низший рейтинг"
-          },
-          "summary": {
-            "title": "Сводка отзывов",
-            "total_reviews": "Всего отзывов: {count}",
-            "overall": "Общий: {rating}/5",
-            "communication": "Коммуникация: {rating}/5",
-            "service": "Услуга: {rating}/5",
-            "punctuality": "Пунктуальность: {rating}/5",
-            "value": "Ценность: {rating}/5"
-          },
-          "review_item": {
-            "rating": "{rating}/5",
-            "for_guide": "Для гида: {name}",
-            "booking": "Бронирование: {title} ({start_date} - {end_date})",
-            "communication": "Коммуникация: {rating}/5",
-            "service": "Услуга: {rating}/5",
-            "punctuality": "Пунктуальность: {rating}/5",
-            "value": "Ценность: {rating}/5",
-            "likes": "👍 {count}",
-            "dislikes": "👎 {count}",
-            "view_reactions": "Посмотреть реакции",
-            "edit": "Редактировать",
-            "delete": "Удалить",
-            "react": "Реагировать"
-          },
-          "no_reviews": "Нет отзывов, соответствующих вашим фильтрам. Завершите бронирование, чтобы написать отзыв!"
-        },
-        "booking_form": {
-          "title": "Бронирование гида: {name}",
-          "title_label": "Название *",
-          "title_placeholder": "Введите название бронирования",
-          "description_label": "Описание",
-          "description_placeholder": "Опишите, какой тур/услугу вы хотите",
-          "start_date_label": "Дата начала *",
-          "end_date_label": "Дата окончания *",
-          "special_requirements_label": "Особые требования",
-          "special_requirements_placeholder": "Любые специальные запросы или требования",
-          "budget_label": "Бюджет (USD)",
-          "budget_placeholder": "0",
-          "guide_daily_rate": "Дневная ставка гида: ${rate}",
-          "guide_hourly_rate": "Часовая ставка гида: ${rate}",
-          "submit": "Забронировать гида",
-          "cancel": "Отменить"
-        },
-        "review_form": {
-          "title": "{action} Отзыв для гида: {guide} - Бронирование: {booking}",
-          "overall_rating_label": "Общий рейтинг *",
-          "communication_label": "Коммуникация *",
-          "service_label": "Качество услуги *",
-          "punctuality_label": "Пунктуальность *",
-          "value_label": "Ценность за деньги *",
-          "title_label": "Название *",
-          "title_placeholder": "Введите название отзыва",
-          "comment_label": "Комментарий *",
-          "comment_placeholder": "Поделитесь своим опытом и отзывами о гиде...",
-          "submit_create": "Отправить отзыв",
-          "submit_update": "Обновить отзыв",
-          "cancel": "Отменить",
-          "star": "{count} Звезда{count > 1 ? 'ы' : ''}"
-        },
-        "cancel_booking": {
-          "title": "Отмена бронирования",
-          "reason_label": "Причина отмены *",
-          "reason_placeholder": "Пожалуйста, укажите причину отмены",
-          "submit": "Подтвердить отмену",
-          "close": "Закрыть"
-        },
-        "reactions": {
-          "title": "Реакции на отзывы",
-          "summary_title": "Сводка реакций",
-          "likes": "Лайки: {count}",
-          "dislikes": "Дизлайки: {count}",
-          "latest_likes": "Последние комментарии к лайкам",
-          "latest_dislikes": "Последние комментарии к дизлайкам",
-          "no_comments": "Комментарии к {type} отсутствуют.",
-          "all_reactions": "Все реакции",
-          "no_reactions": "Реакции отсутствуют.",
-          "reaction_form": {
-            "reaction_type_label": "Тип реакции",
-            "reaction_like": "Лайк",
-            "reaction_dislike": "Дизлайк",
-            "comment_label": "Комментарий",
-            "comment_placeholder": "{type} (обязательно для дизлайка)",
-            "submit": "Отправить реакцию",
-            "cancel": "Отменить",
-            "remove_reaction": "Удалить мою реакцию"
-          }
-        },
-        "errors": {
-          "required_fields": "Пожалуйста, заполните все обязательные поля",
-          "start_date_required": "Требуется дата начала",
-          "end_date_required": "Требуется дата окончания",
-          "title_required": "Требуется название",
-          "start_date_before_end": "Дата начала должна быть раньше даты окончания",
-          "start_date_past": "Дата начала не может быть в прошлом",
-          "cancel_reason_required": "Требуется причина отмены",
-          "review_title_required": "Требуется название отзыва",
-          "review_comment_required": "Требуется комментарий к отзыву",
-          "dislike_comment_required": "Комментарий обязателен для дизлайка",
-          "booking_failed": "Не удалось создать бронирование",
-          "review_failed": "Не удалось отправить отзыв",
-          "delete_review_failed": "Не удалось удалить отзыв",
-          "reaction_failed": "Не удалось отправить реакцию",
-          "remove_reaction_failed": "Не удалось удалить реакцию",
-          "cancel_booking_failed": "Не удалось отменить бронирование",
-          "load_reactions_failed": "Не удалось загрузить реакции",
-          "load_summary_failed": "Не удалось загрузить сводку отзывов"
-        },
-        "success": {
-          "booking_created": "Бронирование успешно создано!",
-          "review_submitted": "Отзыв успешно отправлен!",
-          "review_updated": "Отзыв успешно обновлён!",
-          "review_deleted": "Отзыв успешно удалён!",
-          "reaction_submitted": "Реакция успешно отправлена!",
-          "reaction_removed": "Реакция успешно удалена!",
-          "booking_cancelled": "Бронирование успешно отменено!"
-        }
-      },
-      "guide_account": {
-        "title": "Аккаунт гида",
-        "welcome": "Добро пожаловать, {name}",
-        "messages": "Сообщения",
-        "tabs": {
-          "dashboard": "Панель управления",
-          "profile": "Профиль",
-          "bookings": "Бронирования",
-          "portfolio": "Портфолио",
-          "availability": "Доступность",
-          "reviews": "Отзывы"
-        },
-        "dashboard": {
-          "stats": {
-            "total_bookings": "Всего бронирований",
-            "active_bookings": "Активные бронирования",
-            "total_reviews": "Всего отзывов",
-            "average_rating": "Средняя оценка"
-          },
-          "recent_bookings": "Недавние бронирования",
-          "booking_status": {
-            "pending": "Ожидает",
-            "confirmed": "Подтверждено",
-            "accepted": "Принято",
-            "completed": "Завершено",
-            "cancelled": "Отменено"
-          },
-          "actions": {
-            "accept": "Принять",
-            "decline": "Отклонить",
-            "chat_with_client": "Чат с клиентом"
-          }
-        },
-        "profile": {
-          "create_profile": "Создать профиль",
-          "edit_profile": "Редактировать профиль",
-          "profile_information": "Информация о профиле",
-          "professional_bio": "Профессиональная биография",
-          "years_of_experience": "Годы опыта: {years}",
-          "availability": "Доступность",
-          "available": "Доступен",
-          "not_available": "Недоступен",
-          "form": {
-            "professional_bio_label": "Профессиональная биография",
-            "professional_bio_placeholder": "Опишите ваш опыт и экспертизу",
-            "years_of_experience_label": "Годы опыта",
-            "city_label": "Город",
-            "city_placeholder": "Выберите ваш город",
-            "service_areas_label": "Зоны обслуживания",
-            "service_areas_placeholder": "например, Центр города, Исторический район",
-            "service_types_label": "Типы услуг",
-            "hourly_rate_label": "Часовая ставка",
-            "hourly_rate_placeholder": "Введите часовую ставку",
-            "daily_rate_label": "Дневная ставка",
-            "daily_rate_placeholder": "Введите дневную ставку",
-            "currency_label": "Валюта",
-            "languages_label": "Языки",
-            "is_available_label": "Доступен для бронирований",
-            "submit_create": "Создать профиль",
-            "submit_update": "Обновить профиль",
-            "cancel": "Отменить"
-          }
-        },
-        "bookings": {
-          "title": "Мои бронирования",
-          "booking_title": "Бронирование: {title}",
-          "dates": "{start_date} - {end_date}",
-          "description": "Описание: {description}"
-        },
-        "portfolio": {
-          "title": "Портфолио",
-          "add_item": "Добавить элемент портфолио",
-          "form": {
-            "title": "{action} Элемент портфолио",
-            "title_label": "Название",
-            "title_placeholder": "Введите название элемента портфолио",
-            "description_label": "Описание",
-            "description_placeholder": "Опишите этот элемент портфолио",
-            "image_label": "Изображение",
-            "order_label": "Порядок",
-            "order_placeholder": "Введите порядок отображения",
-            "submit_create": "Добавить элемент",
-            "submit_update": "Обновить элемент",
-            "cancel": "Отменить"
-          },
-          "item": {
-            "edit": "Редактировать",
-            "delete": "Удалить"
-          }
-        },
-        "availability": {
-          "title": "Доступность",
-          "add_availability": "Добавить доступность",
-          "form": {
-            "title": "{action} Доступность",
-            "date_label": "Дата",
-            "is_available_label": "Доступен",
-            "start_time_label": "Время начала",
-            "end_time_label": "Время окончания",
-            "note_label": "Примечание",
-            "note_placeholder": "Добавьте примечания (необязательно)",
-            "submit_create": "Добавить доступность",
-            "submit_update": "Обновить доступность",
-            "cancel": "Отменить"
-          },
-          "item": {
-            "date": "Дата: {date}",
-            "time": "{start_time} - {end_time}",
-            "all_day": "Весь день",
-            "note": "Примечание: {note}",
-            "available": "Доступен",
-            "unavailable": "Недоступен",
-            "edit": "Редактировать",
-            "delete": "Удалить"
-          }
-        },
-        "reviews": {
-          "title": "Отзывы",
-          "filters": {
-            "all_ratings": "Все рейтинги",
-            "stars_5": "5 звезд",
-            "stars_4": "4+ звезды",
-            "stars_3": "3+ звезды",
-            "stars_2": "2+ звезды",
-            "stars_1": "1+ звезда",
-            "sort_newest": "Сначала новые",
-            "sort_oldest": "Сначала старые",
-            "sort_highest": "Высший рейтинг",
-            "sort_lowest": "Низший рейтинг"
-          },
-          "summary": {
-            "title": "Сводка отзывов",
-            "overall": "Общий: {rating}/5",
-            "communication": "Коммуникация: {rating}/5",
-            "service": "Услуга: {rating}/5",
-            "punctuality": "Пунктуальность: {rating}/5",
-            "value": "Ценность: {rating}/5",
-            "total_reviews": "Всего отзывов: {count}"
-          },
-          "review_item": {
-            "rating": "{rating}/5",
-            "date": "Дата: {date}",
-            "communication": "Коммуникация: {rating}/5",
-            "service": "Услуга: {rating}/5",
-            "punctuality": "Пунктуальность: {rating}/5",
-            "value": "Ценность: {rating}/5",
-            "react": "Реагировать",
-            "remove_reaction": "Удалить реакцию",
-            "my_reaction": "Моя реакция: {type}",
-            "my_reaction_with_comment": "Моя реакция: {type} - {comment}"
-          },
-          "no_reviews": "Отзывы отсутствуют."
-        },
-        "reaction_form": {
-          "reaction_type_label": "Тип реакции",
-          "reaction_like": "Лайк",
-          "reaction_comment": "Комментарий",
-          "reaction_report": "Пожаловаться",
-          "comment_label": "Комментарий",
-          "comment_placeholder": "Добавьте ваш комментарий",
-          "report_reason_label": "Причина жалобы",
-          "report_reason_placeholder": "Пожалуйста, укажите причину жалобы",
-          "submit": "Отправить",
-          "cancel": "Отменить"
-        },
-        "cancel_booking": {
-          "title": "Отмена бронирования",
-          "reason_label": "Причина отмены",
-          "reason_placeholder": "Пожалуйста, укажите причину отмены",
-          "submit": "Подтвердить отмену",
-          "close": "Закрыть"
-        },
-        "errors": {
-          "required_fields": "Пожалуйста, заполните все обязательные поля",
-          "profile_failed": "Не удалось сохранить профиль",
-          "portfolio_failed": "Не удалось сохранить элемент портфолио",
-          "availability_failed": "Не удалось сохранить доступность",
-          "cancel_reason_required": "Требуется причина отмены",
-          "reaction_required": "Пожалуйста, выберите реакцию или добавьте комментарий",
-          "reaction_failed": "Не удалось отправить реакцию",
-          "remove_reaction_failed": "Не удалось удалить реакцию",
-          "cancel_booking_failed": "Не удалось отменить бронирование"
-        },
-        "success": {
-          "profile_created": "Профиль успешно создан!",
-          "profile_updated": "Профиль успешно обновлён!",
-          "portfolio_created": "Элемент портфолио успешно создан!",
-          "portfolio_updated": "Элемент портфолио успешно обновлён!",
-          "portfolio_deleted": "Элемент портфолио успешно удалён!",
-          "availability_created": "Доступность успешно создана!",
-          "availability_updated": "Доступность успешно обновлена!",
-          "availability_deleted": "Доступность успешно удалена!",
-          "booking_accepted": "Бронирование успешно принято!",
-          "booking_cancelled": "Бронирование успешно отменено!",
-          "reaction_submitted": "Реакция успешно отправлена!",
-          "reaction_removed": "Реакция успешно удалена!"
         }
       }
+    },
+    "guides": {
+      "find_guides": "Найти гидов",
+      "search_placeholder": "Поиск гидов...",
+      "years_experience": "{{years}} лет опыта",
+      "rating": "{{rating}} из {{count}} отзывов",
+      "hourly_rate": "${{rate}}/час",
+      "daily_rate": "${{rate}}/день",
+      "filters": {
+        "all_services": "Все услуги",
+        "all_countries": "Все страны",
+        "all_cities": "Все города",
+        "any_rating": "Любой рейтинг",
+        "rating_4": "4+ звезды",
+        "rating_4_5": "4.5+ звезды",
+        "rating_5": "5 звёзд",
+        "available_only": "Только доступные"
+      }
+    },
+    "bookings": {
+      "title": "Мои бронирования",
+      "booking_title": "Бронирование: {{title}}",
+      "description": "Описание: {{description}}",
+      "not_set": "Не указано",
+      "cancellation_reason": "Причина отмены"
+    },
+    "reviews": {
+      "title": "Мои отзывы",
+      "summary_title": "Сводка отзывов",
+      "no_reviews": "Отзывы не найдены.",
+      "unknown": "Неизвестно",
+      "review_for": "Отзыв для {{guideName}}",
+      "rating": "({{rating}}/5)",
+      "communication": "Коммуникация",
+      "service": "Услуга",
+      "punctuality": "Пунктуальность",
+      "value": "Ценность",
+      "booking_details": "Бронирование: {{title}} ({{startDate}} - {{endDate}})",
+      "likes": "Лайки: {{count}}",
+      "dislikes": "Дизлайки: {{count}}",
+      "reactions_title": "Реакции на отзыв",
+      "reaction_summary": "Сводка реакций",
+      "latest_likes": "Последние лайки",
+      "latest_dislikes": "Последние дизлайки",
+      "no_likes": "Лайков пока нет",
+      "no_dislikes": "Дизлайков пока нет",
+      "no_comment": "Комментарий отсутствует",
+      "add_reaction": "Добавить реакцию",
+      "filters": {
+        "all_ratings": "Все рейтинги",
+        "rating_5": "5 звёзд",
+        "rating_4": "4 звезды",
+        "rating_3": "3 звезды",
+        "rating_2": "2 звезды",
+        "rating_1": "1 звезда",
+        "newest_first": "Сначала новые",
+        "oldest_first": "Сначала старые",
+        "highest_rated": "С наивысшим рейтингом",
+        "lowest_rated": "С наименьшим рейтингом"
+      },
+      "summary": {
+        "total_reviews": "Всего отзывов",
+        "avg_overall_rating": "Средний общий рейтинг",
+        "avg_communication": "Средняя коммуникация",
+        "avg_service": "Средняя услуга",
+        "avg_punctuality": "Средняя пунктуальность",
+        "avg_value": "Средняя ценность"
+      }
+    },
+    "forms": {
+      "booking": {
+        "title": "Бронирование {{guideName}}",
+        "title_label": "Название",
+        "title_placeholder": "Введите название бронирования",
+        "title_default": "Бронирование с {{guideName}}",
+        "description": "Описание",
+        "description_placeholder": "Опишите вашу поездку",
+        "start_date": "Дата начала",
+        "end_date": "Дата окончания",
+        "special_requirements": "Особые требования",
+        "special_requirements_placeholder": "Есть ли особые требования?",
+        "budget": "Бюджет",
+        "budget_placeholder": "Введите ваш бюджет",
+        "daily_rate_note": "Дневная ставка гида: ${{rate}}",
+        "hourly_rate_note": "Часовая ставка гида: ${{rate}}"
+      },
+      "review": {
+        "write_title": "Написать отзыв для {{guideName}} - {{bookingTitle}}",
+        "edit_title": "Редактировать отзыв для {{guideName}} - {{bookingTitle}}",
+        "title_default": "Отзыв для {{guideName}} - {{bookingTitle}}",
+        "overall_rating": "Общий рейтинг",
+        "communication_rating": "Рейтинг коммуникации",
+        "service_rating": "Рейтинг услуги",
+        "punctuality_rating": "Рейтинг пунктуальности",
+        "value_rating": "Рейтинг ценности",
+        "title": "Название отзыва",
+        "title_placeholder": "Введите название отзыва",
+        "comment": "Комментарий",
+        "comment_placeholder": "Напишите ваш отзыв...",
+        "star": "{{count}} звезда{{count > 1 ? '' : ''}}"
+      },
+      "reaction": {
+        "reaction_type": "Тип реакции",
+        "like": "Лайк",
+        "dislike": "Дизлайк",
+        "comment": "Комментарий",
+        "like_placeholder": "Почему вам понравился этот отзыв?",
+        "dislike_placeholder": "Почему вам не понравился этот отзыв?"
+      },
+      "cancel_booking": {
+        "title": "Отмена бронирования",
+        "reason": "Причина отмены",
+        "reason_placeholder": "Пожалуйста, укажите причину отмены"
+      }
+    },
+    "errors": {
+      "fill_required_fields": "Пожалуйста, заполните все обязательные поля",
+      "start_date_required": "Дата начала обязательна",
+      "end_date_required": "Дата окончания обязательна",
+      "title_required": "Название обязательно",
+      "start_date_before_end": "Дата начала должна быть раньше даты окончания",
+      "start_date_past": "Дата начала не может быть в прошлом",
+      "failed_create_booking": "Не удалось создать бронирование",
+      "review_title_required": "Название отзыва обязательно",
+      "review_comment_required": "Комментарий к отзыву обязателен",
+      "failed_submit_review": "Не удалось отправить отзыв",
+      "failed_delete_review": "Не удалось удалить отзыв",
+      "dislike_comment_required": "Комментарий обязателен для дизлайка",
+      "failed_submit_reaction": "Не удалось отправить реакцию",
+      "failed_remove_reaction": "Не удалось удалить реакцию",
+      "failed_load_reactions": "Не удалось загрузить реакции",
+      "failed_load_review_summary": "Не удалось загрузить сводку отзывов",
+      "failed_cancel_booking": "Не удалось отменить бронирование",
+      "cancellation_reason_required": "Причина отмены обязательна"
+    },
+    "success": {
+      "booking_created": "Бронирование успешно создано",
+      "review_submitted": "Отзыв успешно отправлен",
+      "review_updated": "Отзыв успешно обновлён",
+      "review_deleted": "Отзыв успешно удалён",
+      "reaction_submitted": "Реакция успешно отправлена",
+      "reaction_removed": "Реакция успешно удалена",
+      "booking_cancelled": "Бронирование успешно отменено"
+    },
+    "confirm": {
+      "delete_review": "Вы уверены, что хотите удалить этот отзыв?"
+    }
+  },
+  "guideAccount": {
+    "title": "Аккаунт гида",
+    "welcome": "Добро пожаловать, {name}",
+    "messages": "Сообщения",
+    "loading": "Загрузка...",
+    "error": {
+      "requiredFields": "Отсутствуют обязательные поля",
+      "noProfile": "Профиль не найден, необходимо создать профиль",
+      "failedToLoadBookings": "Не удалось загрузить бронирования",
+      "failedToLoadReviews": "Не удалось загрузить отзывы",
+      "failedToLoadReviewSummary": "Не удалось загрузить сводку отзывов",
+      "failedToLoadPortfolio": "Не удалось загрузить портфолио",
+      "failedToLoadAvailability": "Не удалось загрузить доступность",
+      "profileRequired": "Требуется профессиональная биография и город",
+      "portfolioTitleRequired": "Требуется название портфолио",
+      "dateRequired": "Требуется дата",
+      "failedToSaveProfile": "Не удалось сохранить профиль",
+      "failedToSavePortfolio": "Не удалось сохранить элемент портфолио",
+      "failedToSaveAvailability": "Не удалось сохранить доступность",
+      "failedToProcessBooking": "Не удалось обработать действие с бронированием",
+      "failedToDeletePortfolio": "Не удалось удалить элемент портфолио",
+      "failedToDeleteAvailability": "Не удалось удалить доступность",
+      "noClientEmail": "Электронная почта клиента недоступна",
+      "reactionRequired": "Требуется тип реакции или комментарий",
+      "failedToSubmitReaction": "Не удалось отправить реакцию",
+      "failedToRemoveReaction": "Не удалось удалить реакцию",
+      "cancelReasonRequired": "Требуется указать причину отмены"
+    },
+    "success": {
+      "profileCreated": "Профиль успешно создан",
+      "profileUpdated": "Профиль успешно обновлен",
+      "portfolioCreated": "Элемент портфолио успешно создан",
+      "portfolioUpdated": "Элемент портфолио успешно обновлен",
+      "availabilityCreated": "Доступность успешно создана",
+      "availabilityUpdated": "Доступность успешно обновлена",
+      "bookingAccepted": "Бронирование успешно принято",
+      "bookingCancelled": "Бронирование успешно отменено",
+      "portfolioDeleted": "Элемент портфолио успешно удален",
+      "availabilityDeleted": "Доступность успешно удалена",
+      "reactionSubmitted": "Реакция успешно отправлена",
+      "reactionRemoved": "Реакция успешно удалена"
+    },
+    "navigation": {
+      "dashboard": "Панель управления",
+      "profile": "Профиль",
+      "bookings": "Бронирования",
+      "portfolio": "Портфолио",
+      "availability": "Доступность",
+      "reviews": "Отзывы"
+    },
+    "dashboard": {
+      "totalBookings": "Всего бронирований",
+      "activeBookings": "Активные бронирования",
+      "totalReviews": "Всего отзывов",
+      "averageRating": "Средний рейтинг",
+      "recentBookings": "Недавние бронирования",
+      "bookingStatus": "{status}",
+      "accept": "Принять",
+      "decline": "Отклонить",
+      "chatWithClient": "Чат с клиентом"
+    },
+    "profile": {
+      "createProfile": "Создать профиль",
+      "editProfile": "Редактировать профиль",
+      "profileInformation": "Информация о профиле",
+      "professionalBio": "Профессиональная биография",
+      "bioPlaceholder": "Введите вашу профессиональную биографию",
+      "yearsOfExperience": "Годы опыта",
+      "city": "Город",
+      "selectCity": "Выберите город",
+      "serviceAreas": "Зоны обслуживания",
+      "serviceAreasPlaceholder": "Введите зоны обслуживания (например, Ташкент, Самарканд)",
+      "serviceTypes": "Типы услуг",
+      "hourlyRate": "Почасовая ставка",
+      "hourlyRatePlaceholder": "Введите почасовую ставку",
+      "dailyRate": "Дневная ставка",
+      "dailyRatePlaceholder": "Введите дневную ставку",
+      "currency": "Валюта",
+      "usd": "USD",
+      "eur": "EUR",
+      "uzs": "UZS",
+      "languages": "Языки",
+      "availableForBookings": "Доступен для бронирований",
+      "availability": "Доступность",
+      "available": "Доступен",
+      "notAvailable": "Недоступен",
+      "updateProfile": "Обновить профиль",
+      "createProfileButton": "Создать профиль",
+      "cancel": "Отмена",
+      "editProfileButton": "Редактировать профиль",
+      "years": "лет"
+    },
+    "bookings": {
+      "myBookings": "Мои бронирования",
+      "dates": "{start} - {end}",
+      "accept": "Принять",
+      "decline": "Отклонить",
+      "chatWithClient": "Чат с клиентом"
+    },
+    "portfolio": {
+      "myPortfolio": "Мое портфолио",
+      "addPortfolioItem": "Добавить элемент портфолио",
+      "editPortfolioItem": "Редактировать элемент портфолио",
+      "createPortfolioItem": "Создать элемент портфолио",
+      "updatePortfolioItem": "Обновить элемент портфолио",
+      "title": "Название",
+      "titlePlaceholder": "Введите название элемента портфолио",
+      "description": "Описание",
+      "descriptionPlaceholder": "Введите описание элемента портфолио",
+      "image": "Изображение",
+      "order": "Порядок",
+      "orderPlaceholder": "Введите порядок отображения",
+      "edit": "Редактировать",
+      "delete": "Удалить",
+      "cancel": "Отмена",
+      "deleteConfirm": "Вы уверены, что хотите удалить этот элемент портфолио?"
+    },
+    "availability": {
+      "myAvailability": "Моя доступность",
+      "addAvailability": "Добавить доступность",
+      "editAvailability": "Редактировать доступность",
+      "createAvailability": "Создать доступность",
+      "updateAvailability": "Обновить доступность",
+      "date": "Дата",
+      "available": "Доступен",
+      "unavailable": "Недоступен",
+      "startTime": "Время начала",
+      "endTime": "Время окончания",
+      "note": "Примечание",
+      "notePlaceholder": "Введите дополнительные примечания",
+      "allDay": "Весь день",
+      "edit": "Редактировать",
+      "delete": "Удалить",
+      "cancel": "Отмена",
+      "deleteConfirm": "Вы уверены, что хотите удалить эту доступность?"
+    },
+    "reviews": {
+      "myReviews": "Мои отзывы",
+      "reviewSummary": "Сводка отзывов",
+      "overallRating": "Общий рейтинг",
+      "communication": "Коммуникация",
+      "service": "Услуга",
+      "punctuality": "Пунктуальность",
+      "value": "Ценность",
+      "totalReviews": "Всего отзывов",
+      "allRatings": "Все рейтинги",
+      "stars": {
+        "5": "5 звезд",
+        "4": "4 звезды",
+        "3": "3 звезды",
+        "2": "2 звезды",
+        "1": "1 звезда"
+      },
+      "sortBy": {
+        "newestFirst": "Сначала новые",
+        "oldestFirst": "Сначала старые",
+        "highestRated": "С наивысшим рейтингом",
+        "lowestRated": "С наименьшим рейтингом"
+      },
+      "noReviews": "Отзывы отсутствуют",
+      "react": "Реагировать",
+      "removeReaction": "Удалить реакцию",
+      "reactionType": "Тип реакции",
+      "like": "Нравится",
+      "comment": "Комментарий",
+      "report": "Пожаловаться",
+      "commentPlaceholder": "Введите ваш комментарий",
+      "reportReasonPlaceholder": "Введите причину жалобы",
+      "submitReaction": "Отправить реакцию",
+      "cancel": "Отмена",
+      "yourReaction": "Ваша реакция: {type} - {comment}",
+      "yourReactionNoComment": "Ваша реакция: {type}"
+    },
+    "cancelModal": {
+      "cancelBooking": "Отменить бронирование",
+      "reasonForCancellation": "Причина отмены",
+      "reasonPlaceholder": "Введите причину отмены",
+      "cancelBookingButton": "Отменить бронирование",
+      "close": "Закрыть"
+    }
+  },
+  "chatWidgets": {
+    "header": {
+      "messages": "Сообщения",
+      "searchUsers": "Поиск пользователей",
+      "blockedUsers": "Заблокированные пользователи",
+      "back": "Назад",
+      "newConversation": "Новое сообщение",
+      "close": "Закрыть"
+    },
+    "error": {
+      "initializeChat": "Не удалось инициализировать чат",
+      "loadConversations": "Не удалось загрузить беседы",
+      "loadMessages": "Не удалось загрузить сообщения",
+      "loadUnreadCount": "Не удалось загрузить количество непрочитанных сообщений",
+      "loadBlockedUsers": "Не удалось загрузить заблокированных пользователей",
+      "webSocket": "Ошибка WebSocket: {message}",
+      "sendMessage": "Не удалось отправить сообщение",
+      "searchUsers": "Не удалось выполнить поиск пользователей",
+      "startConversation": "Не удалось начать беседу",
+      "blockUser": "Не удалось заблокировать пользователя",
+      "unblockUser": "Не удалось разблокировать пользователя",
+      "messageAction": "Не удалось выполнить действие с сообщением",
+      "close": "Закрыть"
+    },
+    "success": {
+      "blockUser": "Пользователь успешно заблокирован",
+      "unblockUser": "Пользователь успешно разблокирован"
+    },
+    "conversations": {
+      "loading": "Загрузка...",
+      "noConversations": "Беседы не найдены",
+      "startConversation": "Начать беседу",
+      "noMessages": "Нет сообщений",
+      "messageDeleted": "Сообщение удалено",
+      "unknownUser": "Неизвестный пользователь",
+      "unknownUserInitial": "Н",
+      "unreadMessages": "{count, plural, one {# непрочитанное сообщение} few {# непрочитанных сообщения} many {# непрочитанных сообщений} other {# непрочитанных сообщений}}"
     },
     "chat": {
-      "title": {
-        "messages": "Сообщения",
-        "search_users": "Поиск пользователей",
-        "blocked_users": "Заблокированные пользователи"
-      },
-      "actions": {
-        "back": "Назад",
-        "new_conversation": "Новая беседа",
-        "blocked_users": "Заблокированные пользователи",
-        "close": "Закрыть",
-        "close_error": "Закрыть",
-        "send": "Отправить",
-        "block_user": "Заблокировать пользователя",
-        "unblock": "Разблокировать"
-      },
-      "status": {
-        "online": "Онлайн",
-        "offline": "Оффлайн"
-      },
-      "conversations": {
-        "loading": "Загрузка бесед...",
-        "no_conversations": "Пока нет бесед.",
-        "start_conversation": "Начать беседу",
-        "no_messages": "Пока нет сообщений",
-        "message_deleted": "Сообщение удалено",
-        "unknown_user": "Неизвестный пользователь",
-        "unknown_user_initial": "U",
-        "total_unread": "Непрочитанные сообщения: {count}"
-      },
-      "chat": {
-        "input_placeholder": "Введите сообщение...",
-        "no_content": "Контент отсутствует",
-        "read_status": "Прочитано",
-        "online_users": "{users} онлайн",
-        "typing_users": "{users} печатает...",
-        "deleted_by_sender_mine": "Вы удалили это сообщение",
-        "deleted_by_sender_other": "Это сообщение было удалено отправителем",
-        "deleted_by_receiver_mine": "Вы удалили это сообщение для себя",
-        "deleted_by_receiver_other": "Это сообщение было удалено получателем",
-        "deleted_for_everyone": "Это сообщение было удалено для всех",
-        "message_deleted": "Сообщение удалено",
-        "actions": {
-          "delete_for_me": "Удалить для меня",
-          "delete_for_everyone": "Удалить для всех",
-          "recover": "Восстановить"
-        }
-      },
-      "search": {
-        "placeholder": "Поиск по имени или email...",
-        "hint": "Введите минимум 2 символа для поиска",
-        "no_results": "Пользователи не найдены",
-        "unknown_user_initial": "U"
-      },
-      "blocked": {
-        "no_blocked_users": "Нет заблокированных пользователей",
-        "unknown_user": "Неизвестный пользователь",
-        "unknown_user_initial": "U",
-        "blocked_on": "Заблокирован: {date}"
-      },
-      "success": {
-        "user_blocked": "Пользователь успешно заблокирован",
-        "user_unblocked": "Пользователь успешно разблокирован"
-      },
-      "errors": {
-        "initialize_failed": "Не удалось инициализировать чат",
-        "load_conversations_failed": "Не удалось загрузить беседы",
-        "load_messages_failed": "Не удалось загрузить сообщения",
-        "load_unread_count_failed": "Не удалось загрузить количество непрочитанных сообщений",
-        "load_blocked_users_failed": "Не удалось загрузить заблокированных пользователей",
-        "websocket_error": "Ошибка WebSocket: {message}",
-        "send_message_failed": "Не удалось отправить сообщение",
-        "search_users_failed": "Не удалось найти пользователей",
-        "create_conversation_failed": "Не удалось начать новую беседу",
-        "block_user_failed": "Не удалось заблокировать пользователя",
-        "unblock_user_failed": "Не удалось разблокировать пользователя",
-        "message_action_failed": "Не удалось выполнить действие с сообщением"
-      }
+      "online": "В сети",
+      "offline": "Не в сети",
+      "onlineUsers": "{users} в сети",
+      "typingUsers": "{users} печатает...",
+      "noContent": "Нет содержимого",
+      "messagePlaceholder": "Введите ваше сообщение...",
+      "send": "Отправить",
+      "blockUser": "Заблокировать пользователя",
+      "deleteForMe": "Удалить для меня",
+      "deleteForEveryone": "Удалить для всех",
+      "recover": "Восстановить",
+      "read": "Прочитано",
+      "deletedByYou": "Удалено вами",
+      "deletedBySender": "Удалено отправителем",
+      "deletedForYou": "Удалено для вас",
+      "deletedByReceiver": "Удалено получателем",
+      "deletedForEveryone": "Удалено для всех",
+      "messageDeleted": "Сообщение удалено"
     },
-    "footer": {
-      "company": {
-        "logo": "TourGuide",
-        "description": "Ваш надёжный партнёр для аутентичных путешествий по всему миру.",
-        "contact": {
-          "address": "Улица Путешествий 123, Город Приключений, Мир",
-          "email": "info@tourguide.com",
-          "phone": "+1 (555) 123-4567"
-        }
-      },
-      "social": {
-        "facebook": "Facebook",
-        "twitter": "Twitter",
-        "instagram": "Instagram",
-        "linkedin": "LinkedIn",
-        "youtube": "YouTube"
-      },
-      "app": {
-        "title": "Скачайте наше мобильное приложение",
-        "description": "Скачайте наше приложение для лучшего опыта в дороге.",
-        "ios_label": "Скачать в",
-        "ios_store": "App Store",
-        "android_label": "Получить в",
-        "android_store": "Google Play",
-        "trust": {
-          "ssl": "SSL-безопасность",
-          "gdpr": "Соответствует GDPR"
-        }
-      },
-      "bottom": {
-        "copyright": "© {year} TourGuide. Все права защищены.",
-        "links": {
-          "terms": "Условия использования",
-          "privacy": "Политика конфиденциальности",
-          "cookies": "Политика использования cookies",
-          "accessibility": "Доступность"
-        }
-      }
+    "search": {
+      "placeholder": "Поиск пользователей по имени или email",
+      "minCharacters": "Введите минимум 2 символа для поиска",
+      "noResults": "Пользователи не найдены",
+      "unknownUserInitial": "Н"
     },
-    "debug": {
-      "title": "Отладочная информация",
-      "auth_status": "Статус авторизации",
-      "is_authenticated": "Авторизован:",
-      "access_token": "Токен доступа:",
-      "refresh_token": "Токен обновления:",
-      "profile_data": "Данные профиля",
-      "has_profile": "Есть профиль:",
-      "profile_id": "ID профиля:",
-      "role": "Роль:",
-      "user_id": "ID пользователя:",
-      "user_data": "Данные пользователя",
-      "no_user_data": "Данные пользователя отсутствуют",
-      "api_config": "Конфигурация API",
-      "api_url": "URL API:",
-      "environment": "Среда:",
-      "debug_mode": "Режим отладки:",
-      "quick_actions": "Быстрые действия",
-      "clear_tokens": "Очистить токены",
-      "reload_page": "Перезагрузить страницу",
-      "log_console": "Записать в консоль",
-      "note": "Эта панель отладки видна только в режиме разработки"
-    },
-    "auth": {
-      "title": "Авторизация TourGuide",
-      "subtitle": "Войдите в свой аккаунт, чтобы исследовать мир с местными экспертами",
-      "close_aria": "Закрыть модальное окно авторизации",
-      "tabs": {
-        "login": "Войти",
-        "register": "Зарегистрироваться",
-        "forgot": "Забыли пароль"
-      },
-      "login": {
-        "title": "Вход в TourGuide",
-        "subtitle": "Введите ваши данные для доступа к аккаунту",
-        "email_label": "Электронная почта",
-        "email_placeholder": "Введите ваш email",
-        "password_label": "Пароль",
-        "password_placeholder": "Введите ваш пароль",
-        "show_password_aria": "Показать пароль",
-        "hide_password_aria": "Скрыть пароль",
-        "submit_button": "Войти",
-        "or": "Или войти через",
-        "social": {
-          "google": "Войти через Google",
-          "facebook": "Войти через Facebook"
-        }
-      },
-      "register": {
-        "title": "Создайте аккаунт TourGuide",
-        "subtitle": "Присоединяйтесь к нам, чтобы открыть аутентичные путешествия",
-        "role_label": "Роль",
-        "role_client": "Путешественник",
-        "role_customer": "Гид",
-        "first_name_label": "Имя",
-        "first_name_placeholder": "Введите ваше имя",
-        "last_name_label": "Фамилия",
-        "last_name_placeholder": "Введите вашу фамилию",
-        "email_label": "Электронная почта",
-        "email_placeholder": "Введите ваш email",
-        "password_label": "Пароль",
-        "password_placeholder": "Введите ваш пароль",
-        "confirm_password_label": "Подтвердите пароль",
-        "confirm_password_placeholder": "Подтвердите ваш пароль",
-        "show_password_aria": "Показать пароль",
-        "hide_password_aria": "Скрыть пароль",
-        "country_label": "Страна",
-        "country_placeholder": "Введите вашу страну",
-        "checkboxes": {
-          "personal_data": "Я согласен на обработку моих персональных данных",
-          "terms": "Я принимаю Условия использования и Политику конфиденциальности",
-          "travel_tips": "Присылайте мне советы по путешествиям и акции"
-        },
-        "submit_button": "Зарегистрироваться",
-        "verification": {
-          "title": "Подтвердите ваш email",
-          "subtitle": "Мы отправили 6-значный код на <strong>{email}</strong>. Введите его ниже.",
-          "code_label": "Код подтверждения",
-          "code_placeholder": "Введите 6-значный код",
-          "submit_button": "Подтвердить",
-          "resend_button": "Отправить код повторно"
-        }
-      },
-      "forgot": {
-        "title": "Сброс пароля",
-        "subtitle": "Введите ваш email, чтобы получить код для сброса пароля",
-        "email_label": "Электронная почта",
-        "email_placeholder": "Введите ваш email",
-        "submit_button": "Отправить код для сброса",
-        "reset": {
-          "title": "Установить новый пароль",
-          "subtitle": "Введите код, отправленный на <strong>{email}</strong>, и новый пароль",
-          "code_label": "Код сброса",
-          "code_placeholder": "Введите 6-значный код",
-          "new_password_label": "Новый пароль",
-          "new_password_placeholder": "Введите новый пароль",
-          "confirm_password_label": "Подтвердите новый пароль",
-          "confirm_password_placeholder": "Подтвердите новый пароль",
-          "show_password_aria": "Показать пароль",
-          "hide_password_aria": "Скрыть пароль",
-          "submit_button": "Сбросить пароль",
-          "resend_button": "Отправить код повторно"
-        }
-      },
-      "validation": {
-        "required_fields": "Пожалуйста, заполните все обязательные поля",
-        "passwords_not_match": "Пароли не совпадают",
-        "password_requirements": "Пароль должен содержать минимум 8 символов, включая заглавные и строчные буквы, цифры и специальные символы",
-        "required_code": "Пожалуйста, введите код подтверждения",
-        "invalid_code": "Недействительный или неверный код",
-        "invalid_country": "Пожалуйста, выберите действительную страну"
-      },
-      "success": {
-        "verification_sent": "Код подтверждения отправлен на ваш email",
-        "register_success": "Аккаунт успешно создан!",
-        "password_reset_sent": "Код для сброса пароля отправлен на ваш email",
-        "password_reset_success": "Пароль успешно сброшен!"
-      },
-      "errors": {
-        "login_failed": "Неверный email или пароль",
-        "email_exists": "Аккаунт с этим email уже существует",
-        "code_request_failed": "Не удалось отправить код подтверждения",
-        "resend_code_failed": "Не удалось повторно отправить код подтверждения",
-        "register_failed": "Регистрация не удалась. Пожалуйста, попробуйте снова",
-        "invalid_code": "Недействительный или неверный код подтверждения",
-        "expired_code": "Срок действия кода подтверждения истёк",
-        "too_many_requests": "Слишком много запросов. Пожалуйста, попробуйте позже",
-        "password_reset_failed": "Не удалось сбросить пароль. Пожалуйста, попробуйте снова",
-        "too_many_attempts": "Слишком много неудачных попыток. Пожалуйста, запросите новый код"
-      },
-      "social_login_dev": "Вход через {provider} находится в разработке",
-      "loading": "Загрузка..."
+    "blocked": {
+      "noBlockedUsers": "Нет заблокированных пользователей",
+      "unknownUser": "Неизвестный пользователь",
+      "unknownUserInitial": "Н",
+      "blockedOn": "Заблокирован {date}",
+      "unblock": "Разблокировать"
     }
   }
 }

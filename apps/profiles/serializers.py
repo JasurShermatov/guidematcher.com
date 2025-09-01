@@ -5,7 +5,6 @@ from apps.common.models import Language, ServiceType
 from apps.users.serializers import UserShortSerializer
 from .models import (
     ClientProfile,
-
     CustomerProfile,
     Portfolio,
     VerificationDocument,
@@ -21,7 +20,7 @@ class ClientProfileCreateUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientProfile
-        fields = ["date_of_birth", "preferred_contact", "languages",  "avatar"]
+        fields = ["date_of_birth", "preferred_contact", "languages", "avatar"]
 
     def update(self, instance, validated_data):
         languages = validated_data.pop("languages", None)

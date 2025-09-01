@@ -18,6 +18,14 @@ class AbstractProfile(BaseModel):
         verbose_name=_("Languages spoken"),
     )
 
+    avatar = models.ImageField(
+        upload_to="avatars/",
+        null=True,
+        blank=True,
+        default="avatars/img.png",
+        verbose_name=_("Profile picture"),
+    )
+
     class Meta:
         abstract = True
 

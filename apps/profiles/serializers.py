@@ -5,6 +5,7 @@ from apps.common.models import Language, ServiceType
 from apps.users.serializers import UserShortSerializer
 from .models import (
     ClientProfile,
+
     CustomerProfile,
     Portfolio,
     VerificationDocument,
@@ -12,11 +13,7 @@ from .models import (
 )
 
 
-# ================== CLIENT SERIALIZERS ==================
 class ClientProfileCreateUpdateSerializer(serializers.ModelSerializer):
-    """
-    Client profil yaratish/yangilash uchun
-    """
 
     languages = serializers.PrimaryKeyRelatedField(
         queryset=Language.objects.all(), many=True, required=False
@@ -24,7 +21,7 @@ class ClientProfileCreateUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientProfile
-        fields = ["date_of_birth", "preferred_contact", "languages"]
+        fields = ["date_of_birth", "preferred_contact", "languages",  "avatar"]
 
     def update(self, instance, validated_data):
         languages = validated_data.pop("languages", None)
@@ -53,6 +50,7 @@ class ClientProfileSerializer(serializers.ModelSerializer):
             "date_of_birth",
             "preferred_contact",
             "languages",
+            "avatar",
             "created_at",
             "updated_at",
         ]
@@ -72,10 +70,9 @@ class ClientProfileShortSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientProfile
-        fields = ["id", "full_name", "email", "preferred_contact"]
+        fields = ["id", "full_name", "email", "preferred_contact", "avatar"]
 
 
-# ================== CUSTOMER SERIALIZERS ==================
 class CustomerProfileCreateUpdateSerializer(serializers.ModelSerializer):
     languages = serializers.PrimaryKeyRelatedField(
         queryset=Language.objects.all(), many=True, required=False
@@ -97,6 +94,7 @@ class CustomerProfileCreateUpdateSerializer(serializers.ModelSerializer):
             "currency",
             "languages",
             "is_available",
+            "avatar",
         ]
 
     def validate_years_of_experience(self, value):
@@ -161,6 +159,7 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             "average_rating",
             "is_available",
             "is_verified",
+            "avatar",
             "created_at",
             "updated_at",
         ]
@@ -196,11 +195,11 @@ class CustomerProfileShortSerializer(serializers.ModelSerializer):
             "is_verified",
             "hourly_rate",
             "is_available",
+            "avatar",
         ]
         read_only_fields = ["id", "user", "city_name", "average_rating", "is_verified"]
 
 
-# ================== PORTFOLIO SERIALIZERS ==================
 class PortfolioSerializer(serializers.ModelSerializer):
     customer_name = serializers.CharField(
         source="customer.user.full_name", read_only=True
@@ -221,7 +220,6 @@ class PortfolioSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "customer", "customer_name", "created_at"]
 
 
-# ================== VERIFICATION DOCUMENT SERIALIZERS ==================
 class VerificationDocumentSerializer(serializers.ModelSerializer):
     customer_name = serializers.CharField(
         source="customer.user.full_name", read_only=True
@@ -257,7 +255,6 @@ class VerificationDocumentSerializer(serializers.ModelSerializer):
         ]
 
 
-# ================== UNAVAILABILITY SERIALIZERS ==================
 class UnavailabilitySerializer(serializers.ModelSerializer):
     customer_name = serializers.CharField(
         source="customer.user.full_name", read_only=True

@@ -1,32 +1,286 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-    getCustomerProfile,
-    createCustomerProfile,
-    updateCustomerProfile,
-    getMyBookings,
-    acceptBooking,
-    cancelBooking,
-    getMyReviews,
-    getReviewSummary,
-    reactToReview,
-    removeReactionFromReview,
-    getMyPortfolio,
-    createPortfolioItem,
-    updatePortfolioItem,
-    deletePortfolioItem,
-    getMyAvailability,
-    createAvailability,
-    updateAvailability,
-    deleteAvailability,
-    getServiceTypes,
-    getLanguages,
-    getCities,
-    getCurrentUser
-} from '../api/api';
+import axios from 'axios';
 import ChatWidgets from './ChatWidgets';
 import './GuideAccount.css';
 
+// API Configuration
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/";
+const WS_URL = process.env.REACT_APP_WS_URL || "ws://localhost:8000/ws/chat/";
+
+const api = axios.create({
+    baseURL: API_URL,
+    headers: { "Content-Type": "application/json" },
+    withCredentials: false,
+});
+
+// Token Interceptor
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
+        headers: config.headers,
+        data: config.data,
+    });
+    return config;
+});
+
+// Token Refresh Interceptor
+api.interceptors.response.use(
+    (response) => {
+        console.log(`API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
+            status: response.status,
+            data: response.data,
+        });
+        return response;
+    },
+    async (error) => {
+        console.error(`API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message,
+        });
+        const originalRequest = error.config;
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            try {
+                const refreshToken = localStorage.getItem("refresh_token");
+                if (!refreshToken) {
+                    throw new Error("No refresh token available");
+                }
+                const refreshResponse = await api.post("token/refresh/", {
+                    refresh: refreshToken,
+                });
+                const newAccessToken = refreshResponse.data.access_token || refreshResponse.data.access;
+                localStorage.setItem("access_token", newAccessToken);
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                return api(originalRequest);
+            } catch (refreshError) {
+                console.error("Token refresh failed:", refreshError);
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("refresh_token");
+                window.location.href = "/login";
+                return Promise.reject(refreshError);
+            }
+        }
+        let errorMessage = "Unknown error occurred";
+        if (error.response?.data) {
+            const data = error.response.data;
+            errorMessage =
+                data.detail ||
+                data.message ||
+                data.error ||
+                (data.email && data.email[0]) ||
+                (data.code && data.code[0]) ||
+                (data.non_field_errors && data.non_field_errors[0]) ||
+                JSON.stringify(data);
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        return Promise.reject(new Error(errorMessage));
+    }
+);
+
+// API Functions
+const getCustomerProfile = () => {
+    console.log("Getting customer profile...");
+    return api.get("profiles/customers/my/").then((r) => r.data);
+};
+
+const createCustomerProfile = (payload) => {
+    console.log("Creating customer profile:", payload);
+    return api.post("profiles/customers/", payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+    }).then((r) => r.data);
+};
+
+const updateCustomerProfile = (payload) => {
+    console.log("Updating customer profile:", payload);
+    return api.patch("profiles/customers/my/", payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+    }).then((r) => r.data);
+};
+
+const getMyBookings = (status = null) => {
+    const params = status ? { status } : {};
+    console.log("Getting my bookings...", params);
+    return api.get("bookings/bookings/", { params }).then((r) => r.data);
+};
+
+const acceptBooking = (id) => {
+    console.log("Accepting booking:", id);
+    return api.post(`bookings/bookings/${id}/accept/`).then((r) => r.data);
+};
+
+const cancelBooking = (id, reason = "") => {
+    console.log("Canceling booking:", id, reason);
+    return api.patch(`bookings/bookings/${id}/`, {
+        status: "cancelled",
+        cancellation_reason: reason
+    }).then((r) => r.data);
+};
+
+const getMyReviews = () => {
+    console.log("Getting my reviews...");
+    return api.get("reviews/my/").then((r) => r.data);
+};
+
+const getReviewSummary = (id) =>
+    api.get(`reviews/reviews/${id}/reactions/summary/`).then((r) => r.data);
+
+const reactToReview = (id, reactionType, comment = "") => {
+    console.log("Reacting to review:", id, reactionType);
+    return api.post(`reviews/reviews/${id}/react/`, {
+        reaction_type: reactionType,
+        comment: comment
+    }).then((r) => r.data);
+};
+
+const removeReactionFromReview = (id) => {
+    console.log("Removing reaction from review:", id);
+    return api.delete(`reviews/reviews/${id}/react/`).then((r) => r.data);
+};
+
+const getMyPortfolio = () => {
+    console.log("Getting my portfolio...");
+    return api.get("profiles/portfolios/my/").then((r) => r.data);
+};
+
+const createPortfolioItem = (payload) => {
+    console.log("Creating portfolio item...");
+    const formData = new FormData();
+    Object.keys(payload).forEach(key => {
+        if (payload[key] !== null && payload[key] !== undefined) {
+            formData.append(key, payload[key]);
+        }
+    });
+    return api.post("profiles/portfolios/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    }).then((r) => r.data);
+};
+
+const updatePortfolioItem = (id, payload) => {
+    console.log("Updating portfolio item:", id);
+    const formData = new FormData();
+    Object.keys(payload).forEach(key => {
+        if (payload[key] !== null && payload[key] !== undefined) {
+            formData.append(key, payload[key]);
+        }
+    });
+    return api.patch(`profiles/portfolios/${id}/`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    }).then((r) => r.data);
+};
+
+const deletePortfolioItem = (id) => {
+    console.log("Deleting portfolio item:", id);
+    return api.delete(`profiles/portfolios/${id}/`).then((r) => r.data);
+};
+
+const getMyUnavailability = () => {
+    console.log("Getting my unavailability...");
+    return api.get("profiles/unavailabilities/my/").then((r) => r.data);
+};
+
+const createUnavailability = (payload) => {
+    console.log("Creating unavailability:", payload);
+    return api.post("profiles/unavailabilities/", payload).then((r) => r.data);
+};
+
+const updateUnavailability = (id, payload) => {
+    console.log("Updating unavailability:", id, payload);
+    return api.patch(`profiles/unavailabilities/${id}/`, payload).then((r) => r.data);
+};
+
+const deleteUnavailability = (id) => {
+    console.log("Deleting unavailability:", id);
+    return api.delete(`profiles/unavailabilities/${id}/`).then((r) => r.data);
+};
+
+const getServiceTypes = () => {
+    console.log("Getting service types...");
+    return api.get("common/service-types/").then((r) => r.data);
+};
+
+const getLanguages = () => {
+    console.log("Getting languages...");
+    return api.get("common/languages/").then((r) => r.data);
+};
+
+const getCities = (countryId = null) => {
+    const params = countryId ? { country: countryId } : {};
+    console.log("Getting cities...", params);
+    return api.get("common/cities/", { params }).then((r) => r.data);
+};
+
+const getCurrentUser = () => {
+    console.log("Getting current user info...");
+    return api.get("auth/users/short/").then((r) => r.data);
+};
+
+// WebSocket Helpers
+let wsConnections = {};
+
+const connectWebSocket = (conversationId, onMessage, onOpen, onClose, onError) => {
+    if (wsConnections[conversationId]) {
+        console.log(`WebSocket already connected for conversation ${conversationId}`);
+        return wsConnections[conversationId];
+    }
+
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+        throw new Error("No access token for WebSocket");
+    }
+
+    const ws = new WebSocket(`${WS_URL}${conversationId}/?token=${token}`);
+
+    ws.onopen = () => {
+        console.log(`WebSocket connected for conversation ${conversationId}`);
+        if (onOpen) onOpen();
+    };
+
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log(`WebSocket message received:`, data);
+        if (onMessage) onMessage(data);
+    };
+
+    ws.onclose = (event) => {
+        console.log(`WebSocket closed for conversation ${conversationId}:`, event);
+        delete wsConnections[conversationId];
+        if (onClose) onClose(event);
+        setTimeout(() => connectWebSocket(conversationId, onMessage, onOpen, onClose, onError), 3000);
+    };
+
+    ws.onerror = (error) => {
+        console.error(`WebSocket error for conversation ${conversationId}:`, error);
+        if (onError) onError(error);
+    };
+
+    wsConnections[conversationId] = ws;
+    return ws;
+};
+
+const sendWebSocketMessage = (conversationId, payload) => {
+    const ws = wsConnections[conversationId];
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+        console.error(`WebSocket not open for conversation ${conversationId}`);
+        return;
+    }
+    ws.send(JSON.stringify(payload));
+};
+
+const closeWebSocket = (conversationId) => {
+    const ws = wsConnections[conversationId];
+    if (ws) {
+        ws.close();
+        delete wsConnections[conversationId];
+    }
+};
+
+// React Component
 const GuideAccount = () => {
     const { t } = useTranslation();
     const [currentUser, setCurrentUser] = useState(null);
@@ -35,7 +289,7 @@ const GuideAccount = () => {
     const [reviews, setReviews] = useState([]);
     const [reviewSummary, setReviewSummary] = useState(null);
     const [portfolio, setPortfolio] = useState([]);
-    const [availability, setAvailability] = useState([]);
+    const [unavailability, setUnavailability] = useState([]);
     const [serviceTypes, setServiceTypes] = useState([]);
     const [languages, setLanguages] = useState([]);
     const [cities, setCities] = useState([]);
@@ -44,11 +298,11 @@ const GuideAccount = () => {
     const [error, setError] = useState(null);
     const [showProfileForm, setShowProfileForm] = useState(false);
     const [showPortfolioForm, setShowPortfolioForm] = useState(false);
-    const [showAvailabilityForm, setShowAvailabilityForm] = useState(false);
+    const [showUnavailabilityForm, setShowUnavailabilityForm] = useState(false);
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [cancelReason, setCancelReason] = useState('');
     const [editingPortfolioItem, setEditingPortfolioItem] = useState(null);
-    const [editingAvailability, setEditingAvailability] = useState(null);
+    const [editingUnavailability, setEditingUnavailability] = useState(null);
     const [selectedBookingForCancel, setSelectedBookingForCancel] = useState(null);
     const [showChat, setShowChat] = useState(false);
     const [selectedUserForChat, setSelectedUserForChat] = useState(null);
@@ -71,7 +325,8 @@ const GuideAccount = () => {
         daily_rate: '',
         currency: 'USD',
         languages: [],
-        is_available: true
+        is_available: true,
+        avatar: null
     });
     const [portfolioForm, setPortfolioForm] = useState({
         title: '',
@@ -79,12 +334,10 @@ const GuideAccount = () => {
         image: null,
         order: 0
     });
-    const [availabilityForm, setAvailabilityForm] = useState({
-        date: '',
-        is_available: true,
-        start_time: '',
-        end_time: '',
-        note: ''
+    const [unavailabilityForm, setUnavailabilityForm] = useState({
+        start_date: '',
+        end_date: '',
+        reason: ''
     });
 
     useEffect(() => {
@@ -117,13 +370,14 @@ const GuideAccount = () => {
                     daily_rate: profileData.daily_rate || '',
                     currency: profileData.currency || 'USD',
                     languages: profileData.languages || [],
-                    is_available: profileData.is_available !== undefined ? profileData.is_available : true
+                    is_available: profileData.is_available !== undefined ? profileData.is_available : true,
+                    avatar: null
                 });
                 await Promise.all([
                     loadBookings(),
                     loadReviews(),
                     loadPortfolio(),
-                    loadAvailability(),
+                    loadUnavailability(),
                     loadReviewSummary()
                 ]);
             } catch (profileError) {
@@ -180,13 +434,13 @@ const GuideAccount = () => {
         }
     };
 
-    const loadAvailability = async () => {
+    const loadUnavailability = async () => {
         try {
-            const data = await getMyAvailability();
-            setAvailability(data.results || data);
+            const data = await getMyUnavailability();
+            setUnavailability(data.results || data);
         } catch (err) {
-            console.error('Error loading availability:', err);
-            setError(t('guideAccount.error.failedToLoadAvailability'));
+            console.error('Error loading unavailability:', err);
+            setError(t('guideAccount.error.failedToLoadUnavailability'));
         }
     };
 
@@ -197,11 +451,26 @@ const GuideAccount = () => {
             return;
         }
         try {
+            const formData = new FormData();
+            formData.append('professional_bio', profileForm.professional_bio);
+            formData.append('years_of_experience', profileForm.years_of_experience);
+            profileForm.service_types.forEach(st => formData.append('service_types', st));
+            formData.append('city', profileForm.city);
+            formData.append('service_areas', profileForm.service_areas);
+            formData.append('hourly_rate', profileForm.hourly_rate);
+            formData.append('daily_rate', profileForm.daily_rate);
+            formData.append('currency', profileForm.currency);
+            profileForm.languages.forEach(lang => formData.append('languages', lang));
+            formData.append('is_available', profileForm.is_available);
+            if (profileForm.avatar) {
+                formData.append('avatar', profileForm.avatar);
+            }
+
             let result;
             if (profile) {
-                result = await updateCustomerProfile(profileForm);
+                result = await updateCustomerProfile(formData);
             } else {
-                result = await createCustomerProfile(profileForm);
+                result = await createCustomerProfile(formData);
             }
             setProfile(result);
             setShowProfileForm(false);
@@ -235,26 +504,35 @@ const GuideAccount = () => {
         }
     };
 
-    const handleAvailabilitySubmit = async (e) => {
+    const handleUnavailabilitySubmit = async (e) => {
         e.preventDefault();
-        if (!availabilityForm.date) {
-            setError(t('guideAccount.error.dateRequired'));
+        if (!unavailabilityForm.start_date || !unavailabilityForm.end_date) {
+            setError(t('guideAccount.error.datesRequired'));
+            return;
+        }
+        if (new Date(unavailabilityForm.end_date) < new Date(unavailabilityForm.start_date)) {
+            setError(t('guideAccount.error.invalidDateRange'));
             return;
         }
         try {
-            if (editingAvailability) {
-                await updateAvailability(editingAvailability.id, availabilityForm);
+            const payload = {
+                start_date: unavailabilityForm.start_date,
+                end_date: unavailabilityForm.end_date,
+                reason: unavailabilityForm.reason || '',
+            };
+            if (editingUnavailability) {
+                await updateUnavailability(editingUnavailability.id, payload);
             } else {
-                await createAvailability(availabilityForm);
+                await createUnavailability(payload);
             }
-            loadAvailability();
-            setShowAvailabilityForm(false);
-            setEditingAvailability(null);
-            setAvailabilityForm({ date: '', is_available: true, start_time: '', end_time: '', note: '' });
+            loadUnavailability();
+            setShowUnavailabilityForm(false);
+            setEditingUnavailability(null);
+            setUnavailabilityForm({ start_date: '', end_date: '', reason: '' });
             setError(null);
-            alert(editingAvailability ? t('guideAccount.success.availabilityUpdated') : t('guideAccount.success.availabilityCreated'));
+            alert(editingUnavailability ? t('guideAccount.success.unavailabilityUpdated') : t('guideAccount.success.unavailabilityCreated'));
         } catch (err) {
-            setError(t('guideAccount.error.failedToSaveAvailability'));
+            setError(t('guideAccount.error.failedToSaveUnavailability'));
         }
     };
 
@@ -299,15 +577,15 @@ const GuideAccount = () => {
         }
     };
 
-    const handleDeleteAvailability = async (id) => {
-        if (!window.confirm(t('guideAccount.availability.deleteConfirm'))) return;
+    const handleDeleteUnavailability = async (id) => {
+        if (!window.confirm(t('guideAccount.unavailability.deleteConfirm'))) return;
         try {
-            await deleteAvailability(id);
-            loadAvailability();
+            await deleteUnavailability(id);
+            loadUnavailability();
             setError(null);
-            alert(t('guideAccount.success.availabilityDeleted'));
+            alert(t('guideAccount.success.unavailabilityDeleted'));
         } catch (err) {
-            setError(t('guideAccount.error.failedToDeleteAvailability'));
+            setError(t('guideAccount.error.failedToDeleteUnavailability'));
         }
     };
 
@@ -387,7 +665,6 @@ const GuideAccount = () => {
                 <h1 className="guide-account-title">{t('guideAccount.title')}</h1>
                 {currentUser && (
                     <div className="guide-account-user-info">
-                        <span className="guide-account-welcome">{t('guideAccount.welcome', { name: currentUser.full_name })}</span>
                         <button
                             className="guide-account-chat-btn"
                             onClick={() => setShowChat(true)}
@@ -438,10 +715,10 @@ const GuideAccount = () => {
                     {t('guideAccount.navigation.portfolio')}
                 </button>
                 <button
-                    className={`guide-account-nav-btn ${activeTab === 'availability' ? 'guide-account-nav-active' : ''}`}
-                    onClick={() => setActiveTab('availability')}
+                    className={`guide-account-nav-btn ${activeTab === 'unavailability' ? 'guide-account-nav-active' : ''}`}
+                    onClick={() => setActiveTab('unavailability')}
                 >
-                    {t('guideAccount.navigation.availability')}
+                    {t('guideAccount.navigation.unavailability')}
                 </button>
                 <button
                     className={`guide-account-nav-btn ${activeTab === 'reviews' ? 'guide-account-nav-active' : ''}`}
@@ -684,6 +961,23 @@ const GuideAccount = () => {
                                             {t('guideAccount.profile.availableForBookings')}
                                         </label>
                                     </div>
+                                    <div className="guide-account-form-group">
+                                        <label className="guide-account-label">{t('guideAccount.profile.avatar')}</label>
+                                        <input
+                                            type="file"
+                                            className="guide-account-file-input"
+                                            accept="image/*"
+                                            onChange={(e) => setProfileForm({ ...profileForm, avatar: e.target.files[0] })}
+                                        />
+                                        {profile?.avatar && (
+                                            <img
+                                                src={profile.avatar}
+                                                alt="Current avatar"
+                                                className="guide-account-avatar-preview"
+                                                style={{ width: '100px', height: '100px', borderRadius: '50%', marginTop: '10px' }}
+                                            />
+                                        )}
+                                    </div>
                                     <div className="guide-account-form-actions">
                                         <button type="submit" className="guide-account-btn guide-account-btn-primary">
                                             {profile ? t('guideAccount.profile.updateProfile') : t('guideAccount.profile.createProfileButton')}
@@ -725,6 +1019,19 @@ const GuideAccount = () => {
                                         <p className="guide-account-profile-value">
                                             {profile.is_available ? t('guideAccount.profile.available') : t('guideAccount.profile.notAvailable')}
                                         </p>
+                                    </div>
+                                    <div className="guide-account-profile-field">
+                                        <label className="guide-account-profile-label">{t('guideAccount.profile.avatar')}</label>
+                                        {profile.avatar ? (
+                                            <img
+                                                src={profile.avatar}
+                                                alt="Avatar"
+                                                className="guide-account-avatar-preview"
+                                                style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+                                            />
+                                        ) : (
+                                            <p className="guide-account-profile-value">{t('guideAccount.profile.notSet')}</p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -900,136 +1207,108 @@ const GuideAccount = () => {
                         </div>
                     </div>
                 )}
-                {activeTab === 'availability' && (
-                    <div className="guide-account-availability">
-                        <div className="guide-account-availability-header">
-                            <h3 className="guide-account-section-title">{t('guideAccount.availability.myAvailability')}</h3>
+                {activeTab === 'unavailability' && (
+                    <div className="guide-account-unavailability">
+                        <div className="guide-account-unavailability-header">
+                            <h3 className="guide-account-section-title">{t('guideAccount.unavailability.myUnavailability')}</h3>
                             <button
                                 className="guide-account-btn guide-account-btn-primary"
-                                onClick={() => setShowAvailabilityForm(true)}
+                                onClick={() => setShowUnavailabilityForm(true)}
                             >
-                                {t('guideAccount.availability.addAvailability')}
+                                {t('guideAccount.unavailability.addUnavailability')}
                             </button>
                         </div>
-                        {showAvailabilityForm && (
-                            <div className="guide-account-availability-form">
+                        {showUnavailabilityForm && (
+                            <div className="guide-account-unavailability-form">
                                 <h4 className="guide-account-form-title">
-                                    {editingAvailability ? t('guideAccount.availability.editAvailability') : t('guideAccount.availability.createAvailability')}
+                                    {editingUnavailability ? t('guideAccount.unavailability.editUnavailability') : t('guideAccount.unavailability.createUnavailability')}
                                 </h4>
-                                <form onSubmit={handleAvailabilitySubmit} className="guide-account-form">
+                                <form onSubmit={handleUnavailabilitySubmit} className="guide-account-form">
                                     <div className="guide-account-form-row">
                                         <div className="guide-account-form-group">
-                                            <label className="guide-account-label">{t('guideAccount.availability.date')}</label>
+                                            <label className="guide-account-label">{t('guideAccount.unavailability.startDate')}</label>
                                             <input
                                                 type="date"
                                                 className="guide-account-input"
-                                                value={availabilityForm.date}
-                                                onChange={(e) => setAvailabilityForm({ ...availabilityForm, date: e.target.value })}
+                                                value={unavailabilityForm.start_date}
+                                                onChange={(e) => setUnavailabilityForm({ ...unavailabilityForm, start_date: e.target.value })}
                                                 required
                                             />
                                         </div>
                                         <div className="guide-account-form-group">
-                                            <label className="guide-account-checkbox-label">
-                                                <input
-                                                    type="checkbox"
-                                                    className="guide-account-checkbox"
-                                                    checked={availabilityForm.is_available}
-                                                    onChange={(e) => setAvailabilityForm({ ...availabilityForm, is_available: e.target.checked })}
-                                                />
-                                                {t('guideAccount.availability.available')}
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div className="guide-account-form-row">
-                                        <div className="guide-account-form-group">
-                                            <label className="guide-account-label">{t('guideAccount.availability.startTime')}</label>
+                                            <label className="guide-account-label">{t('guideAccount.unavailability.endDate')}</label>
                                             <input
-                                                type="time"
+                                                type="date"
                                                 className="guide-account-input"
-                                                value={availabilityForm.start_time}
-                                                onChange={(e) => setAvailabilityForm({ ...availabilityForm, start_time: e.target.value })}
-                                            />
-                                        </div>
-                                        <div className="guide-account-form-group">
-                                            <label className="guide-account-label">{t('guideAccount.availability.endTime')}</label>
-                                            <input
-                                                type="time"
-                                                className="guide-account-input"
-                                                value={availabilityForm.end_time}
-                                                onChange={(e) => setAvailabilityForm({ ...availabilityForm, end_time: e.target.value })}
+                                                value={unavailabilityForm.end_date}
+                                                onChange={(e) => setUnavailabilityForm({ ...unavailabilityForm, end_date: e.target.value })}
+                                                required
                                             />
                                         </div>
                                     </div>
                                     <div className="guide-account-form-group">
-                                        <label className="guide-account-label">{t('guideAccount.availability.note')}</label>
-                                        <input
-                                            type="text"
-                                            className="guide-account-input"
-                                            value={availabilityForm.note}
-                                            onChange={(e) => setAvailabilityForm({ ...availabilityForm, note: e.target.value })}
-                                            placeholder={t('guideAccount.availability.notePlaceholder')}
+                                        <label className="guide-account-label">{t('guideAccount.unavailability.reason')}</label>
+                                        <textarea
+                                            className="guide-account-textarea"
+                                            value={unavailabilityForm.reason}
+                                            onChange={(e) => setUnavailabilityForm({ ...unavailabilityForm, reason: e.target.value })}
+                                            placeholder={t('guideAccount.unavailability.reasonPlaceholder')}
+                                            rows="3"
                                         />
                                     </div>
                                     <div className="guide-account-form-actions">
                                         <button type="submit" className="guide-account-btn guide-account-btn-primary">
-                                            {editingAvailability ? t('guideAccount.availability.updateAvailability') : t('guideAccount.availability.createAvailability')}
+                                            {editingUnavailability ? t('guideAccount.unavailability.updateUnavailability') : t('guideAccount.unavailability.createUnavailability')}
                                         </button>
                                         <button
                                             type="button"
                                             className="guide-account-btn guide-account-btn-secondary"
                                             onClick={() => {
-                                                setShowAvailabilityForm(false);
-                                                setEditingAvailability(null);
-                                                setAvailabilityForm({ date: '', is_available: true, start_time: '', end_time: '', note: '' });
+                                                setShowUnavailabilityForm(false);
+                                                setEditingUnavailability(null);
+                                                setUnavailabilityForm({ start_date: '', end_date: '', reason: '' });
                                             }}
                                         >
-                                            {t('guideAccount.availability.cancel')}
+                                            {t('guideAccount.unavailability.cancel')}
                                         </button>
                                     </div>
                                 </form>
                             </div>
                         )}
-                        <div className="guide-account-availability-list">
-                            {availability.map(item => (
-                                <div key={item.id} className="guide-account-availability-item">
-                                    <div className="guide-account-availability-info">
-                                        <h4 className="guide-account-availability-date">
-                                            {t('guideAccount.availability.date')}: {new Date(item.date).toLocaleDateString()}
+                        <div className="guide-account-unavailability-list">
+                            {unavailability.map(item => (
+                                <div key={item.id} className="guide-account-unavailability-item">
+                                    <div className="guide-account-unavailability-info">
+                                        <h4 className="guide-account-unavailability-dates">
+                                            {t('guideAccount.unavailability.dates', {
+                                                start: new Date(item.start_date).toLocaleDateString(),
+                                                end: new Date(item.end_date).toLocaleDateString()
+                                            })}
                                         </h4>
-                                        <p className="guide-account-availability-time">
-                                            {item.start_time && item.end_time
-                                                ? `${item.start_time} - ${item.end_time}`
-                                                : t('guideAccount.availability.allDay')}
+                                        <p className="guide-account-unavailability-reason">
+                                            {t('guideAccount.unavailability.reason')}: {item.reason || t('guideAccount.unavailability.noReason')}
                                         </p>
-                                        <p className="guide-account-availability-note">
-                                            {t('guideAccount.availability.note')}: {item.note || 'None'}
-                                        </p>
-                                        <span className={`guide-account-availability-status ${item.is_available ? 'guide-account-available' : 'guide-account-unavailable'}`}>
-                                            {item.is_available ? t('guideAccount.availability.available') : t('guideAccount.availability.unavailable')}
-                                        </span>
                                     </div>
-                                    <div className="guide-account-availability-actions">
+                                    <div className="guide-account-unavailability-actions">
                                         <button
                                             className="guide-account-btn guide-account-btn-small"
                                             onClick={() => {
-                                                setEditingAvailability(item);
-                                                setAvailabilityForm({
-                                                    date: item.date,
-                                                    is_available: item.is_available,
-                                                    start_time: item.start_time || '',
-                                                    end_time: item.end_time || '',
-                                                    note: item.note || ''
+                                                setEditingUnavailability(item);
+                                                setUnavailabilityForm({
+                                                    start_date: item.start_date,
+                                                    end_date: item.end_date,
+                                                    reason: item.reason || ''
                                                 });
-                                                setShowAvailabilityForm(true);
+                                                setShowUnavailabilityForm(true);
                                             }}
                                         >
-                                            {t('guideAccount.availability.edit')}
+                                            {t('guideAccount.unavailability.edit')}
                                         </button>
                                         <button
                                             className="guide-account-btn guide-account-btn-small guide-account-btn-danger"
-                                            onClick={() => handleDeleteAvailability(item.id)}
+                                            onClick={() => handleDeleteUnavailability(item.id)}
                                         >
-                                            {t('guideAccount.availability.delete')}
+                                            {t('guideAccount.unavailability.delete')}
                                         </button>
                                     </div>
                                 </div>
@@ -1123,7 +1402,7 @@ const GuideAccount = () => {
                                                 </span>
                                             </div>
                                             <span className="guide-account-review-date">
-                                                {t('guideAccount.availability.date')}: {new Date(review.created_at).toLocaleDateString()}
+                                                {t('guideAccount.reviews.date')}: {new Date(review.created_at).toLocaleDateString()}
                                             </span>
                                         </div>
                                         <h4 className="guide-account-review-title">{review.title}</h4>

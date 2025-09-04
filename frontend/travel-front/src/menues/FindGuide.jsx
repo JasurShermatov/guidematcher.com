@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiSearch, FiFilter, FiStar, FiMapPin, FiUsers } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
-import { getCustomerProfiles, getCountries, getCities, getLanguages, createBooking } from '../api/api';
+import axios from 'axios';
 import './FindGuide.css';
 
 // Simple debounce function
@@ -12,6 +12,111 @@ const debounce = (func, wait) => {
         clearTimeout(timeout);
         timeout = setTimeout(() => func(...args), wait);
     };
+};
+
+// API Configuration
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/";
+
+const api = axios.create({
+    baseURL: API_URL,
+    headers: { "Content-Type": "application/json" },
+    withCredentials: false,
+});
+
+// Token Interceptor
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
+        headers: config.headers,
+        data: config.data,
+    });
+    return config;
+});
+
+// Token Refresh Interceptor
+api.interceptors.response.use(
+    (response) => {
+        console.log(`API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
+            status: response.status,
+            data: response.data,
+        });
+        return response;
+    },
+    async (error) => {
+        console.error(`API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message,
+        });
+        const originalRequest = error.config;
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            try {
+                const refreshToken = localStorage.getItem("refresh_token");
+                if (!refreshToken) {
+                    throw new Error("No refresh token available");
+                }
+                const refreshResponse = await api.post("token/refresh/", {
+                    refresh: refreshToken,
+                });
+                const newAccessToken = refreshResponse.data.access_token || refreshResponse.data.access;
+                localStorage.setItem("access_token", newAccessToken);
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                return api(originalRequest);
+            } catch (refreshError) {
+                console.error("Token refresh failed:", refreshError);
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("refresh_token");
+                window.location.href = "/login";
+                return Promise.reject(refreshError);
+            }
+        }
+        let errorMessage = "Unknown error occurred";
+        if (error.response?.data) {
+            const data = error.response.data;
+            errorMessage =
+                data.detail ||
+                data.message ||
+                data.error ||
+                (data.email && data.email[0]) ||
+                (data.code && data.code[0]) ||
+                (data.non_field_errors && data.non_field_errors[0]) ||
+                JSON.stringify(data);
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        return Promise.reject(new Error(errorMessage));
+    }
+);
+
+// API Functions
+const getCustomerProfiles = (params = {}) => {
+    console.log("Getting customer profiles...", params);
+    return api.get("profiles/customers/", { params }).then((r) => r.data);
+};
+
+const getCountries = () => {
+    console.log("Getting countries...");
+    return api.get("common/countries/").then((r) => r.data);
+};
+
+const getCities = (countryId = null) => {
+    const params = countryId ? { country: countryId } : {};
+    console.log("Getting cities...", params);
+    return api.get("common/cities/", { params }).then((r) => r.data);
+};
+
+const getLanguages = () => {
+    console.log("Getting languages...");
+    return api.get("common/languages/").then((r) => r.data);
+};
+
+const createBooking = (payload) => {
+    console.log("Creating booking:", payload);
+    return api.post("bookings/bookings/", payload).then((r) => r.data);
 };
 
 const FindGuide = ({ user }) => {
@@ -393,14 +498,6 @@ const FindGuide = ({ user }) => {
                                         aria-label={`${t('find_guide.book_now', { defaultValue: 'Book Now' })} ${guide.name}`}
                                     >
                                         {t('find_guide.book_now', { defaultValue: 'Book Now' })}
-                                    </button>
-                                    <button
-                                        className="find-guide-btn find-guide-message-btn"
-                                        onClick={() => handleMessageGuide(guide)}
-                                        disabled={!guide.userId || isLoading}
-                                        aria-label={`${t('find_guide.message_guide', { defaultValue: 'Message' })} ${guide.name}`}
-                                    >
-                                        {t('find_guide.message_guide', { defaultValue: 'Message' })}
                                     </button>
                                 </div>
                             </div>

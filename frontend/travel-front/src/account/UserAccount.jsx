@@ -1,32 +1,264 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next'; // Import useTranslation hook
-import {
-    getClientProfile,
-    createClientProfile,
-    updateClientProfile,
-    getMyBookings,
-    createBooking,
-    cancelBooking,
-    getCustomerProfiles,
-    getMyReviews,
-    createReview,
-    updateReview,
-    deleteReview,
-    getLanguages,
-    getCurrentUser,
-    getServiceTypes,
-    reactToReview,
-    removeReactionFromReview,
-    getReviewReactions,
-    getReviewSummary,
-    getCities,
-    getCountries
-} from '../api/api';
+import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 import ChatWidgets from './ChatWidgets';
 import './UserAccount.css';
 
+// API Configuration
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/";
+const WS_URL = process.env.REACT_APP_WS_URL || "ws://localhost:8000/ws/chat/";
+
+const api = axios.create({
+    baseURL: API_URL,
+    headers: { "Content-Type": "application/json" },
+    withCredentials: false,
+});
+
+// Token Interceptor
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
+        headers: config.headers,
+        data: config.data,
+    });
+    return config;
+});
+
+// Token Refresh Interceptor
+api.interceptors.response.use(
+    (response) => {
+        console.log(`API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
+            status: response.status,
+            data: response.data,
+        });
+        return response;
+    },
+    async (error) => {
+        console.error(`API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message,
+        });
+        const originalRequest = error.config;
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            try {
+                const refreshToken = localStorage.getItem("refresh_token");
+                if (!refreshToken) {
+                    throw new Error("No refresh token available");
+                }
+                const refreshResponse = await api.post("token/refresh/", {
+                    refresh: refreshToken,
+                });
+                const newAccessToken = refreshResponse.data.access_token || refreshResponse.data.access;
+                localStorage.setItem("access_token", newAccessToken);
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                return api(originalRequest);
+            } catch (refreshError) {
+                console.error("Token refresh failed:", refreshError);
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("refresh_token");
+                window.location.href = "/login";
+                return Promise.reject(refreshError);
+            }
+        }
+        let errorMessage = "Unknown error occurred";
+        if (error.response?.data) {
+            const data = error.response.data;
+            errorMessage =
+                data.detail ||
+                data.message ||
+                data.error ||
+                (data.email && data.email[0]) ||
+                (data.code && data.code[0]) ||
+                (data.non_field_errors && data.non_field_errors[0]) ||
+                JSON.stringify(data);
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        return Promise.reject(new Error(errorMessage));
+    }
+);
+
+// API Functions
+const getClientProfile = () => {
+    console.log("Getting client profile...");
+    return api.get("profiles/clients/my/").then((r) => r.data);
+};
+
+const createClientProfile = (payload) => {
+    console.log("Creating client profile:", payload);
+    return api.post("profiles/clients/", payload).then((r) => r.data);
+};
+
+const updateClientProfile = (payload) => {
+    console.log("Updating client profile:", payload);
+    return api.patch("profiles/clients/my/", payload).then((r) => r.data);
+};
+
+const getMyBookings = (status = null) => {
+    const params = status ? { status } : {};
+    console.log("Getting my bookings...", params);
+    return api.get("bookings/bookings/", { params }).then((r) => r.data);
+};
+
+const createBooking = (payload) => {
+    console.log("Creating booking:", payload);
+    return api.post("bookings/bookings/", payload).then((r) => r.data);
+};
+
+const cancelBooking = (id, reason = "") => {
+    console.log("Canceling booking:", id, reason);
+    return api.patch(`bookings/bookings/${id}/`, {
+        status: "cancelled",
+        cancellation_reason: reason
+    }).then((r) => r.data);
+};
+
+const getCustomerProfiles = (params = {}) => {
+    console.log("Getting customer profiles...", params);
+    return api.get("profiles/customers/", { params }).then((r) => r.data);
+};
+
+const getMyReviews = () => {
+    console.log("Getting my reviews...");
+    return api.get("reviews/my/").then((r) => r.data);
+};
+
+const createReview = (payload) => {
+    console.log("Creating review:", payload);
+    return api.post("reviews/reviews/", payload).then((r) => r.data);
+};
+
+const updateReview = (id, payload) => {
+    console.log("Updating review:", id);
+    return api.patch(`reviews/reviews/${id}/`, payload).then((r) => r.data);
+};
+
+const deleteReview = (id) => {
+    console.log("Deleting review:", id);
+    return api.delete(`reviews/reviews/${id}/`).then((r) => r.data);
+};
+
+const getLanguages = () => {
+    console.log("Getting languages...");
+    return api.get("common/languages/").then((r) => r.data);
+};
+
+const getCurrentUser = () => {
+    console.log("Getting current user info...");
+    return api.get("auth/users/short/").then((r) => r.data);
+};
+
+const getServiceTypes = () => {
+    console.log("Getting service types...");
+    return api.get("common/service-types/").then((r) => r.data);
+};
+
+const reactToReview = (id, reactionType, comment = "") => {
+    console.log("Reacting to review:", id, reactionType);
+    return api.post(`reviews/reviews/${id}/react/`, {
+        reaction_type: reactionType,
+        comment: comment
+    }).then((r) => r.data);
+};
+
+const removeReactionFromReview = (id) => {
+    console.log("Removing reaction from review:", id);
+    return api.delete(`reviews/reviews/${id}/react/`).then((r) => r.data);
+};
+
+const getReviewReactions = (id, type = null) => {
+    const params = type ? { type } : {};
+    return api.get(`reviews/reviews/${id}/reactions/`, { params }).then((r) => r.data);
+};
+
+const getReviewSummary = (id) => {
+    return api.get(`reviews/reviews/${id}/reactions/summary/`).then((r) => r.data);
+};
+
+const getCities = (countryId = null) => {
+    const params = countryId ? { country: countryId } : {};
+    console.log("Getting cities...", params);
+    return api.get("common/cities/", { params }).then((r) => r.data);
+};
+
+const getCountries = () => {
+    console.log("Getting countries...");
+    return api.get("common/countries/").then((r) => r.data);
+};
+
+const updateClientAvatar = (payload) => {
+    console.log("Updating client avatar:", payload);
+    return api.patch("profiles/clients/my/", payload).then((r) => r.data);
+};
+
+// WebSocket Helpers
+let wsConnections = {};
+
+const connectWebSocket = (conversationId, onMessage, onOpen, onClose, onError) => {
+    if (wsConnections[conversationId]) {
+        console.log(`WebSocket already connected for conversation ${conversationId}`);
+        return wsConnections[conversationId];
+    }
+
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+        throw new Error("No access token for WebSocket");
+    }
+
+    const ws = new WebSocket(`${WS_URL}${conversationId}/?token=${token}`);
+
+    ws.onopen = () => {
+        console.log(`WebSocket connected for conversation ${conversationId}`);
+        if (onOpen) onOpen();
+    };
+
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log(`WebSocket message received:`, data);
+        if (onMessage) onMessage(data);
+    };
+
+    ws.onclose = (event) => {
+        console.log(`WebSocket closed for conversation ${conversationId}:`, event);
+        delete wsConnections[conversationId];
+        if (onClose) onClose(event);
+        setTimeout(() => connectWebSocket(conversationId, onMessage, onOpen, onClose, onError), 3000);
+    };
+
+    ws.onerror = (error) => {
+        console.error(`WebSocket error for conversation ${conversationId}:`, error);
+        if (onError) onError(error);
+    };
+
+    wsConnections[conversationId] = ws;
+    return ws;
+};
+
+const sendWebSocketMessage = (conversationId, payload) => {
+    const ws = wsConnections[conversationId];
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+        console.error(`WebSocket not open for conversation ${conversationId}`);
+        return;
+    }
+    ws.send(JSON.stringify(payload));
+};
+
+const closeWebSocket = (conversationId) => {
+    const ws = wsConnections[conversationId];
+    if (ws) {
+        ws.close();
+        delete wsConnections[conversationId];
+    }
+};
+
+// React Component
 const UserAccount = () => {
-    const { t } = useTranslation(); // Initialize translation hook
+    const { t } = useTranslation();
     const [currentUser, setCurrentUser] = useState(null);
     const [profile, setProfile] = useState(null);
     const [bookings, setBookings] = useState([]);
@@ -69,7 +301,9 @@ const UserAccount = () => {
     const [profileForm, setProfileForm] = useState({
         date_of_birth: '',
         preferred_contact: 'email',
-        languages: []
+        languages: [],
+        avatar: null,
+        avatarPreview: null
     });
     const [bookingForm, setBookingForm] = useState({
         title: '',
@@ -116,11 +350,13 @@ const UserAccount = () => {
             setCountries(countriesData.results || countriesData);
             try {
                 const profileData = await getClientProfile();
+                console.log("Profile Data:", profileData); // Debug uchun
                 setProfile(profileData);
                 setProfileForm({
                     date_of_birth: profileData.date_of_birth || '',
                     preferred_contact: profileData.preferred_contact || 'email',
-                    languages: profileData.languages || []
+                    languages: profileData.languages || [],
+                    avatar: null
                 });
             } catch (profileError) {
                 console.log('No profile found, user needs to create one');
@@ -133,7 +369,7 @@ const UserAccount = () => {
             ]);
         } catch (err) {
             console.error('Error initializing data:', err);
-            setError(t('user_account.errors.fill_required_fields')); // Use translation
+            setError(t('user_account.errors.fill_required_fields'));
         } finally {
             setLoading(false);
         }
@@ -179,7 +415,7 @@ const UserAccount = () => {
             setReactions(data.results || data);
         } catch (err) {
             console.error('Error loading reactions:', err);
-            setError(t('user_account.errors.failed_load_reactions')); // Use translation
+            setError(t('user_account.errors.failed_load_reactions'));
         }
     };
 
@@ -189,48 +425,105 @@ const UserAccount = () => {
             setReactionSummary(data);
         } catch (err) {
             console.error('Error loading review summary:', err);
-            setError(t('user_account.errors.failed_load_review_summary')); // Use translation
+            setError(t('user_account.errors.failed_load_review_summary'));
+        }
+    };
+    // Avatar oldindan ko'rish funksiyasi
+    const handleAvatarChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfileForm({
+                    ...profileForm,
+                    avatar: file,
+                    avatarPreview: reader.result
+                });
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setProfileForm({
+                ...profileForm,
+                avatar: null,
+                avatarPreview: null
+            });
         }
     };
 
     const handleProfileSubmit = async (e) => {
         e.preventDefault();
         try {
+            const formData = new FormData();
+            formData.append('date_of_birth', profileForm.date_of_birth || '');
+            formData.append('preferred_contact', profileForm.preferred_contact || 'email');
+            profileForm.languages.forEach(lang => {
+                if (lang) formData.append('languages', lang);
+            });
+
             let result;
             if (profile) {
-                result = await updateClientProfile(profileForm);
+                result = await updateClientProfile(formData);
             } else {
-                result = await createClientProfile(profileForm);
+                result = await createClientProfile(formData);
             }
             setProfile(result);
+            setProfileForm({
+                ...profileForm,
+                avatar: null,
+                avatarPreview: null
+            });
             setShowProfileForm(false);
             setError(null);
         } catch (err) {
-            setError(t('user_account.errors.fill_required_fields')); // Use translation
+            console.error('Profile submit error:', err);
+            setError(t('user_account.errors.fill_required_fields') + ': ' + err.message);
+        }
+    };
+
+    const handleAvatarSubmit = async (e) => {
+        e.preventDefault();
+        if (!profileForm.avatar) {
+            setError(t('user_account.errors.avatar_required'));
+            return;
+        }
+        try {
+            const formData = new FormData();
+            formData.append('avatar', profileForm.avatar);
+            const result = await updateClientAvatar(formData);
+            setProfile(result); // Full profile ni yangilash, chunki response full bo'ladi
+            setProfileForm({
+                ...profileForm,
+                avatar: null,
+                avatarPreview: null
+            });
+            setError(null);
+        } catch (err) {
+            console.error('Avatar submit error:', err);
+            setError(t('user_account.errors.avatar_upload_failed') + ': ' + err.message);
         }
     };
 
     const handleBookingSubmit = async (e) => {
         e.preventDefault();
         if (!bookingForm.start_date) {
-            setError(t('user_account.errors.start_date_required')); // Use translation
+            setError(t('user_account.errors.start_date_required'));
             return;
         }
         if (!bookingForm.end_date) {
-            setError(t('user_account.errors.end_date_required')); // Use translation
+            setError(t('user_account.errors.end_date_required'));
             return;
         }
         if (!bookingForm.title.trim()) {
-            setError(t('user_account.errors.title_required')); // Use translation
+            setError(t('user_account.errors.title_required'));
             return;
         }
         if (new Date(bookingForm.start_date) > new Date(bookingForm.end_date)) {
-            setError(t('user_account.errors.start_date_before_end')); // Use translation
+            setError(t('user_account.errors.start_date_before_end'));
             return;
         }
         const today = new Date().toISOString().split('T')[0];
         if (bookingForm.start_date < today) {
-            setError(t('user_account.errors.start_date_past')); // Use translation
+            setError(t('user_account.errors.start_date_past'));
             return;
         }
         try {
@@ -257,21 +550,21 @@ const UserAccount = () => {
                 customer_profile: ''
             });
             setError(null);
-            alert(t('user_account.success.booking_created')); // Use translation
+            alert(t('user_account.success.booking_created'));
         } catch (err) {
             console.error('Booking creation error:', err);
-            setError(t('user_account.errors.failed_create_booking')); // Use translation
+            setError(t('user_account.errors.failed_create_booking'));
         }
     };
 
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
         if (!reviewForm.title.trim()) {
-            setError(t('user_account.errors.review_title_required')); // Use translation
+            setError(t('user_account.errors.review_title_required'));
             return;
         }
         if (!reviewForm.comment.trim()) {
-            setError(t('user_account.errors.review_comment_required')); // Use translation
+            setError(t('user_account.errors.review_comment_required'));
             return;
         }
         try {
@@ -300,14 +593,14 @@ const UserAccount = () => {
                 booking_id: ''
             });
             setError(null);
-            alert(editingReview ? t('user_account.success.review_updated') : t('user_account.success.review_submitted')); // Use translation
+            alert(editingReview ? t('user_account.success.review_updated') : t('user_account.success.review_submitted'));
         } catch (err) {
-            setError(t('user_account.errors.failed_submit_review')); // Use translation
+            setError(t('user_account.errors.failed_submit_review'));
         }
     };
 
     const handleDeleteReview = async (reviewId) => {
-        if (!window.confirm(t('user_account.confirm.delete_review'))) { // Use translation
+        if (!window.confirm(t('user_account.confirm.delete_review'))) {
             return;
         }
         try {
@@ -315,15 +608,15 @@ const UserAccount = () => {
             loadReviews();
             loadBookings();
             setError(null);
-            alert(t('user_account.success.review_deleted')); // Use translation
+            alert(t('user_account.success.review_deleted'));
         } catch (err) {
-            setError(t('user_account.errors.failed_delete_review')); // Use translation
+            setError(t('user_account.errors.failed_delete_review'));
         }
     };
 
     const handleReactToReview = async (reviewId) => {
         if (reactionForm.reaction_type === 'dislike' && !reactionForm.comment.trim()) {
-            setError(t('user_account.errors.dislike_comment_required')); // Use translation
+            setError(t('user_account.errors.dislike_comment_required'));
             return;
         }
         try {
@@ -332,9 +625,9 @@ const UserAccount = () => {
             loadReviewSummary(reviewId);
             setReactionForm({ reaction_type: 'like', comment: '' });
             setError(null);
-            alert(t('user_account.success.reaction_submitted')); // Use translation
+            alert(t('user_account.success.reaction_submitted'));
         } catch (err) {
-            setError(t('user_account.errors.failed_submit_reaction')); // Use translation
+            setError(t('user_account.errors.failed_submit_reaction'));
         }
     };
 
@@ -344,9 +637,9 @@ const UserAccount = () => {
             loadReviewReactions(reviewId);
             loadReviewSummary(reviewId);
             setError(null);
-            alert(t('user_account.success.reaction_removed')); // Use translation
+            alert(t('user_account.success.reaction_removed'));
         } catch (err) {
-            setError(t('user_account.errors.failed_remove_reaction')); // Use translation
+            setError(t('user_account.errors.failed_remove_reaction'));
         }
     };
 
@@ -375,7 +668,7 @@ const UserAccount = () => {
 
     const handleCancelBooking = async () => {
         if (!cancelReason.trim()) {
-            setError(t('user_account.errors.cancellation_reason_required')); // Use translation
+            setError(t('user_account.errors.cancellation_reason_required'));
             return;
         }
         try {
@@ -385,9 +678,9 @@ const UserAccount = () => {
             setSelectedBookingForCancel(null);
             setCancelReason('');
             setError(null);
-            alert(t('user_account.success.booking_cancelled')); // Use translation
+            alert(t('user_account.success.booking_cancelled'));
         } catch (err) {
-            setError(t('user_account.errors.failed_cancel_booking')); // Use translation
+            setError(t('user_account.errors.failed_cancel_booking'));
         }
     };
 
@@ -399,7 +692,7 @@ const UserAccount = () => {
         const nextWeek = new Date(today);
         nextWeek.setDate(nextWeek.getDate() + 7);
         setBookingForm({
-            title: t('user_account.forms.booking.title_default', { guideName: guide.user?.full_name || 'Guide' }), // Use translation with interpolation
+            title: t('user_account.forms.booking.title_default', { guideName: guide.user?.full_name || 'Guide' }),
             description: '',
             start_date: tomorrow.toISOString().split('T')[0],
             end_date: nextWeek.toISOString().split('T')[0],
@@ -422,7 +715,7 @@ const UserAccount = () => {
             title: t('user_account.forms.review.title_default', {
                 guideName: booking.customer_profile?.user?.full_name || 'Unknown',
                 bookingTitle: booking.title
-            }), // Use translation with interpolation
+            }),
             comment: '',
             booking_id: booking.id
         });
@@ -506,9 +799,6 @@ const UserAccount = () => {
                 <h1 className="user-account-title">{t('user_account.title')}</h1>
                 {currentUser && (
                     <div className="user-account-user-info">
-                        <span className="user-account-welcome">
-                            {t('user_account.welcome', { name: currentUser.full_name })}
-                        </span>
                         <button
                             className="user-account-chat-btn"
                             onClick={() => setShowChat(true)}
@@ -713,11 +1003,51 @@ const UserAccount = () => {
                                             <button
                                                 type="button"
                                                 className="user-account-btn user-account-btn-secondary"
-                                                onClick={() => setShowProfileForm(false)}
+                                                onClick={() => {
+                                                    setShowProfileForm(false);
+                                                    setProfileForm({
+                                                        ...profileForm,
+                                                        avatar: null,
+                                                        avatarPreview: null
+                                                    });
+                                                }}
                                             >
                                                 {t('user_account.buttons.cancel')}
                                             </button>
                                         )}
+                                    </div>
+                                </form>
+                                <form onSubmit={handleAvatarSubmit} className="user-account-form">
+                                    <div className="user-account-form-group">
+                                        <label className="user-account-label">{t('user_account.forms.profile.avatar')}</label>
+                                        <input
+                                            type="file"
+                                            className="user-account-file-input"
+                                            accept="image/*"
+                                            onChange={handleAvatarChange}
+                                        />
+                                        {(profile?.avatar || profileForm.avatarPreview) && (
+                                            <img
+                                                src={
+                                                    profileForm.avatarPreview ||
+                                                    (profile?.avatar?.startsWith('http')
+                                                        ? profile.avatar
+                                                        : `${API_URL.replace('/api/v1/', '')}${profile.avatar}`)
+                                                }
+                                                alt="Avatar preview"
+                                                className="user-account-avatar-preview"
+                                                style={{ width: '120px', height: '120px', borderRadius: '50%', marginTop: '12px', objectFit: 'cover', border: '2px solid #e2e8f0' }}
+                                                onError={(e) => {
+                                                    e.target.src = '/placeholder-avatar.png';
+                                                    console.error("Avatar yuklanmadi:", e);
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                    <div className="user-account-form-actions">
+                                        <button type="submit" className="user-account-btn user-account-btn-primary">
+                                            {t('user_account.buttons.upload_avatar')}
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -752,6 +1082,32 @@ const UserAccount = () => {
                                                 ? profile.languages.map(id => languages.find(l => l.id === id)?.name).join(', ')
                                                 : t('user_account.profile.not_set')}
                                         </p>
+                                    </div>
+                                    <div className="user-account-profile-field">
+                                        <label className="user-account-profile-label">{t('user_account.forms.profile.avatar')}</label>
+                                        {profile.avatar ? (
+                                            <img
+                                                src={
+                                                    profile.avatar.startsWith('http')
+                                                        ? profile.avatar
+                                                        : `${API_URL.replace('/api/v1/', '')}${profile.avatar}`
+                                                }
+                                                alt="Avatar"
+                                                className="user-account-avatar-preview"
+                                                style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #e2e8f0' }}
+                                                onError={(e) => {
+                                                    e.target.src = '/placeholder-avatar.png';
+                                                    console.error("Avatar yuklanmadi:", e);
+                                                }}
+                                            />
+                                        ) : (
+                                            <img
+                                                src="/placeholder-avatar.png"
+                                                alt="No avatar"
+                                                className="user-account-avatar-preview"
+                                                style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #e2e8f0' }}
+                                            />
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -1033,7 +1389,7 @@ const UserAccount = () => {
                                                 <div className="user-account-review-rating">
                                                     {'★'.repeat(review.overall_rating)}{'☆'.repeat(5 - review.overall_rating)}
                                                     <span className="user-account-review-rating-text">
-                                                        {t('user_account.reviews.rating', { rating: review.overall_rating })}
+                                                        {review.overall_rating}/5
                                                     </span>
                                                 </div>
                                                 <span className="user-account-review-date">
@@ -1161,7 +1517,6 @@ const UserAccount = () => {
                     </div>
                 )}
             </div>
-
             {/* Booking Form Modal */}
             {showBookingForm && selectedGuide && (
                 <div className="user-account-modal">
@@ -1258,7 +1613,6 @@ const UserAccount = () => {
                     </div>
                 </div>
             )}
-
             {/* Review Form Modal */}
             {showReviewForm && selectedBookingForReview && (
                 <div className="user-account-modal">
@@ -1381,7 +1735,6 @@ const UserAccount = () => {
                     </div>
                 </div>
             )}
-
             {/* Cancel Booking Modal */}
             {showCancelModal && selectedBookingForCancel && (
                 <div className="user-account-modal">
@@ -1418,7 +1771,6 @@ const UserAccount = () => {
                     </div>
                 </div>
             )}
-
             {/* Reactions Modal */}
             {showReactionsModal && selectedReviewForReactions && (
                 <div className="user-account-modal">
@@ -1477,7 +1829,6 @@ const UserAccount = () => {
                     </div>
                 </div>
             )}
-
             {/* Chat Widget */}
             {showChat && (
                 <div className="user-account-chat">

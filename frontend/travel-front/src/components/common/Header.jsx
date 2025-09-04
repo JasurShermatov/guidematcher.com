@@ -16,9 +16,110 @@ import {
 } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 import { changeLanguage } from "../../i18n";
-import { logoutUser } from "../../api/api";
+import axios from "axios";
 import "./Header.css";
 
+// API Configuration
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/";
+
+const api = axios.create({
+    baseURL: API_URL,
+    headers: { "Content-Type": "application/json" },
+    withCredentials: false,
+});
+
+// Token Interceptor
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
+        headers: config.headers,
+        data: config.data,
+    });
+    return config;
+});
+
+// Token Refresh Interceptor
+api.interceptors.response.use(
+    (response) => {
+        console.log(`API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
+            status: response.status,
+            data: response.data,
+        });
+        return response;
+    },
+    async (error) => {
+        console.error(`API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message,
+        });
+        const originalRequest = error.config;
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            try {
+                const refreshToken = localStorage.getItem("refresh_token");
+                if (!refreshToken) {
+                    throw new Error("No refresh token available");
+                }
+                const refreshResponse = await api.post("token/refresh/", {
+                    refresh: refreshToken,
+                });
+                const newAccessToken = refreshResponse.data.access_token || refreshResponse.data.access;
+                localStorage.setItem("access_token", newAccessToken);
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                return api(originalRequest);
+            } catch (refreshError) {
+                console.error("Token refresh failed:", refreshError);
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("refresh_token");
+                window.location.href = "/login";
+                return Promise.reject(refreshError);
+            }
+        }
+        let errorMessage = "Unknown error occurred";
+        if (error.response?.data) {
+            const data = error.response.data;
+            errorMessage =
+                data.detail ||
+                data.message ||
+                data.error ||
+                (data.email && data.email[0]) ||
+                (data.code && data.code[0]) ||
+                (data.non_field_errors && data.non_field_errors[0]) ||
+                JSON.stringify(data);
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        return Promise.reject(new Error(errorMessage));
+    }
+);
+
+// Logout API Function
+const logoutUser = () => {
+    const refreshToken = localStorage.getItem("refresh_token");
+    console.log("Logging out user");
+
+    return api
+        .post("accounts/logout/", {
+            refresh: refreshToken,
+        })
+        .then((r) => {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            return r.data;
+        })
+        .catch((error) => {
+            console.error("Logout error:", error);
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            return { detail: "Logged out" };
+        });
+};
+
+// React Component
 const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuthState }) => {
     const { t } = useTranslation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -372,21 +473,6 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                                 <FiX />
                             </button>
                         </div>
-
-                        {!hideMenu && (
-                            <nav className="header-mobile-nav">
-                                {menuItems.map((item, index) => (
-                                    <Link
-                                        key={index}
-                                        to={item.href.startsWith("/") ? item.href : `#${item.href}`}
-                                        className="header-mobile-nav-link"
-                                        onClick={toggleMenu}
-                                    >
-                                        {item.label}
-                                    </Link>
-                                ))}
-                            </nav>
-                        )}
 
                         <div className="header-mobile-controls">
                             {/* Mobile Theme Controls */}

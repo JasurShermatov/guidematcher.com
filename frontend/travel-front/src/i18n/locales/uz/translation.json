@@ -413,8 +413,8 @@
       "messages": "Xabarlar",
       "cancel": "Bekor qilish",
       "write_review": "Sharh yozish",
-      "chat_with_guide": "Yo'riqchi bilan suhbat",
-      "book_now": "Hozir band qilish",
+      "chat_with_guide": "Yo'lboshchi bilan suhbat",
+      "book_now": "Hoziroq bron qilish",
       "unavailable": "Mavjud emas",
       "chat": "Suhbat",
       "edit": "Tahrirlash",
@@ -426,25 +426,26 @@
       "edit_profile": "Profilni tahrirlash",
       "update_profile": "Profilni yangilash",
       "create_profile": "Profil yaratish",
-      "submit_booking": "Band qilishni yuborish",
+      "submit_booking": "Bronlashni yuborish",
       "submit_cancellation": "Bekor qilishni yuborish",
       "submit_review": "Sharhni yuborish",
       "update_review": "Sharhni yangilash",
-      "close": "Yopish"
+      "close": "Yopish",
+      "upload_avatar": "Avatar yuklash"
     },
     "navigation": {
       "dashboard": "Boshqaruv paneli",
       "profile": "Profil",
-      "guides": "Yo'riqchilar",
-      "bookings": "Band qilishlar",
+      "guides": "Yo'lboshchilar",
+      "bookings": "Bronlashlar",
       "reviews": "Sharhlar"
     },
     "dashboard": {
-      "total_bookings": "Jami band qilishlar",
-      "active_bookings": "Faol band qilishlar",
+      "total_bookings": "Jami bronlashlar",
+      "active_bookings": "Faol bronlashlar",
       "completed_trips": "Tugallangan sayohatlar",
       "reviews_written": "Yozilgan sharhlar",
-      "recent_bookings": "So'nggi band qilishlar"
+      "recent_bookings": "Yaqin bronlashlar"
     },
     "status": {
       "pending": "Kutilmoqda",
@@ -456,13 +457,14 @@
     "profile": {
       "edit_profile": "Profilni tahrirlash",
       "create_profile": "Profil yaratish",
-      "profile_information": "Profil haqida ma'lumot",
-      "not_set": "Belgilanmagan",
+      "profile_information": "Profil ma'lumotlari",
+      "not_set": "O'rnatilmagan",
       "forms": {
         "profile": {
           "date_of_birth": "Tug'ilgan sana",
           "preferred_contact": "Afzal aloqa usuli",
           "languages": "Tillar",
+          "avatar": "Avatar",
           "contact_options": {
             "email": "Elektron pochta",
             "phone": "Telefon",
@@ -472,10 +474,10 @@
       }
     },
     "guides": {
-      "find_guides": "Yo'riqchilarni topish",
-      "search_placeholder": "Yo'riqchilarni qidirish...",
+      "find_guides": "Yo'lboshchilarni topish",
+      "search_placeholder": "Yo'lboshchilarni qidirish...",
       "years_experience": "{{years}} yil tajriba",
-      "rating": "{{rating}} dan {{count}} sharh",
+      "rating": "{{count}} sharhdan {{rating}}",
       "hourly_rate": "${{rate}}/soat",
       "daily_rate": "${{rate}}/kun",
       "filters": {
@@ -490,10 +492,10 @@
       }
     },
     "bookings": {
-      "title": "Mening band qilishlarim",
-      "booking_title": "Band qilish: {{title}}",
+      "title": "Mening bronlashlarim",
+      "booking_title": "Bronlash: {{title}}",
       "description": "Tavsif: {{description}}",
-      "not_set": "Belgilanmagan",
+      "not_set": "O'rnatilmagan",
       "cancellation_reason": "Bekor qilish sababi"
     },
     "reviews": {
@@ -506,16 +508,16 @@
       "communication": "Aloqa",
       "service": "Xizmat",
       "punctuality": "O'z vaqtida bo'lish",
-      "value": "Qadr",
-      "booking_details": "Band qilish: {{title}} ({{startDate}} - {{endDate}})",
+      "value": "Qiymat",
+      "booking_details": "Bronlash: {{title}} ({{startDate}} - {{endDate}})",
       "likes": "Yoqdi: {{count}}",
       "dislikes": "Yoqmadi: {{count}}",
       "reactions_title": "Sharh reaksiyalari",
       "reaction_summary": "Reaksiyalar xulosasi",
-      "latest_likes": "So'nggi yoqdi",
-      "latest_dislikes": "So'nggi yoqmadi",
-      "no_likes": "Hali yoqdi yo'q",
-      "no_dislikes": "Hali yoqmadi yo'q",
+      "latest_likes": "So'nggi yoqdi reaksiyalari",
+      "latest_dislikes": "So'nggi yoqmadi reaksiyalari",
+      "no_likes": "Hali yoqdi reaksiyalari yo'q",
+      "no_dislikes": "Hali yoqmadi reaksiyalari yo'q",
       "no_comment": "Izoh berilmagan",
       "add_reaction": "Reaksiya qo'shish",
       "filters": {
@@ -527,24 +529,24 @@
         "rating_1": "1 yulduz",
         "newest_first": "Avval yangilar",
         "oldest_first": "Avval eskilari",
-        "highest_rated": "Eng yuqori reyting",
-        "lowest_rated": "Eng past reyting"
+        "highest_rated": "Yuqori reytinglilar avval",
+        "lowest_rated": "Past reytinglilar avval"
       },
       "summary": {
         "total_reviews": "Jami sharhlar",
         "avg_overall_rating": "O'rtacha umumiy reyting",
         "avg_communication": "O'rtacha aloqa",
         "avg_service": "O'rtacha xizmat",
-        "avg_punctuality": "O'rtacha o'z vaqtida bo'lish",
-        "avg_value": "O'rtacha qadr"
+        "avg_punctuality": "O'rtacha punktualik",
+        "avg_value": "O'rtacha qiymat"
       }
     },
     "forms": {
       "booking": {
-        "title": "{{guideName}} ni band qilish",
-        "title_label": "Sarlavha",
-        "title_placeholder": "Band qilish sarlavhasini kiriting",
-        "title_default": "{{guideName}} bilan band qilish",
+        "title": "{{guideName}} bilan bronlash",
+        "title_label": "Nomi",
+        "title_placeholder": "Bronlash nomini kiriting",
+        "title_default": "{{guideName}} bilan bronlash",
         "description": "Tavsif",
         "description_placeholder": "Sayohatingizni tasvirlang",
         "start_date": "Boshlanish sanasi",
@@ -553,23 +555,23 @@
         "special_requirements_placeholder": "Maxsus talablar bormi?",
         "budget": "Byudjet",
         "budget_placeholder": "Byudjetingizni kiriting",
-        "daily_rate_note": "Yo'riqchi kunlik narxi: ${{rate}}",
-        "hourly_rate_note": "Yo'riqchi soatlik narxi: ${{rate}}"
+        "daily_rate_note": "Yo'lboshchi kunlik narxi: ${{rate}}",
+        "hourly_rate_note": "Yo'lboshchi soatlik narxi: ${{rate}}"
       },
       "review": {
-        "write_title": "{{guideName}} uchun sharh yozish - {{bookingTitle}}",
-        "edit_title": "{{guideName}} uchun sharhni tahrirlash - {{bookingTitle}}",
-        "title_default": "{{guideName}} uchun sharh - {{bookingTitle}}",
+        "write_title": "{{guideName}} - {{bookingTitle}} uchun sharh yozish",
+        "edit_title": "{{guideName}} - {{bookingTitle}} uchun sharhni tahrirlash",
+        "title_default": "{{guideName}} - {{bookingTitle}} uchun sharh",
         "overall_rating": "Umumiy reyting",
         "communication_rating": "Aloqa reytingi",
         "service_rating": "Xizmat reytingi",
-        "punctuality_rating": "O'z vaqtida bo'lish reytingi",
-        "value_rating": "Qadr reytingi",
-        "title": "Sharh sarlavhasi",
-        "title_placeholder": "Sharh sarlavhasini kiriting",
+        "punctuality_rating": "Punktualik reytingi",
+        "value_rating": "Qiymat reytingi",
+        "title": "Sharh nomi",
+        "title_placeholder": "Sharh nomini kiriting",
         "comment": "Izoh",
         "comment_placeholder": "Sharhingizni yozing...",
-        "star": "{{count}} yulduz"
+        "star": "{{count}} yulduz{{count > 1 ? 'lar' : ''}}"
       },
       "reaction": {
         "reaction_type": "Reaksiya turi",
@@ -580,100 +582,117 @@
         "dislike_placeholder": "Nima uchun bu sharh sizga yoqmadi?"
       },
       "cancel_booking": {
-        "title": "Band qilishni bekor qilish",
+        "title": "Bronlashni bekor qilish",
         "reason": "Bekor qilish sababi",
-        "reason_placeholder": "Iltimos, bekor qilish sababini ko'rsating"
+        "reason_placeholder": "Iltimos, bekor qilish sababini taqdim eting"
+      },
+      "profile": {
+        "date_of_birth": "Tug'ilgan sana",
+        "preferred_contact": "Afzal ko'rilgan aloqa usuli",
+        "languages": "Tillar",
+        "avatar": "Avatar",
+        "contact_options": {
+          "email": "Elektron pochta",
+          "phone": "Telefon",
+          "chat": "Chat"
+        }
       }
     },
     "errors": {
       "fill_required_fields": "Iltimos, barcha majburiy maydonlarni to'ldiring",
-      "start_date_required": "Boshlanish sanasi majburiydir",
-      "end_date_required": "Tugash sanasi majburiydir",
-      "title_required": "Sarlavha majburiydir",
+      "start_date_required": "Boshlanish sanasi talab qilinadi",
+      "end_date_required": "Tugash sanasi talab qilinadi",
+      "title_required": "Nomi majburiydir",
       "start_date_before_end": "Boshlanish sanasi tugash sanasidan oldin bo'lishi kerak",
       "start_date_past": "Boshlanish sanasi o'tmishda bo'lishi mumkin emas",
-      "failed_create_booking": "Band qilishni yaratish muvaffaqiyatsiz tugadi",
-      "review_title_required": "Sharh sarlavhasi majburiydir",
+      "failed_create_booking": "Bronlashni yaratish muvaffaqiyatsiz yakunlandi",
+      "review_title_required": "Sharh nomi majburiydir",
       "review_comment_required": "Sharh izohi majburiydir",
-      "failed_submit_review": "Sharhni yuborish muvaffaqiyatsiz tugadi",
-      "failed_delete_review": "Sharhni o'chirish muvaffaqiyatsiz tugadi",
-      "dislike_comment_required": "Yoqmadi reaksiyasi uchun izoh majburiydir",
-      "failed_submit_reaction": "Reaksiyani yuborish muvaffaqiyatsiz tugadi",
-      "failed_remove_reaction": "Reaksiyani o'chirish muvaffaqiyatsiz tugadi",
-      "failed_load_reactions": "Reaksiyalarni yuklash muvaffaqiyatsiz tugadi",
-      "failed_load_review_summary": "Sharhlar xulosasini yuklash muvaffaqiyatsiz tugadi",
-      "failed_cancel_booking": "Band qilishni bekor qilish muvaffaqiyatsiz tugadi",
-      "cancellation_reason_required": "Bekor qilish sababi majburiydir"
+      "failed_submit_review": "Sharhni yuborish muvaffaqiyatsiz yakunlandi",
+      "failed_delete_review": "Sharhni o'chirish muvaffaqiyatsiz yakunlandi",
+      "dislike_comment_required": "Yoqmadi reaksiyasi uchun izoh talab qilinadi",
+      "failed_submit_reaction": "Reaksiyani yuborish muvaffaqiyatsiz yakunlandi",
+      "failed_remove_reaction": "Reaksiyani o'chirish muvaffaqiyatsiz yakunlandi",
+      "failed_load_reactions": "Reaksiyalarni yuklash muvaffaqiyatsiz yakunlandi",
+      "failed_load_review_summary": "Sharhlar xulosasini yuklash muvaffaqiyatsiz yakunlandi",
+      "failed_cancel_booking": "Bronlashni bekor qilish muvaffaqiyatsiz yakunlandi",
+      "cancellation_reason_required": "Bekor qilish sababi majburiydir",
+      "avatar_required": "Avatar fayli majburiydir",
+      "avatar_upload_failed": "Avatar yuklash muvaffaqiyatsiz yakunlandi"
     },
     "success": {
-      "booking_created": "Band qilish muvaffaqiyatli yaratildi",
+      "booking_created": "Bronlash muvaffaqiyatli yaratildi",
       "review_submitted": "Sharh muvaffaqiyatli yuborildi",
       "review_updated": "Sharh muvaffaqiyatli yangilandi",
       "review_deleted": "Sharh muvaffaqiyatli o'chirildi",
       "reaction_submitted": "Reaksiya muvaffaqiyatli yuborildi",
       "reaction_removed": "Reaksiya muvaffaqiyatli o'chirildi",
-      "booking_cancelled": "Band qilish muvaffaqiyatli bekor qilindi"
+      "booking_cancelled": "Bronlash muvaffaqiyatli bekor qilindi",
+      "profile_created": "Profil muvaffaqiyatli yaratildi",
+      "profile_updated": "Profil muvaffaqiyatli yangilandi",
+      "avatar_updated": "Avatar muvaffaqiyatli yangilandi"
     },
     "confirm": {
-      "delete_review": "Bu sharhni o'chirishga ishonchingiz komilmi?"
+      "delete_review": "Ushbu sharhni o'chirishni xohlaysizmi?"
     }
   },
   "guideAccount": {
-    "title": "Yo'riqnoma hisobi",
+    "title": "Yo'lboshchi hisobi",
     "welcome": "Xush kelibsiz, {name}",
     "messages": "Xabarlar",
     "loading": "Yuklanmoqda...",
     "error": {
-      "requiredFields": "Majburiy maydonlar yetishmayapti",
+      "requiredFields": "Majburiy maydonlar kiritilmagan",
       "noProfile": "Profil topilmadi, foydalanuvchi profil yaratishi kerak",
       "failedToLoadBookings": "Bronlarni yuklash muvaffaqiyatsiz yakunlandi",
       "failedToLoadReviews": "Sharhlarni yuklash muvaffaqiyatsiz yakunlandi",
       "failedToLoadReviewSummary": "Sharhlar xulosasini yuklash muvaffaqiyatsiz yakunlandi",
       "failedToLoadPortfolio": "Portfelni yuklash muvaffaqiyatsiz yakunlandi",
-      "failedToLoadAvailability": "Mavjudlikni yuklash muvaffaqiyatsiz yakunlandi",
-      "profileRequired": "Professional biografiya va shahar talab qilinadi",
-      "portfolioTitleRequired": "Portfel sarlavhasi talab qilinadi",
-      "dateRequired": "Sana talab qilinadi",
+      "failedToLoadUnavailability": "Mavjud bo'lmagan vaqtlarni yuklash muvaffaqiyatsiz yakunlandi",
+      "profileRequired": "Professional biografiya va shahar kiritilishi shart",
+      "portfolioTitleRequired": "Portfel nomi majburiydir",
+      "datesRequired": "Boshlanish va tugash sanalari kiritilishi kerak",
+      "invalidDateRange": "Tugash sanasi boshlanish sanasidan oldin bo'lishi mumkin emas",
       "failedToSaveProfile": "Profilni saqlash muvaffaqiyatsiz yakunlandi",
       "failedToSavePortfolio": "Portfel elementini saqlash muvaffaqiyatsiz yakunlandi",
-      "failedToSaveAvailability": "Mavjudlikni saqlash muvaffaqiyatsiz yakunlandi",
+      "failedToSaveUnavailability": "Mavjud bo'lmagan vaqtni saqlash muvaffaqiyatsiz yakunlandi",
       "failedToProcessBooking": "Bronlash amalini bajarish muvaffaqiyatsiz yakunlandi",
       "failedToDeletePortfolio": "Portfel elementini o'chirish muvaffaqiyatsiz yakunlandi",
-      "failedToDeleteAvailability": "Mavjudlikni o'chirish muvaffaqiyatsiz yakunlandi",
+      "failedToDeleteUnavailability": "Mavjud bo'lmagan vaqtni o'chirish muvaffaqiyatsiz yakunlandi",
       "noClientEmail": "Mijozning elektron pochta manzili mavjud emas",
-      "reactionRequired": "Reaksiya turi yoki izoh talab qilinadi",
+      "reactionRequired": "Reaksiya turi yoki izoh kiritilishi shart",
       "failedToSubmitReaction": "Reaksiyani yuborish muvaffaqiyatsiz yakunlandi",
       "failedToRemoveReaction": "Reaksiyani o'chirish muvaffaqiyatsiz yakunlandi",
-      "cancelReasonRequired": "Bekor qilish sababi talab qilinadi"
+      "cancelReasonRequired": "Bekor qilish sababi kiritilishi shart"
     },
     "success": {
       "profileCreated": "Profil muvaffaqiyatli yaratildi",
       "profileUpdated": "Profil muvaffaqiyatli yangilandi",
       "portfolioCreated": "Portfel elementi muvaffaqiyatli yaratildi",
       "portfolioUpdated": "Portfel elementi muvaffaqiyatli yangilandi",
-      "availabilityCreated": "Mavjudlik muvaffaqiyatli yaratildi",
-      "availabilityUpdated": "Mavjudlik muvaffaqiyatli yangilandi",
+      "unavailabilityCreated": "Mavjud bo'lmagan vaqt muvaffaqiyatli yaratildi",
+      "unavailabilityUpdated": "Mavjud bo'lmagan vaqt muvaffaqiyatli yangilandi",
       "bookingAccepted": "Bronlash muvaffaqiyatli qabul qilindi",
       "bookingCancelled": "Bronlash muvaffaqiyatli bekor qilindi",
       "portfolioDeleted": "Portfel elementi muvaffaqiyatli o'chirildi",
-      "availabilityDeleted": "Mavjudlik muvaffaqiyatli o'chirildi",
+      "unavailabilityDeleted": "Mavjud bo'lmagan vaqt muvaffaqiyatli o'chirildi",
       "reactionSubmitted": "Reaksiya muvaffaqiyatli yuborildi",
       "reactionRemoved": "Reaksiya muvaffaqiyatli o'chirildi"
     },
     "navigation": {
       "dashboard": "Boshqaruv paneli",
       "profile": "Profil",
-      "bookings": "Bronlar",
+      "bookings": "Bronlashlar",
       "portfolio": "Portfel",
-      "availability": "Mavjudlik",
+      "unavailability": "Mavjud emaslik",
       "reviews": "Sharhlar"
     },
     "dashboard": {
-      "totalBookings": "Jami bronlar",
-      "activeBookings": "Faol bronlar",
+      "totalBookings": "Jami bronlashlar",
+      "activeBookings": "Faol bronlashlar",
       "totalReviews": "Jami sharhlar",
       "averageRating": "O'rtacha reyting",
-      "recentBookings": "Yaqin bronlar",
+      "recentBookings": "Yaqin bronlashlar",
       "bookingStatus": "{status}",
       "accept": "Qabul qilish",
       "decline": "Rad etish",
@@ -682,14 +701,14 @@
     "profile": {
       "createProfile": "Profil yaratish",
       "editProfile": "Profilni tahrirlash",
-      "profileInformation": "Profil haqida ma'lumot",
+      "profileInformation": "Profil ma'lumotlari",
       "professionalBio": "Professional biografiya",
       "bioPlaceholder": "Professional biografiyangizni kiriting",
       "yearsOfExperience": "Tajriba yillari",
       "city": "Shahar",
       "selectCity": "Shahar tanlang",
-      "serviceAreas": "Xizmat hududlari",
-      "serviceAreasPlaceholder": "Xizmat hududlarini kiriting (masalan, Toshkent, Samarqand)",
+      "serviceAreas": "Xizmat ko'rsatish hududlari",
+      "serviceAreasPlaceholder": "Xizmat ko'rsatish hududlarini kiriting (masalan, Toshkent, Samarqand)",
       "serviceTypes": "Xizmat turlari",
       "hourlyRate": "Soatlik narx",
       "hourlyRatePlaceholder": "Soatlik narxni kiriting",
@@ -704,27 +723,28 @@
       "availability": "Mavjudlik",
       "available": "Mavjud",
       "notAvailable": "Mavjud emas",
+      "avatar": "Avatar",
+      "notSet": "O'rnatilmagan",
       "updateProfile": "Profilni yangilash",
       "createProfileButton": "Profil yaratish",
       "cancel": "Bekor qilish",
-      "editProfileButton": "Profilni tahrirlash",
-      "years": "yil"
+      "editProfileButton": "Profilni tahrirlash"
     },
     "bookings": {
-      "myBookings": "Mening bronlarim",
+      "myBookings": "Mening bronlashlarim",
       "dates": "{start} - {end}",
       "accept": "Qabul qilish",
       "decline": "Rad etish",
       "chatWithClient": "Mijoz bilan suhbat"
     },
     "portfolio": {
-      "myPortfolio": "Mening portfelim",
+      "myPortfolio": "Mening portfelyim",
       "addPortfolioItem": "Portfel elementini qo'shish",
       "editPortfolioItem": "Portfel elementini tahrirlash",
       "createPortfolioItem": "Portfel elementini yaratish",
       "updatePortfolioItem": "Portfel elementini yangilash",
-      "title": "Sarlavha",
-      "titlePlaceholder": "Portfel elementi sarlavhasini kiriting",
+      "title": "Nomi",
+      "titlePlaceholder": "Portfel elementi nomini kiriting",
       "description": "Tavsif",
       "descriptionPlaceholder": "Portfel elementi tavsifini kiriting",
       "image": "Rasm",
@@ -733,32 +753,30 @@
       "edit": "Tahrirlash",
       "delete": "O'chirish",
       "cancel": "Bekor qilish",
-      "deleteConfirm": "Ushbu portfel elementini o'chirishga ishonchingiz komilmi?"
+      "deleteConfirm": "Ushbu portfel elementini o'chirishni xohlaysizmi?"
     },
-    "availability": {
-      "myAvailability": "Mening mavjudligim",
-      "addAvailability": "Mavjudlik qo'shish",
-      "editAvailability": "Mavjudlikni tahrirlash",
-      "createAvailability": "Mavjudlik yaratish",
-      "updateAvailability": "Mavjudlikni yangilash",
-      "date": "Sana",
-      "available": "Mavjud",
-      "unavailable": "Mavjud emas",
-      "startTime": "Boshlanish vaqti",
-      "endTime": "Tugash vaqti",
-      "note": "Eslatma",
-      "notePlaceholder": "Qo'shimcha eslatmalarni kiriting",
-      "allDay": "Butun kun",
+    "unavailability": {
+      "myUnavailability": "Mening mavjud emasligim",
+      "addUnavailability": "Mavjud emaslik qo'shish",
+      "editUnavailability": "Mavjud emaslikni tahrirlash",
+      "createUnavailability": "Mavjud emaslikni yaratish",
+      "updateUnavailability": "Mavjud emaslikni yangilash",
+      "startDate": "Boshlanish sanasi",
+      "endDate": "Tugash sanasi",
+      "reason": "Sabab",
+      "reasonPlaceholder": "Mavjud emaslik sababini kiriting (ixtiyoriy)",
+      "noReason": "Sabab kiritilmagan",
+      "dates": "{start} - {end}",
       "edit": "Tahrirlash",
       "delete": "O'chirish",
       "cancel": "Bekor qilish",
-      "deleteConfirm": "Ushbu mavjudlikni o'chirishga ishonchingiz komilmi?"
+      "deleteConfirm": "Ushbu mavjud emaslik davrini o'chirishni xohlaysizmi?"
     },
     "reviews": {
       "myReviews": "Mening sharhlarim",
       "reviewSummary": "Sharhlar xulosasi",
       "overallRating": "Umumiy reyting",
-      "communication": "Muloqot",
+      "communication": "Aloqa",
       "service": "Xizmat",
       "punctuality": "O'z vaqtida bo'lish",
       "value": "Qiymat",
@@ -772,16 +790,17 @@
         "1": "1 yulduz"
       },
       "sortBy": {
-        "newestFirst": "Avval yangilari",
-        "oldestFirst": "Avval eskilar",
-        "highestRated": "Eng yuqori reyting",
-        "lowestRated": "Eng past reyting"
+        "newestFirst": "Avval yangilar",
+        "oldestFirst": "Avval eskilari",
+        "highestRated": "Yuqori reytinglilar avval",
+        "lowestRated": "Past reytinglilar avval"
       },
       "noReviews": "Sharhlar mavjud emas",
+      "date": "Sana",
       "react": "Reaksiya qilish",
       "removeReaction": "Reaksiyani o'chirish",
       "reactionType": "Reaksiya turi",
-      "like": "Yoqdi",
+      "like": "Yoqadi",
       "comment": "Izoh",
       "report": "Shikoyat qilish",
       "commentPlaceholder": "Izohingizni kiriting",

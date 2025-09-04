@@ -430,7 +430,8 @@
       "submit_cancellation": "Submit Cancellation",
       "submit_review": "Submit Review",
       "update_review": "Update Review",
-      "close": "Close"
+      "close": "Close",
+      "upload_avatar": "Upload Avatar"
     },
     "navigation": {
       "dashboard": "Dashboard",
@@ -463,6 +464,7 @@
           "date_of_birth": "Date of Birth",
           "preferred_contact": "Preferred Contact Method",
           "languages": "Languages",
+          "avatar": "Avatar",
           "contact_options": {
             "email": "Email",
             "phone": "Phone",
@@ -583,6 +585,17 @@
         "title": "Cancel Booking",
         "reason": "Reason for Cancellation",
         "reason_placeholder": "Please provide a reason for cancellation"
+      },
+      "profile": {
+        "date_of_birth": "Date of Birth",
+        "preferred_contact": "Preferred Contact Method",
+        "languages": "Languages",
+        "avatar": "Avatar",
+        "contact_options": {
+          "email": "Email",
+          "phone": "Phone",
+          "chat": "Chat"
+        }
       }
     },
     "errors": {
@@ -603,7 +616,9 @@
       "failed_load_reactions": "Failed to load reactions",
       "failed_load_review_summary": "Failed to load review summary",
       "failed_cancel_booking": "Failed to cancel booking",
-      "cancellation_reason_required": "Cancellation reason is required"
+      "cancellation_reason_required": "Cancellation reason is required",
+      "avatar_required": "Avatar file is required",
+      "avatar_upload_failed": "Failed to upload avatar"
     },
     "success": {
       "booking_created": "Booking created successfully",
@@ -612,7 +627,10 @@
       "review_deleted": "Review deleted successfully",
       "reaction_submitted": "Reaction submitted successfully",
       "reaction_removed": "Reaction removed successfully",
-      "booking_cancelled": "Booking cancelled successfully"
+      "booking_cancelled": "Booking cancelled successfully",
+      "profile_created": "Profile created successfully",
+      "profile_updated": "Profile updated successfully",
+      "avatar_updated": "Avatar updated successfully"
     },
     "confirm": {
       "delete_review": "Are you sure you want to delete this review?"
@@ -625,21 +643,22 @@
     "loading": "Loading...",
     "error": {
       "requiredFields": "Required fields are missing",
-      "noProfile": "No profile found, user needs to create one",
+      "noProfile": "No profile found, please create one",
       "failedToLoadBookings": "Failed to load bookings",
       "failedToLoadReviews": "Failed to load reviews",
       "failedToLoadReviewSummary": "Failed to load review summary",
       "failedToLoadPortfolio": "Failed to load portfolio",
-      "failedToLoadAvailability": "Failed to load availability",
+      "failedToLoadUnavailability": "Failed to load unavailability",
       "profileRequired": "Professional bio and city are required",
       "portfolioTitleRequired": "Portfolio title is required",
-      "dateRequired": "Date is required",
+      "datesRequired": "Start and end dates are required",
+      "invalidDateRange": "End date cannot be before start date",
       "failedToSaveProfile": "Failed to save profile",
       "failedToSavePortfolio": "Failed to save portfolio item",
-      "failedToSaveAvailability": "Failed to save availability",
+      "failedToSaveUnavailability": "Failed to save unavailability",
       "failedToProcessBooking": "Failed to process booking action",
       "failedToDeletePortfolio": "Failed to delete portfolio item",
-      "failedToDeleteAvailability": "Failed to delete availability",
+      "failedToDeleteUnavailability": "Failed to delete unavailability",
       "noClientEmail": "No client email available",
       "reactionRequired": "Reaction type or comment is required",
       "failedToSubmitReaction": "Failed to submit reaction",
@@ -651,12 +670,12 @@
       "profileUpdated": "Profile updated successfully",
       "portfolioCreated": "Portfolio item created successfully",
       "portfolioUpdated": "Portfolio item updated successfully",
-      "availabilityCreated": "Availability created successfully",
-      "availabilityUpdated": "Availability updated successfully",
+      "unavailabilityCreated": "Unavailability created successfully",
+      "unavailabilityUpdated": "Unavailability updated successfully",
       "bookingAccepted": "Booking accepted successfully",
       "bookingCancelled": "Booking cancelled successfully",
       "portfolioDeleted": "Portfolio item deleted successfully",
-      "availabilityDeleted": "Availability deleted successfully",
+      "unavailabilityDeleted": "Unavailability deleted successfully",
       "reactionSubmitted": "Reaction submitted successfully",
       "reactionRemoved": "Reaction removed successfully"
     },
@@ -665,7 +684,7 @@
       "profile": "Profile",
       "bookings": "Bookings",
       "portfolio": "Portfolio",
-      "availability": "Availability",
+      "unavailability": "Unavailability",
       "reviews": "Reviews"
     },
     "dashboard": {
@@ -704,11 +723,12 @@
       "availability": "Availability",
       "available": "Available",
       "notAvailable": "Not Available",
+      "avatar": "Avatar",
+      "notSet": "Not set",
       "updateProfile": "Update Profile",
       "createProfileButton": "Create Profile",
       "cancel": "Cancel",
-      "editProfileButton": "Edit Profile",
-      "years": "years"
+      "editProfileButton": "Edit Profile"
     },
     "bookings": {
       "myBookings": "My Bookings",
@@ -735,24 +755,22 @@
       "cancel": "Cancel",
       "deleteConfirm": "Are you sure you want to delete this portfolio item?"
     },
-    "availability": {
-      "myAvailability": "My Availability",
-      "addAvailability": "Add Availability",
-      "editAvailability": "Edit Availability",
-      "createAvailability": "Create Availability",
-      "updateAvailability": "Update Availability",
-      "date": "Date",
-      "available": "Available",
-      "unavailable": "Unavailable",
-      "startTime": "Start Time",
-      "endTime": "End Time",
-      "note": "Note",
-      "notePlaceholder": "Enter any additional notes",
-      "allDay": "All Day",
+    "unavailability": {
+      "myUnavailability": "My Unavailability",
+      "addUnavailability": "Add Unavailability",
+      "editUnavailability": "Edit Unavailability",
+      "createUnavailability": "Create Unavailability",
+      "updateUnavailability": "Update Unavailability",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "reason": "Reason",
+      "reasonPlaceholder": "Enter reason for unavailability (optional)",
+      "noReason": "No reason provided",
+      "dates": "{start} - {end}",
       "edit": "Edit",
       "delete": "Delete",
       "cancel": "Cancel",
-      "deleteConfirm": "Are you sure you want to delete this availability?"
+      "deleteConfirm": "Are you sure you want to delete this unavailability period?"
     },
     "reviews": {
       "myReviews": "My Reviews",
@@ -778,6 +796,7 @@
         "lowestRated": "Lowest Rated"
       },
       "noReviews": "No reviews available",
+      "date": "Date",
       "react": "React",
       "removeReaction": "Remove Reaction",
       "reactionType": "Reaction Type",

@@ -22,7 +22,7 @@ class AbstractProfile(BaseModel):
         upload_to="avatars/",
         null=True,
         blank=True,
-        default="avatars/img.png",
+        # default="avatars/img.png",
         verbose_name=_("Profile picture"),
     )
 

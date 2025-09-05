@@ -4,11 +4,124 @@ import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { loginUser, requestCode, registerUser, requestPasswordReset, confirmPasswordReset, getCurrentUserShort } from "../api/api";
+import axios from "axios";
 import "./Authentication.css";
 
+// API Configuration
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/";
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
+const api = axios.create({
+    baseURL: API_URL,
+    headers: { "Content-Type": "application/json" },
+    withCredentials: false,
+});
+
+// Token Interceptor
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
+        headers: config.headers,
+        data: config.data,
+    });
+    return config;
+});
+
+// Token Refresh Interceptor
+api.interceptors.response.use(
+    (response) => {
+        console.log(`API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
+            status: response.status,
+            data: response.data,
+        });
+        return response;
+    },
+    async (error) => {
+        console.error(`API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message,
+        });
+        const originalRequest = error.config;
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            try {
+                const refreshToken = localStorage.getItem("refresh_token");
+                if (!refreshToken) {
+                    throw new Error("No refresh token available");
+                }
+                const refreshResponse = await api.post("token/refresh/", {
+                    refresh: refreshToken,
+                });
+                const newAccessToken = refreshResponse.data.access_token || refreshResponse.data.access;
+                localStorage.setItem("access_token", newAccessToken);
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                return api(originalRequest);
+            } catch (refreshError) {
+                console.error("Token refresh failed:", refreshError);
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("refresh_token");
+                window.location.href = "/login";
+                return Promise.reject(refreshError);
+            }
+        }
+        let errorMessage = "Unknown error occurred";
+        if (error.response?.data) {
+            const data = error.response.data;
+            errorMessage =
+                data.detail ||
+                data.message ||
+                data.error ||
+                (data.email && data.email[0]) ||
+                (data.code && data.code[0]) ||
+                (data.non_field_errors && data.non_field_errors[0]) ||
+                JSON.stringify(data);
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        return Promise.reject(new Error(errorMessage));
+    }
+);
+
+// Necessary API Functions for Authentication
+const loginUser = (payload) => {
+    console.log("Logging in user:", { ...payload, password: "***" });
+    return api.post("accounts/login/", payload).then((r) => ({
+        access: r.data.access_token,
+        refresh: r.data.refresh_token,
+        user: r.data.user,
+    }));
+};
+
+const requestCode = (data) => {
+    console.log("Requesting verification code for:", data.email);
+    return api.post("accounts/request-code/", data).then((r) => r.data);
+};
+
+const registerUser = (data) => {
+    console.log("Registering user:", { ...data, password: "***" });
+    return api.post("accounts/register/", data).then((r) => ({
+        access: r.data.access_token,
+        refresh: r.data.refresh_token,
+        user: r.data.user,
+    }));
+};
+
+const requestPasswordReset = (data) =>
+    api.post("accounts/forgot-password/", data).then((r) => r.data);
+
+const confirmPasswordReset = (payload) =>
+    api.post("accounts/reset-password/", payload).then((r) => r.data);
+
+const getCurrentUserShort = () => {
+    console.log("Getting current user short info...");
+    return api.get("auth/users/short/").then((r) => r.data);
+};
+
+// React Component
 const Authentication = ({ setIsAuthenticated, setUser }) => {
     const { t, i18n } = useTranslation("translation");
     const [activeTab, setActiveTab] = useState("login");
@@ -266,7 +379,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setSuccessMessage(t("authentication.success.verification_code_sent", { defaultValue: "Verification code sent" }));
             setVerificationStep(true);
         } catch (error) {
-            const errorMsg = error.message.includes("Too many verification code requests")
+            const errorMsg = error.message.includes("Too many verification verification code requests")
                 ? t("authentication.errors.too_many_requests", { defaultValue: "Too many requests. Please try again later" })
                 : error.message.includes("already exists")
                     ? t("authentication.errors.email_exists", { defaultValue: "Email already exists" })
@@ -339,7 +452,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             await requestCode({ email: registerForm.email.toLowerCase().trim() });
             setSuccessMessage(t("authentication.success.verification_code_sent", { defaultValue: "Verification code sent" }));
         } catch (error) {
-            const errorMsg = error.message.includes("Too many verification code requests")
+            const errorMsg = error.message.includes("Too many verification verification code requests")
                 ? t("authentication.errors.too_many_requests", { defaultValue: "Too many requests. Please try again later" })
                 : error.message || t("authentication.errors.resend_code_failed", { defaultValue: "Failed to resend code" });
             setError(errorMsg);
@@ -627,25 +740,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
 
                         <div className="auth-divider">
                             <span>{t("authentication.login.or", { defaultValue: "or" })}</span>
-                        </div>
-
-                        <div className="auth-social">
-                            <button
-                                className="auth-social-btn google-btn"
-                                onClick={() => handleSocialLogin("Google")}
-                                disabled={loading}
-                            >
-                                <FcGoogle />
-                                {t("authentication.login.google", { defaultValue: "Continue with Google" })}
-                            </button>
-                            <button
-                                className="auth-social-btn facebook-btn"
-                                onClick={() => handleSocialLogin("Facebook")}
-                                disabled={loading}
-                            >
-                                <FaFacebook />
-                                {t("authentication.login.facebook", { defaultValue: "Continue with Facebook" })}
-                            </button>
                         </div>
                     </div>
                 )}

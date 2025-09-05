@@ -1,23 +1,13 @@
-# apps/users/views.py
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema
 import logging
 from django.core.cache import cache
-
 from rest_framework import permissions, status
-from rest_framework.exceptions import NotFound
-
-
-logger = logging.getLogger(__name__)
-
-
-from rest_framework.exceptions import PermissionDenied
-from rest_framework import generics
+from rest_framework.exceptions import NotFound, ValidationError, PermissionDenied
+from django.contrib.auth import get_user_model
 from apps.profiles.models import CustomerProfile
-
-
 from apps.users.models import User
 from apps.users.serializers import (
     GoogleAuthSerializer,
@@ -25,6 +15,10 @@ from apps.users.serializers import (
     UserShortSerializer,
 )
 from apps.users.permissions import IsOwnerOrAdmin
+
+logger = logging.getLogger(__name__)
+
+User = get_user_model()
 
 
 @extend_schema(
@@ -59,16 +53,21 @@ class UserListView(viewsets.ModelViewSet):
         return ProfileSerializer
 
     def get_object(self):
-        pk = self.kwargs.get("pk") or self.request.user.pk
-        user = cache.get(f"user:{pk}")
-        if not user:
-            user = self.get_queryset().get(pk=pk)
-            cache.set(f"user:{pk}", user, timeout=3600)
-        return user
+        pk = self.kwargs.get("pk")
+        if pk == "me":
+            return self.request.user  # Return the authenticated user for /me/
+        try:
+            user = cache.get(f"user:{pk}")
+            if not user:
+                user = self.get_queryset().get(pk=pk)
+                cache.set(f"user:{pk}", user, timeout=3600)
+            return user
+        except (User.DoesNotExist, ValueError):
+            raise ValidationError({"detail": "Invalid user ID or user not found."})
 
     @extend_schema(
         summary="Retrieve User Detail",
-        description="Get full details of a user by ID. Admins can retrieve any user, ordinary users can retrieve only their own profile.",
+        description="Get full details of a user by ID or 'me'. Admins can retrieve any user, ordinary users can retrieve only their own profile.",
     )
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
@@ -128,7 +127,6 @@ class CustomerDetailView(generics.RetrieveAPIView):
 
     def get_object(self):
         user_id = self.kwargs.get("pk")
-
         try:
             customer_profile = CustomerProfile.objects.select_related("user").get(
                 user__id=user_id

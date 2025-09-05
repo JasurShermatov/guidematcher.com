@@ -380,3 +380,7 @@ LOGGING = {
 ACCOUNTS_VERIFICATION_CODE_TTL_SECONDS = 300  # 5 minutes
 ACCOUNTS_VERIFICATION_CODE_LENGTH = 6
 DEFAULT_FROM_EMAIL = "feruzbekhamrayev2002@gmail.com"
+
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"

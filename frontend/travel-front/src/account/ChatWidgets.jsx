@@ -1,24 +1,224 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-    getConversations,
-    getChatMessages,
-    sendMessage,
-    markMessagesAsRead,
-    createConversation,
-    getUnreadCount,
-    searchUsers,
-    blockUser,
-    unblockUser,
-    getBlockedUsers,
-    messageAction,
-    getCurrentUser,
-    connectWebSocket,
-    closeWebSocket,
-    sendTypingIndicator,
-} from '../api/api';
+import axios from 'axios';
 import './ChatWidgets.css';
 
+// API Configuration
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/";
+const WS_URL = process.env.REACT_APP_WS_URL || "ws://localhost:8000/ws/chat/";
+
+const api = axios.create({
+    baseURL: API_URL,
+    headers: { "Content-Type": "application/json" },
+    withCredentials: false,
+});
+
+// Token Interceptor
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
+        headers: config.headers,
+        data: config.data,
+    });
+    return config;
+});
+
+// Token Refresh Interceptor
+api.interceptors.response.use(
+    (response) => {
+        console.log(`API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
+            status: response.status,
+            data: response.data,
+        });
+        return response;
+    },
+    async (error) => {
+        console.error(`API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message,
+        });
+        const originalRequest = error.config;
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            try {
+                const refreshToken = localStorage.getItem("refresh_token");
+                if (!refreshToken) {
+                    throw new Error("No refresh token available");
+                }
+                const refreshResponse = await api.post("token/refresh/", {
+                    refresh: refreshToken,
+                });
+                const newAccessToken = refreshResponse.data.access_token || refreshResponse.data.access;
+                localStorage.setItem("access_token", newAccessToken);
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                return api(originalRequest);
+            } catch (refreshError) {
+                console.error("Token refresh failed:", refreshError);
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("refresh_token");
+                window.location.href = "/login";
+                return Promise.reject(refreshError);
+            }
+        }
+        let errorMessage = "Unknown error occurred";
+        if (error.response?.data) {
+            const data = error.response.data;
+            errorMessage =
+                data.detail ||
+                data.message ||
+                data.error ||
+                (data.email && data.email[0]) ||
+                (data.code && data.code[0]) ||
+                (data.non_field_errors && data.non_field_errors[0]) ||
+                JSON.stringify(data);
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        return Promise.reject(new Error(errorMessage));
+    }
+);
+
+// Chat APIs
+const getConversations = () => {
+    console.log("Getting conversations...");
+    return api.get("chat/conversations/").then((r) => r.data);
+};
+
+const getChatMessages = (conversationId, params = {}) => {
+    console.log("Getting chat messages for conversation:", conversationId);
+    return api.get(`chat/conversations/${conversationId}/messages/`, { params }).then((r) => r.data);
+};
+
+const createConversation = (payload) => {
+    console.log("Creating conversation:", payload);
+    return api.post("chat/conversations/", payload).then((r) => r.data);
+};
+
+const getUnreadCount = () =>
+    api.get("chat/unread-count/").then((r) => r.data);
+
+const searchUsers = (query) => {
+    console.log("Searching users:", query);
+    return api.get("chat/users/search/", { params: { q: query } }).then((r) => r.data);
+};
+
+const blockUser = (payload) => {
+    console.log("Blocking user:", payload);
+    return api.post("chat/block/", payload).then((r) => r.data);
+};
+
+const unblockUser = (userId) => {
+    console.log("Unblocking user:", userId);
+    return api.delete(`chat/unblock/${userId}/`).then((r) => r.data);
+};
+
+const getBlockedUsers = () =>
+    api.get("chat/blocked/").then((r) => r.data);
+
+const getCurrentUser = () => {
+    console.log("Getting current user info...");
+    return api.get("auth/users/short/").then((r) => r.data);
+};
+
+// WebSocket Helpers
+let wsConnections = {};
+
+const connectWebSocket = (conversationId, onMessage, onOpen, onClose, onError) => {
+    if (wsConnections[conversationId]) {
+        console.log(`WebSocket already connected for conversation ${conversationId}`);
+        return wsConnections[conversationId];
+    }
+
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+        throw new Error("No access token for WebSocket");
+    }
+
+    const ws = new WebSocket(`${WS_URL}${conversationId}/?token=${token}`);
+
+    ws.onopen = () => {
+        console.log(`WebSocket connected for conversation ${conversationId}`);
+        if (onOpen) onOpen();
+    };
+
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log(`WebSocket message received:`, data);
+        if (onMessage) onMessage(data);
+    };
+
+    ws.onclose = (event) => {
+        console.log(`WebSocket closed for conversation ${conversationId}:`, event);
+        delete wsConnections[conversationId];
+        if (onClose) onClose(event);
+        setTimeout(() => connectWebSocket(conversationId, onMessage, onOpen, onClose, onError), 3000);
+    };
+
+    ws.onerror = (error) => {
+        console.error(`WebSocket error for conversation ${conversationId}:`, error);
+        if (onError) onError(error);
+    };
+
+    wsConnections[conversationId] = ws;
+    return ws;
+};
+
+const sendWebSocketMessage = (conversationId, payload) => {
+    const ws = wsConnections[conversationId];
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+        console.error(`WebSocket not open for conversation ${conversationId}`);
+        return;
+    }
+    ws.send(JSON.stringify(payload));
+};
+
+const closeWebSocket = (conversationId) => {
+    const ws = wsConnections[conversationId];
+    if (ws) {
+        ws.close();
+        delete wsConnections[conversationId];
+    }
+};
+
+// WebSocket-dependent API functions
+const sendMessage = async (payload) => {
+    const { conversation, content } = payload;
+    try {
+        sendWebSocketMessage(conversation, { type: 'chat_message', content });
+        return { ...payload, id: Date.now(), is_mine: true, created_at: new Date().toISOString() }; // Optimistic
+    } catch (err) {
+        console.error('WS send failed, fallback to REST:', err);
+        return api.post("chat/messages/send/", payload).then((r) => r.data);
+    }
+};
+
+const markMessagesAsRead = async (conversationId) => {
+    try {
+        sendWebSocketMessage(conversationId, { type: 'message_read' });
+    } catch (err) {
+        console.error('WS mark read failed, fallback to REST:', err);
+        return api.post(`chat/conversations/${conversationId}/mark-read/`).then((r) => r.data);
+    }
+};
+
+const messageAction = async (conversationId, messageId, action) => {
+    try {
+        sendWebSocketMessage(conversationId, { type: 'message_action', message_id: messageId, action });
+    } catch (err) {
+        console.error('WS action failed, fallback to REST:', err);
+        return api.post(`chat/messages/${messageId}/action/`, { action }).then((r) => r.data);
+    }
+};
+
+const sendTypingIndicator = (conversationId, isTyping) => {
+    sendWebSocketMessage(conversationId, { type: 'typing', is_typing: isTyping });
+};
+
+// React Component
 const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'client' }) => {
     const { t } = useTranslation();
     const [currentUser, setCurrentUser] = useState(null);
@@ -76,6 +276,14 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
         } catch (err) {
             console.error('Error initializing chat:', err);
             setError(t('chatWidgets.error.initializeChat'));
+            // Continue rendering with limited functionality
+            setCurrentUser({}); // Set a fallback to prevent breaking the UI
+            await Promise.all([
+                loadConversations(),
+                loadUnreadCount()
+            ]).catch(() => {
+                setError(t('chatWidgets.error.loadConversations'));
+            });
         } finally {
             setLoading(false);
         }

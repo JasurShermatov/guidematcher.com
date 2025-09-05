@@ -121,11 +121,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
-    """
-    Review yaratish uchun serializer.
-    Client va Customer backend’da avtomatik set qilinadi (request.user va booking’dan).
-    """
-
     class Meta:
         model = Review
         fields = [
@@ -138,14 +133,42 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
             "comment",
         ]
 
-    def create(self, validated_data):
-        request = self.context.get("request")
-        booking = self.context.get("booking")  # view’dan keladi
+    def validate(self, data):
+        booking = self.context.get("booking")
         if not booking:
             raise serializers.ValidationError({"booking": _("Booking is required.")})
 
+        # Check if booking is completed
+        if booking.status != "completed":
+            raise serializers.ValidationError(
+                {"booking": _("Booking must be completed to write a review.")}
+            )
+
+        # Check for existing review
+        if Review.objects.filter(booking=booking).exists():
+            raise serializers.ValidationError(
+                {"booking": _("A review for this booking already exists.")}
+            )
+
+        # Validate ratings
+        for field in [
+            "overall_rating",
+            "communication_rating",
+            "service_rating",
+            "punctuality_rating",
+            "value_rating",
+        ]:
+            if data.get(field) not in [1, 2, 3, 4, 5]:
+                raise serializers.ValidationError(
+                    {field: _("Rating must be between 1 and 5.")}
+                )
+
+        return data
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        booking = self.context.get("booking")
         validated_data["booking"] = booking
         validated_data["client"] = request.user
-        validated_data["customer"] = booking.customer  # booking orqali provider
-
+        validated_data["customer"] = booking.customer
         return super().create(validated_data)

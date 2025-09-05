@@ -1,19 +1,18 @@
 # apps/accounts/serializers.py
 import datetime
+import logging
 import secrets
 import string
-import logging
-from django.conf import settings
-from django.utils import timezone
 
+from django.conf import settings
+from django.core.cache import cache
+from django.utils import timezone
+from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-
-from django.core.cache import cache
-from rest_framework import serializers
-from apps.users.models import User, Country
 from apps.accounts.models import EmailVerification
 from apps.accounts.tasks import send_verification_email, send_welcome_email
+from apps.users.models import User, Country
 from .services import (
     create_and_send_password_reset_code,
     validate_password_reset_code,
@@ -278,3 +277,9 @@ class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField(
         required=True, help_text="Refresh token obtained from login"
     )
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "email", "first_name", "last_name", "is_staff", "is_superuser"]

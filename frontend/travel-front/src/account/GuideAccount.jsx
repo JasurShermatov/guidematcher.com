@@ -83,6 +83,25 @@ api.interceptors.response.use(
     }
 );
 
+const getCustomerAvatar = (userId) => {
+    console.log(`Getting customer avatar for user ${userId}...`);
+    return api.get(`profiles/customers/${userId}/avatar/`).then((r) => r.data);
+};
+
+const uploadCustomerAvatar = (userId, avatarFile) => {
+    console.log(`Uploading customer avatar for user ${userId}...`);
+    const formData = new FormData();
+    formData.append("avatar", avatarFile);
+    return api.put(`profiles/customers/${userId}/avatar/`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    }).then((r) => r.data);
+};
+
+const deleteCustomerAvatar = (userId) => {
+    console.log(`Deleting customer avatar for user ${userId}...`);
+    return api.delete(`profiles/customers/${userId}/avatar/`).then((r) => r.data);
+};
+
 // API Functions
 const getCustomerProfile = () => {
     console.log("Getting customer profile...");
@@ -116,9 +135,15 @@ const acceptBooking = (id) => {
 
 const cancelBooking = (id, reason = "") => {
     console.log("Canceling booking:", id, reason);
-    return api.patch(`bookings/bookings/${id}/`, {
-        status: "cancelled",
+    return api.post(`bookings/bookings/${id}/cancel/`, {
         cancellation_reason: reason
+    }).then((r) => r.data);
+};
+
+const checkAvailability = async (customerId, startDate, endDate) => {
+    console.log("Checking availability:", customerId, startDate, endDate);
+    return api.get(`bookings/bookings/${customerId}/check-availability/`, {
+        params: { start_date: startDate, end_date: endDate }
     }).then((r) => r.data);
 };
 
@@ -306,6 +331,14 @@ const GuideAccount = () => {
     const [selectedBookingForCancel, setSelectedBookingForCancel] = useState(null);
     const [showChat, setShowChat] = useState(false);
     const [selectedUserForChat, setSelectedUserForChat] = useState(null);
+    const [avatarUrl, setAvatarUrl] = useState(null);
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
+    const [bookingFilter, setBookingFilter] = useState('all');
+    const [availabilityForm, setAvailabilityForm] = useState({
+        start_date: '',
+        end_date: ''
+    });
+    const [availabilityResult, setAvailabilityResult] = useState(null);
     const [reviewFilter, setReviewFilter] = useState({
         minRating: '',
         sortBy: 'date_desc'
@@ -326,7 +359,6 @@ const GuideAccount = () => {
         currency: 'USD',
         languages: [],
         is_available: true,
-        avatar: null
     });
     const [portfolioForm, setPortfolioForm] = useState({
         title: '',
@@ -352,7 +384,7 @@ const GuideAccount = () => {
             const [serviceTypesData, languagesData, citiesData] = await Promise.all([
                 getServiceTypes(),
                 getLanguages(),
-                getCities()
+                getCities(),
             ]);
             setServiceTypes(serviceTypesData.results || serviceTypesData);
             setLanguages(languagesData.results || languagesData);
@@ -361,43 +393,84 @@ const GuideAccount = () => {
                 const profileData = await getCustomerProfile();
                 setProfile(profileData);
                 setProfileForm({
-                    professional_bio: profileData.professional_bio || '',
+                    professional_bio: profileData.professional_bio || "",
                     years_of_experience: profileData.years_of_experience || 0,
                     service_types: profileData.service_types || [],
-                    city: profileData.city || '',
-                    service_areas: profileData.service_areas || '',
-                    hourly_rate: profileData.hourly_rate || '',
-                    daily_rate: profileData.daily_rate || '',
-                    currency: profileData.currency || 'USD',
+                    city: profileData.city || "",
+                    service_areas: profileData.service_areas || "",
+                    hourly_rate: profileData.hourly_rate || "",
+                    daily_rate: profileData.daily_rate || "",
+                    currency: profileData.currency || "USD",
                     languages: profileData.languages || [],
                     is_available: profileData.is_available !== undefined ? profileData.is_available : true,
-                    avatar: null
                 });
+                if (userData.id) {
+                    try {
+                        const avatarData = await getCustomerAvatar(userData.id);
+                        setAvatarUrl(avatarData.avatar_url || null);
+                    } catch (avatarError) {
+                        console.log("No avatar found or error fetching avatar:", avatarError);
+                        setAvatarUrl(null);
+                    }
+                }
                 await Promise.all([
                     loadBookings(),
                     loadReviews(),
                     loadPortfolio(),
                     loadUnavailability(),
-                    loadReviewSummary()
+                    loadReviewSummary(),
                 ]);
             } catch (profileError) {
-                console.log(t('guideAccount.error.noProfile'));
+                console.log(t("guideAccount.error.noProfile"));
                 setShowProfileForm(true);
+                setAvatarUrl(null);
             }
         } catch (err) {
-            console.error('Error initializing data:', err);
-            setError(t('guideAccount.error.requiredFields'));
+            console.error("Error initializing data:", err);
+            setError(t("guideAccount.error.requiredFields"));
         } finally {
             setLoading(false);
         }
     };
 
-    const loadBookings = async () => {
+    const handleAvatarUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) {
+            setError(t("guideAccount.error.noAvatarSelected"));
+            return;
+        }
         try {
-            const data = await getMyBookings();
+            setUploadingAvatar(true);
+            const avatarData = await uploadCustomerAvatar(currentUser.id, file);
+            setAvatarUrl(avatarData.avatar_url);
+            setProfile({ ...profile, avatar: avatarData.avatar_url });
+            setError(null);
+            alert(t("guideAccount.success.avatarUploaded"));
+        } catch (err) {
+            setError(t("guideAccount.error.failedToUploadAvatar"));
+        } finally {
+            setUploadingAvatar(false);
+        }
+    };
+
+    const handleAvatarDelete = async () => {
+        if (!window.confirm(t('guideAccount.profile.deleteAvatarConfirm'))) return;
+        try {
+            await deleteCustomerAvatar(currentUser.id);
+            setAvatarUrl(null);
+            setError(null);
+            alert(t('guideAccount.success.avatarDeleted'));
+        } catch (err) {
+            setError(t('guideAccount.error.failedToDeleteAvatar'));
+        }
+    };
+
+    const loadBookings = async (status = null) => {
+        try {
+            const data = await getMyBookings(status);
             setBookings(data.results || data);
         } catch (err) {
-            console.error('Error loading bookings:', err);
+            console.error('Bronlarni yuklashda xato:', err);
             setError(t('guideAccount.error.failedToLoadBookings'));
         }
     };
@@ -444,6 +517,21 @@ const GuideAccount = () => {
         }
     };
 
+    const handleAvailabilityCheck = async (e) => {
+        e.preventDefault();
+        if (!availabilityForm.start_date || !availabilityForm.end_date) {
+            setError(t('guideAccount.error.datesRequired'));
+            return;
+        }
+        try {
+            const result = await checkAvailability(currentUser.id, availabilityForm.start_date, availabilityForm.end_date);
+            setAvailabilityResult(result);
+            setError(null);
+        } catch (err) {
+            setError(t('guideAccount.error.failedToCheckAvailability'));
+        }
+    };
+
     const handleProfileSubmit = async (e) => {
         e.preventDefault();
         if (!profileForm.professional_bio.trim() || !profileForm.city) {
@@ -462,9 +550,6 @@ const GuideAccount = () => {
             formData.append('currency', profileForm.currency);
             profileForm.languages.forEach(lang => formData.append('languages', lang));
             formData.append('is_available', profileForm.is_available);
-            if (profileForm.avatar) {
-                formData.append('avatar', profileForm.avatar);
-            }
 
             let result;
             if (profile) {
@@ -481,27 +566,9 @@ const GuideAccount = () => {
         }
     };
 
-    const handlePortfolioSubmit = async (e) => {
-        e.preventDefault();
-        if (!portfolioForm.title.trim()) {
-            setError(t('guideAccount.error.portfolioTitleRequired'));
-            return;
-        }
-        try {
-            if (editingPortfolioItem) {
-                await updatePortfolioItem(editingPortfolioItem.id, portfolioForm);
-            } else {
-                await createPortfolioItem(portfolioForm);
-            }
-            loadPortfolio();
-            setShowPortfolioForm(false);
-            setEditingPortfolioItem(null);
-            setPortfolioForm({ title: '', description: '', image: null, order: 0 });
-            setError(null);
-            alert(editingPortfolioItem ? t('guideAccount.success.portfolioUpdated') : t('guideAccount.success.portfolioCreated'));
-        } catch (err) {
-            setError(t('guideAccount.error.failedToSavePortfolio'));
-        }
+    const handleBookingFilterChange = (status) => {
+        setBookingFilter(status);
+        loadBookings(status === 'all' ? null : status);
     };
 
     const handleUnavailabilitySubmit = async (e) => {
@@ -549,13 +616,13 @@ const GuideAccount = () => {
                 await cancelBooking(bookingId, cancelReason);
                 alert(t('guideAccount.success.bookingCancelled'));
             }
-            loadBookings();
+            loadBookings(bookingFilter === 'all' ? null : bookingFilter);
             setShowCancelModal(false);
             setSelectedBookingForCancel(null);
             setCancelReason('');
             setError(null);
         } catch (err) {
-            setError(t('guideAccount.error.failedToProcessBooking'));
+            setError(err.message || t('guideAccount.error.failedToProcessBooking'));
         }
     };
 
@@ -595,6 +662,37 @@ const GuideAccount = () => {
             setShowChat(true);
         } else {
             setError(t('guideAccount.error.noClientEmail'));
+        }
+    };
+
+    const handlePortfolioSubmit = async (e) => {
+        e.preventDefault();
+        if (!portfolioForm.title.trim()) {
+            setError(t('guideAccount.error.portfolioTitleRequired'));
+            return;
+        }
+        try {
+            const formData = new FormData();
+            formData.append('title', portfolioForm.title);
+            formData.append('description', portfolioForm.description || '');
+            if (portfolioForm.image) {
+                formData.append('image', portfolioForm.image);
+            }
+            formData.append('order', portfolioForm.order);
+
+            if (editingPortfolioItem) {
+                await updatePortfolioItem(editingPortfolioItem.id, formData);
+            } else {
+                await createPortfolioItem(formData);
+            }
+            loadPortfolio();
+            setShowPortfolioForm(false);
+            setEditingPortfolioItem(null);
+            setPortfolioForm({ title: '', description: '', image: null, order: 0 });
+            setError(null);
+            alert(editingPortfolioItem ? t('guideAccount.success.portfolioUpdated') : t('guideAccount.success.portfolioCreated'));
+        } catch (err) {
+            setError(t('guideAccount.error.failedToSavePortfolio'));
         }
     };
 
@@ -708,12 +806,12 @@ const GuideAccount = () => {
                 >
                     {t('guideAccount.navigation.bookings')}
                 </button>
-                <button
-                    className={`guide-account-nav-btn ${activeTab === 'portfolio' ? 'guide-account-nav-active' : ''}`}
-                    onClick={() => setActiveTab('portfolio')}
-                >
-                    {t('guideAccount.navigation.portfolio')}
-                </button>
+                {/*<button*/}
+                {/*    className={`guide-account-nav-btn ${activeTab === 'portfolio' ? 'guide-account-nav-active' : ''}`}*/}
+                {/*    onClick={() => setActiveTab('portfolio')}*/}
+                {/*>*/}
+                {/*    {t('guideAccount.navigation.portfolio')}*/}
+                {/*</button>*/}
                 <button
                     className={`guide-account-nav-btn ${activeTab === 'unavailability' ? 'guide-account-nav-active' : ''}`}
                     onClick={() => setActiveTab('unavailability')}
@@ -784,7 +882,7 @@ const GuideAccount = () => {
                                                         className="guide-account-btn guide-account-btn-cancel"
                                                         onClick={() => handleOpenCancelModal(booking)}
                                                     >
-                                                        {t('guideAccount.dashboard.decline')}
+                                                        {t('guideAccount.bookings.decline')}
                                                     </button>
                                                 </>
                                             )}
@@ -967,19 +1065,34 @@ const GuideAccount = () => {
                                             type="file"
                                             className="guide-account-file-input"
                                             accept="image/*"
-                                            onChange={(e) => setProfileForm({ ...profileForm, avatar: e.target.files[0] })}
+                                            onChange={handleAvatarUpload}
+                                            disabled={uploadingAvatar}
                                         />
-                                        {profile?.avatar && (
-                                            <img
-                                                src={profile.avatar}
-                                                alt="Current avatar"
-                                                className="guide-account-avatar-preview"
-                                                style={{ width: '100px', height: '100px', borderRadius: '50%', marginTop: '10px' }}
-                                            />
+                                        {avatarUrl ? (
+                                            <div style={{ marginTop: '10px' }}>
+                                                <img
+                                                    src={avatarUrl}
+                                                    alt="Current avatar"
+                                                    className="guide-account-avatar-preview"
+                                                    style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="guide-account-btn guide-account-btn-danger"
+                                                    onClick={handleAvatarDelete}
+                                                    style={{ marginLeft: '10px' }}
+                                                    disabled={uploadingAvatar}
+                                                >
+                                                    {t('guideAccount.profile.deleteAvatar')}
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <p className="guide-account-profile-value">{t('guideAccount.profile.noAvatar')}</p>
                                         )}
+                                        {uploadingAvatar && <p>{t('guideAccount.profile.uploading')}</p>}
                                     </div>
                                     <div className="guide-account-form-actions">
-                                        <button type="submit" className="guide-account-btn guide-account-btn-primary">
+                                        <button type="submit" className="guide-account-btn guide-account-btn-primary" disabled={uploadingAvatar}>
                                             {profile ? t('guideAccount.profile.updateProfile') : t('guideAccount.profile.createProfileButton')}
                                         </button>
                                         {profile && (
@@ -987,6 +1100,7 @@ const GuideAccount = () => {
                                                 type="button"
                                                 className="guide-account-btn guide-account-btn-secondary"
                                                 onClick={() => setShowProfileForm(false)}
+                                                disabled={uploadingAvatar}
                                             >
                                                 {t('guideAccount.profile.cancel')}
                                             </button>
@@ -1015,6 +1129,38 @@ const GuideAccount = () => {
                                         <p className="guide-account-profile-value">{profile.years_of_experience} {t('guideAccount.profile.yearsOfExperience').toLowerCase()}</p>
                                     </div>
                                     <div className="guide-account-profile-field">
+                                        <label className="guide-account-profile-label">{t('guideAccount.profile.serviceAreas')}</label>
+                                        <p className="guide-account-profile-value">{profile.service_areas || t('guideAccount.profile.notSet')}</p>
+                                    </div>
+                                    <div className="guide-account-profile-field">
+                                        <label className="guide-account-profile-label">{t('guideAccount.profile.serviceTypes')}</label>
+                                        <p className="guide-account-profile-value">
+                                            {profile.service_types?.length > 0
+                                                ? profile.service_types.map(id => serviceTypes.find(st => st.id === id)?.name).filter(Boolean).join(', ')
+                                                : t('guideAccount.profile.notSet')}
+                                        </p>
+                                    </div>
+                                    <div className="guide-account-profile-field">
+                                        <label className="guide-account-profile-label">{t('guideAccount.profile.hourlyRate')}</label>
+                                        <p className="guide-account-profile-value">
+                                            {profile.hourly_rate ? `${profile.hourly_rate} ${profile.currency}` : t('guideAccount.profile.notSet')}
+                                        </p>
+                                    </div>
+                                    <div className="guide-account-profile-field">
+                                        <label className="guide-account-profile-label">{t('guideAccount.profile.dailyRate')}</label>
+                                        <p className="guide-account-profile-value">
+                                            {profile.daily_rate ? `${profile.daily_rate} ${profile.currency}` : t('guideAccount.profile.notSet')}
+                                        </p>
+                                    </div>
+                                    <div className="guide-account-profile-field">
+                                        <label className="guide-account-profile-label">{t('guideAccount.profile.languages')}</label>
+                                        <p className="guide-account-profile-value">
+                                            {profile.languages?.length > 0
+                                                ? profile.languages.map(id => languages.find(lang => lang.id === id)?.name).filter(Boolean).join(', ')
+                                                : t('guideAccount.profile.notSet')}
+                                        </p>
+                                    </div>
+                                    <div className="guide-account-profile-field">
                                         <label className="guide-account-profile-label">{t('guideAccount.profile.availability')}</label>
                                         <p className="guide-account-profile-value">
                                             {profile.is_available ? t('guideAccount.profile.available') : t('guideAccount.profile.notAvailable')}
@@ -1022,15 +1168,35 @@ const GuideAccount = () => {
                                     </div>
                                     <div className="guide-account-profile-field">
                                         <label className="guide-account-profile-label">{t('guideAccount.profile.avatar')}</label>
-                                        {profile.avatar ? (
-                                            <img
-                                                src={profile.avatar}
-                                                alt="Avatar"
-                                                className="guide-account-avatar-preview"
-                                                style={{ width: '100px', height: '100px', borderRadius: '50%' }}
-                                            />
+                                        {avatarUrl ? (
+                                            <div>
+                                                <img
+                                                    src={avatarUrl}
+                                                    alt="Avatar"
+                                                    className="guide-account-avatar-preview"
+                                                    style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+                                                />
+                                                <button
+                                                    className="guide-account-btn guide-account-btn-danger"
+                                                    onClick={handleAvatarDelete}
+                                                    style={{ marginLeft: '10px' }}
+                                                    disabled={uploadingAvatar}
+                                                >
+                                                    {t('guideAccount.profile.deleteAvatar')}
+                                                </button>
+                                            </div>
                                         ) : (
-                                            <p className="guide-account-profile-value">{t('guideAccount.profile.notSet')}</p>
+                                            <div>
+                                                <p className="guide-account-profile-value">{t('guideAccount.profile.noAvatar')}</p>
+                                                <input
+                                                    type="file"
+                                                    className="guide-account-file-input"
+                                                    accept="image/*"
+                                                    onChange={handleAvatarUpload}
+                                                    disabled={uploadingAvatar}
+                                                />
+                                                {uploadingAvatar && <p>{t('guideAccount.profile.uploading')}</p>}
+                                            </div>
                                         )}
                                     </div>
                                 </div>
@@ -1041,6 +1207,18 @@ const GuideAccount = () => {
                 {activeTab === 'bookings' && (
                     <div className="guide-account-bookings">
                         <h3 className="guide-account-section-title">{t('guideAccount.bookings.myBookings')}</h3>
+                        <div className="guide-account-bookings-filters">
+                            <select
+                                className="guide-account-filter-select"
+                                value={bookingFilter}
+                                onChange={(e) => handleBookingFilterChange(e.target.value)}
+                            >
+                                <option value="all">{t('guideAccount.bookings.allStatuses')}</option>
+                                <option value="pending">{t('guideAccount.bookings.pending')}</option>
+                                <option value="accepted">{t('guideAccount.bookings.accepted')}</option>
+                                <option value="cancelled">{t('guideAccount.bookings.cancelled')}</option>
+                            </select>
+                        </div>
                         <div className="guide-account-bookings-list">
                             {bookings.map(booking => (
                                 <div key={booking.id} className="guide-account-booking-item">

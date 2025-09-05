@@ -16,7 +16,7 @@ from drf_spectacular.utils import (
     OpenApiExample,
     OpenApiResponse,
 )
-from rest_framework import viewsets, mixins, status
+from rest_framework import viewsets, mixins, status, serializers
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
@@ -218,34 +218,48 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(obj)
         return Response(serializer.data)
 
+    # apps/reviews/views.py
+    # ReviewViewSet ichidagi create funksiyasini o‘zgartirish
     @transaction.atomic
     def create(self, request, *args, **kwargs):
-        # booking_id ni olamiz
         booking_id = _get_booking_from_request(request)
         if not booking_id:
-            return Response({"booking_id": "This field is required."}, status=400)
-
-        # Booking ni select_related(customer) bilan topamiz
-        from apps.bookings.models import Booking  # local import to avoid circular
-
-        booking = get_object_or_404(
-            Booking.objects.select_related("customer"), pk=booking_id
-        )
-
-        # Muvofiqlik: faqat booking egasi yozishi kerak
-        if booking.client_id != request.user.id:
             return Response(
-                {"detail": "This booking doesn't belong to you."}, status=403
+                {
+                    "error": "booking_id is required in the request body or query params."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Unique per booking constraint'i serializer/create hamda DB darajasida tutadi.
+        from apps.bookings.models import Booking
+
+        booking = get_object_or_404(
+            Booking.objects.select_related("customer", "client"), pk=booking_id
+        )
+
+        if booking.client_id != request.user.id:
+            return Response(
+                {"error": "You can only review your own bookings."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if booking.status != "completed":
+            return Response(
+                {"error": "Booking must be completed to write a review."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if Review.objects.filter(booking=booking).exists():
+            return Response(
+                {"error": "A review for this booking already exists."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         serializer = self.get_serializer(
             data=request.data, context={"request": request, "booking": booking}
         )
         serializer.is_valid(raise_exception=True)
         review = serializer.save()
-
-        # Full payload qaytaramiz
         out = ReviewSerializer(review, context={"request": request}).data
         return Response(out, status=status.HTTP_201_CREATED)
 

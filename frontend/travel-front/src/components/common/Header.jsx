@@ -119,20 +119,29 @@ const logoutUser = () => {
         });
 };
 
+// Avatar olish funksiyasi
+const getAvatar = async (userId, role) => {
+    try {
+        const endpoint = role === "customer" ? `profiles/customers/${userId}/avatar/` : `profiles/clients/${userId}/avatar/`;
+        const response = await api.get(endpoint);
+        return response.data.avatar_url || null;
+    } catch (error) {
+        console.error("Avatar fetch error:", error.message);
+        return null;
+    }
+};
+
 // React Component
 const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuthState }) => {
     const { t } = useTranslation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [theme, setTheme] = useState(() => {
-        return localStorage.getItem("theme") || "default";
-    });
-    const [language, setLanguage] = useState(() => {
-        return localStorage.getItem("language") || "en";
-    });
+    const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "default");
+    const [language, setLanguage] = useState(() => localStorage.getItem("language") || "en");
     const [isThemeDropdownOpen, setIsThemeDropdownOpen] = useState(false);
     const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
     const [isAvatarDropdownOpen, setIsAvatarDropdownOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    const [avatarUrl, setAvatarUrl] = useState(null); // Avatar URL uchun state
 
     const themeDropdownRef = useRef(null);
     const langDropdownRef = useRef(null);
@@ -156,6 +165,13 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
     ];
 
     const currentLang = languageOptions.find((lang) => lang.value === language);
+
+    // Avatarni olish
+    useEffect(() => {
+        if (isAuthenticated && user?.id && user?.role) {
+            getAvatar(user.id, user.role).then((url) => setAvatarUrl(url));
+        }
+    }, [isAuthenticated, user]);
 
     // Scroll hodisasini kuzatish
     useEffect(() => {
@@ -272,15 +288,12 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
         } catch (error) {
             console.error("Logout error:", error.message);
         } finally {
-            // updateAuthState funksiyasini ishlatish (agar mavjud bo'lsa)
             if (updateAuthState) {
                 updateAuthState(false, null);
             } else {
-                // Fallback: eski usul
                 localStorage.removeItem("access_token");
                 localStorage.removeItem("refresh_token");
                 localStorage.removeItem("user_data");
-                // Account-specific localStorage'larni ham tozalash
                 localStorage.removeItem("userAccount_isEditing");
                 localStorage.removeItem("userAccount_formData");
                 localStorage.removeItem("guideAccount_isEditing");
@@ -415,7 +428,16 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                                 aria-label={t("header.account") || "Account"}
                                 aria-expanded={isAvatarDropdownOpen}
                             >
-                                <span className="header-avatar">{avatarLetter}</span>
+                                {avatarUrl ? (
+                                    <img
+                                        src={avatarUrl}
+                                        alt={displayUsername}
+                                        className="header-avatar-img"
+                                        onError={() => setAvatarUrl(null)} // Agar rasm yuklanmasa, fallback
+                                    />
+                                ) : (
+                                    <span className="header-avatar">{avatarLetter}</span>
+                                )}
                                 <span className="header-username">{displayUsername}</span>
                                 <FiChevronDown className={`header-dropdown-arrow ${isAvatarDropdownOpen ? "header-open" : ""}`} />
                             </button>
@@ -426,7 +448,11 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                                         {process.env.NODE_ENV === 'development' && (
                                             <span className="header-user-debug">Debug: {user?.role}</span>
                                         )}
+                                        <span className="header-user-role">{getUserRoleDisplay()}</span>
                                     </div>
+                                    <Link to="/account" className="header-dropdown-item">
+                                        <span className="header-theme-name">{t("header.profile") || "Profile"}</span>
+                                    </Link>
                                     <button type="button" className="header-dropdown-item" onClick={handleLogout}>
                                         <FiLogOut className="header-theme-icon" />
                                         <span className="header-theme-name">{t("header.logout") || "Logout"}</span>
@@ -436,10 +462,6 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                         </div>
                     ) : (
                         <div className="header-auth-buttons">
-                            {/*<Link to="/register" className="header-btn header-auth-btn header-register-btn">*/}
-                            {/*    <FiUserPlus />*/}
-                            {/*    <span>{t("header.register") || "Register"}</span>*/}
-                            {/*</Link>*/}
                             <Link to="/login" className="header-btn header-auth-btn header-signin-btn">
                                 <FiLogIn />
                                 <span>{t("header.sign_in") || "Sign In"}</span>
@@ -462,7 +484,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="header-mobile-menu-overlay"onClick={toggleMenu}>
+                <div className="header-mobile-menu-overlay" onClick={toggleMenu}>
                     <div className="header-mobile-menu" onClick={(e) => e.stopPropagation()}>
                         <div className="header-mobile-menu-header">
                             <div className="header-mobile-logo">
@@ -517,13 +539,33 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                             {isAuthenticated ? (
                                 <div className="header-mobile-auth-section">
                                     <div className="header-mobile-user-info">
-                                        <div className="header-mobile-avatar">{avatarLetter}</div>
+                                        {avatarUrl ? (
+                                            <img
+                                                src={avatarUrl}
+                                                alt={displayUsername}
+                                                className="header-mobile-avatar-img"
+                                                onError={() => setAvatarUrl(null)} // Agar rasm yuklanmasa, fallback
+                                            />
+                                        ) : (
+                                            <div className="header-mobile-avatar">{avatarLetter}</div>
+                                        )}
                                         <div className="header-mobile-user-details">
                                             <span className="header-mobile-username">{displayUsername}</span>
                                             <span className="header-mobile-role">{getUserRoleDisplay()}</span>
                                         </div>
                                     </div>
-                                    <button type="button" className="header-btn header-mobile-logout-btn" onClick={handleLogout}>
+                                    <Link
+                                        to="/account"
+                                        className="header-btn header-mobile-auth-btn"
+                                        onClick={toggleMenu}
+                                    >
+                                        <span>{t("header.profile") || "Profile"}</span>
+                                    </Link>
+                                    <button
+                                        type="button"
+                                        className="header-btn header-mobile-logout-btn"
+                                        onClick={handleLogout}
+                                    >
                                         <FiLogOut />
                                         <span>{t("header.logout") || "Logout"}</span>
                                     </button>

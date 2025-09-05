@@ -276,6 +276,14 @@ const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'clien
         } catch (err) {
             console.error('Error initializing chat:', err);
             setError(t('chatWidgets.error.initializeChat'));
+            // Continue rendering with limited functionality
+            setCurrentUser({}); // Set a fallback to prevent breaking the UI
+            await Promise.all([
+                loadConversations(),
+                loadUnreadCount()
+            ]).catch(() => {
+                setError(t('chatWidgets.error.loadConversations'));
+            });
         } finally {
             setLoading(false);
         }

@@ -1544,3 +1544,27 @@
         color: black;
     }
 }
+
+.guide-account-avatar-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-top: 10px;
+}
+
+.guide-account-profile-value.no-avatar {
+    color: #666;
+    font-style: italic;
+}
+
+.guide-account-file-input {
+    margin-top: 10px;
+    display: block;
+}
+
+.guide-account-uploading {
+    color: #888;
+    margin-top: 10px;
+    font-size: 14px;
+}

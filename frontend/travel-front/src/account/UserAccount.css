@@ -1,8 +1,37 @@
 /* ===== UserAccount Component Styles ===== */
 
 /* Use App.css variables for consistency */
+:root {
+    --container-padding: 1.5rem;
+    --border-radius: 6px;
+    --border-radius-lg: 8px;
+    --border-radius-full: 9999px;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f7fafc;
+    --bg-card: #ffffff;
+    --bg-overlay: rgba(0, 0, 0, 0.5);
+    --text-primary: #1a202c;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    --text-white: #ffffff;
+    --primary: #007bff;
+    --success: #28a745;
+    --info: #17a2b8;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --border-light: #e2e8f0;
+    --border-medium: #cbd5e0;
+    --border-dark: #a0aec0;
+    --gradient-primary: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --transition-fast: all 0.2s ease;
+    --transition-normal: all 0.3s ease;
+}
+
 .user-account-container {
-    max-width: 1200px; /* Matches App.css container */
+    max-width: 1200px;
     margin: 0 auto;
     padding: var(--container-padding);
     background: var(--bg-primary);
@@ -458,7 +487,7 @@
     height: 120px;
     border-radius: var(--border-radius-full);
     object-fit: cover;
-    border: 3px solid var(--bg-primary);
+    border: 3px solid var(--border-light);
     box-shadow: var(--shadow-md);
 }
 
@@ -875,6 +904,67 @@
     z-index: 1000;
     max-width: 400px;
     width: 90%;
+    display: block; /* Ensure container is visible */
+    visibility: visible;
+    opacity: 1;
+    transition: var(--transition-normal);
+}
+
+/* Assumed ChatWidgets styles */
+.chat-widgets-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+    height: 500px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    z-index: 1001;
+}
+
+.chat-widgets-header {
+    background: var(--gradient-primary);
+    color: var(--text-white);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.chat-widgets-close-btn {
+    background: none;
+    border: none;
+    color: var(--text-white);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.chat-widgets-close-btn:hover {
+    opacity: 0.8;
+}
+
+.chat-widgets-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    background: var(--bg-secondary);
+}
+
+.chat-widgets-loading,
+.chat-widgets-error {
+    text-align: center;
+    padding: 1rem;
+    color: var(--text-primary);
+}
+
+.chat-widgets-error {
+    color: var(--danger);
 }
 
 /* Responsive Design */
@@ -898,6 +988,11 @@
     .user-account-guides-grid {
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     }
+
+    .user-account-chat,
+    .chat-widgets-container {
+        max-width: 350px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -917,7 +1012,6 @@
         font-size: 2rem;
     }
 
-    /* Keep navigation horizontal with scroll */
     .user-account-navigation {
         flex-direction: row;
         overflow-x: auto;
@@ -1045,6 +1139,14 @@
         left: 0.5rem;
         width: auto;
     }
+
+    .chat-widgets-container {
+        width: 100%;
+        height: 80vh;
+        max-width: none;
+        border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+        bottom: 0;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1155,11 +1257,31 @@
         align-self: flex-start;
         margin-top: 0.5rem;
     }
+
+    .user-account-chat {
+        max-width: calc(100% - 0.5rem);
+        right: 0.25rem;
+        bottom: 0.25rem;
+        left: 0.25rem;
+    }
+
+    .chat-widgets-container {
+        height: 85vh;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
 }
 
 /* Dark mode support */
 [data-theme="dark"] {
-    /* Variables are already defined in App.css */
+    --bg-primary: #1a202c;
+    --bg-secondary: #2d3748;
+    --bg-card: #2d3748;
+    --text-primary: #e2e8f0;
+    --text-secondary: #a0aec0;
+    --text-muted: #718096;
+    --border-light: #4a5568;
+    --border-medium: #2d3748;
+    --border-dark: #1a202c;
 }
 
 /* Accessibility */
@@ -1227,4 +1349,89 @@
         box-shadow: none !important;
         border: 1px solid var(--border-medium) !important;
     }
+}
+
+.user-account-avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e2e8f0;
+    margin-top: 12px;
+}
+
+.user-account-file-input {
+    margin-top: 8px;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.user-account-btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.user-account-btn-danger:hover {
+    background-color: #c82333;
+}
+
+.user-account-form-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.user-account-guide-actions {
+    display: flex;
+    gap: 8px;
+}
+.user-account-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.user-account-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.user-account-unavailabilities {
+    margin-bottom: 16px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+.user-account-unavailabilities h4 {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.user-account-unavailabilities ul {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+
+.user-account-unavailabilities li {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+.user-account-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 14px;
 }

@@ -159,6 +159,10 @@ CORS_ALLOWED_ORIGINS = env.list(
         "http://127.0.0.1:3000",
         "http://localhost:3003",
         "http://127.0.0.1:3003",
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+        "http://localhost:8081",  # ✅ frontend port
+        "http://127.0.0.1:8081",  # ✅ qo‘shib qo‘yish kerak
     ],
 )
 CORS_ALLOW_CREDENTIALS = True
@@ -166,6 +170,7 @@ CORS_ALLOW_CREDENTIALS = True
 # ╭──────────────────────────────────────────────────────────────╮
 # | 8. Password validation                                      |
 # ╰──────────────────────────────────────────────────────────────╯
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"

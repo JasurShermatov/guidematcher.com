@@ -16,21 +16,23 @@ import "./GuideAccount.css";
 const API_BASE = (process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/").replace(/\/+$/, "");
 const BACKEND_ORIGIN = API_BASE.replace(/\/api\/v1\/?$/, ""); // → http://localhost:8000
 
+const PLACEHOLDER = "/placeholder-avatar.png";
+
 const toAbsMedia = (url) => {
-    if (!url) return "/placeholder-avatar.png";
+    if (!url) return PLACEHOLDER;
     if (/^https?:\/\//i.test(url)) return url;
     if (url.startsWith("/media")) return BACKEND_ORIGIN + url;
     if (url.startsWith("media/")) return `${BACKEND_ORIGIN}/${url}`;
     return url;
 };
 
-// Header dagidek: GUIDE (customer) avatarini GET orqali olish
+// GUIDE (customer) avatarini GET orqali olish — doimiy fallback bilan
 const fetchGuideAvatarUrl = async (userId) => {
     try {
         const { data } = await api.get(`profiles/customers/${userId}/avatar/`);
-        return data?.avatar_url || null;
+        return toAbsMedia(data?.avatar_url || data?.avatar || PLACEHOLDER);
     } catch {
-        return null;
+        return PLACEHOLDER;
     }
 };
 
@@ -128,12 +130,22 @@ export default function GuideAccount() {
     /* =======================
        PROFILE (avatar & info)
        ======================= */
+
+    // Foydalanuvchi ma'lumotlari uchun ishonchli fallback (UserAccount dagi kabi)
+    const safeUser = {
+        first_name: userData?.first_name || profile?.user?.first_name || "",
+        last_name:  userData?.last_name  || profile?.user?.last_name  || "",
+        email:      userData?.email      || profile?.user?.email      || me?.email || "",
+    };
+
+    // Avatar manbai (har doim qiymatga ega bo'ladi)
     const avatarSrc = toAbsMedia(
         avatarUrl ||
         profile?.avatar_url ||
         profile?.avatar ||
         profile?.user?.avatar_url ||
-        profile?.user?.avatar
+        profile?.user?.avatar ||
+        PLACEHOLDER
     );
 
     const handleAvatarUpload = async () => {
@@ -143,7 +155,7 @@ export default function GuideAccount() {
         await api.put(
             `profiles/customers/${profile.user.id}/avatar/`,
             fd,
-            { headers: { "Content-Type": "multipart/form-data" } } // 415 oldini oladi
+            { headers: { "Content-Type": "multipart/form-data" } }
         );
 
         // profil va avatar urlni yangilab oling
@@ -311,7 +323,7 @@ export default function GuideAccount() {
                                 src={avatarSrc}
                                 alt="avatar"
                                 className="guide-account-avatar-img"
-                                onError={(e)=>{ e.currentTarget.src="/placeholder-avatar.png"; }}
+                                onError={(e)=>{ e.currentTarget.src = PLACEHOLDER; }}
                             />
                             <label className="guide-account-avatar-upload-btn">
                                 <FiUpload />
@@ -331,15 +343,15 @@ export default function GuideAccount() {
                         <div className="guide-account-user">
                             <div className="guide-account-field">
                                 <label>{t("first_name")}</label>
-                                <input value={userData?.first_name || ""} readOnly />
+                                <input value={safeUser.first_name} readOnly />
                             </div>
                             <div className="guide-account-field">
                                 <label>{t("last_name")}</label>
-                                <input value={userData?.last_name || ""} readOnly />
+                                <input value={safeUser.last_name} readOnly />
                             </div>
                             <div className="guide-account-field">
                                 <label>{t("email")}</label>
-                                <input value={userData?.email || ""} readOnly />
+                                <input value={safeUser.email} readOnly />
                             </div>
                         </div>
                     </div>

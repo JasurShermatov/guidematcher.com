@@ -373,7 +373,6 @@ export default function UserAccount() {
                             </div>
                             <div className="user-account-actions">
                                 <button className="user-account-btn primary" onClick={saveProfile} disabled={saving}><FiSave /> {saving ? t("saving") : t("save_changes")}</button>
-                                <button className="user-account-btn" onClick={()=>setPwOpen(true)}><FiShield /> {t("change_password")}</button>
                             </div>
                         </div>
                     </div>
@@ -401,7 +400,6 @@ export default function UserAccount() {
                                         </div>
                                         <div className="user-account-actions">
                                             <button className="user-account-btn primary" onClick={confirmReset}>{t("confirm")}</button>
-                                            <button className="user-account-btn" onClick={()=>{setPwOpen(false); setPwEmailSent(false);}}>{t("close")}</button>
                                         </div>
                                     </>
                                 )}

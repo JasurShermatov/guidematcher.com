@@ -1,2349 +1,872 @@
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import axios from 'axios';
-import ChatWidgets from './ChatWidgets';
-import './UserAccount.css';
+// src/UserAccount.jsx
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import api from "./api";
+import ChatWidgets from "./ChatWidgets";
+import "./UserAccount.css";
+import {
+    FiMessageSquare,
+    FiRefreshCw,
+    FiUser,
+    FiMapPin,
+    FiCalendar,
+    FiClipboard,
+    FiStar,
+    FiTrash2,
+    FiUpload,
+    FiX,
+    FiSearch,
+} from "react-icons/fi";
 
-// API Configuration
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/";
-const WS_URL = process.env.REACT_APP_WS_URL || "ws://localhost:8000/ws/chat/";
+/* ============== Helpers ============== */
+const toArr = (x) => (Array.isArray(x) ? x : Array.isArray(x?.results) ? x.results : []);
+const byId = (list) => Object.fromEntries(toArr(list).map((x) => [String(x.id), x]));
+const errText = (e, f) =>
+    e?.response?.data
+        ? typeof e.response.data === "string"
+            ? e.response.data
+            : e.response.data.detail ||
+            Object.entries(e.response.data)
+                .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join("; ") : String(v)}`)
+                .join(" | ")
+        : e?.message || f;
 
-const api = axios.create({
-    baseURL: API_URL,
-    withCredentials: false,
-});
-
-// Token Interceptor
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("access_token");
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    if (config.data instanceof FormData) {
-        config.headers['Content-Type'] = 'multipart/form-data';
-    }
-    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
-        headers: config.headers,
-        data: config.data,
-    });
-    return config;
-});
-
-// Token Refresh Interceptor
-api.interceptors.response.use(
-    (response) => {
-        console.log(`API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-            status: response.status,
-            data: response.data,
-        });
-        return response;
-    },
-    async (error) => {
-        console.error(`API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
-            status: error.response?.status,
-            data: error.response?.data,
-            message: error.message,
-        });
-        const originalRequest = error.config;
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-            try {
-                const refreshToken = localStorage.getItem("refresh_token");
-                if (!refreshToken) {
-                    throw new Error("No refresh token available");
-                }
-                const refreshResponse = await api.post("token/refresh/", {
-                    refresh: refreshToken,
-                });
-                const newAccessToken = refreshResponse.data.access_token || refreshResponse.data.access;
-                localStorage.setItem("access_token", newAccessToken);
-                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                return api(originalRequest);
-            } catch (refreshError) {
-                console.error("Token refresh failed:", refreshError);
-                localStorage.removeItem("access_token");
-                localStorage.removeItem("refresh_token");
-                window.location.href = "/login";
-                return Promise.reject(refreshError);
-            }
-        }
-        let errorMessage = "Unknown error occurred";
-        if (error.response?.data) {
-            const data = error.response.data;
-            errorMessage =
-                data.detail ||
-                data.message ||
-                data.error ||
-                (data.email && data.email[0]) ||
-                (data.code && data.code[0]) ||
-                (data.non_field_errors && data.non_field_errors[0]) ||
-                JSON.stringify(data);
-        } else if (error.message) {
-            errorMessage = error.message;
-        }
-        return Promise.reject(new Error(errorMessage));
-    }
-);
-
-// API Functions
-const getClientProfile = () => {
-    console.log("Getting client profile...");
-    return api.get("profiles/clients/my/").then((r) => r.data);
-};
-
-const createClientProfile = (payload) => {
-    console.log("Creating client profile:", payload);
-    return api.post("profiles/clients/", payload).then((r) => r.data);
-};
-
-const updateClientProfile = (payload) => {
-    console.log("Updating client profile:", payload);
-    return api.patch("profiles/clients/my/", payload).then((r) => r.data);
-};
-
-const getMyBookings = (status = null) => {
-    console.log("Getting my bookings with status:", status);
-    const params = status ? { status } : {};
-    return api.get("bookings/bookings/", { params }).then((r) => {
-        console.log("Bookings response:", r.data);
-        return r.data;
-    });
-};
-
-const getBooking = (id) => {
-    console.log("Getting booking:", id);
-    return api.get(`bookings/bookings/${id}/`).then((r) => r.data);
-};
-
-const updateBooking = (id, payload) => {
-    console.log("Updating booking:", id, payload);
-    return api.put(`bookings/bookings/${id}/`, payload).then((r) => r.data);
-};
-
-const patchBooking = (id, payload) => {
-    console.log("Patching booking:", id, payload);
-    return api.patch(`bookings/bookings/${id}/`, payload).then((r) => r.data);
-};
-
-const deleteBooking = (id) => {
-    console.log("Deleting booking:", id);
-    return api.delete(`bookings/bookings/${id}/`).then((r) => r.data);
-};
-
-const checkGuideAvailability = (guideId, startDate, endDate) => {
-    console.log("Checking guide availability:", { guideId, startDate, endDate });
-    return api.get(`bookings/bookings/${guideId}/check-availability/`, {
-        params: { start_date: startDate, end_date: endDate }
-    }).then((r) => r.data);
-};
-
-const createBooking = (payload) => {
-    console.log("Creating booking:", payload);
-    return api.post("bookings/bookings/", payload).then((r) => r.data);
-};
-
-const cancelBooking = (id, reason = "") => {
-    console.log("Canceling booking:", id, reason);
-    return api.post(`bookings/bookings/${id}/cancel/`, {
-        cancellation_reason: reason
-    }).then((r) => r.data);
-};
-
-const getCustomerProfiles = (params = {}) => {
-    console.log("Getting customer profiles...", params);
-    return api.get("profiles/customers/", { params }).then((r) => r.data);
-};
-
-const getMyReviews = () => {
-    console.log("Getting my reviews...");
-    return api.get("reviews/my/").then((r) => r.data);
-};
-
-const createReview = (payload) => {
-    console.log("Creating review with payload:", payload);
-    return api.post("reviews/reviews/", { ...payload, booking_id: payload.booking_id }).then((r) => r.data);
-};
-
-const updateReview = (id, payload) => {
-    console.log("Updating review:", id);
-    return api.patch(`reviews/reviews/${id}/`, payload).then((r) => r.data);
-};
-
-const deleteReview = (id) => {
-    console.log("Deleting review:", id);
-    return api.delete(`reviews/reviews/${id}/`).then((r) => r.data);
-};
-
-const getLanguages = () => {
-    console.log("Getting languages...");
-    return api.get("common/languages/").then((r) => r.data);
-};
-
-const getCurrentUser = () => {
-    console.log("Getting current user info...");
-    return api.get("auth/users/short/").then((r) => r.data);
-};
-
-const getServiceTypes = () => {
-    console.log("Getting service types...");
-    return api.get("common/service-types/").then((r) => r.data);
-};
-
-const reactToReview = (id, reactionType, comment = "") => {
-    console.log("Reacting to review:", id, reactionType);
-    return api.post(`reviews/reviews/${id}/react/`, {
-        reaction_type: reactionType,
-        comment: comment
-    }).then((r) => r.data);
-};
-
-const removeReactionFromReview = (id) => {
-    console.log("Removing reaction from review:", id);
-    return api.delete(`reviews/reviews/${id}/react/`).then((r) => r.data);
-};
-
-const getReviewReactions = (id, type = null) => {
-    const params = type ? { type } : {};
-    return api.get(`reviews/reviews/${id}/reactions/`, { params }).then((r) => r.data);
-};
-
-const getReviewSummary = (id) => {
-    return api.get(`reviews/reviews/${id}/reactions/summary/`).then((r) => r.data);
-};
-
-const getCities = (countryId = null) => {
-    const params = countryId ? { country: countryId } : {};
-    console.log("Getting cities...", params);
-    return api.get("common/cities/", { params }).then((r) => r.data);
-};
-
-const getCountries = () => {
-    console.log("Getting countries...");
-    return api.get("common/countries/").then((r) => r.data);
-};
-
-const getClientAvatar = async (userId) => {
-    return api.get(`profiles/clients/${userId}/avatar/`).then(r => r.data.avatar_url || null);
-};
-
-const uploadClientAvatar = async (userId, formData) => {
-    return api.put(`profiles/clients/${userId}/avatar/`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-    }).then(r => r.data);
-};
-
-const deleteClientAvatar = async (userId) => {
-    return api.delete(`profiles/clients/${userId}/avatar/`);
-};
-
-// WebSocket Helpers
-let wsConnections = {};
-
-const connectWebSocket = (conversationId, onMessage, onOpen, onClose, onError) => {
-    if (wsConnections[conversationId]) {
-        console.log(`WebSocket already connected for conversation ${conversationId}`);
-        return wsConnections[conversationId];
-    }
-
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-        throw new Error("No access token for WebSocket");
-    }
-
-    const ws = new WebSocket(`${WS_URL}${conversationId}/?token=${token}`);
-
-    ws.onopen = () => {
-        console.log(`WebSocket connected for conversation ${conversationId}`);
-        if (onOpen) onOpen();
-    };
-
-    ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        console.log(`WebSocket message received:`, data);
-        if (onMessage) onMessage(data);
-    };
-
-    ws.onclose = (event) => {
-        console.log(`WebSocket closed for conversation ${conversationId}:`, event);
-        delete wsConnections[conversationId];
-        if (onClose) onClose(event);
-        setTimeout(() => connectWebSocket(conversationId, onMessage, onOpen, onClose, onError), 3000);
-    };
-
-    ws.onerror = (error) => {
-        console.error(`WebSocket error for conversation ${conversationId}:`, error);
-        if (onError) onError(error);
-    };
-
-    wsConnections[conversationId] = ws;
-    return ws;
-};
-
-const sendWebSocketMessage = (conversationId, payload) => {
-    const ws = wsConnections[conversationId];
-    if (!ws || ws.readyState !== WebSocket.OPEN) {
-        console.error(`WebSocket not open for conversation ${conversationId}`);
-        return;
-    }
-    ws.send(JSON.stringify(payload));
-};
-
-const closeWebSocket = (conversationId) => {
-    const ws = wsConnections[conversationId];
-    if (ws) {
-        ws.close();
-        delete wsConnections[conversationId];
-    }
-};
-
-// React Component
-const UserAccount = () => {
+/* ====================================================================== */
+export default function UserAccount() {
     const { t } = useTranslation();
-    const [currentUser, setCurrentUser] = useState(null);
-    const [profile, setProfile] = useState(null);
-    const [bookings, setBookings] = useState([]);
-    const [reviews, setReviews] = useState([]);
-    const [guides, setGuides] = useState([]);
+
+    /* UI */
+    const [tab, setTab] = useState("guides");
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState("");
+    const toast = (msg) => console.log("[UserAccount]", msg);
+
+    /* Chat (badge) */
+    const [chatOpen, setChatOpen] = useState(false);
+    const [chatUnread, setChatUnread] = useState(0);
+    const [chatLoading, setChatLoading] = useState(false);
+
+    const refreshChatUnread = useCallback(async () => {
+        try {
+            setChatLoading(true);
+            const { data } = await api.get("chat/unread-count/");
+            setChatUnread(Number(data?.total_unread ?? 0));
+        } catch (_) {
+            /* ignore */
+        } finally {
+            setChatLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        let timer;
+        const start = async () => {
+            await refreshChatUnread();
+            timer = setInterval(refreshChatUnread, 30000);
+        };
+        if (!chatOpen) start();
+        return () => timer && clearInterval(timer);
+    }, [chatOpen, refreshChatUnread]);
+
+    /* Lookups */
+    const [countries, setCountries] = useState([]);
+    const [cities, setCities] = useState([]);
     const [languages, setLanguages] = useState([]);
     const [serviceTypes, setServiceTypes] = useState([]);
-    const [cities, setCities] = useState([]);
-    const [countries, setCountries] = useState([]);
-    const [activeTab, setActiveTab] = useState('dashboard');
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [showProfileForm, setShowProfileForm] = useState(false);
-    const [showBookingForm, setShowBookingForm] = useState(false);
-    const [showReviewForm, setShowReviewForm] = useState(false);
-    const [showBookingDetails, setShowBookingDetails] = useState(false);
-    const [editingBooking, setEditingBooking] = useState(null);
-    const [showCancelModal, setShowCancelModal] = useState(false);
-    const [showReactionsModal, setShowReactionsModal] = useState(false);
-    const [cancelReason, setCancelReason] = useState('');
-    const [selectedGuide, setSelectedGuide] = useState(null);
-    const [selectedBookingForReview, setSelectedBookingForReview] = useState(null);
-    const [selectedBookingForCancel, setSelectedBookingForCancel] = useState(null);
-    const [selectedReviewForReactions, setSelectedReviewForReactions] = useState(null);
-    const [selectedBooking, setSelectedBooking] = useState(null);
-    const [reactions, setReactions] = useState([]);
-    const [reactionSummary, setReactionSummary] = useState(null);
-    const [showChat, setShowChat] = useState(false);
-    const [selectedUserForChat, setSelectedUserForChat] = useState(null);
-    const [unavailabilities, setUnavailabilities] = useState([]);
-    const [guidesFilter, setGuidesFilter] = useState({
-        search: '',
-        service_type: '',
-        country: '',
-        city: '',
-        min_rating: '',
-        is_available: true
+
+    const loadLookups = async () => {
+        const [ctr, cty, lng, st] = await Promise.all([
+            api.get("common/countries/"),
+            api.get("common/cities/"),
+            api.get("common/languages/").catch(() => ({ data: [] })),
+            api.get("common/service-types/").catch(() => ({ data: [] })),
+        ]);
+        setCountries(toArr(ctr.data));
+        setCities(toArr(cty.data));
+        setLanguages(toArr(lng.data));
+        setServiceTypes(toArr(st.data));
+    };
+
+    /* ===== Client Profile + Avatar (NO /my endpoints) ===== */
+    const [clientProfiles, setClientProfiles] = useState([]);
+    const [clientUserId, setClientUserId] = useState(null);
+
+    const [clientAvatarUrl, setClientAvatarUrl] = useState(null);
+    const [pendingAvatarFile, setPendingAvatarFile] = useState(null);
+    const clientAvatarRef = useRef(null);
+
+    const fetchClientProfiles = async () => {
+        const { data } = await api.get("profiles/clients/");
+        const list = toArr(data);
+        setClientProfiles(list);
+        const profile = list[0] || null;
+        const uid = profile?.user?.id ?? profile?.user ?? null; // serializer short user
+        setClientUserId(uid || null);
+        return { list, uid: uid || null };
+    };
+
+    const ensureClientProfile = async () => {
+        const { list } = await fetchClientProfiles();
+        if (!list.length) {
+            try {
+                await api.post("profiles/clients/", {});
+            } catch (e) {
+                throw new Error(errText(e, "Create client profile failed"));
+            }
+            await fetchClientProfiles();
+        }
+    };
+
+    const fetchClientAvatar = async (uid) => {
+        try {
+            const { data } = await api.get(`profiles/clients/${uid}/avatar/`);
+            setClientAvatarUrl(data?.avatar_url || null);
+        } catch {
+            setClientAvatarUrl(null);
+        }
+    };
+
+    const loadClientProfile = async () => {
+        const { uid } = await fetchClientProfiles();
+        if (uid) await fetchClientAvatar(uid);
+    };
+
+    const saveClientAvatar = async () => {
+        if (!clientUserId || !pendingAvatarFile) return;
+        setBusy(true);
+        setError("");
+        try {
+            const fd = new FormData();
+            fd.append("avatar", pendingAvatarFile);
+            const { data } = await api.put(`profiles/clients/${clientUserId}/avatar/`, fd);
+            setClientAvatarUrl(data?.avatar_url || null);
+            setPendingAvatarFile(null);
+            if (clientAvatarRef.current) clientAvatarRef.current.value = "";
+            toast("Avatar saved");
+        } catch (e) {
+            setError(errText(e, "Upload failed"));
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    const deleteClientAvatar = async () => {
+        if (!clientUserId) return;
+        setBusy(true);
+        setError("");
+        try {
+            await api.delete(`profiles/clients/${clientUserId}/avatar/`);
+            setClientAvatarUrl(null);
+            setPendingAvatarFile(null);
+            if (clientAvatarRef.current) clientAvatarRef.current.value = "";
+            toast("Avatar deleted");
+        } catch (e) {
+            setError(errText(e, "Delete failed"));
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    /* ===== Guides (customers) search + manual Search button ===== */
+    const [customers, setCustomers] = useState([]);
+    const [filters, setFilters] = useState({
+        countryId: "",
+        cityId: "",
+        minRating: "",
     });
-    const [reviewFilter, setReviewFilter] = useState({
-        minRating: '',
-        sortBy: 'date_desc'
+
+    const loadCustomers = async () => {
+        const params = {};
+        if (filters.countryId) params.country = filters.countryId;
+        if (filters.cityId) params.city = filters.cityId;
+        if (filters.minRating !== "") params.min_rating = filters.minRating;
+        const { data } = await api.get("profiles/customers/", { params });
+        setCustomers(toArr(data));
+    };
+
+    const customersById = useMemo(() => byId(customers), [customers]);
+
+    const filteredCities = useMemo(() => {
+        if (!filters.countryId) return cities;
+        const cid = String(filters.countryId);
+        return toArr(cities).filter(
+            (c) => String(c.country) === cid || String(c.country?.id) === cid
+        );
+    }, [cities, filters.countryId]);
+
+    /* ===== Bookings ===== */
+    const [bookings, setBookings] = useState([]);
+    const [bookModal, setBookModal] = useState({ open: false, customer: null, name: "" });
+    const [bookDates, setBookDates] = useState({ start_date: "", end_date: "" });
+    const [selectedServiceType, setSelectedServiceType] = useState("");
+
+    const loadBookings = async () => {
+        const { data } = await api.get("bookings/bookings/");
+        setBookings(toArr(data));
+    };
+
+    const openBookNow = async (cust) => {
+        const cid = cust?.id ?? cust;
+        try {
+            await ensureClientProfile(); // make sure we can book
+        } catch (e) {
+            setError(e.message);
+            return;
+        }
+        setBookModal({
+            open: true,
+            customer: cid,
+            name: cust?.full_name || cust?.display_name || "Guide",
+        });
+        setBookDates({ start_date: "", end_date: "" });
+    };
+
+    const submitBooking = async (e) => {
+        e.preventDefault();
+        setError("");
+
+        if (!bookModal.customer || !bookDates.start_date || !bookDates.end_date) {
+            setError("Start/End required");
+            return;
+        }
+        const s = new Date(bookDates.start_date);
+        const en = new Date(bookDates.end_date);
+        if (en < s) {
+            setError("Invalid date range");
+            return;
+        }
+
+        // IMPORTANT: availability is validated server-side in perform_create.
+        // We rely on BE to return a clear 400 error if the guide is unavailable.
+        const payload = {
+            customer_profile: Number(bookModal.customer),
+            start_date: bookDates.start_date,
+            end_date: bookDates.end_date,
+            title: `Booking with ${bookModal.name}`,
+            ...(selectedServiceType ? { service_type: Number(selectedServiceType) } : {}),
+        };
+
+        try {
+            setBusy(true);
+            await api.post("bookings/bookings/", payload);
+            setBookModal({ open: false, customer: null, name: "" });
+            await Promise.all([loadBookings(), loadCustomers()]);
+            setTab("bookings");
+        } catch (e2) {
+            // Surface BE unavailability message if present
+            const msg = errText(e2, "Booking failed");
+            setError(msg);
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    const cancelBooking = async (id) => {
+        try {
+            await api.post(`bookings/bookings/${id}/cancel/`, {});
+            await loadBookings();
+        } catch (e) {
+            setError(errText(e, "Cancel failed"));
+        }
+    };
+
+    /* ===== Reviews ===== */
+    const [myReviews, setMyReviews] = useState([]);
+
+    const [reviewModal, setReviewModal] = useState({
+        open: false,
+        bookingId: null,
+        guideName: "",
     });
-    const [editingReview, setEditingReview] = useState(null);
-    const [profileForm, setProfileForm] = useState({
-        date_of_birth: '',
-        preferred_contact: 'email',
-        languages: [],
-        avatar: null,
-        avatarPreview: null
-    });
-    const [bookingForm, setBookingForm] = useState({
-        title: '',
-        description: '',
-        start_date: '',
-        end_date: '',
-        special_requirements: '',
-        budget: '',
-        customer_profile: '',
-        country: '' // Yangi maydon qo‘shildi
-    });
-    const [reviewForm, setReviewForm] = useState({
+    const [reviewDraft, setReviewDraft] = useState({
         overall_rating: 5,
         communication_rating: 5,
         service_rating: 5,
         punctuality_rating: 5,
         value_rating: 5,
-        title: '',
-        comment: '',
-        booking_id: ''
-    });
-    const [reactionForm, setReactionForm] = useState({
-        reaction_type: 'like',
-        comment: ''
+        comment: "",
     });
 
-    const acceptBooking = (id) => {
-        console.log("Accepting booking:", id);
-        return api.post(`bookings/bookings/${id}/accept/`).then((r) => r.data);
+    const [me, setMe] = useState(null);
+    useEffect(() => {
+        (async () => {
+            try {
+                const { data } = await api.get("auth/users/me/");
+                setMe(data);
+            } catch (_) {
+                /* ignore */
+            }
+        })();
+    }, []);
+
+    const loadMyReviews = async () => {
+        // Use dedicated endpoint that returns user's own published + unpublished
+        const { data } = await api.get("reviews/my/");
+        setMyReviews(toArr(data));
     };
 
     useEffect(() => {
-        initializeData();
-    }, []);
+        loadMyReviews();
+    }, [me?.id]);
 
-    const initializeData = async () => {
-        try {
-            setLoading(true);
-            const userData = await getCurrentUser();
-            setCurrentUser(userData);
-            const [languagesData, serviceTypesData, citiesData, countriesData] = await Promise.all([
-                getLanguages(),
-                getServiceTypes(),
-                getCities(),
-                getCountries()
-            ]);
-            setLanguages(languagesData.results || languagesData);
-            setServiceTypes(serviceTypesData.results || serviceTypesData);
-            setCities(citiesData.results || citiesData);
-            setCountries(countriesData.results || countriesData);
+    const hasReviewForBooking = useCallback(
+        (bookingId) =>
+            toArr(myReviews).some(
+                (r) => String(r.booking) === String(bookingId) || String(r.booking_id) === String(bookingId)
+            ),
+        [myReviews]
+    );
 
-            try {
-                const profileData = await getClientProfile();
-                console.log("Profile Data:", profileData);
-                setProfile(profileData);
-                setProfileForm({
-                    date_of_birth: profileData.date_of_birth || '',
-                    preferred_contact: profileData.preferred_contact || 'email',
-                    languages: profileData.languages || [],
-                    avatar: null,
-                    avatarPreview: null
-                });
-                const avatarUrl = await getClientAvatar(userData.id);
-                setProfile(prev => ({ ...prev, avatar: avatarUrl }));
-            } catch (profileError) {
-                console.log('No profile found, user needs to create one');
-                setShowProfileForm(true);
-            }
-            await Promise.all([
-                loadBookings(),
-                loadReviews(),
-                loadGuides()
-            ]);
-        } catch (err) {
-            console.error('Error initializing data:', err);
-            setError(t('user_account.errors.fill_required_fields'));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const loadBookings = async () => {
-        try {
-            const data = await getMyBookings();
-            console.log("Bookings data:", data);
-            setBookings(data.results || data);
-        } catch (err) {
-            console.error('Error loading bookings:', err);
-            setError(t('user_account.errors.failed_to_load_bookings'));
-        }
-    };
-
-    const loadReviews = async () => {
-        try {
-            const data = await getMyReviews();
-            setReviews(data.results || data);
-        } catch (err) {
-            console.error('Error loading reviews:', err);
-        }
-    };
-
-    const loadGuides = async () => {
-        try {
-            const params = {};
-            if (guidesFilter.search) params.search = guidesFilter.search;
-            if (guidesFilter.service_type) params.service_types = guidesFilter.service_type;
-            if (guidesFilter.country) params.country = guidesFilter.country;
-            if (guidesFilter.city) params.city = guidesFilter.city;
-            if (guidesFilter.min_rating) params.average_rating__gte = guidesFilter.min_rating;
-            if (guidesFilter.is_available) params.is_available = guidesFilter.is_available;
-            const data = await getCustomerProfiles(params);
-            setGuides(data.results.map(guide => ({
-                ...guide,
-                is_available: guide.is_available ?? true // Default true, agar backend qaytarmasa
-            })));
-        } catch (err) {
-            console.error('Error loading guides:', err);
-        }
-    };
-
-    const loadReviewReactions = async (reviewId) => {
-        try {
-            const data = await getReviewReactions(reviewId);
-            setReactions(data.results || data);
-        } catch (err) {
-            console.error('Error loading reactions:', err);
-            setError(t('user_account.errors.failed_load_reactions'));
-        }
-    };
-
-    const loadReviewSummary = async (reviewId) => {
-        try {
-            const data = await getReviewSummary(reviewId);
-            setReactionSummary(data);
-        } catch (err) {
-            console.error('Error loading review summary:', err);
-            setError(t('user_account.errors.failed_load_review_summary'));
-        }
-    };
-    // Avatar oldindan ko'rish funksiyasi
-    const handleAvatarChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            // Validate file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                setError(t('user_account.errors.avatar_size_limit'));
-                return;
-            }
-            // Validate file type
-            if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
-                setError(t('user_account.errors.avatar_invalid_format'));
-                return;
-            }
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setProfileForm({
-                    ...profileForm,
-                    avatar: file,
-                    avatarPreview: reader.result
-                });
-                setError(null); // Clear previous errors
-            };
-            reader.onerror = () => {
-                setError(t('user_account.errors.avatar_read_failed'));
-            };
-            reader.readAsDataURL(file);
-        } else {
-            setProfileForm({
-                ...profileForm,
-                avatar: null,
-                avatarPreview: null
-            });
-        }
-    };
-
-    const handleBookingSubmit = async (e) => {
-        e.preventDefault();
-        setError(null);
-
-        // Client-side validation
-        if (!bookingForm.title.trim()) {
-            setError(t('user_account.errors.title_required'));
-            return;
-        }
-        if (!bookingForm.start_date) {
-            setError(t('user_account.errors.start_date_required'));
-            return;
-        }
-        if (!bookingForm.end_date) {
-            setError(t('user_account.errors.end_date_required'));
-            return;
-        }
-        if (new Date(bookingForm.start_date) > new Date(bookingForm.end_date)) {
-            setError(t('user_account.errors.start_date_before_end'));
-            return;
-        }
-        const today = new Date().toISOString().split('T')[0];
-        if (bookingForm.start_date < today) {
-            setError(t('user_account.errors.start_date_past'));
-            return;
-        }
-        if (!bookingForm.customer_profile) {
-            setError(t('user_account.errors.guide_required'));
-            console.error("customer_profile is missing:", { bookingForm, selectedGuide });
-            return;
-        }
-        if (!bookingForm.country) {
-            setError(t('user_account.errors.country_required'));
-            return;
-        }
-
-        try {
-            // Check guide availability
-            const availability = await checkGuideAvailability(
-                bookingForm.customer_profile,
-                bookingForm.start_date,
-                bookingForm.end_date
-            );
-            if (!availability.is_available) {
-                setError(`${t('user_account.errors.guide_unavailable')}: ${availability.message}`);
-                return;
-            }
-            // Prepare booking payload
-            const bookingData = {
-                title: bookingForm.title.trim(),
-                description: bookingForm.description.trim(),
-                start_date: bookingForm.start_date,
-                end_date: bookingForm.end_date,
-                special_requirements: bookingForm.special_requirements.trim(),
-                budget: bookingForm.budget ? parseFloat(bookingForm.budget) : null,
-                customer_profile: bookingForm.customer_profile,
-                country: bookingForm.country // Yangi maydon qo‘shildi
-            };
-            console.log("Booking payload:", bookingData);
-            let newBooking;
-            if (editingBooking) {
-                newBooking = await updateBooking(editingBooking.id, bookingData);
-            } else {
-                newBooking = await createBooking(bookingData);
-            }
-            await loadBookings();
-            setShowBookingForm(false);
-            setSelectedGuide(null);
-            setEditingBooking(null);
-            setBookingForm({
-                title: '',
-                description: '',
-                start_date: '',
-                end_date: '',
-                special_requirements: '',
-                budget: '',
-                customer_profile: '',
-                country: '' // Yangi maydon qo‘shildi
-            });
-            alert(editingBooking ? t('user_account.success.booking_updated') : t('user_account.success.booking_created'));
-        } catch (err) {
-            console.error('Booking error:', err.response?.data || err.message);
-            const errorMessage = err.response?.data?.detail ||
-                err.response?.data?.non_field_errors?.[0] ||
-                err.response?.data?.country?.[0] || // Yangi xato xabari qo‘shildi
-                err.message ||
-                t('user_account.errors.unknown_error');
-            setError(`${editingBooking ? t('user_account.errors.failed_update_booking') : t('user_account.errors.failed_create_booking')}: ${errorMessage}`);
-        }
-    };
-
-    const handleEditBooking = (booking) => {
-        setEditingBooking(booking);
-        setBookingForm({
-            title: booking.title || '',
-            description: booking.description || '',
-            start_date: booking.start_date || '',
-            end_date: booking.end_date || '',
-            special_requirements: booking.special_requirements || '',
-            budget: booking.budget ? booking.budget.toString() : '',
-            customer_profile: booking.customer_profile?.id || '',
-            country: booking.country || '' // Yangi maydon qo‘shildi
-        });
-        setSelectedGuide(booking.customer_profile);
-        setShowBookingForm(true);
-    };
-
-    const handleDeleteBooking = async (bookingId) => {
-        if (!window.confirm(t('user_account.confirm.delete_booking'))) {
-            return;
-        }
-        try {
-            await deleteBooking(bookingId);
-            await loadBookings();
-            setError(null);
-            alert(t('user_account.success.booking_deleted'));
-        } catch (err) {
-            console.error('Delete booking error:', err);
-            setError(t('user_account.errors.failed_delete_booking') + `: ${err.message}`);
-        }
-    };
-
-    const handleAcceptBooking = async (bookingId) => {
-        if (!window.confirm(t('user_account.confirm.accept_booking'))) {
-            return;
-        }
-        try {
-            await acceptBooking(bookingId);
-            await loadBookings();
-            setError(null);
-            alert(t('user_account.success.booking_accepted'));
-        } catch (err) {
-            console.error('Accept booking error:', err);
-            setError(t('user_account.errors.failed_accept_booking') + `: ${err.message}`);
-        }
-    };
-
-    const handleProfileSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const payload = {
-                date_of_birth: profileForm.date_of_birth || '',
-                preferred_contact: profileForm.preferred_contact || 'email',
-                languages: profileForm.languages.filter(lang => lang)
-            };
-
-            let result;
-            if (profile) {
-                result = await updateClientProfile(payload);
-            } else {
-                result = await createClientProfile(payload);
-            }
-            setProfile(result);
-            setProfileForm({
-                ...profileForm,
-                avatar: null,
-                avatarPreview: null
-            });
-            setShowProfileForm(false);
-            setError(null);
-        } catch (err) {
-            console.error('Profile submit error:', err);
-            setError(t('user_account.errors.fill_required_fields') + ': ' + err.message);
-        }
-    };
-
-    const handleAvatarSubmit = async (e) => {
-        e.preventDefault();
-        if (!profileForm.avatar) {
-            setError(t('user_account.errors.avatar_required'));
-            return;
-        }
-        try {
-            const formData = new FormData();
-            formData.append('avatar', profileForm.avatar);
-            // Debug FormData contents
-            for (let pair of formData.entries()) {
-                console.log(`${pair[0]}: ${pair[1]}`);
-            }
-            const result = await uploadClientAvatar(currentUser.id, formData);
-            setProfile({ ...profile, avatar: result.avatar_url });
-            setProfileForm({
-                ...profileForm,
-                avatar: null,
-                avatarPreview: null
-            });
-            setError(null);
-            alert(t('user_account.success.avatar_uploaded'));
-        } catch (err) {
-            console.error('Avatar submit error:', err);
-            setError(t('user_account.errors.avatar_upload_failed') + ': ' + err.message);
-        }
-    };
-
-    const handleDeleteAvatar = async () => {
-        if (!window.confirm(t('user_account.confirm.delete_avatar'))) {
-            return;
-        }
-        try {
-            await deleteClientAvatar(currentUser.id);
-            setProfile({ ...profile, avatar: null });
-            setProfileForm({
-                ...profileForm,
-                avatar: null,
-                avatarPreview: null
-            });
-            setError(null);
-            alert(t('user_account.success.avatar_deleted'));
-        } catch (err) {
-            console.error('Avatar delete error:', err);
-            setError(t('user_account.errors.avatar_delete_failed') + ': ' + err.message);
-        }
-    };
-
-    const handleViewBooking = async (booking) => {
-        try {
-            const bookingData = await getBooking(booking.id);
-            setSelectedBooking(bookingData);
-            setShowBookingDetails(true);
-            setError(null);
-        } catch (err) {
-            console.error('Error fetching booking details:', err);
-            setError(t('user_account.errors.failed_load_booking') + `: ${err.message}`);
-        }
-    };
-
-    const handleReviewSubmit = async (e) => {
-        e.preventDefault();
-        console.log("Submitting review form:", reviewForm);
-        if (!reviewForm.title.trim()) {
-            setError(t('user_account.errors.review_title_required'));
-            console.log("Error: Title is empty");
-            return;
-        }
-        if (!reviewForm.comment.trim()) {
-            setError(t('user_account.errors.review_comment_required'));
-            console.log("Error: Comment is empty");
-            return;
-        }
-        try {
-            const reviewData = {
-                overall_rating: parseInt(reviewForm.overall_rating),
-                communication_rating: parseInt(reviewForm.communication_rating),
-                service_rating: parseInt(reviewForm.service_rating),
-                punctuality_rating: parseInt(reviewForm.punctuality_rating),
-                value_rating: parseInt(reviewForm.value_rating),
-                title: reviewForm.title.trim(),
-                comment: reviewForm.comment.trim(),
-                booking_id: selectedBookingForReview.id
-            };
-            console.log("Submitting review with data:", reviewData);
-            if (editingReview) {
-                await updateReview(editingReview.id, reviewData);
-            } else {
-                await createReview(reviewData);
-            }
-            await loadReviews();
-            await loadBookings();
-            setShowReviewForm(false);
-            setSelectedBookingForReview(null);
-            setEditingReview(null);
-            setReviewForm({
-                overall_rating: 5,
-                communication_rating: 5,
-                service_rating: 5,
-                punctuality_rating: 5,
-                value_rating: 5,
-                title: '',
-                comment: '',
-                booking_id: ''
-            });
-            setError(null);
-            alert(t('user_account.success.review_submitted'));
-        } catch (err) {
-            console.error("Review submission error:", err.response?.data || err.message);
-            const errorMessage = err.response?.data?.detail ||
-                err.response?.data?.booking?.[0] ||
-                err.response?.data?.non_field_errors?.[0] ||
-                err.message ||
-                t('user_account.errors.failed_submit_review');
-            setError(`${t('user_account.errors.failed_submit_review')}: ${errorMessage}`);
-        }
-    };
-
-// Update createReview to accept query params
-    const createReview = (payload, config = {}) => {
-        console.log("Creating review with payload:", payload, "config:", config);
-        return api.post("reviews/reviews/", payload, config).then((r) => r.data);
-    };
-
-    const handleDeleteReview = async (reviewId) => {
-        if (!window.confirm(t('user_account.confirm.delete_review'))) {
-            return;
-        }
-        try {
-            await deleteReview(reviewId);
-            loadReviews();
-            loadBookings();
-            setError(null);
-            alert(t('user_account.success.review_deleted'));
-        } catch (err) {
-            setError(t('user_account.errors.failed_delete_review'));
-        }
-    };
-
-    const handleReactToReview = async (reviewId) => {
-        if (reactionForm.reaction_type === 'dislike' && !reactionForm.comment.trim()) {
-            setError(t('user_account.errors.dislike_comment_required'));
-            return;
-        }
-        try {
-            await reactToReview(reviewId, reactionForm.reaction_type, reactionForm.comment);
-            loadReviewReactions(reviewId);
-            loadReviewSummary(reviewId);
-            setReactionForm({ reaction_type: 'like', comment: '' });
-            setError(null);
-            alert(t('user_account.success.reaction_submitted'));
-        } catch (err) {
-            setError(t('user_account.errors.failed_submit_reaction'));
-        }
-    };
-
-    const handleRemoveReaction = async (reviewId) => {
-        try {
-            await removeReactionFromReview(reviewId);
-            loadReviewReactions(reviewId);
-            loadReviewSummary(reviewId);
-            setError(null);
-            alert(t('user_account.success.reaction_removed'));
-        } catch (err) {
-            setError(t('user_account.errors.failed_remove_reaction'));
-        }
-    };
-
-    const handleViewReactions = (review) => {
-        setSelectedReviewForReactions(review);
-        loadReviewReactions(review.id);
-        loadReviewSummary(review.id);
-        setShowReactionsModal(true);
-    };
-
-    const handleEditReview = (review, booking) => {
-        setSelectedBookingForReview(booking);
-        setEditingReview(review);
-        setReviewForm({
-            overall_rating: review.overall_rating,
-            communication_rating: review.communication_rating,
-            service_rating: review.service_rating,
-            punctuality_rating: review.punctuality_rating,
-            value_rating: review.value_rating,
-            title: review.title,
-            comment: review.comment,
-            booking_id: review.booking
-        });
-        setShowReviewForm(true);
-    };
-
-    const handleCancelBooking = async () => {
-        if (!cancelReason.trim()) {
-            setError(t('user_account.errors.cancellation_reason_required'));
-            return;
-        }
-        try {
-            await cancelBooking(selectedBookingForCancel.id, cancelReason);
-            await loadBookings();
-            setShowCancelModal(false);
-            setSelectedBookingForCancel(null);
-            setCancelReason('');
-            setError(null);
-            alert(t('user_account.success.booking_cancelled'));
-        } catch (err) {
-            console.error('Cancel booking error:', err);
-            setError(t('user_account.errors.failed_cancel_booking') + `: ${err.message}`);
-        }
-    };
-
-    const getGuideUnavailabilities = (guideId) => {
-        console.log("Getting guide unavailabilities for guide:", guideId);
-        return api.get(`profiles/unavailabilities/?customer=${guideId}`).then((r) => r.data);
-    };
-
-    const handleBookGuide = async (guide) => {
-        if (!guide || !guide.id || guide.is_available === undefined) {
-            setError(t('user_account.errors.guide_required'));
-            console.error("Invalid guide data:", guide);
-            return;
-        }
-        try {
-            setError(null);
-            setSelectedGuide(guide);
-            // Fetch guide unavailabilities
-            const unavailabilityData = await getGuideUnavailabilities(guide.id);
-            setUnavailabilities(unavailabilityData.results || unavailabilityData);
-            setShowBookingForm(true);
-            setBookingForm({
-                title: '',
-                description: '',
-                start_date: '',
-                end_date: '',
-                special_requirements: '',
-                budget: '',
-                customer_profile: guide.id // Ensure guide.id is set
-            });
-            console.log("Opening booking form for guide:", guide.id, guide);
-        } catch (err) {
-            setError(t('user_account.errors.failed_to_load_guide'));
-            console.error("Error in handleBookGuide:", err);
-        }
-    };
-
-    const handleWriteReview = (booking) => {
-        setSelectedBookingForReview(booking);
-        setEditingReview(null);
-        setReviewForm({
+    const openReviewForBooking = (bk) => {
+        const guide =
+            customersById[String(bk.customer_profile)] || customersById[String(bk.customer)] || {};
+        const guideName = guide.full_name || guide.display_name || "Guide";
+        setReviewModal({ open: true, bookingId: bk.id, guideName });
+        setReviewDraft({
             overall_rating: 5,
             communication_rating: 5,
             service_rating: 5,
             punctuality_rating: 5,
             value_rating: 5,
-            title: t('user_account.forms.review.title_default', {
-                guideName: booking.customer_profile?.user?.full_name || 'Unknown',
-                bookingTitle: booking.title
-            }),
-            comment: '',
-            booking_id: booking.id
+            comment: "",
         });
-        setShowReviewForm(true);
     };
 
-    const handleOpenCancelModal = (booking) => {
-        setSelectedBookingForCancel(booking);
-        setCancelReason('');
-        setShowCancelModal(true);
-    };
-
-    const handleChatWithUser = (user) => {
-        setSelectedUserForChat(user?.user?.email || user?.email);
-        setShowChat(true);
-    };
-
-    const handleCloseChat = () => {
-        setShowChat(false);
-        setSelectedUserForChat(null);
-    };
-
-    const checkGuideAvailability = async (guideId, startDate, endDate) => {
-        console.log("Checking guide availability:", { guideId, startDate, endDate });
+    const submitReview = async (e) => {
+        e.preventDefault();
+        setError("");
         try {
-            const response = await api.get(`bookings/bookings/${guideId}/check-availability/`, {
-                params: { start_date: startDate, end_date: endDate }
-            });
-            return response.data;
-        } catch (err) {
-            console.error("Availability check failed:", err);
-            throw new Error(err.message || t('user_account.errors.failed_check_availability'));
+            const payload = {
+                booking_id: Number(reviewModal.bookingId),
+                overall_rating: Number(reviewDraft.overall_rating),
+                communication_rating: Number(reviewDraft.communication_rating),
+                service_rating: Number(reviewDraft.service_rating),
+                punctuality_rating: Number(reviewDraft.punctuality_rating),
+                value_rating: Number(reviewDraft.value_rating),
+                title: `Review for ${reviewModal.guideName}`,
+                comment: reviewDraft.comment || "",
+            };
+            await api.post("reviews/reviews/", payload);
+            await loadMyReviews();
+            setReviewModal({ open: false, bookingId: null, guideName: "" });
+            toast("Review submitted");
+        } catch (e2) {
+            setError(errText(e2, "Review failed"));
         }
     };
 
-    const handleFilterChange = async (key, value) => {
-        if (key === 'country') {
-            setGuidesFilter({ ...guidesFilter, [key]: value, city: '' });
-            if (value) {
-                try {
-                    const citiesData = await getCities(value);
-                    setCities(citiesData.results || citiesData);
-                } catch (err) {
-                    console.error('Error loading cities:', err);
-                }
-            } else {
-                try {
-                    const allCitiesData = await getCities();
-                    setCities(allCitiesData.results || allCitiesData);
-                } catch (err) {
-                    console.error('Error loading all cities:', err);
-                }
-            }
-        } else {
-            setGuidesFilter({ ...guidesFilter, [key]: value });
+    /* ===== Initial load ===== */
+    const initialLoad = async () => {
+        setBusy(true);
+        setError("");
+        try {
+            await loadLookups();
+            await ensureClientProfile(); // ensure exists before anything
+            await loadClientProfile();
+            await Promise.all([loadCustomers(), loadBookings(), loadMyReviews()]);
+        } catch (e) {
+            setError(errText(e, "Load failed"));
+        } finally {
+            setBusy(false);
         }
     };
-
-    const handleReviewFilterChange = (key, value) => {
-        setReviewFilter({ ...reviewFilter, [key]: value });
-    };
-
-    const filteredReviews = reviews
-        .filter(review => reviewFilter.minRating ? review.overall_rating >= parseInt(reviewFilter.minRating) : true)
-        .sort((a, b) => {
-            if (reviewFilter.sortBy === 'date_desc') {
-                return new Date(b.created_at) - new Date(a.created_at);
-            } else if (reviewFilter.sortBy === 'date_asc') {
-                return new Date(a.created_at) - new Date(b.created_at);
-            } else if (reviewFilter.sortBy === 'rating_desc') {
-                return b.overall_rating - a.overall_rating;
-            } else if (reviewFilter.sortBy === 'rating_asc') {
-                return a.overall_rating - b.overall_rating;
-            }
-            return 0;
-        });
 
     useEffect(() => {
-        loadGuides();
-    }, [guidesFilter]);
+        initialLoad();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    if (loading) {
+    /* ======================= UI ======================= */
+    const ChatModal = ({ open, onClose, title, children }) => {
+        if (!open) return null;
         return (
-            <div className="user-account-loading">
-                <div className="user-account-spinner"></div>
-                <p>{t('user_account.loading')}</p>
-            </div>
-        );
-    }
-
-    return (
-        <div className="user-account-container">
-            <div className="user-account-header">
-                <h1 className="user-account-title">{t('user_account.title')}</h1>
-                {currentUser && (
-                    <div className="user-account-user-info">
-                        <button
-                            className="user-account-chat-btn"
-                            onClick={() => {
-                                console.log('Messages button clicked, setting showChat to true');
-                                setShowChat(true);
-                            }}
-                            style={{
-                                marginLeft: '16px',
-                                padding: '8px 16px',
-                                backgroundColor: '#667eea',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                fontWeight: '500'
-                            }}
-                        >
-                            {t('user_account.buttons.messages')}
+            <div className="user-account-chatmodal">
+                <div className="user-account-chatmodal__backdrop" onClick={onClose} />
+                <div className="user-account-chatmodal__panel">
+                    <div className="user-account-chatmodal__header">
+                        <h4 className="user-account-card__title">
+                            <FiMessageSquare /> {title}
+                        </h4>
+                        <button className="user-account-iconbtn" onClick={onClose} title={t("chat.close")}>
+                            <FiX />
                         </button>
                     </div>
-                )}
-            </div>
-            {error && (
-                <div className="user-account-error" style={{ background: '#f8d7da', color: '#721c24', padding: '8px 12px', borderRadius: '4px', marginBottom: '16px' }}>
-                    <p>{error}</p>
-                    <button onClick={() => setError(null)} className="user-account-error-close">×</button>
+                    <div className="user-account-chatmodal__body">{children}</div>
                 </div>
-            )}
-            <div className="user-account-navigation">
+            </div>
+        );
+    };
+
+    return (
+        <div className="user-account-root">
+            <div className="user-account-header">
+                <h2 className="user-account-title">{t("userAccount.title") || "User Account"}</h2>
+                <div className="user-account-header__actions">
+                    <button
+                        type="button"
+                        className="user-account-btn user-account-btn--ghost"
+                        onClick={initialLoad}
+                        disabled={busy}
+                        title={t("userAccount.loading")}
+                    >
+                        <FiRefreshCw />
+                    </button>
+                    <button
+                        type="button"
+                        className="user-account-btn user-account-btn--primary"
+                        onClick={() => setChatOpen(true)}
+                        title={t("ui.openChat")}
+                    >
+                        <FiMessageSquare />
+                        <span>{t("ui.openChat") || "Open chat"}</span>
+                        {!chatOpen && (chatLoading ? (
+                            <span className="user-account-badge user-account-badge--muted">…</span>
+                        ) : chatUnread > 0 ? (
+                            <span className="user-account-badge">{chatUnread}</span>
+                        ) : null)}
+                    </button>
+                </div>
+                {busy && <span className="user-account-busy">{t("userAccount.loading") || "Loading..."}</span>}
+                {error && <span className="user-account-error">{error}</span>}
+            </div>
+
+            <div className="user-account-tabs">
                 <button
-                    className={`user-account-nav-btn ${activeTab === 'dashboard' ? 'user-account-nav-active' : ''}`}
-                    onClick={() => setActiveTab('dashboard')}
+                    className={`user-account-tab ${tab === "profile" ? "user-account-tab--active" : ""}`}
+                    onClick={() => setTab("profile")}
                 >
-                    {t('user_account.navigation.dashboard')}
+                    <FiUser /> {t("userAccount.tabs.profile") || "Profile"}
                 </button>
                 <button
-                    className={`user-account-nav-btn ${activeTab === 'profile' ? 'user-account-nav-active' : ''}`}
-                    onClick={() => setActiveTab('profile')}
+                    className={`user-account-tab ${tab === "guides" ? "user-account-tab--active" : ""}`}
+                    onClick={() => setTab("guides")}
                 >
-                    {t('user_account.navigation.profile')}
+                    <FiMapPin /> {t("userAccount.tabs.guides") || "Guides"}
                 </button>
                 <button
-                    className={`user-account-nav-btn ${activeTab === 'guides' ? 'user-account-nav-active' : ''}`}
-                    onClick={() => setActiveTab('guides')}
+                    className={`user-account-tab ${tab === "bookings" ? "user-account-tab--active" : ""}`}
+                    onClick={() => setTab("bookings")}
                 >
-                    {t('user_account.navigation.guides')}
+                    <FiClipboard /> {t("userAccount.tabs.bookings") || "Bookings"}
                 </button>
                 <button
-                    className={`user-account-nav-btn ${activeTab === 'bookings' ? 'user-account-nav-active' : ''}`}
-                    onClick={() => setActiveTab('bookings')}
+                    className={`user-account-tab ${tab === "reviews" ? "user-account-tab--active" : ""}`}
+                    onClick={() => setTab("reviews")}
                 >
-                    {t('user_account.navigation.bookings')}
-                </button>
-                <button
-                    className={`user-account-nav-btn ${activeTab === 'reviews' ? 'user-account-nav-active' : ''}`}
-                    onClick={() => setActiveTab('reviews')}
-                >
-                    {t('user_account.navigation.reviews')}
+                    <FiStar /> {t("userAccount.tabs.reviews") || "Reviews"}
                 </button>
             </div>
-            <div className="user-account-content">
-                {activeTab === 'dashboard' && (
-                    <div className="user-account-dashboard">
-                        <div className="user-account-stats">
-                            <div className="user-account-stat-card">
-                                <h3 className="user-account-stat-title">{t('user_account.dashboard.total_bookings')}</h3>
-                                <p className="user-account-stat-value">{bookings.length}</p>
-                            </div>
-                            <div className="user-account-stat-card">
-                                <h3 className="user-account-stat-title">{t('user_account.dashboard.active_bookings')}</h3>
-                                <p className="user-account-stat-value">
-                                    {bookings.filter(b => b.status === 'confirmed' || b.status === 'accepted').length}
-                                </p>
-                            </div>
-                            <div className="user-account-stat-card">
-                                <h3 className="user-account-stat-title">{t('user_account.dashboard.completed_trips')}</h3>
-                                <p className="user-account-stat-value">
-                                    {bookings.filter(b => b.status === 'completed').length}
-                                </p>
-                            </div>
-                            <div className="user-account-stat-card">
-                                <h3 className="user-account-stat-title">{t('user_account.dashboard.reviews_written')}</h3>
-                                <p className="user-account-stat-value">{reviews.length}</p>
-                            </div>
-                        </div>
-                        <div className="user-account-recent">
-                            <h3 className="user-account-section-title">{t('user_account.dashboard.recent_bookings')}</h3>
-                            <div className="user-account-recent-bookings">
-                                {bookings.slice(0, 5).map(booking => (
-                                    <div key={booking.id} className="user-account-booking-card">
-                                        <div className="user-account-booking-info">
-                                            <h4 className="user-account-booking-title">{booking.title}</h4>
-                                            <p className="user-account-booking-date">
-                                                {new Date(booking.start_date).toLocaleDateString()} - {new Date(booking.end_date).toLocaleDateString()}
-                                            </p>
-                                            <span className={`user-account-booking-status user-account-status-${booking.status}`}>
-                                {t(`user_account.status.${booking.status}`)}
-                            </span>
-                                            {booking.status === 'cancelled' && booking.cancellation_reason && (
-                                                <p className="user-account-booking-cancel-reason" style={{ color: '#721c24', fontSize: '14px', marginTop: '8px' }}>
-                                                    {t('user_account.bookings.cancellation_reason')}: {booking.cancellation_reason}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="user-account-booking-actions">
-                                            {['pending', 'confirmed', 'accepted'].includes(booking.status) && (
-                                                <button
-                                                    className="user-account-btn user-account-btn-cancel"
-                                                    onClick={() => handleOpenCancelModal(booking)}
-                                                >
-                                                    {t('user_account.buttons.cancel')}
-                                                </button>
-                                            )}
-                                            {booking.status === 'completed' && !reviews.find(r => r.booking === booking.id) && (
-                                                <button
-                                                    className="user-account-btn user-account-btn-primary"
-                                                    onClick={() => {
-                                                        console.log("Write Review clicked for booking:", booking);
-                                                        handleWriteReview(booking);
-                                                    }}
-                                                >
-                                                    {t('user_account.buttons.write_review')}
-                                                </button>
-                                            )}
-                                            {booking.customer_profile && (
-                                                <button
-                                                    className="user-account-btn user-account-btn-primary"
-                                                    onClick={() => {
-                                                        console.log("Book Now clicked for guide:", booking.customer_profile);
-                                                        handleBookGuide(booking.customer_profile);
-                                                    }}
-                                                    disabled={!booking.customer_profile?.is_available ?? false}
-                                                    title={
-                                                        booking.customer_profile?.is_available
-                                                            ? t('user_account.buttons.book_now')
-                                                            : t('user_account.guides.currently_unavailable')
-                                                    }
-                                                >
-                                                    {booking.customer_profile?.is_available
-                                                        ? t('user_account.buttons.book_now')
-                                                        : t('user_account.buttons.unavailable')}
-                                                </button>
-                                            )}
-                                            {booking.customer_profile?.user && (
-                                                <button
-                                                    className="user-account-btn user-account-btn-secondary"
-                                                    onClick={() => handleChatWithUser(booking.customer_profile)}
-                                                    style={{
-                                                        marginLeft: '8px',
-                                                        backgroundColor: '#6c757d',
-                                                        color: 'white'
-                                                    }}
-                                                >
-                                                    {t('user_account.buttons.chat_with_guide')}
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                )}
-                {activeTab === 'profile' && (
-                    <div className="user-account-profile">
-                        {!profile || showProfileForm ? (
-                            <div className="user-account-profile-form">
-                                <h3 className="user-account-section-title">
-                                    {profile ? t('user_account.profile.edit_profile') : t('user_account.profile.create_profile')}
-                                </h3>
-                                <form onSubmit={handleProfileSubmit} className="user-account-form">
-                                    {/* Other profile fields (unchanged) */}
-                                    <div className="user-account-form-group">
-                                        <label className="user-account-label">{t('user_account.forms.profile.date_of_birth')}</label>
-                                        <input
-                                            type="date"
-                                            className="user-account-input"
-                                            value={profileForm.date_of_birth}
-                                            onChange={(e) => setProfileForm({ ...profileForm, date_of_birth: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className="user-account-form-group">
-                                        <label className="user-account-label">{t('user_account.forms.profile.preferred_contact')}</label>
-                                        <select
-                                            className="user-account-select"
-                                            value={profileForm.preferred_contact}
-                                            onChange={(e) => setProfileForm({ ...profileForm, preferred_contact: e.target.value })}
-                                        >
-                                            <option value="email">{t('user_account.forms.profile.contact_options.email')}</option>
-                                            <option value="phone">{t('user_account.forms.profile.contact_options.phone')}</option>
-                                            <option value="chat">{t('user_account.forms.profile.contact_options.chat')}</option>
-                                        </select>
-                                    </div>
-                                    <div className="user-account-form-group">
-                                        <label className="user-account-label">{t('user_account.forms.profile.languages')}</label>
-                                        <div className="user-account-checkbox-group">
-                                            {languages.map(language => (
-                                                <label key={language.id} className="user-account-checkbox-label">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="user-account-checkbox"
-                                                        checked={profileForm.languages.includes(language.id)}
-                                                        onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                setProfileForm({
-                                                                    ...profileForm,
-                                                                    languages: [...profileForm.languages, language.id]
-                                                                });
-                                                            } else {
-                                                                setProfileForm({
-                                                                    ...profileForm,
-                                                                    languages: profileForm.languages.filter(id => id !== language.id)
-                                                                });
-                                                            }
-                                                        }}
-                                                    />
-                                                    {language.name}
-                                                </label>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className="user-account-form-actions">
-                                        <button type="submit" className="user-account-btn user-account-btn-primary">
-                                            {profile ? t('user_account.buttons.update_profile') : t('user_account.buttons.create_profile')}
-                                        </button>
-                                        {profile && (
-                                            <button
-                                                type="button"
-                                                className="user-account-btn user-account-btn-secondary"
-                                                onClick={() => {
-                                                    setShowProfileForm(false);
-                                                    setProfileForm({
-                                                        ...profileForm,
-                                                        avatar: null,
-                                                        avatarPreview: null
-                                                    });
-                                                }}
-                                            >
-                                                {t('user_account.buttons.cancel')}
-                                            </button>
-                                        )}
-                                    </div>
-                                </form>
-                                <form onSubmit={handleAvatarSubmit} className="user-account-form">
-                                    <div className="user-account-form-group">
-                                        <label className="user-account-label">{t('user_account.forms.profile.avatar')}</label>
-                                        <input
-                                            type="file"
-                                            className="user-account-file-input"
-                                            accept="image/jpeg,image/png,image/gif"
-                                            onChange={handleAvatarChange}
-                                        />
-                                        {(profile?.avatar || profileForm.avatarPreview) && (
-                                            <div>
-                                                <img
-                                                    src={profileForm.avatarPreview || profile.avatar}
-                                                    alt="Avatar preview"
-                                                    className="user-account-avatar-preview"
-                                                    style={{
-                                                        width: '120px',
-                                                        height: '120px',
-                                                        borderRadius: '50%',
-                                                        marginTop: '12px',
-                                                        objectFit: 'cover',
-                                                        border: '2px solid #e2e8f0'
-                                                    }}
-                                                    onError={(e) => {
-                                                        e.target.src = '/placeholder-avatar.png';
-                                                        console.error("Avatar yuklanmadi:", e);
-                                                    }}
-                                                />
-                                                {profile?.avatar && (
-                                                    <button
-                                                        type="button"
-                                                        className="user-account-btn user-account-btn-danger"
-                                                        onClick={handleDeleteAvatar}
-                                                        style={{ marginTop: '8px' }}
-                                                    >
-                                                        {t('user_account.buttons.delete_avatar')}
-                                                    </button>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="user-account-form-actions">
-                                        <button
-                                            type="submit"
-                                            className="user-account-btn user-account-btn-primary"
-                                            disabled={!profileForm.avatar}
-                                        >
-                                            {t('user_account.buttons.upload_avatar')}
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        ) : (
-                            <div className="user-account-profile-view">
-                                <div className="user-account-profile-header">
-                                    <h3 className="user-account-section-title">{t('user_account.profile.profile_information')}</h3>
-                                    <button
-                                        className="user-account-btn user-account-btn-primary"
-                                        onClick={() => setShowProfileForm(true)}
-                                    >
-                                        {t('user_account.buttons.edit_profile')}
-                                    </button>
-                                </div>
-                                <div className="user-account-profile-info">
-                                    <div className="user-account-profile-field">
-                                        <label className="user-account-profile-label">{t('user_account.forms.profile.avatar')}</label>
-                                        {profile.avatar ? (
-                                            <div>
-                                                <img
-                                                    src={profile.avatar}
-                                                    alt="Avatar"
-                                                    className="user-account-avatar-preview"
-                                                    style={{
-                                                        width: '120px',
-                                                        height: '120px',
-                                                        borderRadius: '50%',
-                                                        objectFit: 'cover',
-                                                        border: '2px solid #e2e8f0'
-                                                    }}
-                                                    onError={(e) => {
-                                                        e.target.src = '/placeholder-avatar.png';
-                                                        console.error("Avatar yuklanmadi:", e);
-                                                    }}
-                                                />
-                                                <button
-                                                    className="user-account-btn user-account-btn-danger"
-                                                    onClick={handleDeleteAvatar}
-                                                    style={{ marginTop: '8px' }}
-                                                >
-                                                    {t('user_account.buttons.delete_avatar')}
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <div>
-                                                <img
-                                                    src="/placeholder-avatar.png"
-                                                    alt="No avatar"
-                                                    className="user-account-avatar-preview"
-                                                    style={{
-                                                        width: '120px',
-                                                        height: '120px',
-                                                        borderRadius: '50%',
-                                                        objectFit: 'cover',
-                                                        border: '2px solid #e2e8f0'
-                                                    }}
-                                                />
-                                                <p>{t('user_account.profile.no_avatar')}</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                    {/* Other profile fields (unchanged) */}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                )}
-                {activeTab === 'guides' && (
-                    <div className="user-account-guides">
-                        <div className="user-account-guides-header">
-                            <h3 className="user-account-section-title">{t('user_account.guides.find_guides')}</h3>
-                            <div className="user-account-guides-filters">
-                                <input
-                                    type="text"
-                                    className="user-account-filter-input"
-                                    placeholder={t('user_account.guides.search_placeholder')}
-                                    value={guidesFilter.search}
-                                    onChange={(e) => handleFilterChange('search', e.target.value)}
-                                />
-                                <select
-                                    className="user-account-filter-select"
-                                    value={guidesFilter.service_type}
-                                    onChange={(e) => handleFilterChange('service_type', e.target.value)}
-                                >
-                                    <option value="">{t('user_account.guides.filters.all_services')}</option>
-                                    {serviceTypes.map(service => (
-                                        <option key={service.id} value={service.id}>{service.name}</option>
-                                    ))}
-                                </select>
-                                <select
-                                    className="user-account-filter-select"
-                                    value={guidesFilter.country}
-                                    onChange={(e) => handleFilterChange('country', e.target.value)}
-                                >
-                                    <option value="">{t('user_account.guides.filters.all_countries')}</option>
-                                    {countries.map(country => (
-                                        <option key={country.id} value={country.id}>{country.name}</option>
-                                    ))}
-                                </select>
-                                <select
-                                    className="user-account-filter-select"
-                                    value={guidesFilter.city}
-                                    onChange={(e) => handleFilterChange('city', e.target.value)}
-                                >
-                                    <option value="">{t('user_account.guides.filters.all_cities')}</option>
-                                    {cities.map(city => (
-                                        <option key={city.id} value={city.id}>{city.name}</option>
-                                    ))}
-                                </select>
-                                <select
-                                    className="user-account-filter-select"
-                                    value={guidesFilter.min_rating}
-                                    onChange={(e) => handleFilterChange('min_rating', e.target.value)}
-                                >
-                                    <option value="">{t('user_account.guides.filters.any_rating')}</option>
-                                    <option value="4">{t('user_account.guides.filters.rating_4')}</option>
-                                    <option value="4.5">{t('user_account.guides.filters.rating_4_5')}</option>
-                                    <option value="5">{t('user_account.guides.filters.rating_5')}</option>
-                                </select>
-                                <label className="user-account-filter-checkbox">
-                                    <input
-                                        type="checkbox"
-                                        checked={guidesFilter.is_available}
-                                        onChange={(e) => handleFilterChange('is_available', e.target.checked)}
-                                    />
-                                    {t('user_account.guides.filters.available_only')}
-                                </label>
-                            </div>
-                        </div>
-                        <div className="user-account-guides-grid">
-                            {guides.map(guide => (
-                                <div key={guide.id} className="user-account-guide-card">
-                                    <div className="user-account-guide-avatar">
-                                        {guide.user?.avatar ? (
-                                            <img src={guide.user.avatar} alt={guide.user.full_name} onError={(e) => { e.target.src = '/placeholder-avatar.png'; }} />
-                                        ) : (
-                                            <div className="user-account-guide-avatar-placeholder">
-                                                {guide.user?.full_name?.charAt(0) || 'G'}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="user-account-guide-info">
-                                        <h4 className="user-account-guide-name">{guide.user?.full_name || t('user_account.guides.unknown')}</h4>
-                                        <p className="user-account-guide-bio">{guide.professional_bio || t('user_account.guides.no_bio')}</p>
-                                        <div className="user-account-guide-details">
-                <span className="user-account-guide-experience">
-                    {t('user_account.guides.years_experience', { years: guide.years_of_experience || 0 })}
-                </span>
-                                            <div className="user-account-guide-rating">
-                                                {'★'.repeat(Math.floor(Number(guide.average_rating) || 0))}
-                                                {'☆'.repeat(5 - Math.floor(Number(guide.average_rating) || 0))}
-                                                <span className="user-account-guide-rating-text">
-                        {t('user_account.guides.rating', {
-                            rating: Number(guide.average_rating) ? Number(guide.average_rating).toFixed(1) : '0.0',
-                            count: guide.total_reviews || 0
-                        })}
-                    </span>
-                                            </div>
-                                            <div className="user-account-guide-pricing">
-                                                {guide.hourly_rate && (
-                                                    <span className="user-account-guide-price">
-                            {t('user_account.guides.hourly_rate', { rate: Number(guide.hourly_rate).toFixed(2) })}
-                        </span>
-                                                )}
-                                                {guide.daily_rate && (
-                                                    <span className="user-account-guide-price">
-                            {t('user_account.guides.daily_rate', { rate: Number(guide.daily_rate).toFixed(2) })}
-                        </span>
-                                                )}
-                                            </div>
-                                            {!guide.is_available && (
-                                                <p className="user-account-guide-unavailable" style={{ color: '#721c24', fontSize: '14px', marginTop: '8px' }}>
-                                                    {t('user_account.guides.currently_unavailable')}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="user-account-guide-actions">
-                                            <button
-                                                className="user-account-btn user-account-btn-primary"
-                                                onClick={() => handleBookGuide(guide)}
-                                                disabled={!guide.is_available}
-                                                title={guide.is_available ? t('user_account.buttons.book_now') : t('user_account.guides.currently_unavailable')}
-                                            >
-                                                {guide.is_available ? t('user_account.buttons.book_now') : t('user_account.buttons.unavailable')}
-                                            </button>
-                                            <button
-                                                className="user-account-btn user-account-btn-secondary"
-                                                onClick={() => handleChatWithUser(guide)}
-                                                style={{
-                                                    marginLeft: '8px',
-                                                    backgroundColor: '#6c757d',
-                                                    color: 'white'
-                                                }}
-                                            >
-                                                {t('user_account.buttons.chat')}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-                {activeTab === 'bookings' && (
-                    <div className="user-account-bookings">
-                        <div className="user-account-bookings-header">
-                            <h3 className="user-account-section-title">{t('user_account.bookings.title')}</h3>
-                            <button
-                                className="user-account-btn user-account-btn-primary"
-                                onClick={() => {
-                                    setShowBookingForm(true);
-                                    setEditingBooking(null);
-                                    setBookingForm({
-                                        title: '',
-                                        description: '',
-                                        start_date: '',
-                                        end_date: '',
-                                        special_requirements: '',
-                                        budget: '',
-                                        customer_profile: ''
-                                    });
-                                    setSelectedGuide(null);
-                                }}
-                                style={{ marginBottom: '16px' }}
-                            >
-                                {t('user_account.buttons.create_booking')}
-                            </button>
-                        </div>
-                        {error && (
-                            <div className="user-account-error" style={{ background: '#f8d7da', color: '#721c24', padding: '8px 12px', borderRadius: '4px', marginBottom: '16px' }}>
-                                <p>{error}</p>
-                                <button onClick={() => setError(null)} className="user-account-error-close">×</button>
-                            </div>
-                        )}
-                        {bookings.length === 0 ? (
-                            <p className="user-account-no-data">{t('user_account.bookings.no_bookings')}</p>
-                        ) : (
-                            <div className="user-account-bookings-list">
-                                {bookings.map(booking => (
-                                    <div key={booking.id} className="user-account-booking-item">
-                                        <div className="user-account-booking-details">
-                                            <h4 className="user-account-booking-title">
-                                                {t('user_account.bookings.booking_title', { title: booking.title })}
-                                            </h4>
-                                            <p className="user-account-booking-dates">
-                                                {new Date(booking.start_date).toLocaleDateString()} - {new Date(booking.end_date).toLocaleDateString()}
-                                            </p>
-                                            <p className="user-account-booking-description">
-                                                {t('user_account.bookings.description', { description: booking.description || t('user_account.bookings.not_set') })}
-                                            </p>
-                                            {booking.budget && (
-                                                <p className="user-account-booking-budget">
-                                                    {t('user_account.bookings.budget', { budget: Number(booking.budget).toFixed(2) })}
-                                                </p>
-                                            )}
-                                            {booking.special_requirements && (
-                                                <p className="user-account-booking-requirements">
-                                                    {t('user_account.bookings.special_requirements', { requirements: booking.special_requirements })}
-                                                </p>
-                                            )}
-                                            <p className="user-account-booking-guide">
-                                                {t('user_account.bookings.guide')}: {booking.customer_profile?.user?.full_name || t('user_account.reviews.unknown')}
-                                            </p>
-                                            <span className={`user-account-booking-status user-account-status-${booking.status}`}>
-                                {t(`user_account.status.${booking.status}`)}
-                            </span>
-                                            {booking.status === 'cancelled' && booking.cancellation_reason && (
-                                                <p className="user-account-booking-cancel-reason" style={{ color: '#721c24', fontSize: '14px', marginTop: '8px' }}>
-                                                    {t('user_account.bookings.cancellation_reason')}: {booking.cancellation_reason}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="user-account-booking-actions">
-                                            <button
-                                                className="user-account-btn user-account-btn-secondary"
-                                                onClick={() => handleViewBooking(booking)}
-                                            >
-                                                {t('user_account.buttons.view_details')}
-                                            </button>
-                                            {['pending', 'confirmed', 'accepted'].includes(booking.status) && (
-                                                <>
-                                                    <button
-                                                        className="user-account-btn user-account-btn-primary"
-                                                        onClick={() => handleEditBooking(booking)}
-                                                    >
-                                                        {t('user_account.buttons.edit')}
-                                                    </button>
-                                                    <button
-                                                        className="user-account-btn user-account-btn-cancel"
-                                                        onClick={() => handleOpenCancelModal(booking)}
-                                                    >
-                                                        {t('user_account.buttons.cancel')}
-                                                    </button>
-                                                </>
-                                            )}
-                                            {booking.status === 'completed' && !reviews.find(r => r.booking === booking.id) && booking.customer_profile && (
-                                                <button
-                                                    className="user-account-btn user-account-btn-primary"
-                                                    onClick={() => {
-                                                        console.log("Book Now clicked for guide:", booking.customer_profile);
-                                                        handleBookGuide(booking.customer_profile);
-                                                    }}
-                                                    disabled={!booking.customer_profile?.is_available ?? false}
-                                                    title={
-                                                        booking.customer_profile?.is_available
-                                                            ? t('user_account.buttons.book_now')
-                                                            : t('user_account.guides.currently_unavailable')
-                                                    }
-                                                >
-                                                    {booking.customer_profile?.is_available
-                                                        ? t('user_account.buttons.book_now')
-                                                        : t('user_account.buttons.unavailable')}
-                                                </button>
-                                            )}
-                                            {booking.customer_profile && (
-                                                <button
-                                                    className="user-account-btn user-account-btn-primary"
-                                                    onClick={() => handleBookGuide(booking.customer_profile)}
-                                                    disabled={!booking.customer_profile.is_available}
-                                                    title={
-                                                        booking.customer_profile.is_available
-                                                            ? t('user_account.buttons.book_now')
-                                                            : t('user_account.guides.currently_unavailable')
-                                                    }
-                                                >
-                                                    {booking.customer_profile.is_available
-                                                        ? t('user_account.buttons.book_now')
-                                                        : t('user_account.buttons.unavailable')}
-                                                </button>
-                                            )}
-                                            {booking.customer_profile?.user && (
-                                                <button
-                                                    className="user-account-btn user-account-btn-secondary"
-                                                    onClick={() => handleChatWithUser(booking.customer_profile)}
-                                                    style={{
-                                                        marginLeft: '8px',
-                                                        backgroundColor: '#6c757d',
-                                                        color: 'white'
-                                                    }}
-                                                >
-                                                    {t('user_account.buttons.chat_with_guide')}
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
-                {showBookingForm && (
-                    <div className="user-account-modal">
-                        <div className="user-account-modal-content">
-                            <h3 className="user-account-modal-title">
-                                {editingBooking
-                                    ? t('user_account.forms.booking.edit_title', { guideName: selectedGuide?.user?.full_name || 'Guide' })
-                                    : t('user_account.forms.booking.title', { guideName: selectedGuide?.user?.full_name || 'Guide' })}
+
+            {/* PROFILE — Avatar */}
+            {tab === "profile" && (
+                <section className="user-account-section">
+                    <div className="user-account-grid">
+                        <div className="user-account-card">
+                            <h3 className="user-account-card__title">
+                                <FiUpload /> {t("userAccount.avatar.title") || "Avatar"}
                             </h3>
-                            {error && (
-                                <div className="user-account-error" style={{ background: '#f8d7da', color: '#721c24', padding: '8px 12px', borderRadius: '4px', marginBottom: '16px' }}>
-                                    <p>{error}</p>
-                                    <button onClick={() => setError(null)} className="user-account-error-close">×</button>
-                                </div>
-                            )}
-                            <p className="user-account-form-note" style={{ color: '#555', fontSize: '14px', marginBottom: '16px' }}>
-                                {t('user_account.forms.booking.availability_note')}
-                            </p>
-                            {unavailabilities.length > 0 && (
-                                <div className="user-account-unavailabilities">
-                                    <h4>{t('user_account.forms.booking.unavailable_dates')}</h4>
-                                    <ul>
-                                        {unavailabilities.map((unavailability, index) => (
-                                            <li key={index}>
-                                                {new Date(unavailability.start_date).toLocaleDateString()} {unavailability.end_date ? `- ${new Date(unavailability.end_date).toLocaleDateString()}` : ''}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                            {!editingBooking && (
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">{t('user_account.forms.booking.guide')} <span style={{ color: '#721c24' }}>*</span></label>
-                                    <select
-                                        className="user-account-select"
-                                        value={bookingForm.customer_profile || ''}
-                                        onChange={(e) => {
-                                            const guideId = e.target.value;
-                                            const guide = guides.find(g => g.id === guideId);
-                                            setSelectedGuide(guide || null);
-                                            setBookingForm({ ...bookingForm, customer_profile: guideId });
-                                            if (guide) {
-                                                getGuideUnavailabilities(guide.id).then(data => {
-                                                    setUnavailabilities(data.results || data);
-                                                }).catch(err => {
-                                                    console.error("Failed to load unavailabilities:", err);
-                                                    setError(t('user_account.errors.failed_to_load_unavailabilities'));
-                                                });
-                                            }
-                                        }}
-                                        required
-                                    >
-                                        <option value="">{t('user_account.forms.booking.select_guide')}</option>
-                                        {guides.map(guide => (
-                                            <option key={guide.id} value={guide.id}>
-                                                {guide.user?.full_name || 'Guide'}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            )}
-                            <form onSubmit={handleBookingSubmit} className="user-account-form">
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">{t('user_account.forms.booking.title_label')} <span style={{ color: '#721c24' }}>*</span></label>
-                                    <input
-                                        type="text"
-                                        className="user-account-input"
-                                        placeholder={t('user_account.forms.booking.title_placeholder')}
-                                        value={bookingForm.title}
-                                        onChange={(e) => setBookingForm({ ...bookingForm, title: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">{t('user_account.forms.booking.description_label')}</label>
-                                    <textarea
-                                        className="user-account-textarea"
-                                        placeholder={t('user_account.forms.booking.description_placeholder')}
-                                        value={bookingForm.description}
-                                        onChange={(e) => setBookingForm({ ...bookingForm, description: e.target.value })}
-                                    />
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">{t('user_account.forms.booking.start_date_label')} <span style={{ color: '#721c24' }}>*</span></label>
-                                    <input
-                                        type="date"
-                                        className="user-account-input"
-                                        value={bookingForm.start_date}
-                                        onChange={(e) => setBookingForm({ ...bookingForm, start_date: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">{t('user_account.forms.booking.end_date_label')} <span style={{ color: '#721c24' }}>*</span></label>
-                                    <input
-                                        type="date"
-                                        className="user-account-input"
-                                        value={bookingForm.end_date}
-                                        onChange={(e) => setBookingForm({ ...bookingForm, end_date: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">{t('user_account.forms.booking.country_label')} <span style={{ color: '#721c24' }}>*</span></label>
-                                    <select
-                                        className="user-account-select"
-                                        value={bookingForm.country || ''}
-                                        onChange={(e) => setBookingForm({ ...bookingForm, country: e.target.value })}
-                                        required
-                                    >
-                                        <option value="">{t('user_account.forms.booking.select_country')}</option>
-                                        {countries.map(country => (
-                                            <option key={country.id} value={country.id}>
-                                                {country.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">{t('user_account.forms.booking.special_requirements_label')}</label>
-                                    <textarea
-                                        className="user-account-textarea"
-                                        placeholder={t('user_account.forms.booking.special_requirements_placeholder')}
-                                        value={bookingForm.special_requirements}
-                                        onChange={(e) => setBookingForm({ ...bookingForm, special_requirements: e.target.value })}
-                                    />
-                                </div>
-                                <div className="user-account-form-group">
-                                    <label className="user-account-label">{t('user_account.forms.booking.budget_label')}</label>
-                                    <input
-                                        type="number"
-                                        className="user-account-input"
-                                        placeholder={t('user_account.forms.booking.budget_placeholder')}
-                                        value={bookingForm.budget}
-                                        onChange={(e) => setBookingForm({ ...bookingForm, budget: e.target.value })}
-                                        min="0"
-                                        step="0.01"
-                                    />
-                                </div>
-                                <div className="user-account-form-actions">
-                                    <button type="submit" className="user-account-btn user-account-btn-primary">
-                                        {editingBooking ? t('user_account.buttons.update_booking') : t('user_account.buttons.submit_booking')}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="user-account-btn user-account-btn-secondary"
-                                        onClick={() => {
-                                            setShowBookingForm(false);
-                                            setSelectedGuide(null);
-                                            setEditingBooking(null);
-                                            setBookingForm({
-                                                title: '',
-                                                description: '',
-                                                start_date: '',
-                                                end_date: '',
-                                                special_requirements: '',
-                                                budget: '',
-                                                customer_profile: '',
-                                                country: '' // Yangi maydon qo‘shildi
-                                            });
-                                            setError(null);
-                                        }}
-                                    >
-                                        {t('user_account.buttons.cancel')}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                )}
-                {activeTab === 'reviews' && (
-                    <div className="user-account-reviews">
-                        <div className="user-account-reviews-header">
-                            <h3 className="user-account-section-title">{t('user_account.reviews.title')}</h3>
-                            <div className="user-account-reviews-filters">
-                                <select
-                                    className="user-account-filter-select"
-                                    value={reviewFilter.minRating}
-                                    onChange={(e) => handleReviewFilterChange('minRating', e.target.value)}
-                                >
-                                    <option value="">{t('user_account.reviews.filters.all_ratings')}</option>
-                                    <option value="5">{t('user_account.reviews.filters.rating_5')}</option>
-                                    <option value="4">{t('user_account.reviews.filters.rating_4')}</option>
-                                    <option value="3">{t('user_account.reviews.filters.rating_3')}</option>
-                                    <option value="2">{t('user_account.reviews.filters.rating_2')}</option>
-                                    <option value="1">{t('user_account.reviews.filters.rating_1')}</option>
-                                </select>
-                                <select
-                                    className="user-account-filter-select"
-                                    value={reviewFilter.sortBy}
-                                    onChange={(e) => handleReviewFilterChange('sortBy', e.target.value)}
-                                >
-                                    <option value="date_desc">{t('user_account.reviews.filters.newest_first')}</option>
-                                    <option value="date_asc">{t('user_account.reviews.filters.oldest_first')}</option>
-                                    <option value="rating_desc">{t('user_account.reviews.filters.highest_rated')}</option>
-                                    <option value="rating_asc">{t('user_account.reviews.filters.lowest_rated')}</option>
-                                </select>
+                            <div className="user-account-avatar">
+                                {clientAvatarUrl ? (
+                                    <img className="user-account-avatar__img" src={clientAvatarUrl} alt={t("userAccount.avatar.alt") || "Avatar"} />
+                                ) : (
+                                    <div className="user-account-avatar__placeholder">
+                                        {t("userAccount.avatar.noAvatar") || "No avatar"}
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                        <div className="user-account-reviews-summary">
-                            <h4 className="user-account-section-subtitle">{t('user_account.reviews.summary_title')}</h4>
-                            <div className="user-account-reviews-summary-grid">
-                                <div className="user-account-summary-item">
-                                    <span className="user-account-summary-label">{t('user_account.reviews.summary.total_reviews')}</span>
-                                    <span className="user-account-summary-value">{reviews.length}</span>
-                                </div>
-                                <div className="user-account-summary-item">
-                                    <span className="user-account-summary-label">{t('user_account.reviews.summary.avg_overall_rating')}</span>
-                                    <span className="user-account-summary-value">
-                                        {reviews.length > 0
-                                            ? (reviews.reduce((sum, r) => sum + r.overall_rating, 0) / reviews.length).toFixed(1)
-                                            : 0}/5
-                                    </span>
-                                </div>
-                                <div className="user-account-summary-item">
-                                    <span className="user-account-summary-label">{t('user_account.reviews.summary.avg_communication')}</span>
-                                    <span className="user-account-summary-value">
-                                        {reviews.length > 0
-                                            ? (reviews.reduce((sum, r) => sum + r.communication_rating, 0) / reviews.length).toFixed(1)
-                                            : 0}/5
-                                    </span>
-                                </div>
-                                <div className="user-account-summary-item">
-                                    <span className="user-account-summary-label">{t('user_account.reviews.summary.avg_service')}</span>
-                                    <span className="user-account-summary-value">
-                                        {reviews.length > 0
-                                            ? (reviews.reduce((sum, r) => sum + r.service_rating, 0) / reviews.length).toFixed(1)
-                                            : 0}/5
-                                    </span>
-                                </div>
-                                <div className="user-account-summary-item">
-                                    <span className="user-account-summary-label">{t('user_account.reviews.summary.avg_punctuality')}</span>
-                                    <span className="user-account-summary-value">
-                                        {reviews.length > 0
-                                            ? (reviews.reduce((sum, r) => sum + r.punctuality_rating, 0) / reviews.length).toFixed(1)
-                                            : 0}/5
-                                    </span>
-                                </div>
-                                <div className="user-account-summary-item">
-                                    <span className="user-account-summary-label">{t('user_account.reviews.summary.avg_value')}</span>
-                                    <span className="user-account-summary-value">
-                                        {reviews.length > 0
-                                            ? (reviews.reduce((sum, r) => sum + r.value_rating, 0) / reviews.length).toFixed(1)
-                                            : 0}/5
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        {filteredReviews.length === 0 ? (
-                            <p>{t('user_account.reviews.no_reviews')}</p>
-                        ) : (
-                            <div className="user-account-reviews-list">
-                                {filteredReviews.map(review => {
-                                    const relatedBooking = bookings.find(b => b.id === review.booking);
-                                    const guideName = relatedBooking?.customer_profile?.user?.full_name || t('user_account.reviews.unknown');
-                                    return (
-                                        <div key={review.id} className="user-account-review-item">
-                                            <div className="user-account-review-header">
-                                                <div className="user-account-review-rating">
-                                                    {'★'.repeat(review.overall_rating)}{'☆'.repeat(5 - review.overall_rating)}
-                                                    <span className="user-account-review-rating-text">
-                                                        {review.overall_rating}/5
-                                                    </span>
-                                                </div>
-                                                <span className="user-account-review-date">
-                                                    {new Date(review.created_at).toLocaleDateString()}
-                                                </span>
-                                            </div>
-                                            <h4 className="user-account-review-title">
-                                                {t('user_account.reviews.review_for', { guideName })}
-                                            </h4>
-                                            <p className="user-account-review-comment">{review.comment}</p>
-                                            <div className="user-account-review-details">
-                                                <span className="user-account-review-detail">
-                                                    {t('user_account.reviews.communication')}: {review.communication_rating}/5
-                                                </span>
-                                                <span className="user-account-review-detail">
-                                                    {t('user_account.reviews.service')}: {review.service_rating}/5
-                                                </span>
-                                                <span className="user-account-review-detail">
-                                                    {t('user_account.reviews.punctuality')}: {review.punctuality_rating}/5
-                                                </span>
-                                                <span className="user-account-review-detail">
-                                                    {t('user_account.reviews.value')}: {review.value_rating}/5
-                                                </span>
-                                            </div>
-                                            {relatedBooking && (
-                                                <div className="user-account-review-booking">
-                                                    <p>
-                                                        {t('user_account.reviews.booking_details', {
-                                                            title: relatedBooking.title,
-                                                            startDate: new Date(relatedBooking.start_date).toLocaleDateString(),
-                                                            endDate: new Date(relatedBooking.end_date).toLocaleDateString()
-                                                        })}
-                                                    </p>
-                                                </div>
-                                            )}
-                                            <div className="user-account-review-reactions">
-                                                <span className="user-account-review-reaction-count">
-                                                    {t('user_account.reviews.likes', { count: review.like_count || 0 })}
-                                                </span>
-                                                <span className="user-account-review-reaction-count">
-                                                    {t('user_account.reviews.dislikes', { count: review.dislike_count || 0 })}
-                                                </span>
-                                                <button
-                                                    className="user-account-btn user-account-btn-small"
-                                                    onClick={() => handleViewReactions(review)}
-                                                >
-                                                    {t('user_account.buttons.view_reactions')}
-                                                </button>
-                                            </div>
-                                            <div className="user-account-review-actions">
-                                                <button
-                                                    className="user-account-btn user-account-btn-small"
-                                                    onClick={() => handleEditReview(review, relatedBooking)}
-                                                >
-                                                    {t('user_account.buttons.edit')}
-                                                </button>
-                                                <button
-                                                    className="user-account-btn user-account-btn-small user-account-btn-danger"
-                                                    onClick={() => handleDeleteReview(review.id)}
-                                                >
-                                                    {t('user_account.buttons.delete')}
-                                                </button>
-                                                <button
-                                                    className="user-account-btn user-account-btn-small"
-                                                    onClick={() => {
-                                                        setSelectedReviewForReactions(review);
-                                                        setReactionForm({ reaction_type: 'like', comment: '' });
-                                                    }}
-                                                >
-                                                    {t('user_account.buttons.react')}
-                                                </button>
-                                            </div>
-                                            {selectedReviewForReactions?.id === review.id && (
-                                                <div className="user-account-reaction-form">
-                                                    <h4>{t('user_account.reviews.add_reaction')}</h4>
-                                                    <div className="user-account-form-group">
-                                                        <label className="user-account-label">{t('user_account.forms.reaction.reaction_type')}</label>
-                                                        <select
-                                                            className="user-account-select"
-                                                            value={reactionForm.reaction_type}
-                                                            onChange={(e) => setReactionForm({ ...reactionForm, reaction_type: e.target.value })}
-                                                        >
-                                                            <option value="like">{t('user_account.forms.reaction.like')}</option>
-                                                            <option value="dislike">{t('user_account.forms.reaction.dislike')}</option>
-                                                        </select>
-                                                    </div>
-                                                    <div className="user-account-form-group">
-                                                        <label className="user-account-label">{t('user_account.forms.reaction.comment')}</label>
-                                                        <textarea
-                                                            className="user-account-textarea"
-                                                            placeholder={reactionForm.reaction_type === 'like' ? t('user_account.forms.reaction.like_placeholder') : t('user_account.forms.reaction.dislike_placeholder')}
-                                                            value={reactionForm.comment}
-                                                            onChange={(e) => setReactionForm({ ...reactionForm, comment: e.target.value })}
-                                                        />
-                                                    </div>
-                                                    <div className="user-account-form-actions">
-                                                        <button
-                                                            className="user-account-btn user-account-btn-primary"
-                                                            onClick={() => handleReactToReview(review.id)}
-                                                        >
-                                                            {t('user_account.buttons.submit_reaction')}
-                                                        </button>
-                                                        <button
-                                                            className="user-account-btn user-account-btn-secondary"
-                                                            onClick={() => setSelectedReviewForReactions(null)}
-                                                        >
-                                                            {t('user_account.buttons.cancel')}
-                                                        </button>
-                                                        {reactions.some(r => r.user === currentUser?.id && r.review === review.id) && (
-                                                            <button
-                                                                className="user-account-btn user-account-btn-danger"
-                                                                onClick={() => handleRemoveReaction(review.id)}
-                                                            >
-                                                                {t('user_account.buttons.remove_reaction')}
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
-            {/* Booking Form Modal */}
-            {showBookingDetails && selectedBooking && (
-                <div className="user-account-modal">
-                    <div className="user-account-modal-content">
-                        <h3 className="user-account-modal-title">{t('user_account.bookings.details_title', { title: selectedBooking.title })}</h3>
-                        <div className="user-account-booking-details">
-                            <p><strong>{t('user_account.bookings.guide')}</strong>: {selectedBooking.customer_profile?.user?.full_name || t('user_account.reviews.unknown')}</p>
-                            <p><strong>{t('user_account.bookings.dates')}</strong>: {new Date(selectedBooking.start_date).toLocaleDateString()} - {new Date(selectedBooking.end_date).toLocaleDateString()}</p>
-                            <p><strong>{t('user_account.bookings.description')}</strong>: {selectedBooking.description || t('user_account.bookings.not_set')}</p>
-                            <p><strong>{t('user_account.bookings.budget')}</strong>: {selectedBooking.budget ? Number(selectedBooking.budget).toFixed(2) : t('user_account.bookings.not_set')}</p>
-                            <p><strong>{t('user_account.bookings.special_requirements')}</strong>: {selectedBooking.special_requirements || t('user_account.bookings.not_set')}</p>
-                            <p><strong>{t('user_account.bookings.status')}</strong>: {t(`user_account.status.${selectedBooking.status}`)}</p>
-                            {selectedBooking.status === 'cancelled' && selectedBooking.cancellation_reason && (
-                                <p><strong>{t('user_account.bookings.cancellation_reason')}</strong>: {selectedBooking.cancellation_reason}</p>
-                            )}
-                            <p><strong>{t('user_account.bookings.created_at')}</strong>: {new Date(selectedBooking.created_at).toLocaleString()}</p>
-                            <p><strong>{t('user_account.bookings.updated_at')}</strong>: {new Date(selectedBooking.updated_at).toLocaleString()}</p>
-                        </div>
-                        <div className="user-account-form-actions">
-                            <button
-                                className="user-account-btn user-account-btn-secondary"
-                                onClick={() => {
-                                    setShowBookingDetails(false);
-                                    setSelectedBooking(null);
-                                }}
-                            >
-                                {t('user_account.buttons.close')}
-                            </button>
-                            {['pending', 'confirmed', 'accepted'].includes(selectedBooking.status) && (
-                                <button
-                                    className="user-account-btn user-account-btn-primary"
-                                    onClick={() => {
-                                        setShowBookingDetails(false);
-                                        handleEditBooking(selectedBooking);
-                                    }}
-                                >
-                                    {t('user_account.buttons.edit')}
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-            {/* Review Form Modal */}
-            {showReviewForm && selectedBookingForReview && (
-                <div className="user-account-modal">
-                    <div className="user-account-modal-content">
-                        <h3 className="user-account-modal-title">
-                            {editingReview
-                                ? t('user_account.forms.review.edit_title', {
-                                    guideName: selectedBookingForReview.customer_profile?.user?.full_name || t('user_account.reviews.unknown'),
-                                    bookingTitle: selectedBookingForReview.title
-                                })
-                                : t('user_account.forms.review.write_title', {
-                                    guideName: selectedBookingForReview.customer_profile?.user?.full_name || t('user_account.reviews.unknown'),
-                                    bookingTitle: selectedBookingForReview.title
-                                })}
-                        </h3>
-                        <form onSubmit={handleReviewSubmit} className="user-account-form">
-                            <div className="user-account-form-group">
-                                <label className="user-account-label">{t('user_account.forms.review.overall_rating')}</label>
-                                <select
-                                    className="user-account-select"
-                                    value={reviewForm.overall_rating}
-                                    onChange={(e) => setReviewForm({ ...reviewForm, overall_rating: parseInt(e.target.value) })}
-                                    required
-                                >
-                                    {[1, 2, 3, 4, 5].map(num => (
-                                        <option key={num} value={num}>{t('user_account.forms.review.star', { count: num })}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="user-account-form-group">
-                                <label className="user-account-label">{t('user_account.forms.review.communication_rating')}</label>
-                                <select
-                                    className="user-account-select"
-                                    value={reviewForm.communication_rating}
-                                    onChange={(e) => setReviewForm({ ...reviewForm, communication_rating: parseInt(e.target.value) })}
-                                    required
-                                >
-                                    {[1, 2, 3, 4, 5].map(num => (
-                                        <option key={num} value={num}>{t('user_account.forms.review.star', { count: num })}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="user-account-form-group">
-                                <label className="user-account-label">{t('user_account.forms.review.service_rating')}</label>
-                                <select
-                                    className="user-account-select"
-                                    value={reviewForm.service_rating}
-                                    onChange={(e) => setReviewForm({ ...reviewForm, service_rating: parseInt(e.target.value) })}
-                                    required
-                                >
-                                    {[1, 2, 3, 4, 5].map(num => (
-                                        <option key={num} value={num}>{t('user_account.forms.review.star', { count: num })}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="user-account-form-group">
-                                <label className="user-account-label">{t('user_account.forms.review.punctuality_rating')}</label>
-                                <select
-                                    className="user-account-select"
-                                    value={reviewForm.punctuality_rating}
-                                    onChange={(e) => setReviewForm({ ...reviewForm, punctuality_rating: parseInt(e.target.value) })}
-                                    required
-                                >
-                                    {[1, 2, 3, 4, 5].map(num => (
-                                        <option key={num} value={num}>{t('user_account.forms.review.star', { count: num })}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="user-account-form-group">
-                                <label className="user-account-label">{t('user_account.forms.review.value_rating')}</label>
-                                <select
-                                    className="user-account-select"
-                                    value={reviewForm.value_rating}
-                                    onChange={(e) => setReviewForm({ ...reviewForm, value_rating: parseInt(e.target.value) })}
-                                    required
-                                >
-                                    {[1, 2, 3, 4, 5].map(num => (
-                                        <option key={num} value={num}>{t('user_account.forms.review.star', { count: num })}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="user-account-form-group">
-                                <label className="user-account-label">{t('user_account.forms.review.title')}</label>
+                            <div className="user-account-actions">
                                 <input
-                                    type="text"
+                                    ref={clientAvatarRef}
+                                    type="file"
+                                    accept="image/*"
                                     className="user-account-input"
-                                    placeholder={t('user_account.forms.review.title_placeholder')}
-                                    value={reviewForm.title}
-                                    onChange={(e) => setReviewForm({ ...reviewForm, title: e.target.value })}
-                                    required
+                                    onChange={(e) => setPendingAvatarFile(e.target.files?.[0] || null)}
                                 />
-                            </div>
-                            <div className="user-account-form-group">
-                                <label className="user-account-label">{t('user_account.forms.review.comment')}</label>
-                                <textarea
-                                    className="user-account-textarea"
-                                    placeholder={t('user_account.forms.review.comment_placeholder')}
-                                    value={reviewForm.comment}
-                                    onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
-                                    required
-                                />
-                            </div>
-                            <div className="user-account-form-actions">
-                                <button type="submit" className="user-account-btn user-account-btn-primary">
-                                    {editingReview ? t('user_account.buttons.update_review') : t('user_account.buttons.submit_review')}
-                                </button>
                                 <button
                                     type="button"
-                                    className="user-account-btn user-account-btn-secondary"
-                                    onClick={() => {
-                                        setShowReviewForm(false);
-                                        setSelectedBookingForReview(null);
-                                        setEditingReview(null);
-                                    }}
+                                    className="user-account-btn user-account-btn--primary"
+                                    onClick={saveClientAvatar}
+                                    disabled={!pendingAvatarFile || busy}
                                 >
-                                    {t('user_account.buttons.cancel')}
+                                    {t("userAccount.avatar.save") || "Save"}
                                 </button>
+                                {clientAvatarUrl && (
+                                    <button type="button" className="user-account-btn user-account-btn--danger" onClick={deleteClientAvatar}>
+                                        <FiTrash2 /> {t("userAccount.avatar.delete") || "Delete"}
+                                    </button>
+                                )}
                             </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
+                </section>
             )}
-            {/* Cancel Booking Modal */}
-            {showCancelModal && selectedBookingForCancel && (
-                <div className="user-account-modal">
-                    <div className="user-account-modal-content">
-                        <h3 className="user-account-modal-title">{t('user_account.forms.cancel_booking.title')}</h3>
-                        <form onSubmit={handleCancelBooking} className="user-account-form">
-                            <div className="user-account-form-group">
-                                <label className="user-account-label">{t('user_account.forms.cancel_booking.reason')}</label>
-                                <textarea
-                                    className="user-account-textarea"
-                                    placeholder={t('user_account.forms.cancel_booking.reason_placeholder')}
-                                    value={cancelReason}
-                                    onChange={(e) => setCancelReason(e.target.value)}
-                                    required
+
+            {/* GUIDES — Filters + Search */}
+            {tab === "guides" && (
+                <section className="user-account-section">
+                    <h3 className="user-account-card__title">
+                        <FiMapPin /> {t("userAccount.guides.title") || "Find Guides"}
+                    </h3>
+                    <div className="user-account-card">
+                        <div className="user-account-row">
+                            <label className="user-account-label user-account-col">
+                                {t("userAccount.guides.country") || "Country"}
+                                <select
+                                    className="user-account-select"
+                                    value={filters.countryId}
+                                    onChange={(e) => setFilters((s) => ({ ...s, countryId: e.target.value }))}
+                                >
+                                    <option value="">{t("userAccount.select.placeholder") || "Select"}</option>
+                                    {countries.map((c) => (
+                                        <option key={c.id} value={c.id}>
+                                            {c.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            <label className="user-account-label user-account-col">
+                                {t("userAccount.guides.city") || "City"}
+                                <select
+                                    className="user-account-select"
+                                    value={filters.cityId}
+                                    onChange={(e) => setFilters((s) => ({ ...s, cityId: e.target.value }))}
+                                >
+                                    <option value="">{t("userAccount.select.placeholder") || "Select"}</option>
+                                    {filteredCities.map((c) => (
+                                        <option key={c.id} value={c.id}>
+                                            {c.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            <label className="user-account-label user-account-col">
+                                {t("userAccount.guides.minRating") || "Min rating"}
+                                <input
+                                    type="number"
+                                    min={0}
+                                    max={5}
+                                    step="0.1"
+                                    className="user-account-input"
+                                    value={filters.minRating}
+                                    onChange={(e) => setFilters((s) => ({ ...s, minRating: e.target.value }))}
+                                    placeholder="e.g., 4.0"
                                 />
-                            </div>
-                            <div className="user-account-form-actions">
-                                <button type="submit" className="user-account-btn user-account-btn-primary">
-                                    {t('user_account.buttons.submit_cancellation')}
-                                </button>
-                                <button
-                                    type="button"
-                                    className="user-account-btn user-account-btn-secondary"
-                                    onClick={() => {
-                                        setShowCancelModal(false);
-                                        setSelectedBookingForCancel(null);
-                                        setCancelReason('');
-                                    }}
-                                >
-                                    {t('user_account.buttons.close')}
+                            </label>
+                            <div className="user-account-col" style={{ alignSelf: "end" }}>
+                                <button className="user-account-btn" onClick={loadCustomers}>
+                                    <FiSearch /> {t("userAccount.guides.search") || "Search"}
                                 </button>
                             </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
-            )}
-            {/* Reactions Modal */}
-            {showReactionsModal && selectedReviewForReactions && (
-                <div className="user-account-modal">
-                    <div className="user-account-modal-content">
-                        <h3 className="user-account-modal-title">{t('user_account.reviews.reactions_title')}</h3>
-                        {reactionSummary && (
-                            <div className="user-account-reactions-summary">
-                                <h4 className="user-account-section-subtitle">{t('user_account.reviews.reaction_summary')}</h4>
-                                <p>{t('user_account.reviews.likes', { count: reactionSummary.like_count || 0 })}</p>
-                                <p>{t('user_account.reviews.dislikes', { count: reactionSummary.dislike_count || 0 })}</p>
+
+                    <div className="user-account-grid">
+                        {toArr(customers).map((g) => (
+                            <div className="user-account-card" key={g.id}>
+                                <div className="user-account-card__title">
+                                    {g.full_name || g.display_name || "Guide"} {g.is_verified ? "✅" : ""}
+                                </div>
+                                {g.avatar && (
+                                    <img className="user-account-card__media" src={g.avatar} alt={g.full_name || "avatar"} />
+                                )}
+                                <div className="user-account-card__text">
+                                    <div>
+                                        {t("userAccount.guides.cityName") || "City"}: {g.city_name ?? g.city?.name ?? "-"}
+                                    </div>
+                                    <div>
+                                        {t("userAccount.guides.rating") || "Rating"}: {g.average_rating ?? 0} / 5
+                                    </div>
+                                    <div>
+                                        {t("userAccount.guides.experience") || "Experience"}: {g.years_of_experience ?? 0}
+                                    </div>
+                                </div>
+                                <div className="user-account-card__footer">
+                                    <button className="user-account-btn" onClick={() => openBookNow(g)}>
+                                        {t("userAccount.guides.book") || "Book now"}
+                                    </button>
+                                </div>
                             </div>
+                        ))}
+                        {toArr(customers).length === 0 && (
+                            <div className="user-account-empty">{t("userAccount.guides.empty") || "No guides"}</div>
                         )}
-                        <div className="user-account-reactions-list">
-                            <h4>{t('user_account.reviews.latest_likes')}</h4>
-                            {reactions.filter(r => r.reaction_type === 'like').length > 0 ? (
-                                reactions
-                                    .filter(r => r.reaction_type === 'like')
-                                    .slice(0, 5)
-                                    .map((reaction, index) => (
-                                        <div key={index} className="user-account-reaction-item">
-                                            <p>{reaction.comment || t('user_account.reviews.no_comment')}</p>
-                                            <span>{new Date(reaction.created_at).toLocaleDateString()}</span>
-                                        </div>
-                                    ))
-                            ) : (
-                                <p>{t('user_account.reviews.no_likes')}</p>
-                            )}
-                            <h4>{t('user_account.reviews.latest_dislikes')}</h4>
-                            {reactions.filter(r => r.reaction_type === 'dislike').length > 0 ? (
-                                reactions
-                                    .filter(r => r.reaction_type === 'dislike')
-                                    .slice(0, 5)
-                                    .map((reaction, index) => (
-                                        <div key={index} className="user-account-reaction-item">
-                                            <p>{reaction.comment || t('user_account.reviews.no_comment')}</p>
-                                            <span>{new Date(reaction.created_at).toLocaleDateString()}</span>
-                                        </div>
-                                    ))
-                            ) : (
-                                <p>{t('user_account.reviews.no_dislikes')}</p>
-                            )}
-                        </div>
-                        <div className="user-account-form-actions">
-                            <button
-                                className="user-account-btn user-account-btn-secondary"
-                                onClick={() => {
-                                    setShowReactionsModal(false);
-                                    setSelectedReviewForReactions(null);
-                                    setReactions([]);
-                                    setReactionSummary(null);
-                                }}
-                            >
-                                {t('user_account.buttons.close')}
-                            </button>
-                        </div>
                     </div>
-                </div>
+
+                    {/* Booking modal */}
+                    {bookModal.open && (
+                        <div className="user-account-chatmodal">
+                            <div
+                                className="user-account-chatmodal__backdrop"
+                                onClick={() => setBookModal({ open: false, customer: null, name: "" })}
+                            />
+                            <div className="user-account-chatmodal__panel">
+                                <div className="user-account-chatmodal__header">
+                                    <h4 className="user-account-card__title">
+                                        <FiClipboard /> {t("userAccount.bookings.title") || "Create booking"}
+                                    </h4>
+                                    <button
+                                        className="user-account-iconbtn"
+                                        onClick={() => setBookModal({ open: false, customer: null, name: "" })}
+                                    >
+                                        <FiX />
+                                    </button>
+                                </div>
+                                <div className="user-account-chatmodal__body" style={{ padding: 12 }}>
+                                    <form onSubmit={submitBooking} className="user-account-form">
+                                        <div className="user-account-row">
+                                            <label className="user-account-label user-account-col">
+                                                {t("userAccount.bookings.start") || "Start date"}
+                                                <input
+                                                    type="date"
+                                                    className="user-account-input"
+                                                    value={bookDates.start_date}
+                                                    onChange={(e) => setBookDates((s) => ({ ...s, start_date: e.target.value }))}
+                                                    required
+                                                />
+                                            </label>
+                                            <label className="user-account-label user-account-col">
+                                                {t("userAccount.bookings.end") || "End date"}
+                                                <input
+                                                    type="date"
+                                                    className="user-account-input"
+                                                    value={bookDates.end_date}
+                                                    min={bookDates.start_date || undefined}
+                                                    onChange={(e) => setBookDates((s) => ({ ...s, end_date: e.target.value }))}
+                                                    required
+                                                />
+                                            </label>
+                                            {serviceTypes.length > 0 && (
+                                                <label className="user-account-label user-account-col">
+                                                    {t("userAccount.bookings.serviceType") || "Service type"}
+                                                    <select
+                                                        className="user-account-select"
+                                                        value={selectedServiceType}
+                                                        onChange={(e) => setSelectedServiceType(e.target.value)}
+                                                    >
+                                                        <option value="">{t("userAccount.select.placeholder") || "Select"}</option>
+                                                        {serviceTypes.map((s) => (
+                                                            <option key={s.id} value={s.id}>
+                                                                {s.title || s.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </label>
+                                            )}
+                                        </div>
+                                        <div className="user-account-actions">
+                                            <button className="user-account-btn user-account-btn--primary" type="submit" disabled={busy}>
+                                                {t("userAccount.bookings.create") || "Create"}
+                                            </button>
+                                            <button
+                                                className="user-account-btn user-account-btn--ghost"
+                                                type="button"
+                                                onClick={() => setBookModal({ open: false, customer: null, name: "" })}
+                                            >
+                                                {t("chat.close") || "Close"}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </section>
             )}
-            {/* Chat Widget */}
-            {showChat && (
-                <div className="user-account-chat">
-                    <ChatWidgets
-                        isOpen={showChat}
-                        user={selectedUserForChat}
-                        onClose={handleCloseChat}
-                    />
-                </div>
+
+            {/* BOOKINGS — list + cancel + review */}
+            {tab === "bookings" && (
+                <section className="user-account-section">
+                    <h3 className="user-account-card__title">
+                        <FiClipboard /> {t("userAccount.bookings.title") || "My bookings"}
+                    </h3>
+                    <div className="user-account-list">
+                        {bookings.map((b) => {
+                            const guide =
+                                customersById[String(b.customer_profile)] || customersById[String(b.customer)] || {};
+                            const guideName = guide.full_name || guide.display_name || b.customer_name || "Guide";
+                            const reviewed = hasReviewForBooking(b.id);
+                            return (
+                                <div className="user-account-item" key={b.id}>
+                                    <div className="user-account-item__main">
+                                        <div className="user-account-item__title">#{b.id} — {b.title || guideName}</div>
+                                        <div className="user-account-item__sub">
+                                            <FiCalendar /> {b.start_date} → {b.end_date} | {t("userAccount.bookings.status") || "Status"}: <strong>{b.status_display ?? b.status}</strong>
+                                        </div>
+                                    </div>
+                                    <div className="user-account-actions">
+                                        {b.status !== "cancelled" && (
+                                            <button className="user-account-btn user-account-btn--danger" onClick={() => cancelBooking(b.id)}>
+                                                {t("userAccount.bookings.cancel") || "Cancel"}
+                                            </button>
+                                        )}
+                                        {b.status === "completed" && !reviewed && (
+                                            <button className="user-account-btn" onClick={() => openReviewForBooking(b)}>
+                                                {t("userAccount.reviews.add") || "Review"}
+                                            </button>
+                                        )}
+                                        {reviewed && <span className="user-account-badge">{t("userAccount.reviews.submitted") || "Reviewed"}</span>}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {bookings.length === 0 && <div className="user-account-empty">{t("userAccount.bookings.empty") || "No bookings"}</div>}
+                    </div>
+
+                    {/* Review modal */}
+                    {reviewModal.open && (
+                        <div className="user-account-chatmodal">
+                            <div
+                                className="user-account-chatmodal__backdrop"
+                                onClick={() => setReviewModal({ open: false, bookingId: null, guideName: "" })}
+                            />
+                            <div className="user-account-chatmodal__panel">
+                                <div className="user-account-chatmodal__header">
+                                    <h4 className="user-account-card__title">
+                                        <FiStar /> {t("userAccount.reviews.title") || "Reviews"}
+                                    </h4>
+                                    <button
+                                        className="user-account-iconbtn"
+                                        onClick={() => setReviewModal({ open: false, bookingId: null, guideName: "" })}
+                                    >
+                                        <FiX />
+                                    </button>
+                                </div>
+                                <div className="user-account-chatmodal__body" style={{ padding: 12 }}>
+                                    <form className="user-account-form" onSubmit={submitReview}>
+                                        <div className="user-account-row">
+                                            <label className="user-account-label user-account-col">
+                                                Overall
+                                                <input
+                                                    type="number"
+                                                    min={1}
+                                                    max={5}
+                                                    className="user-account-input"
+                                                    value={reviewDraft.overall_rating}
+                                                    onChange={(e) => setReviewDraft((s) => ({ ...s, overall_rating: Number(e.target.value) }))}
+                                                    required
+                                                />
+                                            </label>
+                                            <label className="user-account-label user-account-col">
+                                                Communication
+                                                <input
+                                                    type="number"
+                                                    min={1}
+                                                    max={5}
+                                                    className="user-account-input"
+                                                    value={reviewDraft.communication_rating}
+                                                    onChange={(e) => setReviewDraft((s) => ({ ...s, communication_rating: Number(e.target.value) }))}
+                                                    required
+                                                />
+                                            </label>
+                                            <label className="user-account-label user-account-col">
+                                                Service
+                                                <input
+                                                    type="number"
+                                                    min={1}
+                                                    max={5}
+                                                    className="user-account-input"
+                                                    value={reviewDraft.service_rating}
+                                                    onChange={(e) => setReviewDraft((s) => ({ ...s, service_rating: Number(e.target.value) }))}
+                                                    required
+                                                />
+                                            </label>
+                                            <label className="user-account-label user-account-col">
+                                                Punctuality
+                                                <input
+                                                    type="number"
+                                                    min={1}
+                                                    max={5}
+                                                    className="user-account-input"
+                                                    value={reviewDraft.punctuality_rating}
+                                                    onChange={(e) => setReviewDraft((s) => ({ ...s, punctuality_rating: Number(e.target.value) }))}
+                                                    required
+                                                />
+                                            </label>
+                                            <label className="user-account-label user-account-col">
+                                                Value
+                                                <input
+                                                    type="number"
+                                                    min={1}
+                                                    max={5}
+                                                    className="user-account-input"
+                                                    value={reviewDraft.value_rating}
+                                                    onChange={(e) => setReviewDraft((s) => ({ ...s, value_rating: Number(e.target.value) }))}
+                                                    required
+                                                />
+                                            </label>
+                                        </div>
+                                        <div className="user-account-row">
+                                            <label className="user-account-label user-account-col">
+                                                {t("userAccount.reviews.comment") || "Comment"}
+                                                <input
+                                                    className="user-account-input"
+                                                    value={reviewDraft.comment}
+                                                    onChange={(e) => setReviewDraft((s) => ({ ...s, comment: e.target.value }))}
+                                                />
+                                            </label>
+                                        </div>
+                                        <div className="user-account-actions">
+                                            <button className="user-account-btn user-account-btn--primary" type="submit" disabled={busy}>
+                                                {t("userAccount.reviews.submit") || "Submit"}
+                                            </button>
+                                            <button
+                                                className="user-account-btn user-account-btn--ghost"
+                                                type="button"
+                                                onClick={() => setReviewModal({ open: false, bookingId: null, guideName: "" })}
+                                            >
+                                                {t("chat.close") || "Close"}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </section>
             )}
+
+            {/* REVIEWS — read-only list */}
+            {tab === "reviews" && (
+                <section className="user-account-section">
+                    <h3 className="user-account-card__title">
+                        <FiStar /> {t("userAccount.reviews.title") || "Reviews"}
+                    </h3>
+                    <div className="user-account-list">
+                        {toArr(myReviews).map((r) => (
+                            <div key={r.id} className="user-account-item">
+                                <div className="user-account-item__main">
+                                    <div className="user-account-item__title">
+                                        #{r.id} — {customersById[String(r.customer)]?.full_name ||
+                                        customersById[String(r.customer)]?.display_name || r.title || "—"} — {r.overall_rating}/5
+                                    </div>
+                                    <div className="user-account-item__sub">{r.comment}</div>
+                                </div>
+                            </div>
+                        ))}
+                        {toArr(myReviews).length === 0 && (
+                            <div className="user-account-empty">{t("userAccount.reviews.empty") || "No reviews"}</div>
+                        )}
+                    </div>
+                </section>
+            )}
+
+            {/* Floating Chat FAB */}
+            <button className="user-account-fab" title={t("ui.openChat") || "Open chat"} onClick={() => setChatOpen(true)}>
+                <FiMessageSquare />
+                {chatUnread > 0 && !chatOpen && <span className="user-account-fab__badge">{chatUnread}</span>}
+            </button>
+
+            {/* Chat Modal */}
+            <ChatModal
+                open={chatOpen}
+                onClose={async () => {
+                    setChatOpen(false);
+                    await refreshChatUnread();
+                }}
+                title={t("ui.openChat") || "Chat"}
+            >
+                <ChatWidgets />
+            </ChatModal>
         </div>
     );
-};
-
-export default UserAccount;
+}

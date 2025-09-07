@@ -1,20 +1,9 @@
 {
-  "short_name": "MyApp",
-  "name": "My Application",
-  "icons": [
-    {
-      "src": "/images/icon-192x192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "/images/icon-512x512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
+  "name": "Guide App",
+  "short_name": "Guide",
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": []
 }

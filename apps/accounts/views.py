@@ -1,10 +1,12 @@
 #  apps/accounts/views.py
-from rest_framework import generics, status
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
 from drf_spectacular.utils import extend_schema
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework import generics, status
+from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .serializers import (
     CustomTokenObtainPairSerializer,
@@ -14,6 +16,7 @@ from .serializers import (
     PasswordResetConfirmSerializer,
     LogoutSerializer,
 )
+from .serializers import UserSerializer  # serializeringiz bo‘lishi kerak
 
 
 @extend_schema(
@@ -197,3 +200,21 @@ class LogoutView(generics.GenericAPIView):
                 {"error": f"Invalid or expired token: {str(e)}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response(
+            {
+                "id": str(user.id),
+                "email": user.email,
+                "role": (
+                    "superadmin"
+                    if user.is_superuser
+                    else "admin" if user.is_staff else "client"
+                ),
+            }
+        )

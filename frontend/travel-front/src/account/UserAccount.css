@@ -1,1437 +1,688 @@
-/* ===== UserAccount Component Styles ===== */
+/* UserAccount Component Styles */
 
-/* Use App.css variables for consistency */
-:root {
-    --container-padding: 1.5rem;
-    --border-radius: 6px;
-    --border-radius-lg: 8px;
-    --border-radius-full: 9999px;
-    --bg-primary: #ffffff;
-    --bg-secondary: #f7fafc;
-    --bg-card: #ffffff;
-    --bg-overlay: rgba(0, 0, 0, 0.5);
-    --text-primary: #1a202c;
-    --text-secondary: #4a5568;
-    --text-muted: #718096;
-    --text-white: #ffffff;
-    --primary: #007bff;
-    --success: #28a745;
-    --info: #17a2b8;
-    --warning: #ffc107;
-    --danger: #dc3545;
-    --border-light: #e2e8f0;
-    --border-medium: #cbd5e0;
-    --border-dark: #a0aec0;
-    --gradient-primary: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-    --transition-fast: all 0.2s ease;
-    --transition-normal: all 0.3s ease;
-}
-
-.user-account-container {
+/* Main wrapper */
+.user-account-wrapper {
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--container-padding);
-    background: var(--bg-primary);
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #f8f9fa;
     min-height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', system-ui, sans-serif;
-    color: var(--text-primary);
-    line-height: 1.6;
 }
 
-/* Header */
-.user-account-header {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--border-radius-lg);
-    padding: var(--container-padding);
-    margin-bottom: var(--container-padding);
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.user-account-title {
-    margin: 0;
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.025em;
-}
-
-.user-account-user-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.user-account-chat-btn {
-    background: var(--gradient-primary);
-    color: var(--text-white);
-    border: none;
-    border-radius: var(--border-radius);
-    padding: 0.75rem 1.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition-normal);
-    box-shadow: var(--shadow-sm);
-}
-
-.user-account-chat-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
-/* Loading */
+/* Loading state */
 .user-account-loading {
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    min-height: 300px;
-    gap: 1rem;
+    align-items: center;
+    height: 50vh;
+    font-size: 18px;
+    color: #6c757d;
 }
 
-.user-account-spinner {
+/* Header section */
+.user-account-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.user-account-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-account-avatar {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.user-account-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.user-account-avatar-img:hover {
+    transform: scale(1.05);
+}
+
+.user-account-avatar-upload-btn {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 50%;
     width: 32px;
     height: 32px;
-    border: 3px solid var(--border-light);
-    border-top: 3px solid var(--primary);
-    border-radius: var(--border-radius-full);
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Error Messages */
-.user-account-error {
-    background: var(--danger);
-    color: var(--text-white);
-    padding: 0.75rem 1rem;
-    border-radius: var(--border-radius);
-    margin-bottom: 1rem;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    box-shadow: var(--shadow-sm);
-}
-
-.user-account-error p {
-    margin: 0;
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-.user-account-error-close {
-    background: none;
-    border: none;
-    color: var(--text-white);
-    font-size: 1.25rem;
+    justify-content: center;
     cursor: pointer;
-    padding: 0.25rem;
-    opacity: 0.8;
-    transition: var(--transition-fast);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.user-account-error-close:hover {
-    opacity: 1;
+.user-account-avatar-upload-btn:hover {
+    background: #218838;
+    transform: scale(1.1);
 }
 
-/* Navigation */
-.user-account-navigation {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--border-radius-lg);
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    display: flex;
-    gap: 0.25rem;
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    box-shadow: var(--shadow-sm);
-    scrollbar-width: thin;
-    scrollbar-color: var(--border-dark) var(--bg-secondary);
-}
-
-.user-account-navigation::-webkit-scrollbar {
-    height: 8px;
-}
-
-.user-account-navigation::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
-}
-
-.user-account-navigation::-webkit-scrollbar-thumb {
-    background: var(--border-dark);
-    border-radius: 4px;
-}
-
-.user-account-navigation::-webkit-scrollbar-thumb:hover {
-    background: var(--text-secondary);
-}
-
-.user-account-nav-btn {
-    background: transparent;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--border-radius);
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition-normal);
-    white-space: nowrap;
-}
-
-.user-account-nav-btn:hover {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-}
-
-.user-account-nav-active {
-    background: var(--gradient-primary);
-    color: var(--text-white);
-    box-shadow: var(--shadow-sm);
-}
-
-.user-account-nav-active:hover {
-    background: var(--gradient-primary);
-    color: var(--text-white);
-}
-
-/* Content Area */
-.user-account-content {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--border-radius-lg);
-    padding: var(--container-padding);
-    box-shadow: var(--shadow-sm);
-}
-
-/* Dashboard Stats */
-.user-account-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.user-account-stat-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--border-radius-lg);
-    padding: 1rem;
-    text-align: center;
-    transition: var(--transition-normal);
-    box-shadow: var(--shadow-sm);
-}
-
-.user-account-stat-card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-}
-
-.user-account-stat-card:nth-child(1) {
-    border-left: 4px solid var(--primary);
-}
-
-.user-account-stat-card:nth-child(2) {
-    border-left: 4px solid var(--success);
-}
-
-.user-account-stat-card:nth-child(3) {
-    border-left: 4px solid var(--info);
-}
-
-.user-account-stat-card:nth-child(4) {
-    border-left: 4px solid var(--warning);
-}
-
-.user-account-stat-title {
-    margin: 0 0 0.5rem 0;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.user-account-stat-value {
-    margin: 0;
-    font-size: 2.25rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    line-height: 1;
-}
-
-/* Section Titles */
-.user-account-section-title {
-    margin: 0 0 1rem 0;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.025em;
-}
-
-.user-account-section-subtitle {
-    margin: 0 0 0.75rem 0;
-    font-size: 1.125rem;
+.user-account-header h2 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
     font-weight: 600;
-    color: var(--text-secondary);
-}
-
-/* Cards and Items */
-.user-account-booking-card,
-.user-account-booking-item,
-.user-account-review-item {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-light);
-    border-radius: var(--border-radius);
-    padding: 1rem;
-    transition: var(--transition-normal);
-    margin-bottom: 1rem;
-}
-
-.user-account-booking-card:hover,
-.user-account-booking-item:hover,
-.user-account-review-item:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
-}
-
-.user-account-booking-card {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-}
-
-.user-account-booking-info {
-    flex: 1;
-}
-
-.user-account-booking-title {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.user-account-booking-date {
-    margin: 0 0 0.5rem 0;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-.user-account-booking-description {
-    margin: 0 0 0.75rem 0;
-    color: var(--text-primary);
-    line-height: 1.6;
-}
-
-/* Status Badges */
-.user-account-booking-status {
-    display: inline-flex;
     align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: var(--border-radius-full);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    gap: 8px;
 }
 
-.user-account-status-pending {
-    background: var(--warning);
-    color: var(--text-white);
+.user-account-email,
+.user-account-country {
+    margin: 4px 0;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
 }
 
-.user-account-status-confirmed,
-.user-account-status-accepted {
-    background: var(--success);
-    color: var(--text-white);
-}
-
-.user-account-status-completed {
-    background: var(--info);
-    color: var(--text-white);
-}
-
-.user-account-status-cancelled {
-    background: var(--danger);
-    color: var(--text-white);
+.user-account-actions {
+    display: flex;
+    gap: 12px;
 }
 
 /* Buttons */
 .user-account-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1.5rem;
+    background: #007bff;
+    color: white;
     border: none;
-    border-radius: var(--border-radius);
-    font-size: 0.875rem;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
     text-decoration: none;
-    min-width: 100px;
-    box-shadow: var(--shadow-sm);
+    min-height: 44px;
+}
+
+.user-account-btn:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
 .user-account-btn:disabled {
-    opacity: 0.6;
+    background: #6c757d;
     cursor: not-allowed;
+    transform: none;
     box-shadow: none;
 }
 
-.user-account-btn-primary {
-    background: var(--gradient-primary);
-    color: var(--text-white);
+.user-account-btn.primary {
+    background: #28a745;
 }
 
-.user-account-btn-primary:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+.user-account-btn.primary:hover {
+    background: #218838;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
-.user-account-btn-secondary {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    border: 1px solid var(--border-medium);
-}
-
-.user-account-btn-secondary:hover {
-    background: var(--bg-tertiary);
-    transform: translateY(-1px);
-}
-
-.user-account-btn-cancel,
-.user-account-btn-danger {
-    background: var(--danger);
-    color: var(--text-white);
-}
-
-.user-account-btn-cancel:hover,
-.user-account-btn-danger:hover {
-    background: #b91c1c;
-    transform: translateY(-1px);
-}
-
-.user-account-btn-small {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.75rem;
-    min-width: 80px;
-}
-
-.user-account-booking-actions {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-/* Profile */
-.user-account-profile-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.user-account-profile-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1rem;
-}
-
-.user-account-profile-field {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-light);
-    border-radius: var(--border-radius);
-    padding: 1rem;
-}
-
-.user-account-profile-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.user-account-profile-value {
-    margin: 0;
-    font-size: 1rem;
-    color: var(--text-primary);
-    font-weight: 500;
-}
-
-.user-account-avatar-preview {
-    width: 120px;
-    height: 120px;
-    border-radius: var(--border-radius-full);
-    object-fit: cover;
-    border: 3px solid var(--border-light);
-    box-shadow: var(--shadow-md);
-}
-
-/* Forms */
-.user-account-form {
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.user-account-form-group {
-    margin-bottom: 1rem;
-}
-
-.user-account-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-.user-account-input,
-.user-account-select,
-.user-account-textarea {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 2px solid var(--border-light);
-    border-radius: var(--border-radius);
-    font-size: 0.875rem;
-    background: var(--bg-card);
-    color: var(--text-primary);
-    transition: var(--transition-normal);
-    box-sizing: border-box;
-}
-
-.user-account-input:focus,
-.user-account-select:focus,
-.user-account-textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-}
-
-.user-account-textarea {
-    resize: vertical;
-    min-height: 120px;
-    font-family: inherit;
-}
-
-.user-account-checkbox-group {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0.5rem;
-    max-height: 200px;
-    overflow-y: auto;
-    padding: 0.75rem;
-    border: 2px solid var(--border-light);
-    border-radius: var(--border-radius);
-    background: var(--bg-card);
-}
-
-.user-account-checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.user-account-icon-btn {
+    background: none;
+    border: none;
+    color: #6c757d;
     cursor: pointer;
-    padding: 0.5rem;
-    border-radius: var(--border-radius);
-    transition: var(--transition-fast);
-    font-size: 0.875rem;
-}
-
-.user-account-checkbox-label:hover {
-    background: var(--bg-secondary);
-}
-
-.user-account-checkbox {
-    margin: 0;
-    width: 16px;
-    height: 16px;
-    accent-color: var(--primary);
-}
-
-.user-account-form-actions {
+    padding: 8px;
+    border-radius: 4px;
     display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    min-width: 32px;
+    min-height: 32px;
 }
 
-/* Guides */
-.user-account-guides-header {
-    margin-bottom: 1rem;
+.user-account-icon-btn:hover {
+    background: #f8f9fa;
+    color: #495057;
 }
 
-.user-account-guides-filters {
+/* Sections */
+.user-account-section {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.3s ease;
+}
+
+.user-account-section:hover {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+}
+
+.user-account-section h3 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #343a40;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 12px;
+}
+
+/* Search form */
+.user-account-search {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0.5rem;
-    margin-top: 1rem;
+    gap: 16px;
+    margin-bottom: 24px;
     align-items: end;
 }
 
-.user-account-filter-input,
-.user-account-filter-select {
-    padding: 0.75rem 1rem;
-    border: 2px solid var(--border-light);
-    border-radius: var(--border-radius);
-    font-size: 0.875rem;
-    background: var(--bg-card);
-    color: var(--text-primary);
-    transition: var(--transition-normal);
-}
-
-.user-account-filter-input:focus,
-.user-account-filter-select:focus {
-    outline: none;
-    border-color: var(--primary);
-}
-
-.user-account-filter-checkbox {
+.user-account-field {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text-secondary);
+    flex-direction: column;
+    gap: 6px;
 }
 
-.user-account-guides-grid {
+.user-account-field label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #495057;
+}
+
+.user-account-field input,
+.user-account-field textarea,
+.user-account-field select {
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.user-account-field input:focus,
+.user-account-field textarea:focus,
+.user-account-field select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.user-account-field textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Guide cards */
+.user-account-guides {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1rem;
+    gap: 16px;
 }
 
 .user-account-guide-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--border-radius-lg);
-    padding: 1rem;
-    transition: var(--transition-normal);
-    box-shadow: var(--shadow-sm);
-    text-align: center;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    background: white;
 }
 
 .user-account-guide-card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-3px);
+    border-color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.user-account-guide-main {
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 .user-account-guide-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: var(--border-radius-full);
-    margin: 0 auto 0.75rem;
-    overflow: hidden;
-    border: 3px solid var(--border-light);
-}
-
-.user-account-guide-avatar img {
-    width: 100%;
-    height: 100%;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
     object-fit: cover;
+    border: 2px solid #e9ecef;
 }
 
-.user-account-guide-avatar-placeholder {
-    width: 100%;
-    height: 100%;
-    background: var(--gradient-primary);
+.user-account-guide-info {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-white);
-    font-size: 1.5rem;
-    font-weight: 700;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .user-account-guide-name {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.user-account-guide-bio {
-    margin: 0 0 0.75rem 0;
-    color: var(--text-secondary);
-    line-height: 1.6;
-}
-
-.user-account-guide-details {
-    margin-bottom: 1rem;
-}
-
-.user-account-guide-experience {
-    display: block;
-    color: var(--text-secondary);
+    font-size: 16px;
     font-weight: 600;
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
+    color: #343a40;
+}
+
+.user-account-guide-loc,
+.user-account-guide-rating {
+    font-size: 14px;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .user-account-guide-rating {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-    color: var(--warning);
-    font-size: 1.125rem;
-}
-
-.user-account-guide-rating-text {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
+    color: #ffc107;
     font-weight: 500;
-}
-
-.user-account-guide-pricing {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.user-account-guide-price {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    padding: 0.25rem 0.75rem;
-    border-radius: var(--border-radius-full);
-    font-size: 0.875rem;
-    font-weight: 600;
 }
 
 .user-account-guide-actions {
     display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-    margin-top: 0.75rem;
+    gap: 8px;
 }
 
 /* Reviews */
-.user-account-reviews-header {
-    margin-bottom: 1rem;
+.user-account-review {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: border-color 0.3s ease;
 }
 
-.user-account-reviews-filters {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    flex-wrap: wrap;
+.user-account-review:hover {
+    border-color: #007bff;
 }
 
-.user-account-reviews-summary {
-    margin-bottom: 1rem;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-light);
-    border-radius: var(--border-radius);
-    padding: 1rem;
-}
-
-.user-account-reviews-summary-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 0.5rem;
-    margin-top: 0.75rem;
-}
-
-.user-account-summary-item {
-    text-align: center;
-    padding: 0.75rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--border-radius);
-}
-
-.user-account-summary-label {
-    display: block;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.25rem;
-}
-
-.user-account-summary-value {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: var(--text-primary);
-}
-
-.user-account-reviews-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.user-account-review-header {
+.user-account-review-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
-}
-
-.user-account-review-rating {
-    color: var(--warning);
-    font-size: 1.125rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.user-account-review-rating-text {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    font-weight: 600;
-}
-
-.user-account-review-date {
-    color: var(--text-muted);
-    font-size: 0.875rem;
+    margin-bottom: 8px;
 }
 
 .user-account-review-title {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.125rem;
     font-weight: 600;
-    color: var(--text-primary);
-}
-
-.user-account-review-comment {
-    margin: 0 0 0.75rem 0;
-    color: var(--text-primary);
-    line-height: 1.7;
-}
-
-.user-account-review-details {
+    color: #343a40;
     display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.75rem;
-}
-
-.user-account-review-detail {
-    background: var(--bg-card);
-    color: var(--text-primary);
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--border-radius-full);
-    font-size: 0.75rem;
-    font-weight: 600;
-    border: 1px solid var(--border-light);
-}
-
-.user-account-review-reactions {
-    display: flex;
-    gap: 0.5rem;
-    margin: 0.75rem 0;
-    flex-wrap: wrap;
     align-items: center;
+    gap: 6px;
 }
 
-.user-account-review-reaction-count {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    font-weight: 500;
+.user-account-review-date {
+    font-size: 12px;
+    color: #6c757d;
 }
 
-.user-account-review-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
-    flex-wrap: wrap;
+.user-account-review-body {
+    margin: 8px 0;
+    line-height: 1.5;
+    color: #495057;
 }
 
-/* Modals */
+.user-account-review-meta {
+    font-size: 12px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Modal */
 .user-account-modal {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--bg-overlay);
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    padding: var(--container-padding);
+    padding: 20px;
+    backdrop-filter: blur(4px);
 }
 
 .user-account-modal-content {
-    background: var(--bg-card);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-lg);
-    max-width: 600px;
+    background: white;
+    border-radius: 16px;
     width: 100%;
+    max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
-    padding: var(--container-padding);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
 }
 
-.user-account-modal-title {
-    margin: 0 0 1rem 0;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
-/* Chat Widget */
-.user-account-chat {
-    position: fixed;
-    bottom: var(--container-padding);
-    right: var(--container-padding);
-    z-index: 1000;
-    max-width: 400px;
-    width: 90%;
-    display: block; /* Ensure container is visible */
-    visibility: visible;
-    opacity: 1;
-    transition: var(--transition-normal);
-}
-
-/* Assumed ChatWidgets styles */
-.chat-widgets-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 400px;
-    height: 500px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-lg);
-    overflow: hidden;
-    z-index: 1001;
-}
-
-.chat-widgets-header {
-    background: var(--gradient-primary);
-    color: var(--text-white);
-    padding: 1rem;
+.user-account-modal-header {
+    padding: 24px 24px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 1.25rem;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+}
+
+.user-account-modal-header h4 {
+    margin: 0;
+    font-size: 18px;
     font-weight: 600;
+    color: #343a40;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.chat-widgets-close-btn {
-    background: none;
-    border: none;
-    color: var(--text-white);
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: var(--transition-fast);
+.user-account-grid {
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
 }
 
-.chat-widgets-close-btn:hover {
-    opacity: 0.8;
+.user-account-col-2 {
+    grid-column: span 2;
 }
 
-.chat-widgets-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1rem;
-    background: var(--bg-secondary);
+.user-account-modal-actions {
+    padding: 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid #e9ecef;
+    margin-top: 24px;
 }
 
-.chat-widgets-loading,
-.chat-widgets-error {
+/* Empty states */
+.user-account-empty {
     text-align: center;
-    padding: 1rem;
-    color: var(--text-primary);
+    color: #6c757d;
+    font-style: italic;
+    padding: 40px 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
 }
 
-.chat-widgets-error {
-    color: var(--danger);
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-    .user-account-container {
-        padding: 1rem;
-    }
-
-    .user-account-header {
-        padding: 1rem;
-    }
-
-    .user-account-content {
-        padding: 1rem;
-    }
-
-    .user-account-stats {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
-
-    .user-account-guides-grid {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    }
-
-    .user-account-chat,
-    .chat-widgets-container {
-        max-width: 350px;
-    }
-}
-
+/* Mobile responsiveness */
 @media (max-width: 768px) {
-    .user-account-container {
-        padding: 0.75rem;
+    .user-account-wrapper {
+        padding: 16px;
     }
 
     .user-account-header {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
-        padding: 0.75rem;
-        text-align: left;
-    }
-
-    .user-account-title {
-        font-size: 2rem;
-    }
-
-    .user-account-navigation {
-        flex-direction: row;
-        overflow-x: auto;
-        white-space: nowrap;
-        padding-bottom: 0.5rem;
-    }
-
-    .user-account-nav-btn {
-        flex: 0 0 auto;
-        padding: 0.75rem 1rem;
-        min-width: 100px;
         text-align: center;
+        gap: 20px;
+        padding: 24px 20px;
     }
 
-    .user-account-content {
-        padding: 0.75rem;
+    .user-account-left {
+        flex-direction: column;
+        gap: 16px;
     }
 
-    .user-account-stats {
+    .user-account-header h2 {
+        font-size: 20px;
+        justify-content: center;
+    }
+
+    .user-account-actions {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .user-account-search {
         grid-template-columns: 1fr;
-        gap: 0.75rem;
-    }
-
-    .user-account-stat-card {
-        padding: 0.75rem;
-    }
-
-    .user-account-stat-value {
-        font-size: 1.875rem;
-    }
-
-    .user-account-guides-filters {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
-    }
-
-    .user-account-guides-grid {
-        grid-template-columns: 1fr;
-        gap: 0.75rem;
     }
 
     .user-account-guide-card {
-        padding: 0.75rem;
-    }
-
-    .user-account-booking-card,
-    .user-account-booking-item {
         flex-direction: column;
-        gap: 0.75rem;
-        align-items: stretch;
-        padding: 0.75rem;
+        text-align: center;
+        gap: 16px;
     }
 
-    .user-account-booking-actions {
+    .user-account-guide-main {
         flex-direction: column;
-        justify-content: stretch;
+        text-align: center;
     }
 
-    .user-account-booking-actions .user-account-btn {
+    .user-account-guide-actions {
         width: 100%;
+        justify-content: center;
     }
 
-    .user-account-profile-info {
-        grid-template-columns: 1fr;
-    }
-
-    .user-account-profile-field {
-        padding: 0.75rem;
-    }
-
-    .user-account-form-actions {
+    .user-account-review-top {
         flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .user-account-form-actions .user-account-btn {
-        width: 100%;
-    }
-
-    .user-account-reviews-filters {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .user-account-reviews-summary-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.5rem;
-    }
-
-    .user-account-review-details {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .user-account-review-actions {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .user-account-review-actions .user-account-btn {
-        width: 100%;
+        align-items: flex-start;
+        gap: 8px;
     }
 
     .user-account-modal {
-        padding: 0.5rem;
-        align-items: flex-start;
-        padding-top: 1rem;
+        padding: 12px;
     }
 
     .user-account-modal-content {
-        padding: 0.75rem;
-        max-height: 85vh;
+        max-height: 95vh;
+    }
+
+    .user-account-grid {
+        grid-template-columns: 1fr;
+        padding: 0 20px;
+    }
+
+    .user-account-col-2 {
+        grid-column: span 1;
+    }
+
+    .user-account-modal-header {
+        padding: 20px 20px 0;
+    }
+
+    .user-account-modal-actions {
+        padding: 20px;
+        flex-direction: column;
+    }
+
+    .user-account-btn {
         width: 100%;
-        margin: 0;
-    }
-
-    .user-account-modal-title {
-        font-size: 1.25rem;
-    }
-
-    .user-account-chat {
-        max-width: calc(100% - 1rem);
-        right: 0.5rem;
-        bottom: 0.5rem;
-        left: 0.5rem;
-        width: auto;
-    }
-
-    .chat-widgets-container {
-        width: 100%;
-        height: 80vh;
-        max-width: none;
-        border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
-        bottom: 0;
+        justify-content: center;
     }
 }
 
 @media (max-width: 480px) {
-    .user-account-container {
-        padding: 0.5rem;
+    .user-account-wrapper {
+        padding: 12px;
+    }
+
+    .user-account-section {
+        padding: 20px 16px;
     }
 
     .user-account-header {
-        padding: 0.5rem;
-        border-radius: var(--border-radius);
+        padding: 20px 16px;
     }
 
-    .user-account-title {
-        font-size: 1.25rem;
+    .user-account-avatar {
+        width: 60px;
+        height: 60px;
     }
 
-    .user-account-content {
-        padding: 0.5rem;
-        border-radius: var(--border-radius);
+    .user-account-avatar-upload-btn {
+        width: 28px;
+        height: 28px;
     }
 
-    .user-account-section-title {
-        font-size: 1.25rem;
+    .user-account-header h2 {
+        font-size: 18px;
     }
 
-    .user-account-stat-card {
-        padding: 0.5rem;
+    .user-account-section h3 {
+        font-size: 18px;
     }
 
-    .user-account-stat-value {
-        font-size: 1.5rem;
-    }
-
-    .user-account-guide-card,
-    .user-account-booking-card,
-    .user-account-booking-item,
-    .user-account-review-item {
-        padding: 0.5rem;
-        border-radius: var(--border-radius);
-    }
-
-    .user-account-reviews-summary {
-        padding: 0.5rem;
-    }
-
-    .user-account-reviews-summary-grid {
-        grid-template-columns: 1fr;
-        gap: 0.25rem;
-    }
-
-    .user-account-summary-item {
-        padding: 0.5rem;
+    .user-account-field input,
+    .user-account-field textarea,
+    .user-account-field select {
+        padding: 10px;
+        font-size: 16px; /* Prevents zoom on iOS */
     }
 
     .user-account-btn {
-        padding: 0.5rem 0.75rem;
+        padding: 12px 16px;
+        font-size: 14px;
     }
 
-    .user-account-btn-small {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-    }
-
-    .user-account-modal-content {
-        padding: 0.5rem;
-        border-radius: var(--border-radius);
-    }
-
-    .user-account-form-group {
-        margin-bottom: 0.75rem;
-    }
-
-    .user-account-input,
-    .user-account-select,
-    .user-account-textarea {
-        padding: 0.5rem;
-        font-size: 0.875rem;
-    }
-
-    .user-account-checkbox-group {
-        grid-template-columns: 1fr;
-        max-height: 150px;
-        padding: 0.5rem;
-    }
-
-    .user-account-avatar-preview {
-        width: 100px;
-        height: 100px;
+    .user-account-guide-card {
+        padding: 16px;
     }
 
     .user-account-guide-avatar {
-        width: 60px;
-        height: 60px;
-        margin-bottom: 0.5rem;
-    }
-
-    .user-account-guide-name {
-        font-size: 1.125rem;
-    }
-
-    .user-account-review-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-
-    .user-account-booking-status {
-        align-self: flex-start;
-        margin-top: 0.5rem;
-    }
-
-    .user-account-chat {
-        max-width: calc(100% - 0.5rem);
-        right: 0.25rem;
-        bottom: 0.25rem;
-        left: 0.25rem;
-    }
-
-    .chat-widgets-container {
-        height: 85vh;
-        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        width: 50px;
+        height: 50px;
     }
 }
 
 /* Dark mode support */
-[data-theme="dark"] {
-    --bg-primary: #1a202c;
-    --bg-secondary: #2d3748;
-    --bg-card: #2d3748;
-    --text-primary: #e2e8f0;
-    --text-secondary: #a0aec0;
-    --text-muted: #718096;
-    --border-light: #4a5568;
-    --border-medium: #2d3748;
-    --border-dark: #1a202c;
+@media (prefers-color-scheme: dark) {
+    .user-account-wrapper {
+        background-color: #1a1a1a;
+        color: #e9ecef;
+    }
+
+    .user-account-section {
+        background: #2d2d2d;
+        color: #e9ecef;
+    }
+
+    .user-account-section h3 {
+        color: #f8f9fa;
+        border-bottom-color: #495057;
+    }
+
+    .user-account-field input,
+    .user-account-field textarea,
+    .user-account-field select {
+        background: #3d3d3d;
+        border-color: #495057;
+        color: #e9ecef;
+    }
+
+    .user-account-field input:focus,
+    .user-account-field textarea:focus,
+    .user-account-field select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+    }
+
+    .user-account-guide-card {
+        background: #3d3d3d;
+        border-color: #495057;
+    }
+
+    .user-account-guide-card:hover {
+        border-color: #007bff;
+    }
+
+    .user-account-guide-name {
+        color: #f8f9fa;
+    }
+
+    .user-account-review {
+        background: #3d3d3d;
+        border-color: #495057;
+    }
+
+    .user-account-review-title {
+        color: #f8f9fa;
+    }
+
+    .user-account-modal-content {
+        background: #2d2d2d;
+        color: #e9ecef;
+    }
+
+    .user-account-modal-header {
+        border-bottom-color: #495057;
+    }
+
+    .user-account-modal-header h4 {
+        color: #f8f9fa;
+    }
+
+    .user-account-modal-actions {
+        border-top-color: #495057;
+    }
+
+    .user-account-empty {
+        background: #3d3d3d;
+        border-color: #495057;
+        color: #adb5bd;
+    }
 }
 
-/* Accessibility */
+/* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
     * {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-    }
-
-    .user-account-spinner {
-        animation: none;
-        border: 3px solid var(--border-medium);
     }
 }
 
-/* Focus styles for accessibility */
-.user-account-btn:focus-visible,
-.user-account-input:focus-visible,
-.user-account-select:focus-visible,
-.user-account-textarea:focus-visible,
-.user-account-nav-btn:focus-visible,
-.user-account-checkbox:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-}
-
-/* High contrast mode support */
+/* High contrast mode */
 @media (prefers-contrast) {
     .user-account-btn {
-        border: 2px solid currentColor;
+        border: 2px solid;
     }
 
-    .user-account-input,
-    .user-account-select,
-    .user-account-textarea {
+    .user-account-field input,
+    .user-account-field textarea,
+    .user-account-field select {
         border-width: 2px;
     }
 }
 
-/* Print styles */
-@media print {
-    .user-account-navigation,
-    .user-account-chat,
-    .user-account-modal,
-    .user-account-btn,
-    .user-account-booking-actions,
-    .user-account-review-actions {
-        display: none !important;
-    }
-
-    .user-account-container {
-        max-width: none;
-        padding: 0;
-        box-shadow: none;
-    }
-
-    .user-account-header,
-    .user-account-content,
-    .user-account-stat-card,
-    .user-account-guide-card,
-    .user-account-booking-card,
-    .user-account-review-item {
-        box-shadow: none !important;
-        border: 1px solid var(--border-medium) !important;
-    }
-}
-
-.user-account-avatar-preview {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #e2e8f0;
-    margin-top: 12px;
-}
-
-.user-account-file-input {
-    margin-top: 8px;
-    padding: 8px;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    width: 100%;
-}
-
-.user-account-btn-danger {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 8px;
-}
-
-.user-account-btn-danger:hover {
-    background-color: #c82333;
-}
-
-.user-account-form-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 16px;
-}
-
-.user-account-guide-actions {
-    display: flex;
-    gap: 8px;
-}
-.user-account-btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-.user-account-btn:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-.user-account-unavailabilities {
-    margin-bottom: 16px;
-    padding: 12px;
-    background-color: #f8f9fa;
-    border-radius: 4px;
-    border: 1px solid #e2e8f0;
-}
-
-.user-account-unavailabilities h4 {
-    font-size: 16px;
-    margin-bottom: 8px;
-    color: #333;
-}
-
-.user-account-unavailabilities ul {
-    list-style-type: disc;
-    margin-left: 20px;
-}
-
-.user-account-unavailabilities li {
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 4px;
-}
-
-.user-account-select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    font-size: 14px;
+/* Focus indicators for keyboard navigation */
+.user-account-btn:focus,
+.user-account-icon-btn:focus,
+.user-account-field input:focus,
+.user-account-field textarea:focus,
+.user-account-field select:focus {
+    outline: 3px solid #007bff;
+    outline-offset: 2px;
 }

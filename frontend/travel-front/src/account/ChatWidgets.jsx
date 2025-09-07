@@ -1,880 +1,398 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import axios from 'axios';
-import './ChatWidgets.css';
+// src/account/ChatWidgets.jsx
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { FiSend, FiSearch, FiUser, FiMessageSquare, FiCheckCircle, FiCircle } from "react-icons/fi";
+import api from "./api";
+import "./ChatWidgets.css";
 
-// API Configuration
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/";
+/* ============ MEDIA URL HELPERS (Header/UserAccount bilan mos) ============ */
+const API_BASE = (process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/").replace(/\/+$/, "");
+const BACKEND_ORIGIN =
+    API_BASE.replace(/\/api\/v1\/?$/, "") ||
+    (typeof window !== "undefined" ? window.location.origin : "http://localhost:8000");
+
+const toAbsMedia = (url) => {
+    if (!url) return "/placeholder-avatar.png";
+    if (/^https?:\/\//i.test(url)) return url;             // allaqachon to‘liq
+    if (url.startsWith("/media")) return BACKEND_ORIGIN + url;
+    if (url.startsWith("media/")) return `${BACKEND_ORIGIN}/${url}`;
+    return url;
+};
+
+const getUserInlineAvatar = (user) => toAbsMedia(user?.avatar_url || user?.avatar || "");
+
+/* ===================== WebSocket ===================== */
 const WS_URL = process.env.REACT_APP_WS_URL || "ws://localhost:8000/ws/chat/";
 
-const api = axios.create({
-    baseURL: API_URL,
-    headers: { "Content-Type": "application/json" },
-    withCredentials: false,
-});
+function useWebSocket(url) {
+    const [socket, setSocket] = useState(null);
+    const [ready, setReady] = useState(false);
 
-// Token Interceptor
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("access_token");
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
-        headers: config.headers,
-        data: config.data,
-    });
-    return config;
-});
+    useEffect(() => {
+        const token = localStorage.getItem("access_token");
+        const ws = new WebSocket(`${url}?token=${encodeURIComponent(token || "")}`);
+        ws.onopen = () => setReady(true);
+        ws.onclose = () => setReady(false);
+        setSocket(ws);
+        return () => ws.close();
+    }, [url]);
 
-// Token Refresh Interceptor
-api.interceptors.response.use(
-    (response) => {
-        console.log(`API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-            status: response.status,
-            data: response.data,
-        });
-        return response;
-    },
-    async (error) => {
-        console.error(`API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
-            status: error.response?.status,
-            data: error.response?.data,
-            message: error.message,
-        });
-        const originalRequest = error.config;
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-            try {
-                const refreshToken = localStorage.getItem("refresh_token");
-                if (!refreshToken) {
-                    throw new Error("No refresh token available");
-                }
-                const refreshResponse = await api.post("token/refresh/", {
-                    refresh: refreshToken,
-                });
-                const newAccessToken = refreshResponse.data.access_token || refreshResponse.data.access;
-                localStorage.setItem("access_token", newAccessToken);
-                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                return api(originalRequest);
-            } catch (refreshError) {
-                console.error("Token refresh failed:", refreshError);
-                localStorage.removeItem("access_token");
-                localStorage.removeItem("refresh_token");
-                window.location.href = "/login";
-                return Promise.reject(refreshError);
-            }
-        }
-        let errorMessage = "Unknown error occurred";
-        if (error.response?.data) {
-            const data = error.response.data;
-            errorMessage =
-                data.detail ||
-                data.message ||
-                data.error ||
-                (data.email && data.email[0]) ||
-                (data.code && data.code[0]) ||
-                (data.non_field_errors && data.non_field_errors[0]) ||
-                JSON.stringify(data);
-        } else if (error.message) {
-            errorMessage = error.message;
-        }
-        return Promise.reject(new Error(errorMessage));
-    }
-);
+    return { socket, ready };
+}
 
-// Chat APIs
-const getConversations = () => {
-    console.log("Getting conversations...");
-    return api.get("chat/conversations/").then((r) => r.data);
-};
-
-const getChatMessages = (conversationId, params = {}) => {
-    console.log("Getting chat messages for conversation:", conversationId);
-    return api.get(`chat/conversations/${conversationId}/messages/`, { params }).then((r) => r.data);
-};
-
-const createConversation = (payload) => {
-    console.log("Creating conversation:", payload);
-    return api.post("chat/conversations/", payload).then((r) => r.data);
-};
-
-const getUnreadCount = () =>
-    api.get("chat/unread-count/").then((r) => r.data);
-
-const searchUsers = (query) => {
-    console.log("Searching users:", query);
-    return api.get("chat/users/search/", { params: { q: query } }).then((r) => r.data);
-};
-
-const blockUser = (payload) => {
-    console.log("Blocking user:", payload);
-    return api.post("chat/block/", payload).then((r) => r.data);
-};
-
-const unblockUser = (userId) => {
-    console.log("Unblocking user:", userId);
-    return api.delete(`chat/unblock/${userId}/`).then((r) => r.data);
-};
-
-const getBlockedUsers = () =>
-    api.get("chat/blocked/").then((r) => r.data);
-
-const getCurrentUser = () => {
-    console.log("Getting current user info...");
-    return api.get("auth/users/short/").then((r) => r.data);
-};
-
-// WebSocket Helpers
-let wsConnections = {};
-
-const connectWebSocket = (conversationId, onMessage, onOpen, onClose, onError) => {
-    if (wsConnections[conversationId]) {
-        console.log(`WebSocket already connected for conversation ${conversationId}`);
-        return wsConnections[conversationId];
-    }
-
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-        throw new Error("No access token for WebSocket");
-    }
-
-    const ws = new WebSocket(`${WS_URL}${conversationId}/?token=${token}`);
-
-    ws.onopen = () => {
-        console.log(`WebSocket connected for conversation ${conversationId}`);
-        if (onOpen) onOpen();
-    };
-
-    ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        console.log(`WebSocket message received:`, data);
-        if (onMessage) onMessage(data);
-    };
-
-    ws.onclose = (event) => {
-        console.log(`WebSocket closed for conversation ${conversationId}:`, event);
-        delete wsConnections[conversationId];
-        if (onClose) onClose(event);
-        setTimeout(() => connectWebSocket(conversationId, onMessage, onOpen, onClose, onError), 3000);
-    };
-
-    ws.onerror = (error) => {
-        console.error(`WebSocket error for conversation ${conversationId}:`, error);
-        if (onError) onError(error);
-    };
-
-    wsConnections[conversationId] = ws;
-    return ws;
-};
-
-const sendWebSocketMessage = (conversationId, payload) => {
-    const ws = wsConnections[conversationId];
-    if (!ws || ws.readyState !== WebSocket.OPEN) {
-        console.error(`WebSocket not open for conversation ${conversationId}`);
-        return;
-    }
-    ws.send(JSON.stringify(payload));
-};
-
-const closeWebSocket = (conversationId) => {
-    const ws = wsConnections[conversationId];
-    if (ws) {
-        ws.close();
-        delete wsConnections[conversationId];
-    }
-};
-
-// WebSocket-dependent API functions
-const sendMessage = async (payload) => {
-    const { conversation, content } = payload;
-    try {
-        sendWebSocketMessage(conversation, { type: 'chat_message', content });
-        return { ...payload, id: Date.now(), is_mine: true, created_at: new Date().toISOString() }; // Optimistic
-    } catch (err) {
-        console.error('WS send failed, fallback to REST:', err);
-        return api.post("chat/messages/send/", payload).then((r) => r.data);
-    }
-};
-
-const markMessagesAsRead = async (conversationId) => {
-    try {
-        sendWebSocketMessage(conversationId, { type: 'message_read' });
-    } catch (err) {
-        console.error('WS mark read failed, fallback to REST:', err);
-        return api.post(`chat/conversations/${conversationId}/mark-read/`).then((r) => r.data);
-    }
-};
-
-const messageAction = async (conversationId, messageId, action) => {
-    try {
-        sendWebSocketMessage(conversationId, { type: 'message_action', message_id: messageId, action });
-    } catch (err) {
-        console.error('WS action failed, fallback to REST:', err);
-        return api.post(`chat/messages/${messageId}/action/`, { action }).then((r) => r.data);
-    }
-};
-
-const sendTypingIndicator = (conversationId, isTyping) => {
-    sendWebSocketMessage(conversationId, { type: 'typing', is_typing: isTyping });
-};
-
-// React Component
-const ChatWidgets = ({ isOpen, onClose, selectedUserId = null, userRole = 'client' }) => {
+/* ===================== Chat Widget ===================== */
+export default function ChatWidgets({ initialPeerEmail = null }) {
     const { t } = useTranslation();
-    const [currentUser, setCurrentUser] = useState(null);
+    const [me, setMe] = useState(null); // accounts/me
     const [conversations, setConversations] = useState([]);
-    const [activeConversation, setActiveConversation] = useState(null);
+    const [activeConv, setActiveConv] = useState(null);
     const [messages, setMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState('');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-    const [unreadCount, setUnreadCount] = useState(0);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [showUserSearch, setShowUserSearch] = useState(false);
-    const [showBlockedUsers, setShowBlockedUsers] = useState(false);
-    const [blockedUsers, setBlockedUsers] = useState([]);
-    const [chatView, setChatView] = useState('conversations');
-    const [wsStatus, setWsStatus] = useState('disconnected');
-    const [typingUsers, setTypingUsers] = useState([]);
-    const [onlineUsers, setOnlineUsers] = useState([]);
+    const [composer, setComposer] = useState("");
+    const [loadingConv, setLoadingConv] = useState(true);
+    const [loadingMsg, setLoadingMsg] = useState(false);
+    const [query, setQuery] = useState("");
 
-    const messagesEndRef = useRef(null);
-    const searchTimeoutRef = useRef(null);
-    const typingTimeoutRef = useRef(null);
+    const listRef = useRef();
+    const { socket } = useWebSocket(WS_URL);
 
+    // Avatar KESH: userId -> absolute url (useRef: set qilganda re-render bo‘lmaydi)
+    const avatarCacheRef = useRef({});
+
+    // Mening rolimni olish
     useEffect(() => {
-        if (isOpen) {
-            initializeChat();
-        }
-        return () => {
-            if (activeConversation) {
-                closeWebSocket(activeConversation.id);
+        (async () => {
+            try {
+                const { data } = await api.get("accounts/me/");
+                setMe(data);
+            } catch (e) {
+                console.error(e);
             }
-        };
-    }, [isOpen]);
+        })();
+    }, []);
 
+    // Parentdan peer yuborilsa, suhbatni create/get
     useEffect(() => {
-        if (selectedUserId && isOpen) {
-            startConversationWithUser(selectedUserId);
-        }
-    }, [selectedUserId, isOpen]);
-
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
-
-    const initializeChat = async () => {
-        try {
-            setLoading(true);
-            const userData = await getCurrentUser();
-            setCurrentUser(userData);
-            await Promise.all([
-                loadConversations(),
-                loadUnreadCount()
-            ]);
-        } catch (err) {
-            console.error('Error initializing chat:', err);
-            setError(t('chatWidgets.error.initializeChat'));
-            // Continue rendering with limited functionality
-            setCurrentUser({}); // Set a fallback to prevent breaking the UI
-            await Promise.all([
-                loadConversations(),
-                loadUnreadCount()
-            ]).catch(() => {
-                setError(t('chatWidgets.error.loadConversations'));
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const loadConversations = async () => {
-        try {
-            const data = await getConversations();
-            setConversations(data.results || data);
-        } catch (err) {
-            console.error('Error loading conversations:', err);
-            setError(t('chatWidgets.error.loadConversations'));
-        }
-    };
-
-    const loadMessages = async (conversationId) => {
-        try {
-            const data = await getChatMessages(conversationId);
-            setMessages(data.results || data);
-            await markMessagesAsRead(conversationId);
-            loadUnreadCount();
-        } catch (err) {
-            console.error('Error loading messages:', err);
-            setError(t('chatWidgets.error.loadMessages'));
-        }
-    };
-
-    const loadUnreadCount = async () => {
-        try {
-            const data = await getUnreadCount();
-            setUnreadCount(data.total_unread || 0);
-        } catch (err) {
-            console.error('Error loading unread count:', err);
-            setError(t('chatWidgets.error.loadUnreadCount'));
-        }
-    };
-
-    const loadBlockedUsers = async () => {
-        try {
-            const data = await getBlockedUsers();
-            setBlockedUsers(data.results || data);
-        } catch (err) {
-            console.error('Error loading blocked users:', err);
-            setError(t('chatWidgets.error.loadBlockedUsers'));
-        }
-    };
-
-    const setupWebSocket = (conversationId) => {
-        connectWebSocket(
-            conversationId,
-            (data) => {
-                if (data.type === 'chat_message') {
-                    setMessages(prev => [data.message, ...prev]);
-                    loadConversations();
-                    loadUnreadCount();
-                } else if (data.type === 'message_action') {
-                    setMessages(prev => prev.map(msg => msg.id === data.message_id ? { ...msg, ...data.message } : msg));
-                } else if (data.type === 'message_read') {
-                    setMessages(prev => prev.map(msg => msg.id === data.message_id ? { ...msg, is_read: true, read_at: new Date().toISOString() } : msg));
-                } else if (data.type === 'typing_indicator') {
-                    if (data.is_typing) {
-                        setTypingUsers(prev => [...new Set([...prev, data.user_name])]);
-                    } else {
-                        setTypingUsers(prev => prev.filter(name => name !== data.user_name));
-                    }
-                } else if (data.type === 'user_online') {
-                    setOnlineUsers(prev => [...new Set([...prev, data.user_name])]);
-                } else if (data.type === 'user_offline') {
-                    setOnlineUsers(prev => prev.filter(name => name !== data.user_name));
-                }
-            },
-            () => setWsStatus('connected'),
-            () => setWsStatus('disconnected'),
-            (err) => {
-                setError(t('chatWidgets.error.webSocket', { message: err.message }));
-                setWsStatus('error');
+        (async () => {
+            if (!initialPeerEmail) return;
+            try {
+                await api.post("chat/conversations/", { user_email: initialPeerEmail });
+            } catch (e) {
+                console.error(e);
             }
-        );
-    };
+        })();
+    }, [initialPeerEmail]);
 
-    const handleSendMessage = async (e) => {
-        e.preventDefault();
-        if (!newMessage.trim() || !activeConversation) return;
-        try {
-            const optimisticMessage = await sendMessage({
-                conversation: activeConversation.id,
-                content: newMessage.trim()
-            });
-            setMessages(prev => [optimisticMessage, ...prev]);
-            setNewMessage('');
-            loadConversations();
-        } catch (err) {
-            setError(t('chatWidgets.error.sendMessage'));
-        }
-    };
+    // Peer avatarini profil endpointidan olish (kesh bilan)
+    const fetchPeerAvatarUrl = useCallback(
+        async (peerUserId) => {
+            if (!peerUserId) return null;
 
-    const handleMessageChange = (e) => {
-        setNewMessage(e.target.value);
-        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-        sendTypingIndicator(activeConversation.id, true);
-        typingTimeoutRef.current = setTimeout(() => {
-            sendTypingIndicator(activeConversation.id, false);
-        }, 3000);
-    };
+            // kesh bor bo‘lsa shu zahoti qaytaramiz
+            if (avatarCacheRef.current[peerUserId]) return avatarCacheRef.current[peerUserId];
 
-    const handleConversationSelect = async (conversation) => {
-        setActiveConversation(conversation);
-        setChatView('chat');
-        setTypingUsers([]);
-        setOnlineUsers([]);
-        await loadMessages(conversation.id);
-        setupWebSocket(conversation.id);
-    };
+            // Mening rolimga teskari bo‘lgan profil endpointini tanlaymiz
+            // client -> peers are "customers"
+            // customer -> peers are "clients"
+            const primary = me?.role === "client" ? "profiles/customers" : "profiles/clients";
+            const fallback = me?.role === "client" ? "profiles/clients" : "profiles/customers";
 
-    const handleUserSearch = async (query) => {
-        if (searchTimeoutRef.current) {
-            clearTimeout(searchTimeoutRef.current);
-        }
-        searchTimeoutRef.current = setTimeout(async () => {
-            if (query.length >= 2) {
+            const tryOne = async (base) => {
                 try {
-                    const data = await searchUsers(query);
-                    setSearchResults(data.results || []);
-                } catch (err) {
-                    console.error('Error searching users:', err);
-                    setError(t('chatWidgets.error.searchUsers'));
+                    const { data } = await api.get(`${base}/${peerUserId}/avatar/`);
+                    return toAbsMedia(data?.avatar_url || data?.avatar);
+                } catch {
+                    return null;
                 }
-            } else {
-                setSearchResults([]);
-            }
-        }, 300);
-    };
+            };
 
-    const startConversationWithUser = async (userEmail) => {
+            let url = await tryOne(primary);
+            if (!url) url = await tryOne(fallback);
+
+            avatarCacheRef.current[peerUserId] = url || "/placeholder-avatar.png";
+            return avatarCacheRef.current[peerUserId];
+        },
+        [me?.role]
+    );
+
+    // activeConvId va peerId’ni ajratib olamiz (dep’lar uchun barqaror primitivlar)
+    const activeConvId = activeConv?.id;
+    const activePeerId = activeConv?.other_user?.id;
+
+    // Suhbatlar ro‘yxatini olish + avatarlarni resolve (birinchi inline, keyin fon’da profil)
+    const fetchConversations = useCallback(async () => {
+        setLoadingConv(true);
         try {
-            const conversationData = await createConversation({
-                user_email: userEmail,
-                message: ''
+            const res = await api.get("chat/conversations/");
+            let items = res.data?.results || res.data || [];
+
+            // Qidiruv
+            const q = (query || "").toLowerCase().trim();
+            if (q) {
+                items = items.filter((c) => {
+                    const name = c.other_user?.full_name || c.other_user?.email || "";
+                    return name.toLowerCase().includes(q);
+                });
+            }
+
+            // Avval inline avatarlar bilan darhol ko‘rsatamiz
+            const withInline = items.map((c) => ({
+                ...c,
+                _other_avatar: getUserInlineAvatar(c.other_user || {}),
+            }));
+            setConversations(withInline);
+
+            // Yetishmayotgan avatarlarni fon’da olib, bitta qo‘shimcha repaint qilamiz
+            Promise.all(
+                withInline.map(async (c) => {
+                    const uid = c.other_user?.id;
+                    if (!uid) return null;
+
+                    const inlineIsEmpty =
+                        !c._other_avatar || c._other_avatar.includes("placeholder-avatar.png");
+
+                    const cached = avatarCacheRef.current[uid];
+                    if (cached && !inlineIsEmpty) return null; // inline bor, kesh bor — ok
+
+                    // Agar inline yo‘q bo‘lsa yoki kesh yo‘q bo‘lsa, API dan o‘qib kelamiz
+                    const fresh = await fetchPeerAvatarUrl(uid);
+                    if (fresh) c._other_avatar = fresh;
+                    return null;
+                })
+            ).then(() => {
+                setConversations((prev) =>
+                    prev.map((x) => {
+                        const updated = withInline.find((y) => y.id === x.id);
+                        return updated || x;
+                    })
+                );
             });
-            const existingConv = conversations.find(c => c.id === conversationData.id);
-            if (!existingConv) {
-                setConversations(prev => [conversationData, ...prev]);
+
+            // activeConv bo‘lsa, yangilangan obyektga “pin” qilamiz
+            if (!activeConvId && withInline.length > 0) {
+                setActiveConv(withInline[0]);
+            } else if (activeConvId) {
+                const updated = withInline.find((x) => x.id === activeConvId);
+                if (updated) setActiveConv(updated);
             }
-            setActiveConversation(conversationData);
-            setChatView('chat');
-            await loadMessages(conversationData.id);
-            setupWebSocket(conversationData.id);
-        } catch (err) {
-            setError(t('chatWidgets.error.startConversation'));
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoadingConv(false);
         }
-    };
+    }, [activeConvId, query, fetchPeerAvatarUrl]);
 
-    const handleBlockUser = async (userEmail) => {
-        try {
-            await blockUser({ user_email: userEmail });
-            setError(t('chatWidgets.success.blockUser'));
-            loadConversations();
-        } catch (err) {
-            setError(t('chatWidgets.error.blockUser'));
-        }
-    };
+    // Qidiruv o‘zgarganda yoki activeConvId/role almashganda — debounce bilan olish
+    useEffect(() => {
+        const id = setTimeout(() => {
+            fetchConversations();
+        }, 300);
+        return () => clearTimeout(id);
+    }, [fetchConversations]);
 
-    const handleUnblockUser = async (userId) => {
-        try {
-            await unblockUser(userId);
-            loadBlockedUsers();
-            setError(t('chatWidgets.success.unblockUser'));
-        } catch (err) {
-            setError(t('chatWidgets.error.unblockUser'));
-        }
-    };
+    // Xabarlarni yuklash (bu yerda endi ro‘yxatni qayta chaqirmaymiz)
+    const loadMessages = useCallback(
+        async (convId) => {
+            if (!convId) return;
+            setLoadingMsg(true);
+            try {
+                const res = await api.get(`chat/conversations/${convId}/messages/`);
+                const items = res.data?.results || res.data || [];
+                setMessages(items.reverse());
 
-    const handleMessageAction = async (messageId, action) => {
-        try {
-            await messageAction(activeConversation.id, messageId, action);
-            if (activeConversation) {
-                await loadMessages(activeConversation.id);
+                // o‘qilgan deb belgilaymiz (badge larni WS yangilab yuboradi)
+                await api.post(`chat/conversations/${convId}/mark-read/`);
+
+                // Header avatari uchun ham profil endpointidan yangilab qo‘yish (agar kerak bo‘lsa)
+                if (activePeerId && (!avatarCacheRef.current[activePeerId] ||
+                    avatarCacheRef.current[activePeerId].includes("placeholder"))) {
+                    await fetchPeerAvatarUrl(activePeerId);
+                }
+
+                // Pastga scroll
+                setTimeout(() => {
+                    if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
+                }, 0);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                setLoadingMsg(false);
             }
-        } catch (err) {
-            setError(t('chatWidgets.error.messageAction'));
-        }
-    };
+        },
+        [activePeerId, fetchPeerAvatarUrl]
+    );
 
-    const getLastMessagePreview = (lastMessage) => {
-        if (!lastMessage) {
-            return t('chatWidgets.conversations.noMessages');
-        }
+    useEffect(() => {
+        if (activeConvId) loadMessages(activeConvId);
+    }, [activeConvId, loadMessages]);
 
-        if (lastMessage.delete_status && lastMessage.delete_status !== 'visible') {
-            if (lastMessage.content) {
-                return lastMessage.content;
+    // WebSocket: xabar/conv yangilansa
+    useEffect(() => {
+        if (!socket) return;
+        socket.onmessage = (e) => {
+            try {
+                const data = JSON.parse(e.data);
+                if (data.type === "message.created") {
+                    const m = data.message;
+                    if (m.conversation === activeConvId) {
+                        setMessages((prev) => [...prev, m]);
+                        setTimeout(() => {
+                            if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
+                        }, 0);
+                        api.post(`chat/conversations/${activeConvId}/mark-read/`).catch(() => {});
+                    } else {
+                        // faqat boshqa suhbatlar uchun ro‘yxatni yangilaymiz
+                        fetchConversations();
+                    }
+                } else if (data.type === "conversation.updated") {
+                    fetchConversations();
+                }
+            } catch (err) {
+                console.error(err);
             }
-            return t('chatWidgets.conversations.messageDeleted');
-        }
-
-        return lastMessage.content || t('chatWidgets.conversations.noMessages');
-    };
-
-    const getMessageDisplay = (message) => {
-        return {
-            isDeleted: message.delete_status && message.delete_status !== 'visible',
-            content: message.content || t('chatWidgets.chat.noContent'),
-            deleteStatus: message.delete_status,
-            showDeletedInfo: message.delete_status && message.delete_status !== 'visible'
         };
-    };
+    }, [socket, activeConvId, fetchConversations]);
 
-    const getDeletedStatusText = (deleteStatus, isMine) => {
-        if (!deleteStatus || deleteStatus === 'visible') return null;
-
-        switch (deleteStatus) {
-            case 'deleted_sender':
-                return isMine ? t('chatWidgets.chat.deletedByYou') : t('chatWidgets.chat.deletedBySender');
-            case 'deleted_receiver':
-                return isMine ? t('chatWidgets.chat.deletedForYou') : t('chatWidgets.chat.deletedByReceiver');
-            case 'deleted_both':
-                return t('chatWidgets.chat.deletedForEveryone');
-            default:
-                return t('chatWidgets.chat.messageDeleted');
+    const sendMessage = async () => {
+        const content = (composer || "").trim();
+        if (!content || !activeConvId) return;
+        try {
+            const res = await api.post("chat/messages/send/", { conversation: activeConvId, content });
+            setMessages((prev) => [...prev, res.data]);
+            setComposer("");
+            setTimeout(() => {
+                if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
+            }, 0);
+        } catch (e) {
+            console.error(e);
         }
     };
 
-    const shouldShowMessageActions = (message) => {
-        return message.is_mine && (!message.delete_status || message.delete_status === 'visible');
+    const roleLabel = () => {
+        if (!me?.role) return "";
+        return me.role === "client" ? t("my_guides") : t("my_clients");
     };
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    const formatTime = (dateString) => {
-        return new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    };
-
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString();
-    };
-
-    if (!isOpen) return null;
+    // Header uchun yakuniy avatar: kesh -> inline -> placeholder
+    const activePeerInline = getUserInlineAvatar(activeConv?.other_user || {});
+    const activePeerAvatar =
+        toAbsMedia(avatarCacheRef.current[activePeerId]) ||
+        activePeerInline ||
+        "/placeholder-avatar.png";
 
     return (
-        <div className="chat-widgets-container">
-            <div className="chat-widgets-overlay" onClick={onClose}></div>
-
-            <div className="chat-widgets-main">
-                <div className="chat-widgets-header">
-                    <h3 className="chat-widgets-title">
-                        {chatView === 'conversations' && t('chatWidgets.header.messages')}
-                        {chatView === 'chat' && activeConversation && activeConversation.other_user?.full_name}
-                        {chatView === 'search' && t('chatWidgets.header.searchUsers')}
-                        {chatView === 'blocked' && t('chatWidgets.header.blockedUsers')}
-                    </h3>
-
-                    <div className="chat-widgets-header-actions">
-                        {chatView !== 'conversations' && (
-                            <button
-                                className="chat-widgets-back-btn"
-                                onClick={() => {
-                                    setChatView('conversations');
-                                    setActiveConversation(null);
-                                    setShowUserSearch(false);
-                                    setShowBlockedUsers(false);
-                                }}
-                            >
-                                {t('chatWidgets.header.back')}
-                            </button>
-                        )}
-
-                        {chatView === 'conversations' && (
-                            <>
-                                <button
-                                    className="chat-widgets-action-btn"
-                                    onClick={() => {
-                                        setChatView('search');
-                                        setShowUserSearch(true);
-                                    }}
-                                >
-                                    {t('chatWidgets.header.newConversation')}
-                                </button>
-                                <button
-                                    className="chat-widgets-action-btn"
-                                    onClick={() => {
-                                        setChatView('blocked');
-                                        setShowBlockedUsers(true);
-                                        loadBlockedUsers();
-                                    }}
-                                >
-                                    {t('chatWidgets.header.blockedUsers')}
-                                </button>
-                            </>
-                        )}
-
-                        {chatView === 'chat' && (
-                            <span className={`chat-widgets-status ${wsStatus}`}>
-                                {wsStatus === 'connected' ? t('chatWidgets.chat.online') : t('chatWidgets.chat.offline')}
-                            </span>
-                        )}
-
-                        <button className="chat-widgets-close-btn" onClick={onClose}>{t('chatWidgets.header.close')}</button>
-                    </div>
+        <div className="chat-widget-wrapper">
+            {/* Sidebar */}
+            <div className="chat-widget-sidebar">
+                <div className="chat-widget-sidebar-header">
+                    <FiMessageSquare /> {t("conversations")} — <span className="chat-widget-role">{roleLabel()}</span>
+                </div>
+                <div className="chat-widget-sidebar-search">
+                    <FiSearch />
+                    <input
+                        placeholder={t("search")}
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                    />
                 </div>
 
-                {error && (
-                    <div className="chat-widgets-error">
-                        <p>{error}</p>
-                        <button onClick={() => setError(null)} className="chat-widgets-error-close">{t('chatWidgets.error.close')}</button>
-                    </div>
-                )}
-
-                <div className="chat-widgets-content">
-                    {chatView === 'conversations' && (
-                        <div className="chat-widgets-conversations">
-                            {loading ? (
-                                <div className="chat-widgets-loading">{t('chatWidgets.conversations.loading')}</div>
-                            ) : conversations.length === 0 ? (
-                                <div className="chat-widgets-empty">
-                                    <p>{t('chatWidgets.conversations.noConversations')}</p>
-                                    <button
-                                        className="chat-widgets-btn chat-widgets-btn-primary"
-                                        onClick={() => {
-                                            setChatView('search');
-                                            setShowUserSearch(true);
-                                        }}
-                                    >
-                                        {t('chatWidgets.conversations.startConversation')}
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="chat-widgets-conversations-list">
-                                    {conversations.map(conversation => (
-                                        <div
-                                            key={conversation.id}
-                                            className="chat-widgets-conversation-item"
-                                            onClick={() => handleConversationSelect(conversation)}
-                                        >
-                                            <div className="chat-widgets-conversation-avatar">
-                                                {conversation.other_user?.avatar ? (
-                                                    <img
-                                                        src={conversation.other_user.avatar}
-                                                        alt={conversation.other_user.full_name}
-                                                        className="chat-widgets-avatar-image"
-                                                    />
-                                                ) : (
-                                                    <div className="chat-widgets-avatar-placeholder">
-                                                        {conversation.other_user?.full_name?.charAt(0) || t('chatWidgets.conversations.unknownUserInitial')}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <div className="chat-widgets-conversation-info">
-                                                <div className="chat-widgets-conversation-header">
-                                                    <h4 className="chat-widgets-conversation-name">
-                                                        {conversation.other_user?.full_name || t('chatWidgets.conversations.unknownUser')}
-                                                    </h4>
-                                                    <span className="chat-widgets-conversation-time">
-                                                        {formatTime(conversation.updated_at)}
-                                                    </span>
-                                                </div>
-
-                                                <div className="chat-widgets-conversation-preview">
-                                                    <p className="chat-widgets-last-message">
-                                                        {getLastMessagePreview(conversation.last_message)}
-                                                    </p>
-                                                    {conversation.unread_count > 0 && (
-                                                        <span className="chat-widgets-unread-badge">
-                                                            {conversation.unread_count}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {chatView === 'chat' && activeConversation && (
-                        <div className="chat-widgets-chat">
-                            <div className="chat-widgets-status-bar">
-                                {onlineUsers.length > 0 && <span>{t('chatWidgets.chat.onlineUsers', { users: onlineUsers.join(', ') })}</span>}
-                                {typingUsers.length > 0 && <span>{t('chatWidgets.chat.typingUsers', { users: typingUsers.join(', ') })}</span>}
-                            </div>
-                            <div className="chat-widgets-messages">
-                                <div className="chat-widgets-messages-list">
-                                    {messages.map(message => {
-                                        const messageDisplay = getMessageDisplay(message);
-                                        const deletedStatusText = getDeletedStatusText(messageDisplay.deleteStatus, message.is_mine);
-
-                                        return (
-                                            <div
-                                                key={message.id}
-                                                className={`chat-widgets-message ${message.is_mine ? 'chat-widgets-message-mine' : 'chat-widgets-message-other'} ${messageDisplay.isDeleted ? 'chat-widgets-message-deleted' : ''}`}
-                                            >
-                                                <div className="chat-widgets-message-content">
-                                                    <div className="chat-widgets-message-text-wrapper">
-                                                        <p className="chat-widgets-message-text">{messageDisplay.content}</p>
-                                                        {messageDisplay.showDeletedInfo && deletedStatusText && (
-                                                            <span className="chat-widgets-message-deleted-info">
-                                                                <small><em>{deletedStatusText}</em></small>
-                                                            </span>
-                                                        )}
-                                                    </div>
-
-                                                    <div className="chat-widgets-message-meta">
-                                                        <span className="chat-widgets-message-time">
-                                                            {formatTime(message.created_at)}
-                                                        </span>
-                                                        {shouldShowMessageActions(message) && (
-                                                            <div className="chat-widgets-message-actions">
-                                                                <button
-                                                                    className="chat-widgets-message-action"
-                                                                    onClick={() => handleMessageAction(message.id, 'delete_sender')}
-                                                                    title={t('chatWidgets.chat.deleteForMe')}
-                                                                >
-                                                                    🗑️
-                                                                </button>
-                                                                <button
-                                                                    className="chat-widgets-message-action"
-                                                                    onClick={() => handleMessageAction(message.id, 'delete_both')}
-                                                                    title={t('chatWidgets.chat.deleteForEveryone')}
-                                                                >
-                                                                    🗑️🗑️
-                                                                </button>
-                                                            </div>
-                                                        )}
-                                                        {message.can_recover && message.is_mine && (
-                                                            <button
-                                                                className="chat-widgets-message-action chat-widgets-recover-btn"
-                                                                onClick={() => handleMessageAction(message.id, 'recover')}
-                                                                title={t('chatWidgets.chat.recover')}
-                                                            >
-                                                                {t('chatWidgets.chat.recover')}
-                                                            </button>
-                                                        )}
-                                                        {message.is_read && <span className="chat-widgets-read-status">{t('chatWidgets.chat.read')}</span>}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                    <div ref={messagesEndRef} />
-                                </div>
-                            </div>
-
-                            <form onSubmit={handleSendMessage} className="chat-widgets-input-form">
-                                <div className="chat-widgets-input-container">
-                                    <input
-                                        type="text"
-                                        className="chat-widgets-input"
-                                        placeholder={t('chatWidgets.chat.messagePlaceholder')}
-                                        value={newMessage}
-                                        onChange={handleMessageChange}
-                                    />
-                                    <button
-                                        type="submit"
-                                        className="chat-widgets-send-btn"
-                                        disabled={!newMessage.trim()}
-                                    >
-                                        {t('chatWidgets.chat.send')}
-                                    </button>
-                                </div>
-                            </form>
-
-                            <div className="chat-widgets-chat-actions">
-                                <button
-                                    className="chat-widgets-action-btn chat-widgets-block-btn"
-                                    onClick={() => {
-                                        if (activeConversation?.other_user?.email) {
-                                            handleBlockUser(activeConversation.other_user.email);
-                                        }
-                                    }}
-                                >
-                                    {t('chatWidgets.chat.blockUser')}
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {chatView === 'search' && (
-                        <div className="chat-widgets-search">
-                            <div className="chat-widgets-search-input">
-                                <input
-                                    type="text"
-                                    className="chat-widgets-input"
-                                    placeholder={t('chatWidgets.search.placeholder')}
-                                    value={searchQuery}
-                                    onChange={(e) => {
-                                        setSearchQuery(e.target.value);
-                                        handleUserSearch(e.target.value);
+                <div className="chat-widget-conv-list">
+                    {loadingConv && <div className="chat-widget-loading">{t("loading")}...</div>}
+                    {!loadingConv &&
+                        conversations.map((c) => (
+                            <div
+                                key={c.id}
+                                className={`chat-widget-conv-item ${activeConvId === c.id ? "active" : ""}`}
+                                onClick={() => setActiveConv(c)}
+                            >
+                                <img
+                                    src={toAbsMedia(avatarCacheRef.current[c?.other_user?.id] || c._other_avatar)}
+                                    alt={c.other_user?.full_name || c.other_user?.email || "avatar"}
+                                    className="chat-widget-avatar"
+                                    onError={(e) => {
+                                        e.currentTarget.src = "/placeholder-avatar.png";
                                     }}
                                 />
-                            </div>
-
-                            <div className="chat-widgets-search-results">
-                                {searchQuery.length < 2 ? (
-                                    <p className="chat-widgets-search-hint">{t('chatWidgets.search.minCharacters')}</p>
-                                ) : searchResults.length === 0 ? (
-                                    <p className="chat-widgets-no-results">{t('chatWidgets.search.noResults')}</p>
-                                ) : (
-                                    <div className="chat-widgets-users-list">
-                                        {searchResults.map(user => (
-                                            <div
-                                                key={user.id}
-                                                className="chat-widgets-user-item"
-                                                onClick={() => startConversationWithUser(user.email)}
-                                            >
-                                                <div className="chat-widgets-user-avatar">
-                                                    {user.avatar_url ? (
-                                                        <img
-                                                            src={user.avatar_url}
-                                                            alt={user.full_name}
-                                                            className="chat-widgets-avatar-image"
-                                                        />
-                                                    ) : (
-                                                        <div className="chat-widgets-avatar-placeholder">
-                                                            {user.full_name?.charAt(0) || t('chatWidgets.search.unknownUserInitial')}
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                <div className="chat-widgets-user-info">
-                                                    <h4 className="chat-widgets-user-name">{user.full_name}</h4>
-                                                    <p className="chat-widgets-user-email">{user.email}</p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {chatView === 'blocked' && (
-                        <div className="chat-widgets-blocked">
-                            {blockedUsers.length === 0 ? (
-                                <p className="chat-widgets-no-blocked">{t('chatWidgets.blocked.noBlockedUsers')}</p>
-                            ) : (
-                                <div className="chat-widgets-blocked-list">
-                                    {blockedUsers.map(blockedUser => (
-                                        <div key={blockedUser.id} className="chat-widgets-blocked-item">
-                                            <div className="chat-widgets-blocked-user-info">
-                                                <div className="chat-widgets-user-avatar">
-                                                    {blockedUser.blocked_user?.avatar_url ? (
-                                                        <img
-                                                            src={blockedUser.blocked_user.avatar_url}
-                                                            alt={blockedUser.blocked_user.full_name}
-                                                            className="chat-widgets-avatar-image"
-                                                        />
-                                                    ) : (
-                                                        <div className="chat-widgets-avatar-placeholder">
-                                                            {blockedUser.blocked_user?.full_name?.charAt(0) || t('chatWidgets.blocked.unknownUserInitial')}
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                <div className="chat-widgets-user-info">
-                                                    <h4 className="chat-widgets-user-name">
-                                                        {blockedUser.blocked_user?.full_name || t('chatWidgets.blocked.unknownUser')}
-                                                    </h4>
-                                                    <p className="chat-widgets-user-email">
-                                                        {blockedUser.blocked_user?.email}
-                                                    </p>
-                                                    <span className="chat-widgets-blocked-date">
-                                                        {t('chatWidgets.blocked.blockedOn', { date: formatDate(blockedUser.created_at) })}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <button
-                                                className="chat-widgets-btn chat-widgets-btn-unblock"
-                                                onClick={() => handleUnblockUser(blockedUser.blocked_user.id)}
-                                            >
-                                                {t('chatWidgets.blocked.unblock')}
-                                            </button>
+                                <div className="chat-widget-conv-meta">
+                                    <div className="chat-widget-conv-top">
+                                        <div className="chat-widget-conv-name">
+                                            {c.other_user?.full_name || c.other_user?.email}
                                         </div>
-                                    ))}
+                                        {c.unread_count > 0 && <span className="chat-widget-badge">{c.unread_count}</span>}
+                                    </div>
+                                    <div className="chat-widget-conv-last">{c.last_message?.content || ""}</div>
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        ))}
+                    {!loadingConv && conversations.length === 0 && (
+                        <div className="chat-widget-empty">{t("no_conversations")}</div>
                     )}
                 </div>
+            </div>
 
-                {unreadCount > 0 && chatView === 'conversations' && (
-                    <div className="chat-widgets-unread-total">
-                        {t('chatWidgets.conversations.unreadMessages', { count: unreadCount })}
-                    </div>
+            {/* Panel */}
+            <div className="chat-widget-panel">
+                {!activeConv ? (
+                    <div className="chat-widget-empty">{t("select_conversation")}</div>
+                ) : (
+                    <>
+                        <div className="chat-widget-panel-header">
+                            <img
+                                src={activePeerAvatar}
+                                className="chat-widget-avatar"
+                                alt={activeConv.other_user?.full_name || activeConv.other_user?.email || "avatar"}
+                                onError={(e) => {
+                                    e.currentTarget.src = "/placeholder-avatar.png";
+                                }}
+                            />
+                            <div className="chat-widget-peer">
+                                <div className="chat-widget-peer-name">
+                                    <FiUser /> {activeConv.other_user?.full_name || activeConv.other_user?.email}
+                                </div>
+                                <div className="chat-widget-peer-sub">
+                                    <FiCircle /> {t("online")}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="chat-widget-message-list" ref={listRef}>
+                            {loadingMsg && <div className="chat-widget-loading">{t("loading")}...</div>}
+                            {!loadingMsg &&
+                                messages.map((m) => (
+                                    <div key={m.id} className={`chat-widget-message ${m.is_mine ? "mine" : "theirs"}`}>
+                                        <div className="chat-widget-bubble">
+                                            <div className="chat-widget-content">{m.content}</div>
+                                            <div className="chat-widget-meta">
+                        <span>
+                          {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                                                {m.is_mine && (
+                                                    <span className="chat-widget-status">{m.is_read ? <FiCheckCircle /> : <FiCircle />}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                        </div>
+
+                        <div className="chat-widget-composer">
+                            <input
+                                placeholder={t("type_a_message")}
+                                value={composer}
+                                onChange={(e) => setComposer(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" && !e.shiftKey) {
+                                        e.preventDefault();
+                                        sendMessage();
+                                    }
+                                }}
+                            />
+                            <button className="chat-widget-send" onClick={sendMessage} title={t("send")}>
+                                <FiSend />
+                            </button>
+                        </div>
+                    </>
                 )}
             </div>
         </div>
     );
-};
-
-export default ChatWidgets;
+}

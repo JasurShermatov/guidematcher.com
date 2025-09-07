@@ -27,16 +27,12 @@ from .serializers import (
 
 
 class AvatarMixin:
-    """Avatar upload, retrieve, delete API mixin"""
 
     parser_classes = [MultiPartParser, FormParser]
 
     @action(detail=True, methods=["get"], url_path="avatar")
     def get_avatar(self, request, user_id=None):
-        """
-        Retrieve profile avatar.
-        Returns 404 if no avatar is set.
-        """
+
         profile = self.get_object()
         if not profile.avatar:
             return Response(
@@ -47,10 +43,7 @@ class AvatarMixin:
 
     @action(detail=True, methods=["put", "patch"], url_path="avatar")
     def upload_avatar(self, request, user_id=None):
-        """
-        Upload or update profile avatar.
-        Expects an avatar file in the request.
-        """
+
         profile = self.get_object()
         avatar = request.FILES.get("avatar")
         if not avatar:
@@ -59,14 +52,12 @@ class AvatarMixin:
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Delete old avatar if exists
         if profile.avatar:
             old_avatar_path = profile.avatar.path
             profile.avatar.delete(save=False)
             if default_storage.exists(old_avatar_path):
                 default_storage.delete(old_avatar_path)
 
-        # Save new avatar
         profile.avatar = avatar
         profile.save(update_fields=["avatar"])
         return Response(
@@ -79,10 +70,6 @@ class AvatarMixin:
 
     @action(detail=True, methods=["delete"], url_path="avatar")
     def delete_avatar(self, request, user_id=None):
-        """
-        Delete profile avatar.
-        Returns 404 if no avatar exists.
-        """
         profile = self.get_object()
         if not profile.avatar:
             return Response(
@@ -300,7 +287,6 @@ class CustomerProfileViewSet(AvatarMixin, BaseProfileViewSet):
                     {"detail": "Avatar file required."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            # Delete old avatar if exists
             if profile.avatar:
                 old_avatar_path = profile.avatar.path
                 profile.avatar.delete(save=False)

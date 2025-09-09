@@ -1,4 +1,5 @@
 # apps/bookings/views.py
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, status
@@ -8,7 +9,7 @@ from rest_framework.response import Response
 
 from apps.bookings.models import Booking
 from apps.bookings.permissions import IsAuthenticatedAndOwnerOrReadOnly
-from apps.bookings.serializers import BookingSerializer
+from apps.bookings.serializers import BookingSerializer, BookingReadSerializer
 from apps.chat.models import Conversation
 
 
@@ -19,20 +20,52 @@ from datetime import datetime
 
 @extend_schema(tags=["Bookings"])
 class BookingViewSet(viewsets.ModelViewSet):
-    serializer_class = BookingSerializer
     permission_classes = [IsAuthenticatedAndOwnerOrReadOnly]
 
+    # ✅ Read vs Write uchun alohida serializer
+    def get_serializer_class(self):
+        if self.action in ["list", "retrieve"]:
+            return BookingReadSerializer
+        return BookingSerializer
+
+    # ✅ Mos rol bo‘yicha aniq filtr (as=guide|client), aks holda ikkisini birlashtirib beramiz
     def get_queryset(self):
         user = self.request.user
-        if hasattr(user, "clientprofile"):
-            return Booking.objects.filter(client_profile=user.clientprofile)
-        if hasattr(user, "customerprofile"):
-            return Booking.objects.filter(customer_profile=user.customerprofile)
+        mode = self.request.query_params.get("as")  # "guide" | "client" yoki None
+        qs = Booking.objects.all()
+
+        has_client = hasattr(user, "clientprofile")
+        has_guide = hasattr(user, "customerprofile")
+
+        if mode == "guide":
+            return (
+                qs.filter(customer_profile=getattr(user, "customerprofile", None))
+                if has_guide
+                else Booking.objects.none()
+            )
+
+        if mode == "client":
+            return (
+                qs.filter(client_profile=getattr(user, "clientprofile", None))
+                if has_client
+                else Booking.objects.none()
+            )
+
+        # Default: foydalanuvchida ikkisi ham bo‘lsa — ikkisini ham ko‘rsatamiz
+        if has_client and has_guide:
+            return qs.filter(
+                Q(client_profile=user.clientprofile)
+                | Q(customer_profile=user.customerprofile)
+            )
+        if has_client:
+            return qs.filter(client_profile=user.clientprofile)
+        if has_guide:
+            return qs.filter(customer_profile=user.customerprofile)
         return Booking.objects.none()
 
     def perform_create(self, serializer):
         user = self.request.user
-        client_profile = getattr(user, "clientprofile", None)
+        client_profile = getattr(user, "clientprofile", None)  # ✅ to‘g‘ri atribut nomi
         if not client_profile:
             raise ValidationError(
                 {"error": "You must have a client profile to create a booking."}
@@ -45,7 +78,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         start_date = serializer.validated_data.get("start_date")
         end_date = serializer.validated_data.get("end_date")
 
-        # Check for unavailability overlap
+        # Unavailability overlap tekshiruvi
         if Unavailability.objects.filter(
             customer=customer_profile,
             start_date__lte=end_date,
@@ -56,12 +89,33 @@ class BookingViewSet(viewsets.ModelViewSet):
             )
 
         instance = serializer.save(client_profile=client_profile)
+
+        # 🔗 Chat conversation biriktirish
         if instance.client_profile:
-            conversation, created = Conversation.objects.get_or_create_chat(
+            conversation, _ = Conversation.objects.get_or_create_chat(
                 user1=instance.client_profile.user, user2=instance.customer_profile.user
             )
             instance.conversation = conversation
             instance.save(update_fields=["conversation"])
+
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
+    def accept(self, request, pk=None):
+        booking = self.get_object()
+        booking.status = Booking.BookingStatus.ACCEPTED
+        booking.save(update_fields=["status"])
+        return Response({"status": "accepted"}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
+    def cancel(self, request, pk=None):
+        booking = self.get_object()
+        if booking.can_cancel:
+            booking.status = Booking.BookingStatus.CANCELLED
+            booking.cancellation_reason = request.data.get("cancellation_reason", "")
+            booking.save(update_fields=["status", "cancellation_reason"])
+            return Response({"status": "cancelled"}, status=status.HTTP_200_OK)
+        return Response(
+            {"error": "Cannot cancel this booking"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
     @action(
         detail=True,
@@ -113,23 +167,4 @@ class BookingViewSet(viewsets.ModelViewSet):
                 ),
             },
             status=status.HTTP_200_OK,
-        )
-
-    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
-    def accept(self, request, pk=None):
-        booking = self.get_object()
-        booking.status = Booking.BookingStatus.ACCEPTED
-        booking.save(update_fields=["status"])
-        return Response({"status": "accepted"}, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
-    def cancel(self, request, pk=None):
-        booking = self.get_object()
-        if booking.can_cancel:
-            booking.status = Booking.BookingStatus.CANCELLED
-            booking.cancellation_reason = request.data.get("cancellation_reason", "")
-            booking.save(update_fields=["status", "cancellation_reason"])
-            return Response({"status": "cancelled"}, status=status.HTTP_200_OK)
-        return Response(
-            {"error": "Cannot cancel this booking"}, status=status.HTTP_400_BAD_REQUEST
         )

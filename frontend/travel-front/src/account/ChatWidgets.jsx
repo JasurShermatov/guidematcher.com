@@ -1,7 +1,14 @@
 // src/account/ChatWidgets.jsx
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FiSend, FiSearch, FiUser, FiMessageSquare, FiCheckCircle, FiCircle } from "react-icons/fi";
+import {
+    FiSend,
+    FiSearch,
+    FiUser,
+    FiMessageSquare,
+    FiCheckCircle,
+    FiCircle,
+} from "react-icons/fi";
 import api from "./api";
 import "./ChatWidgets.css";
 
@@ -13,29 +20,43 @@ const BACKEND_ORIGIN =
 
 const toAbsMedia = (url) => {
     if (!url) return "/placeholder-avatar.png";
-    if (/^https?:\/\//i.test(url)) return url;             // allaqachon to‘liq
+    if (/^https?:\/\//i.test(url)) return url;
     if (url.startsWith("/media")) return BACKEND_ORIGIN + url;
     if (url.startsWith("media/")) return `${BACKEND_ORIGIN}/${url}`;
     return url;
 };
 
-const getUserInlineAvatar = (user) => toAbsMedia(user?.avatar_url || user?.avatar || "");
+const getUserInlineAvatar = (user) =>
+    toAbsMedia(user?.avatar_url || user?.avatar || "");
 
-/* ===================== WebSocket ===================== */
-const WS_URL = process.env.REACT_APP_WS_URL || "ws://localhost:8000/ws/chat/";
+/* ===================== WebSocket (per-conversation) ===================== */
+const WS_ORIGIN = process.env.REACT_APP_WS_ORIGIN || "ws://localhost:8000";
 
-function useWebSocket(url) {
+/**
+ * Har bir active conversation uchun alohida WS ulanish
+ * ws://HOST/ws/chat/<conversationId>/?token=...
+ */
+function useConversationSocket(conversationId) {
     const [socket, setSocket] = useState(null);
     const [ready, setReady] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem("access_token");
-        const ws = new WebSocket(`${url}?token=${encodeURIComponent(token || "")}`);
+        if (!conversationId) return;
+        const token = localStorage.getItem("access_token") || "";
+        const ws = new WebSocket(
+            `${WS_ORIGIN}/ws/chat/${conversationId}/?token=${encodeURIComponent(token)}`
+        );
+
         ws.onopen = () => setReady(true);
         ws.onclose = () => setReady(false);
+
         setSocket(ws);
-        return () => ws.close();
-    }, [url]);
+        return () => {
+            try {
+                ws.close();
+            } catch {}
+        };
+    }, [conversationId]);
 
     return { socket, ready };
 }
@@ -53,7 +74,6 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
     const [query, setQuery] = useState("");
 
     const listRef = useRef();
-    const { socket } = useWebSocket(WS_URL);
 
     // Avatar KESH: userId -> absolute url (useRef: set qilganda re-render bo‘lmaydi)
     const avatarCacheRef = useRef({});
@@ -76,6 +96,8 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
             if (!initialPeerEmail) return;
             try {
                 await api.post("chat/conversations/", { user_email: initialPeerEmail });
+                // create/get dan keyin ro‘yxat yangilansin
+                fetchConversationsRef.current?.();
             } catch (e) {
                 console.error(e);
             }
@@ -87,14 +109,16 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
         async (peerUserId) => {
             if (!peerUserId) return null;
 
-            // kesh bor bo‘lsa shu zahoti qaytaramiz
-            if (avatarCacheRef.current[peerUserId]) return avatarCacheRef.current[peerUserId];
+            if (avatarCacheRef.current[peerUserId]) {
+                return avatarCacheRef.current[peerUserId];
+            }
 
-            // Mening rolimga teskari bo‘lgan profil endpointini tanlaymiz
             // client -> peers are "customers"
             // customer -> peers are "clients"
-            const primary = me?.role === "client" ? "profiles/customers" : "profiles/clients";
-            const fallback = me?.role === "client" ? "profiles/clients" : "profiles/customers";
+            const primary =
+                me?.role === "client" ? "profiles/customers" : "profiles/clients";
+            const fallback =
+                me?.role === "client" ? "profiles/clients" : "profiles/customers";
 
             const tryOne = async (base) => {
                 try {
@@ -114,11 +138,11 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
         [me?.role]
     );
 
-    // activeConvId va peerId’ni ajratib olamiz (dep’lar uchun barqaror primitivlar)
+    // activeConvId va peerId
     const activeConvId = activeConv?.id;
     const activePeerId = activeConv?.other_user?.id;
 
-    // Suhbatlar ro‘yxatini olish + avatarlarni resolve (birinchi inline, keyin fon’da profil)
+    // Suhbatlar ro‘yxatini olish
     const fetchConversations = useCallback(async () => {
         setLoadingConv(true);
         try {
@@ -134,26 +158,26 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
                 });
             }
 
-            // Avval inline avatarlar bilan darhol ko‘rsatamiz
+            // Inline avatarlar bilan darhol ko‘rsatamiz
             const withInline = items.map((c) => ({
                 ...c,
                 _other_avatar: getUserInlineAvatar(c.other_user || {}),
             }));
             setConversations(withInline);
 
-            // Yetishmayotgan avatarlarni fon’da olib, bitta qo‘shimcha repaint qilamiz
+            // Yetishmayotgan avatarlarni fon’da olib, repaint
             Promise.all(
                 withInline.map(async (c) => {
                     const uid = c.other_user?.id;
                     if (!uid) return null;
 
                     const inlineIsEmpty =
-                        !c._other_avatar || c._other_avatar.includes("placeholder-avatar.png");
+                        !c._other_avatar ||
+                        c._other_avatar.includes("placeholder-avatar.png");
 
                     const cached = avatarCacheRef.current[uid];
-                    if (cached && !inlineIsEmpty) return null; // inline bor, kesh bor — ok
+                    if (cached && !inlineIsEmpty) return null;
 
-                    // Agar inline yo‘q bo‘lsa yoki kesh yo‘q bo‘lsa, API dan o‘qib kelamiz
                     const fresh = await fetchPeerAvatarUrl(uid);
                     if (fresh) c._other_avatar = fresh;
                     return null;
@@ -167,7 +191,7 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
                 );
             });
 
-            // activeConv bo‘lsa, yangilangan obyektga “pin” qilamiz
+            // activeConv pin
             if (!activeConvId && withInline.length > 0) {
                 setActiveConv(withInline[0]);
             } else if (activeConvId) {
@@ -181,7 +205,13 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
         }
     }, [activeConvId, query, fetchPeerAvatarUrl]);
 
-    // Qidiruv o‘zgarganda yoki activeConvId/role almashganda — debounce bilan olish
+    // fetchConversations'ni refga qo‘yib WS ichidan ham chaqira olish
+    const fetchConversationsRef = useRef(null);
+    useEffect(() => {
+        fetchConversationsRef.current = fetchConversations;
+    }, [fetchConversations]);
+
+    // Qidiruv/dep o‘zgarsa debounce bilan ro‘yxatni olish
     useEffect(() => {
         const id = setTimeout(() => {
             fetchConversations();
@@ -189,7 +219,7 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
         return () => clearTimeout(id);
     }, [fetchConversations]);
 
-    // Xabarlarni yuklash (bu yerda endi ro‘yxatni qayta chaqirmaymiz)
+    // Xabarlarni yuklash
     const loadMessages = useCallback(
         async (convId) => {
             if (!convId) return;
@@ -199,18 +229,22 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
                 const items = res.data?.results || res.data || [];
                 setMessages(items.reverse());
 
-                // o‘qilgan deb belgilaymiz (badge larni WS yangilab yuboradi)
+                // o‘qilgan deb belgilash
                 await api.post(`chat/conversations/${convId}/mark-read/`);
 
-                // Header avatari uchun ham profil endpointidan yangilab qo‘yish (agar kerak bo‘lsa)
-                if (activePeerId && (!avatarCacheRef.current[activePeerId] ||
-                    avatarCacheRef.current[activePeerId].includes("placeholder"))) {
+                // Header avatari uchun ham profil endpointidan yangilash
+                if (
+                    activePeerId &&
+                    (!avatarCacheRef.current[activePeerId] ||
+                        avatarCacheRef.current[activePeerId].includes("placeholder"))
+                ) {
                     await fetchPeerAvatarUrl(activePeerId);
                 }
 
                 // Pastga scroll
                 setTimeout(() => {
-                    if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
+                    if (listRef.current)
+                        listRef.current.scrollTop = listRef.current.scrollHeight;
                 }, 0);
             } catch (e) {
                 console.error(e);
@@ -225,42 +259,83 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
         if (activeConvId) loadMessages(activeConvId);
     }, [activeConvId, loadMessages]);
 
-    // WebSocket: xabar/conv yangilansa
+    // ✅ Per-conversation WebSocket
+    const { socket } = useConversationSocket(activeConvId);
+
+    // WS event handlerlari
     useEffect(() => {
         if (!socket) return;
+
         socket.onmessage = (e) => {
             try {
                 const data = JSON.parse(e.data);
+
+                // 1) Bizning consumer yuboradigan turlar
+                if (data.type === "chat_message") {
+                    const m = data.message;
+                    // Shu conv ichidami?
+                    if (String(m.conversation) === String(activeConvId)) {
+                        setMessages((prev) => [...prev, m]);
+                        setTimeout(() => {
+                            if (listRef.current)
+                                listRef.current.scrollTop = listRef.current.scrollHeight;
+                        }, 0);
+                        api
+                            .post(`chat/conversations/${activeConvId}/mark-read/`)
+                            .catch(() => {});
+                    } else {
+                        // boshqa suhbat badge’lari yangilansin
+                        fetchConversationsRef.current?.();
+                    }
+                } else if (data.type === "message_read") {
+                    // boshqa user o‘qigan bo‘lsa, lokal statusga ham qo‘llashimiz mumkin
+                    // ixtiyoriy: hozircha e’tiborga olmaymiz
+                } else if (data.type === "message_action") {
+                    // delete/recover sinxronlash (ixtiyoriy)
+                    // agar xohlasangiz, messages holatini yangilang
+                } else if (data.type === "typing_indicator") {
+                    // “Foydalanuvchi yozmoqda…” ko‘rsatkichini qo‘shish mumkin (ixtiyoriy)
+                } else if (data.type === "user_online" || data.type === "user_offline") {
+                    // header statusni yangilash (ixtiyoriy)
+                }
+
+                // 2) Eski frontdagi nomlar bilan orqaga moslik
                 if (data.type === "message.created") {
                     const m = data.message;
                     if (m.conversation === activeConvId) {
                         setMessages((prev) => [...prev, m]);
                         setTimeout(() => {
-                            if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
+                            if (listRef.current)
+                                listRef.current.scrollTop = listRef.current.scrollHeight;
                         }, 0);
-                        api.post(`chat/conversations/${activeConvId}/mark-read/`).catch(() => {});
+                        api
+                            .post(`chat/conversations/${activeConvId}/mark-read/`)
+                            .catch(() => {});
                     } else {
-                        // faqat boshqa suhbatlar uchun ro‘yxatni yangilaymiz
-                        fetchConversations();
+                        fetchConversationsRef.current?.();
                     }
                 } else if (data.type === "conversation.updated") {
-                    fetchConversations();
+                    fetchConversationsRef.current?.();
                 }
             } catch (err) {
                 console.error(err);
             }
         };
-    }, [socket, activeConvId, fetchConversations]);
+    }, [socket, activeConvId]);
 
     const sendMessage = async () => {
         const content = (composer || "").trim();
         if (!content || !activeConvId) return;
         try {
-            const res = await api.post("chat/messages/send/", { conversation: activeConvId, content });
+            const res = await api.post("chat/messages/send/", {
+                conversation: activeConvId,
+                content,
+            });
             setMessages((prev) => [...prev, res.data]);
             setComposer("");
             setTimeout(() => {
-                if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
+                if (listRef.current)
+                    listRef.current.scrollTop = listRef.current.scrollHeight;
             }, 0);
         } catch (e) {
             console.error(e);
@@ -284,7 +359,8 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
             {/* Sidebar */}
             <div className="chat-widget-sidebar">
                 <div className="chat-widget-sidebar-header">
-                    <FiMessageSquare /> {t("conversations")} — <span className="chat-widget-role">{roleLabel()}</span>
+                    <FiMessageSquare /> {t("conversations")} —{" "}
+                    <span className="chat-widget-role">{roleLabel()}</span>
                 </div>
                 <div className="chat-widget-sidebar-search">
                     <FiSearch />
@@ -296,17 +372,25 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
                 </div>
 
                 <div className="chat-widget-conv-list">
-                    {loadingConv && <div className="chat-widget-loading">{t("loading")}...</div>}
+                    {loadingConv && (
+                        <div className="chat-widget-loading">{t("loading")}...</div>
+                    )}
                     {!loadingConv &&
                         conversations.map((c) => (
                             <div
                                 key={c.id}
-                                className={`chat-widget-conv-item ${activeConvId === c.id ? "active" : ""}`}
+                                className={`chat-widget-conv-item ${
+                                    activeConvId === c.id ? "active" : ""
+                                }`}
                                 onClick={() => setActiveConv(c)}
                             >
                                 <img
-                                    src={toAbsMedia(avatarCacheRef.current[c?.other_user?.id] || c._other_avatar)}
-                                    alt={c.other_user?.full_name || c.other_user?.email || "avatar"}
+                                    src={toAbsMedia(
+                                        avatarCacheRef.current[c?.other_user?.id] || c._other_avatar
+                                    )}
+                                    alt={
+                                        c.other_user?.full_name || c.other_user?.email || "avatar"
+                                    }
                                     className="chat-widget-avatar"
                                     onError={(e) => {
                                         e.currentTarget.src = "/placeholder-avatar.png";
@@ -317,9 +401,15 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
                                         <div className="chat-widget-conv-name">
                                             {c.other_user?.full_name || c.other_user?.email}
                                         </div>
-                                        {c.unread_count > 0 && <span className="chat-widget-badge">{c.unread_count}</span>}
+                                        {c.unread_count > 0 && (
+                                            <span className="chat-widget-badge">
+                        {c.unread_count}
+                      </span>
+                                        )}
                                     </div>
-                                    <div className="chat-widget-conv-last">{c.last_message?.content || ""}</div>
+                                    <div className="chat-widget-conv-last">
+                                        {c.last_message?.content || ""}
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -339,14 +429,20 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
                             <img
                                 src={activePeerAvatar}
                                 className="chat-widget-avatar"
-                                alt={activeConv.other_user?.full_name || activeConv.other_user?.email || "avatar"}
+                                alt={
+                                    activeConv.other_user?.full_name ||
+                                    activeConv.other_user?.email ||
+                                    "avatar"
+                                }
                                 onError={(e) => {
                                     e.currentTarget.src = "/placeholder-avatar.png";
                                 }}
                             />
                             <div className="chat-widget-peer">
                                 <div className="chat-widget-peer-name">
-                                    <FiUser /> {activeConv.other_user?.full_name || activeConv.other_user?.email}
+                                    <FiUser />{" "}
+                                    {activeConv.other_user?.full_name ||
+                                        activeConv.other_user?.email}
                                 </div>
                                 <div className="chat-widget-peer-sub">
                                     <FiCircle /> {t("online")}
@@ -355,18 +451,30 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
                         </div>
 
                         <div className="chat-widget-message-list" ref={listRef}>
-                            {loadingMsg && <div className="chat-widget-loading">{t("loading")}...</div>}
+                            {loadingMsg && (
+                                <div className="chat-widget-loading">{t("loading")}...</div>
+                            )}
                             {!loadingMsg &&
                                 messages.map((m) => (
-                                    <div key={m.id} className={`chat-widget-message ${m.is_mine ? "mine" : "theirs"}`}>
+                                    <div
+                                        key={m.id}
+                                        className={`chat-widget-message ${
+                                            m.is_mine ? "mine" : "theirs"
+                                        }`}
+                                    >
                                         <div className="chat-widget-bubble">
                                             <div className="chat-widget-content">{m.content}</div>
                                             <div className="chat-widget-meta">
                         <span>
-                          {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          {new Date(m.created_at).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                          })}
                         </span>
                                                 {m.is_mine && (
-                                                    <span className="chat-widget-status">{m.is_read ? <FiCheckCircle /> : <FiCircle />}</span>
+                                                    <span className="chat-widget-status">
+                            {m.is_read ? <FiCheckCircle /> : <FiCircle />}
+                          </span>
                                                 )}
                                             </div>
                                         </div>
@@ -386,7 +494,11 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
                                     }
                                 }}
                             />
-                            <button className="chat-widget-send" onClick={sendMessage} title={t("send")}>
+                            <button
+                                className="chat-widget-send"
+                                onClick={sendMessage}
+                                title={t("send")}
+                            >
                                 <FiSend />
                             </button>
                         </div>

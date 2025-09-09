@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import {
     FiUser, FiImage, FiFileText,
     FiTrendingUp, FiCalendar, FiPlus, FiTrash2, FiSave, FiClock,
-    FiUpload, FiSettings, FiDollarSign, FiX
+    FiUpload, FiSettings, FiDollarSign, FiX, FiMessageSquare
 } from "react-icons/fi";
 import api from "./api";
 import ChatWidgets from "./ChatWidgets";
@@ -53,6 +53,10 @@ export default function GuideAccount() {
     const [savingService, setSavingService] = useState(false);
     const [uaSubmitting, setUaSubmitting] = useState(false);
 
+    // ✅ muvaffaqiyat bannerlari
+    const [saveProfileSuccess, setSaveProfileSuccess] = useState(false);
+    const [saveServiceSuccess, setSaveServiceSuccess] = useState(false);
+
     const [cities, setCities] = useState([]);
     const [me, setMe] = useState(null);
     const [userData, setUserData] = useState(null);
@@ -85,6 +89,35 @@ export default function GuideAccount() {
     );
 
     /* =======================
+       Booking fetch helper (GUIDE uchun)
+       ======================= */
+    const fetchGuideBookings = async () => {
+        // 1) incoming (agar backendda bor bo‘lsa)
+        try {
+            const r1 = await api.get("bookings/incoming/");
+            const list1 = r1.data?.results || r1.data || [];
+            if (Array.isArray(list1)) return list1;
+        } catch (_) {}
+
+        // 2) as=guide param (ko‘pchilik backend shunday qo‘llab-quvvatlaydi)
+        try {
+            const r2 = await api.get("bookings/bookings/?as=guide");
+            const list2 = r2.data?.results || r2.data || [];
+            if (Array.isArray(list2)) return list2;
+        } catch (_) {}
+
+        // 3) fallback — eski endpoint (bo‘sh bo‘lishi mumkin)
+        try {
+            const r3 = await api.get("bookings/bookings/");
+            const list3 = r3.data?.results || r3.data || [];
+            return Array.isArray(list3) ? list3 : [];
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    };
+
+    /* =======================
        Initial load
        ======================= */
     useEffect(() => {
@@ -111,9 +144,9 @@ export default function GuideAccount() {
                     setAvatarUrl(url);
                 }
 
-                // bookings
-                const myBookings = await api.get("bookings/bookings/");
-                setBookings(myBookings.data?.results || myBookings.data || []);
+                // ✅ BOOKINGS — GUIDE uchun to‘g‘ri endpointlar orqali oling
+                const myBookings = await fetchGuideBookings();
+                setBookings(myBookings);
 
                 // unavailability
                 const myUAs = await api.get("profiles/unavailabilities/my/");
@@ -181,6 +214,10 @@ export default function GuideAccount() {
             await api.patch("profiles/customers/my/", fd);
             const refreshed = await api.get("profiles/customers/my/");
             setProfile(refreshed.data);
+
+            // ✅ muvaffaqiyat banneri
+            setSaveProfileSuccess(true);
+            setTimeout(() => setSaveProfileSuccess(false), 3000);
         } catch (e) {
             console.error(e);
             alert(t("action_failed"));
@@ -208,6 +245,10 @@ export default function GuideAccount() {
             await api.patch("profiles/customers/my/", fd);
             const refreshed = await api.get("profiles/customers/my/");
             setProfile(refreshed.data);
+
+            // ✅ muvaffaqiyat banneri
+            setSaveServiceSuccess(true);
+            setTimeout(() => setSaveServiceSuccess(false), 3000);
         } catch (e) {
             console.error(e);
             alert(t("action_failed"));
@@ -248,8 +289,8 @@ export default function GuideAccount() {
        BOOKINGS (ACCEPT / CANCEL / CHAT)
        ======================= */
     const refreshBookings = async () => {
-        const myBookings = await api.get("bookings/bookings/");
-        setBookings(myBookings.data?.results || myBookings.data || []);
+        const myBookings = await fetchGuideBookings();
+        setBookings(myBookings);
     };
 
     const acceptBooking = async (b) => {
@@ -317,6 +358,14 @@ export default function GuideAccount() {
             {tab === Tab.PROFILE && (
                 <div className="guide-account-section">
                     <h3><FiUser /> {t("profile_information")}</h3>
+
+                    {/* ✅ Profil saqlandi banneri */}
+                    {saveProfileSuccess && (
+                        <div className="guide-account-alert success" role="status" aria-live="polite">
+                            {t("changes_saved") || "Changes saved successfully"}
+                        </div>
+                    )}
+
                     <div className="guide-account-header">
                         <div className="guide-account-avatar">
                             <img
@@ -387,6 +436,14 @@ export default function GuideAccount() {
             {tab === Tab.SERVICE && (
                 <div className="guide-account-section">
                     <h3><FiSettings /> {t("service_details")}</h3>
+
+                    {/* ✅ Service saqlandi banneri */}
+                    {saveServiceSuccess && (
+                        <div className="guide-account-alert success" role="status" aria-live="polite">
+                            {t("changes_saved") || "Changes saved successfully"}
+                        </div>
+                    )}
+
                     <div className="guide-account-grid">
                         <div className="guide-account-field">
                             <label>{t("country")}</label>
@@ -550,6 +607,16 @@ export default function GuideAccount() {
                     </div>
                 </div>
             )}
+
+            {/* ✅ Doimiy Chat FAB (past-o‘ng burchakda) */}
+            <button
+                className="guide-account-chat-fab"
+                title={t("chat")}
+                aria-label={t("chat")}
+                onClick={() => { setChatPeerEmail(null); setChatOpen(true); }}
+            >
+                <FiMessageSquare />
+            </button>
         </div>
     );
 }

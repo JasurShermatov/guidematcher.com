@@ -412,3 +412,49 @@
     .guide-account-tabs button{ padding:.45rem .75rem; font-size:.92rem; }
     .guide-account-avatar-img{ width: 120px; height: 120px; }
 }
+
+/* Muvaffaqiyat alerti */
+.guide-account-alert {
+    margin: 12px 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    border: 1px solid transparent;
+}
+.guide-account-alert.success {
+    background: #e6f7e9;        /* light green */
+    color: #0f5132;              /* dark green text */
+    border-color: #badbcc;       /* subtle border */
+}
+
+/* Floating Action Button (Chat) */
+.guide-account-chat-fab {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: #2563eb;      /* blue-600 */
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(0,0,0,.15), 0 6px 6px rgba(0,0,0,.1);
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+    z-index: 1000;            /* modal pastida qolmasin */
+}
+.guide-account-chat-fab:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(0,0,0,.18), 0 8px 8px rgba(0,0,0,.12);
+    background: #1e4fd8;      /* hover a shade darker */
+}
+.guide-account-chat-fab:active {
+    transform: translateY(0);
+}
+.guide-account-chat-fab svg {
+    width: 22px;
+    height: 22px;
+}

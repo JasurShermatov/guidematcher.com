@@ -109,7 +109,8 @@ class Booking(BaseModel):
     )
 
     # Chat bilan bog‘lanish
-    conversation = models.OneToOneField(
+    # conversation = models.OneToOneField(
+    conversation = models.ForeignKey(
         Conversation,
         on_delete=models.SET_NULL,
         null=True,

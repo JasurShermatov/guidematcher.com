@@ -62,6 +62,8 @@ export default function UserAccount() {
     const [guides, setGuides] = useState([]);
     const [searching, setSearching] = useState(false);
 
+    const [saveSuccess, setSaveSuccess] = useState(false);
+
     // Booking modal
     const [bookingModalOpen, setBookingModalOpen] = useState(false);
     const [selectedGuide, setSelectedGuide] = useState(null);
@@ -176,6 +178,9 @@ export default function UserAccount() {
 
             setAvatarFile(null);
             if (avatarRef.current) avatarRef.current.value = "";
+
+            setSaveSuccess(true);
+            setTimeout(() => setSaveSuccess(false), 3000);
         } catch (e) {
             console.error(e);
             alert(t("action_failed"));
@@ -409,6 +414,25 @@ export default function UserAccount() {
                 </div>
             )}
 
+            {saveSuccess && (
+                <div
+                    className="user-account-alert success"
+                    role="status"
+                    aria-live="polite"
+                    style={{
+                        margin: "12px 0",
+                        padding: "10px 12px",
+                        borderRadius: 8,
+                        background: "#e6f7e9",
+                        color: "#0f5132",
+                        border: "1px solid #badbcc",
+                        fontSize: 14,
+                    }}
+                >
+                    {t("changes_saved") || "Changes saved successfully"}
+                </div>
+            )}
+
             {/* SEARCH & BOOK */}
             {tab === Tab.SEARCH && (
                 <div className="user-account-section">
@@ -613,6 +637,16 @@ export default function UserAccount() {
                     </div>
                 </div>
             )}
+
+            {/* ✅ Doimiy Chat FAB (past-o‘ng burchakda) */}
+            <button
+                className="user-account-chat-fab"
+                title={t("chat")}
+                aria-label={t("chat")}
+                onClick={() => { setChatPeerEmail(null); setChatOpen(true); }}
+            >
+                <FiMessageSquare />
+            </button>
         </div>
     );
 }

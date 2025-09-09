@@ -7,8 +7,6 @@ from apps.users.models import User
 
 
 class UserSimpleSerializer(serializers.ModelSerializer):
-    """Simple user info for front-end display (avatar, name, email)"""
-
     full_name = serializers.CharField(read_only=True)
     email = serializers.EmailField()
     avatar_url = serializers.SerializerMethodField()
@@ -47,9 +45,11 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
+    """Write serializer (create/update)"""
+
     client_profile = serializers.PrimaryKeyRelatedField(
         queryset=ClientProfile.objects.all(),
-        required=False,  # agar login qilgan user asosida avtomatik bo‘lsa
+        required=False,
     )
     customer_profile = serializers.PrimaryKeyRelatedField(
         queryset=CustomerProfile.objects.all()
@@ -61,12 +61,32 @@ class BookingSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "created_at", "updated_at", "conversation")
 
     def create(self, validated_data):
-        # Agar client_profile yuborilmasa, login qilgan user ni qo‘shish
+        # ✅ request.user.clientprofile (underscore emas)
         if "client_profile" not in validated_data:
             validated_data["client_profile"] = self.context[
                 "request"
-            ].user.client_profile
+            ].user.clientprofile
         return super().create(validated_data)
+
+
+class BookingReadSerializer(serializers.ModelSerializer):
+    """Read serializer (list/retrieve) — nested userlar bilan"""
+
+    client_profile = ClientProfileSerializer(read_only=True)
+    customer_profile = CustomerProfileSerializer(read_only=True)
+    status_display = serializers.CharField(source="get_status_display", read_only=True)
+
+    class Meta:
+        model = Booking
+        fields = "__all__"
+        read_only_fields = (
+            "id",
+            "status",
+            "status_display",
+            "created_at",
+            "updated_at",
+            "conversation",
+        )
 
 
 class BaseBookingSerializer(serializers.ModelSerializer):

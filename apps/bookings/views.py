@@ -123,7 +123,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             return Response({"status": "completed"}, status=status.HTTP_200_OK)
         return Response(
             {"error": "Only accepted bookings can be marked as completed."},
-            status=status.HTTP_400_BAD_REQUEST
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
@@ -148,10 +148,6 @@ class BookingViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated],
         url_path="check-availability",
     )
-
-
-
-
     def check_availability(self, request, pk=None):
         customer_profile = get_object_or_404(CustomerProfile, id=pk)
         start_date = request.query_params.get("start_date")

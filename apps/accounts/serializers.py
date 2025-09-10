@@ -123,7 +123,6 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         from django.db import transaction
 
-
         if User.objects.filter(email=email).exists():
             raise serializers.ValidationError(
                 {"email": "This email is already registered."}

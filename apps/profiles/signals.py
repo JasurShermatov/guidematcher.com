@@ -12,9 +12,7 @@ logger = logging.getLogger(__name__)
 def create_user_profile(sender, instance, created, **kwargs):
 
     if created:
-        print(
-            f"🔄 Signal ishga tushdi: {instance.email} | Role: {instance.role}"
-        )
+        print(f"🔄 Signal ishga tushdi: {instance.email} | Role: {instance.role}")
 
         try:
             user_role = instance.role

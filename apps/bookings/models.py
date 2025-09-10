@@ -1,20 +1,16 @@
 # apps/bookings/models.py
-
 from datetime import timedelta
+
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import MinValueValidator
-from apps.common.models import BaseModel, ServiceType
-from apps.users.models import User
-from apps.profiles.models import CustomerProfile, ClientProfile
+
 from apps.chat.models import Conversation
+from apps.common.models import BaseModel, ServiceType
+from apps.profiles.models import CustomerProfile, ClientProfile
 
 
 class Booking(BaseModel):
-    """
-    Booking modeli: client va customer o‘rtasidagi kelishuv va band kunlarni boshqaradi.
-    Chat bilan integratsiyalangan.
-    """
 
     class BookingStatus(models.TextChoices):
         PENDING = "pending", _("Pending")  # client offer qildi
@@ -23,7 +19,6 @@ class Booking(BaseModel):
         COMPLETED = "completed", _("Completed")
         EXPIRED = "expired", _("Expired")  # vaqt o‘tgan bo‘lsa
 
-    # Client va Customer
     client_profile = models.ForeignKey(
         ClientProfile,
         on_delete=models.CASCADE,
@@ -39,7 +34,6 @@ class Booking(BaseModel):
         verbose_name=_("Customer"),
     )
 
-    # Service turi
     service_type = models.ForeignKey(
         ServiceType,
         on_delete=models.PROTECT,
@@ -48,19 +42,16 @@ class Booking(BaseModel):
         blank=True,
     )
 
-    # Booking haqida
     title = models.CharField(
         max_length=255, blank=True, verbose_name=_("Booking title")
     )
     description = models.TextField(blank=True, verbose_name=_("Description"))
 
-    # Search uchun muhim fieldlar
     country = models.CharField(max_length=100, verbose_name=_("Country"), db_index=True)
     city = models.CharField(
         max_length=100, blank=True, verbose_name=_("City"), db_index=True
     )
 
-    # Vaqt
     start_date = models.DateField(verbose_name=_("Start date"))
     end_date = models.DateField(verbose_name=_("End date"))
     start_time = models.TimeField(null=True, blank=True, verbose_name=_("Start time"))
@@ -68,7 +59,6 @@ class Booking(BaseModel):
         null=True, blank=True, verbose_name=_("Duration (hours)")
     )
 
-    # Location
     location = models.CharField(
         max_length=255, blank=True, verbose_name=_("Meeting location")
     )
@@ -80,7 +70,6 @@ class Booking(BaseModel):
         max_digits=9, decimal_places=6, null=True, blank=True
     )
 
-    # Rate
     proposed_rate = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -100,16 +89,16 @@ class Booking(BaseModel):
     )
     currency = models.CharField(max_length=3, default="USD", verbose_name=_("Currency"))
 
-    # Status
     status = models.CharField(
         max_length=20,
         choices=BookingStatus.choices,
         default=BookingStatus.PENDING,
         verbose_name=_("Status"),
     )
+    cancellation_reason = models.TextField(
+        blank=True, null=True, verbose_name=_("Cancellation reason")
+    )
 
-    # Chat bilan bog‘lanish
-    # conversation = models.OneToOneField(
     conversation = models.ForeignKey(
         Conversation,
         on_delete=models.SET_NULL,
@@ -119,7 +108,6 @@ class Booking(BaseModel):
         verbose_name=_("Conversation"),
     )
 
-    # Qo‘shimcha maydonlar
     special_requirements = models.TextField(
         blank=True, verbose_name=_("Special requirements")
     )
@@ -147,7 +135,6 @@ class Booking(BaseModel):
 
     @property
     def booked_days(self):
-        """Customer band kunlari ro'yxati"""
         days = []
         if not self.start_date or not self.end_date:
             return days

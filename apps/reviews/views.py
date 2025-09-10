@@ -1,9 +1,4 @@
 # apps/reviews/views.py
-# -----------------------------------------------------------------------------
-#  Reviews API (disputes removed): stars + review + like/dislike with comments
-#  Clean, performant, swagger-documented endpoints for frontend integration.
-# -----------------------------------------------------------------------------
-
 from typing import Optional
 
 from django.db import transaction
@@ -25,7 +20,6 @@ from rest_framework.response import Response
 from apps.common.permissions import IsVerifiedUser
 from apps.reviews.models import Review, ReviewResponse, ReviewReaction
 
-# Quyidagilar mavjud deb hisoblaymiz (avvalgi loyihangda bor edi):
 from apps.reviews.permissions import IsClientOwner, IsProviderOwner
 from apps.reviews.serializers import (
     ReviewSerializer,
@@ -35,27 +29,13 @@ from apps.reviews.serializers import (
 )
 
 
-# -----------------------------------------------------------------------------
-# Utilities
-# -----------------------------------------------------------------------------
-
-
 def _get_booking_from_request(request) -> Optional[int]:
-    """
-    Booking ID review yaratishda 2 usuldan biri orqali berilishi mumkin:
-    - query param: ?booking_id=123
-    - body: {"booking_id": 123}
-    """
+
     bid = request.query_params.get("booking_id") or request.data.get("booking_id")
     try:
         return int(bid) if bid is not None else None
     except (TypeError, ValueError):
         return None
-
-
-# -----------------------------------------------------------------------------
-# Review ViewSet
-# -----------------------------------------------------------------------------
 
 
 @extend_schema_view(
@@ -158,12 +138,6 @@ def _get_booking_from_request(request) -> Optional[int]:
     ),
 )
 class ReviewViewSet(viewsets.ModelViewSet):
-    """
-    Public listing: only published.
-    Retrieve: published for all, unpublished only for owner (client).
-    Create: client only (verified), by booking.
-    Update/Delete: owner (client) only.
-    """
 
     permission_classes = [IsAuthenticated]  # dynamic adjustments in get_permissions
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
@@ -172,14 +146,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
     search_fields = ["title", "comment"]
 
     def get_queryset(self):
-        """
-        Performance:
-        - select_related: client, customer (+user), booking, response
-        - prefetch_related: reactions + their users
-        Visibility:
-        - list: only published
-        - retrieve: allow unpublished only for owner
-        """
         base = Review.objects.select_related(
             "client", "customer", "customer__user", "booking", "response"
         ).prefetch_related("reactions__user")
@@ -206,9 +172,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return perms
 
     def perform_auth_check_retrieve(self, obj: Review):
-        """
-        Unpublished review’ni faqat owner ko‘ra oladi.
-        """
+
         if not obj.is_published and obj.client_id != self.request.user.id:
             self.permission_denied(self.request, message="Review is not published.")
 

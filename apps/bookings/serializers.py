@@ -61,7 +61,6 @@ class BookingSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "created_at", "updated_at", "conversation")
 
     def create(self, validated_data):
-        # ✅ request.user.clientprofile (underscore emas)
         if "client_profile" not in validated_data:
             validated_data["client_profile"] = self.context[
                 "request"
@@ -70,7 +69,6 @@ class BookingSerializer(serializers.ModelSerializer):
 
 
 class BookingReadSerializer(serializers.ModelSerializer):
-    """Read serializer (list/retrieve) — nested userlar bilan"""
 
     client_profile = ClientProfileSerializer(read_only=True)
     customer_profile = CustomerProfileSerializer(read_only=True)
@@ -103,6 +101,7 @@ class BaseBookingSerializer(serializers.ModelSerializer):
             "status_display",
             "created_at",
             "updated_at",
+
         )
         read_only_fields = (
             "id",

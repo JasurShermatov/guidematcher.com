@@ -115,12 +115,6 @@ class UserListView(viewsets.ModelViewSet):
 
 
 class CustomerDetailView(generics.RetrieveAPIView):
-    """
-    Customer profili ko'rish view.
-    - Admin / Superadmin → har qanday customer profili ko'rishi mumkin.
-    - Oddiy customer → faqat o'z profilini ko'radi.
-    - Profil mavjud bo'lmasa → 404 qaytaradi.
-    """
 
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -137,13 +131,10 @@ class CustomerDetailView(generics.RetrieveAPIView):
         user = customer_profile.user
         request_user = self.request.user
 
-        # Admin / Superadmin har doim ko'rishi mumkin
         if request_user.is_admin or request_user.is_superadmin:
             return user
 
-        # Oddiy customer faqat o'zini ko'rishi mumkin
         if request_user.is_customer and request_user.id == user.id:
             return user
 
-        # Boshqalar boshqa profilingni ko'ra olmaydi
         raise PermissionDenied({"detail": "Siz faqat o'z profilingizni ko'ra olasiz."})

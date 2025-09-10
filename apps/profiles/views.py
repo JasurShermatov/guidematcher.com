@@ -85,7 +85,7 @@ class AvatarMixin:
 
 class BaseProfileViewSet(viewsets.ModelViewSet):
     lookup_field = "user_id"
-    lookup_url_kwarg = "user_id"  # ✅ URL kwarg nomi
+    lookup_url_kwarg = "user_id"
     parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def get_permissions(self):
@@ -116,7 +116,6 @@ class BaseProfileViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get", "put", "patch"], url_path="my")
     def my_profile(self, request):
-        # ✅ mavjud bo‘lmasa yaratib beradi
         profile, _ = self.model.objects.get_or_create(user=request.user)
 
         if request.method == "GET":
@@ -213,7 +212,6 @@ class ClientProfileViewSet(BaseProfileViewSet):
                 {"message": "Avatar uploaded successfully.", "avatar_url": avatar_url},
                 status=status.HTTP_200_OK,
             )
-        # DELETE
         if not profile.avatar:
             return Response(
                 {"error": "No avatar to delete.", "avatar_url": None},
@@ -270,7 +268,6 @@ class CustomerProfileViewSet(AvatarMixin, BaseProfileViewSet):
                 {"detail": "Avatar uploaded successfully.", "avatar_url": avatar_url},
                 status=status.HTTP_200_OK,
             )
-        # DELETE
         if not profile.avatar:
             return Response(
                 {"detail": "No avatar to delete.", "avatar_url": None},

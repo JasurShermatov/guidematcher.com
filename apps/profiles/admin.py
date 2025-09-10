@@ -12,7 +12,6 @@ from .models import (
 )
 
 
-# --- Client Profile Admin ---
 @admin.register(ClientProfile)
 class ClientProfileAdmin(admin.ModelAdmin):
     list_display = (
@@ -106,7 +105,6 @@ class ClientProfileAdmin(admin.ModelAdmin):
     get_user_details.short_description = "User Details"
 
 
-# --- Customer Profile Admin ---
 @admin.register(CustomerProfile)
 class CustomerProfileAdmin(admin.ModelAdmin):
     list_display = (
@@ -206,7 +204,6 @@ class CustomerProfileAdmin(admin.ModelAdmin):
     get_user_details.short_description = "User Details"
 
 
-# --- Portfolio Admin ---
 @admin.register(Portfolio)
 class PortfolioAdmin(admin.ModelAdmin):
     list_display = ("linked_customer", "title", "order")
@@ -222,7 +219,6 @@ class PortfolioAdmin(admin.ModelAdmin):
     linked_customer.short_description = "Customer"
 
 
-# --- VerificationDocument Admin ---
 @admin.register(VerificationDocument)
 class VerificationDocumentAdmin(admin.ModelAdmin):
     list_display = (
@@ -252,7 +248,6 @@ class VerificationDocumentAdmin(admin.ModelAdmin):
     linked_verified_by.short_description = "Verified By"
 
 
-# --- Unavailability Admin (yangi) ---
 @admin.register(Unavailability)
 class UnavailabilityAdmin(admin.ModelAdmin):
     list_display = ("customer", "start_date", "end_date", "reason")

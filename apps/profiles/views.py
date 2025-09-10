@@ -4,7 +4,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError, NotFound
-from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
@@ -27,23 +27,19 @@ from .serializers import (
 
 
 class AvatarMixin:
-
     parser_classes = [MultiPartParser, FormParser]
 
     @action(detail=True, methods=["get"], url_path="avatar")
     def get_avatar(self, request, user_id=None):
-
         profile = self.get_object()
-        if not profile.avatar:
-            return Response(
-                {"detail": "No avatar set.", "avatar_url": None},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        return Response({"avatar_url": request.build_absolute_uri(profile.avatar.url)})
+        avatar_url = (
+            request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
+        )
+        # ✅ 200 qaytaramiz — front fallback qiladi
+        return Response({"avatar_url": avatar_url}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["put", "patch"], url_path="avatar")
     def upload_avatar(self, request, user_id=None):
-
         profile = self.get_object()
         avatar = request.FILES.get("avatar")
         if not avatar:
@@ -76,12 +72,10 @@ class AvatarMixin:
                 {"detail": "No avatar to delete.", "avatar_url": None},
                 status=status.HTTP_404_NOT_FOUND,
             )
-
         avatar_path = profile.avatar.path
         profile.avatar.delete(save=False)
         if default_storage.exists(avatar_path):
             default_storage.delete(avatar_path)
-
         profile.save(update_fields=["avatar"])
         return Response(
             {"detail": "Avatar deleted successfully.", "avatar_url": None},
@@ -91,6 +85,8 @@ class AvatarMixin:
 
 class BaseProfileViewSet(viewsets.ModelViewSet):
     lookup_field = "user_id"
+    lookup_url_kwarg = "user_id"  # ✅ URL kwarg nomi
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
@@ -110,8 +106,7 @@ class BaseProfileViewSet(viewsets.ModelViewSet):
                 return getattr(self.request.user, self.profile_attr)
             except self.model.DoesNotExist:
                 raise NotFound({"detail": "Profile not found."})
-
-        user_id = self.kwargs.get("user_id")
+        user_id = self.kwargs.get(self.lookup_url_kwarg)
         try:
             return self.model.objects.get(user_id=user_id)
         except self.model.DoesNotExist:
@@ -121,21 +116,23 @@ class BaseProfileViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get", "put", "patch"], url_path="my")
     def my_profile(self, request):
-        profile = getattr(request.user, self.profile_attr, None)
-        if not profile:
-            raise NotFound({"detail": "Profile not found."})
+        # ✅ mavjud bo‘lmasa yaratib beradi
+        profile, _ = self.model.objects.get_or_create(user=request.user)
 
         if request.method == "GET":
-            serializer = self.serializer_class(profile)
-            return Response(serializer.data)
+            return Response(
+                self.serializer_class(profile, context={"request": request}).data
+            )
 
         partial = request.method == "PATCH"
-        serializer = self.create_update_serializer_class(
-            profile, data=request.data, partial=partial
+        ser = self.create_update_serializer_class(
+            profile, data=request.data, partial=partial, context={"request": request}
         )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(self.serializer_class(profile).data)
+        ser.is_valid(raise_exception=True)
+        ser.save()
+        return Response(
+            self.serializer_class(profile, context={"request": request}).data
+        )
 
     def perform_create(self, serializer):
         if hasattr(self.request.user, self.profile_attr):
@@ -160,34 +157,15 @@ class ClientProfileViewSet(BaseProfileViewSet):
     model = ClientProfile
     queryset = ClientProfile.objects.all()
     serializer_class = ClientProfileSerializer
-    create_update_serializer_class = ClientProfileSerializer  # Agar senga alohida create/update serializer kerak bo‘lsa keyin alohida qo‘shasan
+    create_update_serializer_class = ClientProfileSerializer
     profile_attr = "clientprofile"
     user_role = "client"
-    lookup_field = "user_id"
-    parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def get_queryset(self):
         user = getattr(self.request, "user", None)
         if user and getattr(user, "is_admin", False):
             return self.queryset
         return self.queryset.filter(user=user)
-
-    @action(
-        detail=False,
-        methods=["get", "patch"],
-        url_path="my",
-        permission_classes=[IsAuthenticated],
-    )
-    def my_profile(self, request):
-        profile, created = ClientProfile.objects.get_or_create(user=request.user)
-        if request.method == "GET":
-            serializer = self.serializer_class(profile)
-            return Response(serializer.data)
-        elif request.method == "PATCH":
-            serializer = self.serializer_class(profile, data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
@@ -198,22 +176,18 @@ class ClientProfileViewSet(BaseProfileViewSet):
     )
     def avatar(self, request, user_id=None):
         profile = get_object_or_404(ClientProfile, user__id=user_id)
-
         if request.user != profile.user and not getattr(
             request.user, "is_admin", False
         ):
             raise PermissionDenied({"error": "You can only manage your own avatar."})
-
         if request.method == "GET":
-            if profile.avatar:
-                avatar_url = request.build_absolute_uri(profile.avatar.url)
-                return Response({"avatar_url": avatar_url}, status=status.HTTP_200_OK)
-            return Response(
-                {"error": "No avatar set.", "avatar_url": None},
-                status=status.HTTP_404_NOT_FOUND,
+            avatar_url = (
+                request.build_absolute_uri(profile.avatar.url)
+                if profile.avatar
+                else None
             )
-
-        elif request.method == "PUT":
+            return Response({"avatar_url": avatar_url}, status=status.HTTP_200_OK)  # ✅
+        if request.method == "PUT":
             avatar = request.FILES.get("avatar")
             if not avatar:
                 return Response(
@@ -239,19 +213,18 @@ class ClientProfileViewSet(BaseProfileViewSet):
                 {"message": "Avatar uploaded successfully.", "avatar_url": avatar_url},
                 status=status.HTTP_200_OK,
             )
-
-        elif request.method == "DELETE":
-            if not profile.avatar:
-                return Response(
-                    {"error": "No avatar to delete.", "avatar_url": None},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
-            profile.avatar.delete(save=False)
-            profile.save(update_fields=["avatar"])
+        # DELETE
+        if not profile.avatar:
             return Response(
-                {"message": "Avatar deleted successfully.", "avatar_url": None},
-                status=status.HTTP_200_OK,
+                {"error": "No avatar to delete.", "avatar_url": None},
+                status=status.HTTP_404_NOT_FOUND,
             )
+        profile.avatar.delete(save=False)
+        profile.save(update_fields=["avatar"])
+        return Response(
+            {"message": "Avatar deleted successfully.", "avatar_url": None},
+            status=status.HTTP_200_OK,
+        )
 
 
 @extend_schema(tags=["Customer Profile"])
@@ -262,7 +235,6 @@ class CustomerProfileViewSet(AvatarMixin, BaseProfileViewSet):
     create_update_serializer_class = CustomerProfileCreateUpdateSerializer
     profile_attr = "customerprofile"
     user_role = "customer"
-    lookup_field = "user_id"
 
     @action(
         detail=True,
@@ -274,14 +246,13 @@ class CustomerProfileViewSet(AvatarMixin, BaseProfileViewSet):
     def avatar(self, request, user_id=None):
         profile = self.get_object()
         if request.method == "GET":
-            if profile.avatar:
-                avatar_url = request.build_absolute_uri(profile.avatar.url)
-                return Response({"avatar_url": avatar_url}, status=status.HTTP_200_OK)
-            return Response(
-                {"detail": "No avatar set.", "avatar_url": None},
-                status=status.HTTP_404_NOT_FOUND,
+            avatar_url = (
+                request.build_absolute_uri(profile.avatar.url)
+                if profile.avatar
+                else None
             )
-        elif request.method == "PUT":
+            return Response({"avatar_url": avatar_url}, status=status.HTTP_200_OK)  # ✅
+        if request.method == "PUT":
             if "avatar" not in request.FILES:
                 return Response(
                     {"detail": "Avatar file required."},
@@ -299,21 +270,21 @@ class CustomerProfileViewSet(AvatarMixin, BaseProfileViewSet):
                 {"detail": "Avatar uploaded successfully.", "avatar_url": avatar_url},
                 status=status.HTTP_200_OK,
             )
-        elif request.method == "DELETE":
-            if not profile.avatar:
-                return Response(
-                    {"detail": "No avatar to delete.", "avatar_url": None},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
-            avatar_path = profile.avatar.path
-            profile.avatar.delete(save=False)
-            if default_storage.exists(avatar_path):
-                default_storage.delete(avatar_path)
-            profile.save(update_fields=["avatar"])
+        # DELETE
+        if not profile.avatar:
             return Response(
-                {"detail": "Avatar deleted successfully.", "avatar_url": None},
-                status=status.HTTP_200_OK,
+                {"detail": "No avatar to delete.", "avatar_url": None},
+                status=status.HTTP_404_NOT_FOUND,
             )
+        avatar_path = profile.avatar.path
+        profile.avatar.delete(save=False)
+        if default_storage.exists(avatar_path):
+            default_storage.delete(avatar_path)
+        profile.save(update_fields=["avatar"])
+        return Response(
+            {"detail": "Avatar deleted successfully.", "avatar_url": None},
+            status=status.HTTP_200_OK,
+        )
 
 
 class CustomerOwnedModelViewSet(viewsets.ModelViewSet):
@@ -379,10 +350,8 @@ class UnavailabilityViewSet(CustomerOwnedModelViewSet):
         customer_profile = self.get_customer_profile()
         if not customer_profile:
             raise ValidationError({"detail": "You don't have a customer profile yet."})
-
         start_date = serializer.validated_data.get("start_date")
         end_date = serializer.validated_data.get("end_date")
-
         if Unavailability.objects.filter(
             customer=customer_profile,
             start_date__lte=end_date,
@@ -393,5 +362,4 @@ class UnavailabilityViewSet(CustomerOwnedModelViewSet):
                     "detail": "You already have an unavailability period overlapping this date range."
                 }
             )
-
         serializer.save(customer=customer_profile)

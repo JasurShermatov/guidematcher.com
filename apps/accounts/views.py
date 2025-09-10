@@ -1,12 +1,10 @@
-#  apps/accounts/views.py
-from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
-from rest_framework.permissions import AllowAny
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.decorators import api_view, permission_classes
 
 from .serializers import (
     CustomTokenObtainPairSerializer,
@@ -16,7 +14,6 @@ from .serializers import (
     PasswordResetConfirmSerializer,
     LogoutSerializer,
 )
-from .serializers import UserSerializer  # serializeringiz bo‘lishi kerak
 
 
 @extend_schema(
@@ -33,37 +30,39 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         serializer.is_valid(raise_exception=True)
         user = serializer.user
         refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
 
+        # optional profile id
         profile_id = None
         if user.role == "Client":
-            from apps.clients.models import ClientProfile
+            from apps.profiles.models import ClientProfile
 
-            profile = ClientProfile.objects.filter(user=user).first()
-            if profile:
-                profile_id = profile.id
+            p = ClientProfile.objects.filter(user=user).first()
+            if p:
+                profile_id = p.id
         elif user.role == "Customer":
-            from apps.customers.models import CustomerProfile
+            from apps.profiles.models import CustomerProfile
 
-            profile = CustomerProfile.objects.filter(user=user).first()
-            if profile:
-                profile_id = profile.id
+            p = CustomerProfile.objects.filter(user=user).first()
+            if p:
+                profile_id = p.id
 
-        response_data = {
-            "message": "Login successful.",
-            "access_token": access_token,
-            "refresh_token": str(refresh),
-            "user": {
-                "id": user.id,
-                "email": user.email,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "role": user.role,
-                "country": user.country_name if user.country else None,
-                "profile_id": profile_id,
+        return Response(
+            {
+                "message": "Login successful.",
+                "access_token": str(refresh.access_token),
+                "refresh_token": str(refresh),
+                "user": {
+                    "id": user.id,
+                    "email": user.email,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "role": user.role,
+                    "country": user.country_name if user.country else None,
+                    "profile_id": profile_id,
+                },
             },
-        }
-        return Response(response_data, status=status.HTTP_200_OK)
+            status=status.HTTP_200_OK,
+        )
 
 
 @extend_schema(
@@ -76,9 +75,9 @@ class RequestCodeView(generics.CreateAPIView):
     serializer_class = RequestVerificationCodeSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        ev = serializer.save()
+        s = self.get_serializer(data=request.data)
+        s.is_valid(raise_exception=True)
+        ev = s.save()
         return Response(
             {
                 "message": "Verification code sent successfully.",
@@ -98,10 +97,9 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-
+        s = self.get_serializer(data=request.data)
+        s.is_valid(raise_exception=True)
+        user = s.save()
         refresh = RefreshToken.for_user(user)
         return Response(
             {
@@ -129,7 +127,6 @@ class RegisterView(generics.CreateAPIView):
 class CustomTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
-        # response.data["refresh"] – bu yangi token, agar ROTATE_REFRESH_TOKENS=True bo'lsa
         return Response(
             {
                 "message": "Token refreshed successfully.",
@@ -152,9 +149,9 @@ class PasswordResetRequestView(generics.CreateAPIView):
     serializer_class = PasswordResetRequestSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        result = serializer.save()
+        s = self.get_serializer(data=request.data)
+        s.is_valid(raise_exception=True)
+        result = s.save()
         return Response(result, status=status.HTTP_200_OK)
 
 
@@ -168,9 +165,9 @@ class PasswordResetConfirmView(generics.CreateAPIView):
     serializer_class = PasswordResetConfirmSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        s = self.get_serializer(data=request.data)
+        s.is_valid(raise_exception=True)
+        s.save()
         return Response(
             {"message": "Password has been reset successfully."},
             status=status.HTTP_200_OK,
@@ -187,11 +184,10 @@ class LogoutView(generics.GenericAPIView):
     serializer_class = LogoutSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
+        s = self.get_serializer(data=request.data)
+        s.is_valid(raise_exception=True)
         try:
-            RefreshToken(serializer.validated_data["refresh"]).blacklist()
+            RefreshToken(s.validated_data["refresh"]).blacklist()
             return Response(
                 {"message": "Successfully logged out"}, status=status.HTTP_200_OK
             )
@@ -202,19 +198,25 @@ class LogoutView(generics.GenericAPIView):
             )
 
 
-class MeView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        user = request.user
-        return Response(
-            {
-                "id": str(user.id),
-                "email": user.email,
-                "role": (
-                    "superadmin"
-                    if user.is_superuser
-                    else "admin" if user.is_staff else "client"
-                ),
-            }
-        )
+# ✅ /api/v1/accounts/me/
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def me_view(request):
+    """Minimal bootstrap info for frontend."""
+    user = request.user
+    profile_id = None
+    if user.role == "Customer" and hasattr(user, "customerprofile"):
+        profile_id = user.customerprofile.id
+    if user.role == "Client" and hasattr(user, "clientprofile"):
+        profile_id = user.clientprofile.id
+    return Response(
+        {
+            "id": user.id,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "role": user.role,
+            "country": user.country_name if user.country else None,
+            "profile_id": profile_id,
+        }
+    )

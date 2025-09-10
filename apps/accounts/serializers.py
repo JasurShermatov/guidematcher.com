@@ -1,18 +1,19 @@
 # apps/accounts/serializers.py
 import datetime
-import logging
 import secrets
 import string
-
+import logging
 from django.conf import settings
-from django.core.cache import cache
 from django.utils import timezone
-from rest_framework import serializers
+
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+
+from django.core.cache import cache
+from rest_framework import serializers
+from apps.users.models import User, Country
 from apps.accounts.models import EmailVerification
 from apps.accounts.tasks import send_verification_email, send_welcome_email
-from apps.users.models import User, Country
 from .services import (
     create_and_send_password_reset_code,
     validate_password_reset_code,
@@ -73,11 +74,9 @@ class RequestVerificationCodeSerializer(serializers.Serializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    verification_code = serializers.CharField(write_only=True, max_length=6)
+    code = serializers.CharField(write_only=True, max_length=6)
     role = serializers.CharField(max_length=20)
-    country = serializers.SlugRelatedField(
-        slug_field="code", queryset=Country.objects.all()  # yoki "name"
-    )
+    country = serializers.CharField(max_length=100)
 
     class Meta:
         model = User
@@ -88,7 +87,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             "last_name",
             "role",
             "country",
-            "verification_code",
+            "code",
         )
         extra_kwargs = {
             "password": {"write_only": True, "min_length": 8},
@@ -115,11 +114,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
     def validate_country(self, value):
-        return value
+        return value.strip()
 
     def validate(self, attrs):
         email = attrs.get("email").lower().strip()
-        verification_code = attrs.pop("verification_code")  # ✅ to‘g‘rilandi
+        code = attrs.pop("code")
+        country_name = attrs.pop("country")
 
         if User.objects.filter(email=email).exists():
             raise serializers.ValidationError(
@@ -127,18 +127,22 @@ class RegisterSerializer(serializers.ModelSerializer):
             )
 
         try:
-            ev = EmailVerification.objects.get(
-                email=email, code=verification_code, is_used=False
-            )
+            ev = EmailVerification.objects.get(email=email, code=code, is_used=False)
         except EmailVerification.DoesNotExist:
             raise serializers.ValidationError(
-                {"verification_code": "Invalid or already used verification code."}
+                {"code": "Invalid or already used verification code."}
             )
 
         if ev.is_expired():
             raise serializers.ValidationError(
-                {"verification_code": "Verification code has expired."}
+                {"code": "Verification code has expired."}
             )
+
+        try:
+            country_instance = Country.objects.get(name__iexact=country_name)
+        except Country.DoesNotExist:
+            country_instance = Country.objects.create(name=country_name)
+        attrs["country"] = country_instance
 
         self.ev = ev
         attrs["email"] = email
@@ -156,6 +160,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         self.ev.verified = True
         self.ev.save(update_fields=["is_used", "verified"])
 
+        # Send welcome email
         send_welcome_email.delay(user.email, user.first_name)
 
         return user
@@ -273,9 +278,3 @@ class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField(
         required=True, help_text="Refresh token obtained from login"
     )
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["id", "email", "first_name", "last_name", "is_staff", "is_superuser"]

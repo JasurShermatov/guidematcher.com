@@ -28,7 +28,8 @@ class BookingViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def get_serializer_class(self):
-        if self.action in ["list", "retrieve"]:
+        # 🔧 incoming ham o‘qish serializeridan foydalansin
+        if self.action in ["list", "retrieve", "incoming"]:
             return BookingReadSerializer
         return BookingSerializer
 

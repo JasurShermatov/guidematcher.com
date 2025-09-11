@@ -2,7 +2,7 @@
   "header": {
     "find_guides": "Find Guides",
     "blog": "Blog",
-    "logo_text": "TourGuide",
+    "logo_text": "UzGuide",
     "tagline": "Explore Together",
     "select_language": "Select Language",
     "choose_appearance": "Choose Appearance",
@@ -276,11 +276,11 @@
     }
   },
   "footer": {
-    "logo_text": "TourGuide",
+    "logo_text": "UzGuide",
     "company_description": "Your trusted platform for finding the best travel guides and experiences worldwide.",
     "contact": {
       "address": "123 Travel St, Global City, World",
-      "email": "support@tourguide.com",
+      "email": "support@uzguide.com",
       "phone": "+1-800-123-4567"
     },
     "social": {

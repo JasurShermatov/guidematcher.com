@@ -2,7 +2,7 @@
   "header": {
     "find_guides": "ابحث عن مرشدين",
     "blog": "مدونة",
-    "logo_text": "TourGuide",
+    "logo_text": "UzGuide",
     "tagline": "استكشف معًا",
     "select_language": "اختر اللغة",
     "choose_appearance": "اختر المظهر",
@@ -280,7 +280,7 @@
     "company_description": "منصتك الموثوقة للعثور على أفضل المرشدين السياحيين والتجارب حول العالم.",
     "contact": {
       "address": "شارع السفر 123، المدينة العالمية، العالم",
-      "email": "support@tourguide.com",
+      "email": "support@uzguide.com",
       "phone": "+1-800-123-4567"
     },
     "social": {

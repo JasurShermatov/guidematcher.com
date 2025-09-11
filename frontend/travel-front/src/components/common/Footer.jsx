@@ -45,7 +45,7 @@ const Footer = () => {
                             <div className="footer-logo-icon">
                                 <FiGlobe />
                             </div>
-                            <span className="footer-logo-text">{t("footer.logo_text", { defaultValue: "TourGuide" })}</span>
+                            <span className="footer-logo-text">{t("footer.logo_text", { defaultValue: "UzGuide" })}</span>
                         </div>
 
                         <p className="footer-company-description">
@@ -61,7 +61,7 @@ const Footer = () => {
                             </div>
                             <div className="footer-contact-item">
                                 <FiMail />
-                                <span>{t("footer.contact.email", { defaultValue: "support@tourguide.com" })}</span>
+                                <span>{t("footer.contact.email", { defaultValue: "support@uzguide.com" })}</span>
                             </div>
                             <div className="footer-contact-item">
                                 <FiPhone />
@@ -122,7 +122,7 @@ const Footer = () => {
                 <div className="footer-bottom-content">
                     <div className="footer-copyright">
                         <p>
-                            {t("footer.copyright", { year: currentYear, defaultValue: `© ${currentYear} TourGuide. All rights reserved.` })}
+                            {t("footer.copyright", { year: currentYear, defaultValue: `© ${currentYear} UzGuide. All rights reserved.` })}
                         </p>
                     </div>
 

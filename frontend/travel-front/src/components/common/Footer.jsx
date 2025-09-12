@@ -55,53 +55,53 @@ const Footer = () => {
                         </p>
 
                         <div className="footer-contact-info">
-                            <div className="footer-contact-item">
-                                <FiMapPin />
-                                <span>{t("footer.contact.address", { defaultValue: "123 Travel St, Global City, World" })}</span>
-                            </div>
+                            {/*<div className="footer-contact-item">*/}
+                            {/*    <FiMapPin />*/}
+                            {/*    <span>{t("footer.contact.address", { defaultValue: "123 Travel St, Global City, World" })}</span>*/}
+                            {/*</div>*/}
                             <div className="footer-contact-item">
                                 <FiMail />
-                                <span>{t("footer.contact.email", { defaultValue: "uzguidecom@gmail.com" })}</span>
+                                <span>{t("footer.contact.email", { defaultValue: "info@uzguide.com" })}</span>
                             </div>
-                            <div className="footer-contact-item">
-                                <FiPhone />
-                                <span>{t("footer.contact.phone", { defaultValue: "+1-800-123-4567" })}</span>
-                            </div>
+                            {/*<div className="footer-contact-item">*/}
+                            {/*    <FiPhone />*/}
+                            {/*    <span>{t("footer.contact.phone", { defaultValue: "+1-800-123-4567" })}</span>*/}
+                            {/*</div>*/}
                         </div>
 
-                        <div className="footer-social-links">
-                            {socialLinks.map((social, index) => (
-                                <a key={index} href={social.href} className="footer-social-link" aria-label={social.label}>
-                                    {social.icon}
-                                </a>
-                            ))}
-                        </div>
+                        {/*<div className="footer-social-links">*/}
+                        {/*    {socialLinks.map((social, index) => (*/}
+                        {/*        <a key={index} href={social.href} className="footer-social-link" aria-label={social.label}>*/}
+                        {/*            {social.icon}*/}
+                        {/*        </a>*/}
+                        {/*    ))}*/}
+                        {/*</div>*/}
                     </div>
 
-                    {/* Mobile App Section */}
+                     {/*Mobile App Section */}
                     <div className="footer-section footer-app-section">
-                        <h4 className="footer-title">{t("footer.app.title", { defaultValue: "Get Our App" })}</h4>
-                        <p className="footer-app-description">
-                            {t("footer.app.description", { defaultValue: "Download our app to explore destinations and book guides on the go." })}
-                        </p>
+                    {/*    <h4 className="footer-title">{t("footer.app.title", { defaultValue: "Get Our App" })}</h4>*/}
+                    {/*    <p className="footer-app-description">*/}
+                    {/*        {t("footer.app.description", { defaultValue: "Download our app to explore destinations and book guides on the go." })}*/}
+                    {/*    </p>*/}
 
-                        <div className="footer-app-buttons">
-                            <button className="footer-app-btn footer-ios">
-                                <FiDownload />
-                                <div className="footer-app-btn-text">
-                                    <span className="footer-app-label">{t("footer.app.download_label", { defaultValue: "Download on the" })}</span>
-                                    <span className="footer-app-store">{t("footer.app.app_store", { defaultValue: "App Store" })}</span>
-                                </div>
-                            </button>
+                    {/*    <div className="footer-app-buttons">*/}
+                    {/*        <button className="footer-app-btn footer-ios">*/}
+                    {/*            <FiDownload />*/}
+                    {/*            <div className="footer-app-btn-text">*/}
+                    {/*                <span className="footer-app-label">{t("footer.app.download_label", { defaultValue: "Download on the" })}</span>*/}
+                    {/*                <span className="footer-app-store">{t("footer.app.app_store", { defaultValue: "App Store" })}</span>*/}
+                    {/*            </div>*/}
+                    {/*        </button>*/}
 
-                            <button className="footer-app-btn footer-android">
-                                <FiDownload />
-                                <div className="footer-app-btn-text">
-                                    <span className="footer-app-label">{t("footer.app.get_it_on", { defaultValue: "Get it on" })}</span>
-                                    <span className="footer-app-store">{t("footer.app.google_play", { defaultValue: "Google Play" })}</span>
-                                </div>
-                            </button>
-                        </div>
+                    {/*        <button className="footer-app-btn footer-android">*/}
+                    {/*            <FiDownload />*/}
+                    {/*            <div className="footer-app-btn-text">*/}
+                    {/*                <span className="footer-app-label">{t("footer.app.get_it_on", { defaultValue: "Get it on" })}</span>*/}
+                    {/*                <span className="footer-app-store">{t("footer.app.google_play", { defaultValue: "Google Play" })}</span>*/}
+                    {/*            </div>*/}
+                    {/*        </button>*/}
+                    {/*    </div>*/}
 
                         <div className="footer-trust-badges">
                             <div className="footer-trust-badge">

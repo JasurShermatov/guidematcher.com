@@ -20,10 +20,12 @@ env = environ.Env(
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
+
 # ─── Health-check (Caddy/Nginx) ────────────────────────────────
 @require_safe
 def health_check(request):
     return HttpResponse("OK", status=200)
+
 
 # ─── Asosiy sozlamalar ─────────────────────────────────────────
 SECRET_KEY = env("DJANGO_SECRET_KEY")
@@ -189,7 +191,10 @@ SPECTACULAR_SETTINGS = {
 if DEBUG and env.bool("EMAIL_DEBUG_MODE", default=True):
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
-    EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
+    EMAIL_BACKEND = env(
+        "EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
+    )
+
 
 EMAIL_HOST = env("EMAIL_HOST", default="uz01.ahost.uz")
 # Ahost tavsiyasi: SSL/465
@@ -200,7 +205,9 @@ EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=True)
 # Kolliziya bo‘lsa, SSL ustun
 if EMAIL_USE_TLS and EMAIL_USE_SSL:
     EMAIL_USE_TLS = False
-    logging.getLogger(__name__).warning("Both TLS & SSL True; forced TLS=False (SSL kept).")
+    logging.getLogger(__name__).warning(
+        "Both TLS & SSL True; forced TLS=False (SSL kept)."
+    )
 
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
@@ -267,7 +274,11 @@ LOGGING = {
         "simple": {"format": "{levelname} {message}", "style": "{"},
     },
     "handlers": {
-        "console": {"level": "INFO", "class": "logging.StreamHandler", "formatter": "simple"},
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
         "file": {
             "level": "INFO",
             "class": "logging.handlers.RotatingFileHandler",
@@ -279,7 +290,11 @@ LOGGING = {
     },
     "root": {"handlers": ["console"], "level": "INFO"},
     "loggers": {
-        "django": {"handlers": ["console"], "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"), "propagate": False},
+        "django": {
+            "handlers": ["console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "propagate": False,
+        },
         "apps": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
     },
 }

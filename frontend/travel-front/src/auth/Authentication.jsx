@@ -6,17 +6,14 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import "./Authentication.css";
-
 // API Configuration
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/";
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
 const api = axios.create({
     baseURL: API_URL,
     headers: { "Content-Type": "application/json" },
     withCredentials: false,
 });
-
 // Token Interceptor
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("access_token");
@@ -29,7 +26,6 @@ api.interceptors.request.use((config) => {
     });
     return config;
 });
-
 // Token Refresh Interceptor
 api.interceptors.response.use(
     (response) => {
@@ -78,6 +74,9 @@ api.interceptors.response.use(
                 (data.email && data.email[0]) ||
                 (data.code && data.code[0]) ||
                 (data.non_field_errors && data.non_field_errors[0]) ||
+                (data.password && data.password[0]) ||
+                (data.role && data.role[0]) ||
+                (data.country && data.country[0]) ||
                 JSON.stringify(data);
         } else if (error.message) {
             errorMessage = error.message;
@@ -85,7 +84,6 @@ api.interceptors.response.use(
         return Promise.reject(new Error(errorMessage));
     }
 );
-
 // Necessary API Functions for Authentication
 const loginUser = (payload) => {
     console.log("Logging in user:", { ...payload, password: "***" });
@@ -95,12 +93,10 @@ const loginUser = (payload) => {
         user: r.data.user,
     }));
 };
-
 const requestCode = (data) => {
     console.log("Requesting verification code for:", data.email);
     return api.post("accounts/request-code/", data).then((r) => r.data);
 };
-
 const registerUser = (data) => {
     console.log("Registering user:", { ...data, password: "***" });
     return api.post("accounts/register/", data).then((r) => ({
@@ -109,18 +105,14 @@ const registerUser = (data) => {
         user: r.data.user,
     }));
 };
-
 const requestPasswordReset = (data) =>
     api.post("accounts/forgot-password/", data).then((r) => r.data);
-
 const confirmPasswordReset = (payload) =>
     api.post("accounts/reset-password/", payload).then((r) => r.data);
-
 const getCurrentUserShort = () => {
     console.log("Getting current user short info...");
     return api.get("auth/users/short/").then((r) => r.data);
 };
-
 // React Component
 const Authentication = ({ setIsAuthenticated, setUser }) => {
     const { t, i18n } = useTranslation("translation");
@@ -159,13 +151,11 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
     const countryInputRef = useRef(null);
     const navigate = useNavigate();
-
     // Debugging: Log current language and translations
     useEffect(() => {
         console.log("Authentication language:", i18n.language);
         console.log("Authentication translations:", i18n.getResourceBundle(i18n.language, "translation")?.authentication);
     }, [i18n.language]);
-
     const countries = [
         "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
         "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin",
@@ -190,7 +180,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City",
         "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
     ];
-
     useEffect(() => {
         const checkAuth = async () => {
             const token = localStorage.getItem("access_token");
@@ -216,33 +205,27 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         };
         checkAuth();
     }, [setIsAuthenticated, setUser, navigate]);
-
     const clearMessages = () => {
         setError("");
         setSuccessMessage("");
     };
-
     const handleLoginChange = (e) => {
         setLoginForm({ ...loginForm, [e.target.name]: e.target.value });
         clearMessages();
     };
-
     const handleRegisterChange = (e) => {
         const { name, value } = e.target;
         setRegisterForm({ ...registerForm, [name]: value });
         clearMessages();
-
         if (name === "country") {
             const filteredSuggestions = countries
                 .filter((country) => country.toLowerCase().startsWith(value.toLowerCase()))
                 .slice(0, 5);
             setCountrySuggestions(filteredSuggestions);
         }
-
         if (name === "password" || name === "confirm_password") {
             const currentPassword = name === "password" ? value : registerForm.password;
             const currentConfirmPassword = name === "confirm_password" ? value : registerForm.confirm_password;
-
             if (value && !passwordRegex.test(value)) {
                 setError(t("authentication.errors.password_requirements", {
                     defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
@@ -254,16 +237,13 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             }
         }
     };
-
     const handleForgotChange = (e) => {
         const { name, value } = e.target;
         setForgotForm({ ...forgotForm, [name]: value });
         clearMessages();
-
         if (name === "new_password" || name === "confirm_password") {
             const currentNewPassword = name === "new_password" ? value : forgotForm.new_password;
             const currentConfirmPassword = name === "confirm_password" ? value : forgotForm.confirm_password;
-
             if (value && !passwordRegex.test(value)) {
                 setError(t("authentication.errors.password_requirements", {
                     defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
@@ -275,34 +255,68 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             }
         }
     };
-
     const handleCountrySelect = (country) => {
         setRegisterForm({ ...registerForm, country });
         setCountrySuggestions([]);
         if (countryInputRef.current) countryInputRef.current.focus();
     };
-
     const handleCheckboxChange = (e) => {
         setCheckboxes({ ...checkboxes, [e.target.name]: e.target.checked });
         clearMessages();
     };
-
     const toggleShowPassword = () => setShowPassword(!showPassword);
     const toggleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
     const toggleShowNewPassword = () => setShowNewPassword(!showNewPassword);
     const toggleShowConfirmNewPassword = () => setShowConfirmNewPassword(!showConfirmNewPassword);
-
+    const getLoginErrorMessage = (errorMessage) => {
+        if (errorMessage.includes("No active account found") || errorMessage.includes("credentials")) {
+            return t("authentication.errors.invalid_email_or_password", { defaultValue: "Invalid email or password" });
+        } else if (errorMessage.includes("email")) {
+            return t("authentication.errors.invalid_email", { defaultValue: "Invalid email address" });
+        } else if (errorMessage.includes("password")) {
+            return t("authentication.errors.invalid_password", { defaultValue: "Invalid password" });
+        }
+        return errorMessage || t("authentication.errors.login_failed", { defaultValue: "Login failed" });
+    };
+    const getRegisterErrorMessage = (errorMessage) => {
+        if (errorMessage.includes("This email is already registered")) {
+            return t("authentication.errors.email_exists", { defaultValue: "This email is already registered" });
+        } else if (errorMessage.includes("Invalid or already used verification code")) {
+            return t("authentication.errors.invalid_code", { defaultValue: "Invalid or already used verification code" });
+        } else if (errorMessage.includes("Verification code has expired")) {
+            return t("authentication.errors.code_expired", { defaultValue: "Verification code has expired" });
+        } else if (errorMessage.includes("Role must be one of")) {
+            return t("authentication.errors.invalid_role", { defaultValue: "Invalid role selected" });
+        } else if (errorMessage.includes("country")) {
+            return t("authentication.errors.invalid_country", { defaultValue: "Invalid country" });
+        } else if (errorMessage.includes("Password must contain")) {
+            return t("authentication.errors.password_requirements", { defaultValue: "Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character (@$!%*?&)." });
+        }
+        return errorMessage || t("authentication.errors.registration_failed", { defaultValue: "Registration failed" });
+    };
+    const getForgotErrorMessage = (errorMessage) => {
+        if (errorMessage.includes("Too many password reset requests")) {
+            return t("authentication.errors.too_many_requests", { defaultValue: "Too many password reset requests. Please wait 30 minutes and try again." });
+        } else if (errorMessage.includes("Code has expired")) {
+            return t("authentication.errors.code_expired", { defaultValue: "Code has expired" });
+        } else if (errorMessage.includes("Invalid or already used code")) {
+            return t("authentication.errors.invalid_code", { defaultValue: "Invalid or already used code" });
+        } else if (errorMessage.includes("Too many failed attempts")) {
+            return t("authentication.errors.too_many_attempts", { defaultValue: "Too many failed attempts. Please request a new code." });
+        } else if (errorMessage.includes("email")) {
+            return t("authentication.errors.invalid_email", { defaultValue: "Invalid email address" });
+        }
+        return errorMessage || t("authentication.errors.password_reset_failed", { defaultValue: "Password reset failed" });
+    };
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
         clearMessages();
         setLoading(true);
-
         if (!loginForm.email || !loginForm.password) {
             setError(t("authentication.errors.all_fields_required", { defaultValue: "All fields are required" }));
             setLoading(false);
             return;
         }
-
         if (!passwordRegex.test(loginForm.password)) {
             setError(t("authentication.errors.password_requirements", {
                 defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
@@ -310,7 +324,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
             return;
         }
-
         try {
             const tokenData = await loginUser({
                 email: loginForm.email.toLowerCase().trim(),
@@ -329,31 +342,26 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             }
             setLoginForm({ email: "", password: "" });
         } catch (error) {
-            setError(error.message || t("authentication.errors.login_failed", { defaultValue: "Login failed" }));
+            setError(getLoginErrorMessage(error.message));
         } finally {
             setLoading(false);
         }
     };
-
     const handleRegisterSubmit = async (e) => {
         e.preventDefault();
         clearMessages();
         setLoading(true);
-
         const { role, first_name, last_name, email, password, confirm_password, country } = registerForm;
-
         if (!role || !first_name || !last_name || !email || !password || !confirm_password || !country) {
             setError(t("authentication.errors.all_fields_required", { defaultValue: "All fields are required" }));
             setLoading(false);
             return;
         }
-
         if (password !== confirm_password) {
             setError(t("authentication.errors.passwords_do_not_match", { defaultValue: "Passwords do not match" }));
             setLoading(false);
             return;
         }
-
         if (!passwordRegex.test(password)) {
             setError(t("authentication.errors.password_requirements", {
                 defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
@@ -361,52 +369,45 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
             return;
         }
-
         if (!checkboxes.personalData || !checkboxes.terms) {
             setError(t("authentication.errors.required_checkboxes", { defaultValue: "You must agree to the required checkboxes" }));
             setLoading(false);
             return;
         }
-
         if (!countries.includes(country)) {
             setError(t("authentication.errors.invalid_country", { defaultValue: "Invalid country selected" }));
             setLoading(false);
             return;
         }
-
         try {
             await requestCode({ email: email.toLowerCase().trim() });
             setSuccessMessage(t("authentication.success.verification_code_sent", { defaultValue: "Verification code sent" }));
             setVerificationStep(true);
         } catch (error) {
-            const errorMsg = error.message.includes("Too many verification verification code requests")
-                ? t("authentication.errors.too_many_requests", { defaultValue: "Too many requests. Please try again later" })
-                : error.message.includes("already exists")
-                    ? t("authentication.errors.email_exists", { defaultValue: "Email already exists" })
-                    : error.message || t("authentication.errors.request_code_failed", { defaultValue: "Failed to request verification code" });
-            setError(errorMsg);
+            const errorMsg = getRegisterErrorMessage(error.message);
+            if (errorMsg.includes("Too many verification code requests")) {
+                setError(t("authentication.errors.too_many_requests", { defaultValue: "Too many verification code requests. Please wait 15 minutes and try again." }));
+            } else {
+                setError(errorMsg);
+            }
         } finally {
             setLoading(false);
         }
     };
-
     const handleVerifyCode = async (e) => {
         e.preventDefault();
         clearMessages();
         setLoading(true);
-
         if (!verificationCode) {
             setError(t("authentication.errors.verification_code_required", { defaultValue: "Verification code is required" }));
             setLoading(false);
             return;
         }
-
         if (!/^\d{6}$/.test(verificationCode)) {
             setError(t("authentication.errors.invalid_verification_code", { defaultValue: "Invalid verification code" }));
             setLoading(false);
             return;
         }
-
         try {
             const { role, first_name, last_name, email, password, country } = registerForm;
             const tokenResponse = await registerUser({
@@ -432,19 +433,11 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             }
             resetRegisterForm();
         } catch (error) {
-            const errorMsg = error.message.includes("already exists")
-                ? t("authentication.errors.email_exists", { defaultValue: "Email already exists" })
-                : error.message.includes("expired")
-                    ? t("authentication.errors.code_expired", { defaultValue: "Verification code expired" })
-                    : error.message.includes("Invalid or already used")
-                        ? t("authentication.errors.invalid_code", { defaultValue: "Invalid or already used code" })
-                        : error.message || t("authentication.errors.registration_failed", { defaultValue: "Registration failed" });
-            setError(errorMsg);
+            setError(getRegisterErrorMessage(error.message));
         } finally {
             setLoading(false);
         }
     };
-
     const handleResendCode = async () => {
         clearMessages();
         setLoading(true);
@@ -452,59 +445,50 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             await requestCode({ email: registerForm.email.toLowerCase().trim() });
             setSuccessMessage(t("authentication.success.verification_code_sent", { defaultValue: "Verification code sent" }));
         } catch (error) {
-            const errorMsg = error.message.includes("Too many verification verification code requests")
-                ? t("authentication.errors.too_many_requests", { defaultValue: "Too many requests. Please try again later" })
-                : error.message || t("authentication.errors.resend_code_failed", { defaultValue: "Failed to resend code" });
-            setError(errorMsg);
+            const errorMsg = getRegisterErrorMessage(error.message);
+            if (errorMsg.includes("Too many verification code requests")) {
+                setError(t("authentication.errors.too_many_requests", { defaultValue: "Too many verification code requests. Please wait 15 minutes and try again." }));
+            } else {
+                setError(errorMsg);
+            }
         } finally {
             setLoading(false);
         }
     };
-
     const handleForgotSubmit = async (e) => {
         e.preventDefault();
         clearMessages();
         setLoading(true);
-
         if (!forgotForm.email) {
             setError(t("authentication.errors.all_fields_required", { defaultValue: "All fields are required" }));
             setLoading(false);
             return;
         }
-
         try {
             const response = await requestPasswordReset({ email: forgotForm.email.toLowerCase().trim() });
             setSuccessMessage(response.message || t("authentication.success.reset_code_sent", { defaultValue: "Password reset code sent" }));
             setForgotStep(true);
         } catch (error) {
-            const errorMsg = error.message.includes("Too many password reset requests")
-                ? t("authentication.errors.too_many_requests", { defaultValue: "Too many requests. Please try again later" })
-                : error.message || t("authentication.errors.request_code_failed", { defaultValue: "Failed to request code" });
-            setError(errorMsg);
+            setError(getForgotErrorMessage(error.message));
         } finally {
             setLoading(false);
         }
     };
-
     const handleResetPassword = async (e) => {
         e.preventDefault();
         clearMessages();
         setLoading(true);
-
         const { email, code, new_password, confirm_password } = forgotForm;
-
         if (!code || !new_password || !confirm_password) {
             setError(t("authentication.errors.all_fields_required", { defaultValue: "All fields are required" }));
             setLoading(false);
             return;
         }
-
         if (new_password !== confirm_password) {
             setError(t("authentication.errors.passwords_do_not_match", { defaultValue: "Passwords do not match" }));
             setLoading(false);
             return;
         }
-
         if (!passwordRegex.test(new_password)) {
             setError(t("authentication.errors.password_requirements", {
                 defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
@@ -512,13 +496,11 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
             return;
         }
-
         if (!/^\d{6}$/.test(code)) {
             setError(t("authentication.errors.invalid_code", { defaultValue: "Invalid code" }));
             setLoading(false);
             return;
         }
-
         try {
             await confirmPasswordReset({
                 email: email.toLowerCase().trim(),
@@ -538,19 +520,11 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                 clearMessages();
             }, 2000);
         } catch (error) {
-            const errorMsg = error.message.includes("expired")
-                ? t("authentication.errors.code_expired", { defaultValue: "Code expired" })
-                : error.message.includes("Invalid")
-                    ? t("authentication.errors.invalid_code", { defaultValue: "Invalid code" })
-                    : error.message.includes("Too many failed attempts")
-                        ? t("authentication.errors.too_many_attempts", { defaultValue: "Too many failed attempts" })
-                        : error.message || t("authentication.errors.password_reset_failed", { defaultValue: "Password reset failed" });
-            setError(errorMsg);
+            setError(getForgotErrorMessage(error.message));
         } finally {
             setLoading(false);
         }
     };
-
     const handleResendResetCode = async () => {
         clearMessages();
         setLoading(true);
@@ -558,19 +532,14 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             const response = await requestPasswordReset({ email: forgotForm.email.toLowerCase().trim() });
             setSuccessMessage(response.message || t("authentication.success.reset_code_sent", { defaultValue: "Password reset code sent" }));
         } catch (error) {
-            const errorMsg = error.message.includes("Too many password reset requests")
-                ? t("authentication.errors.too_many_requests", { defaultValue: "Too many requests. Please try again later" })
-                : error.message || t("authentication.errors.resend_code_failed", { defaultValue: "Failed to resend code" });
-            setError(errorMsg);
+            setError(getForgotErrorMessage(error.message));
         } finally {
             setLoading(false);
         }
     };
-
     const handleSocialLogin = (provider) => {
         alert(t("authentication.social_login_under_development", { provider, defaultValue: `Social login with ${provider} is under development` }));
     };
-
     const resetRegisterForm = () => {
         setRegisterForm({
             role: "Client",
@@ -586,7 +555,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setVerificationStep(false);
         clearMessages();
     };
-
     const closeModal = () => {
         navigate(-1);
         resetRegisterForm();
@@ -594,7 +562,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setCountrySuggestions([]);
         clearMessages();
     };
-
     const switchTab = (tab) => {
         setActiveTab(tab);
         setVerificationStep(false);
@@ -604,7 +571,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setLoginForm({ email: "", password: "" });
         setForgotForm({ email: "", code: "", new_password: "", confirm_password: "" });
     };
-
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === "Escape") closeModal();
@@ -612,19 +578,16 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, []);
-
     return (
         <div className="auth-overlay" onClick={closeModal} role="dialog" aria-labelledby="auth-title" aria-modal="true">
             <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
                 <button className="auth-close-btn" onClick={closeModal} aria-label={t("authentication.close", { defaultValue: "Close" })}>
                     <FiX />
                 </button>
-
                 <div className="auth-header">
                     <h1 className="auth-brand">{t("authentication.brand", { defaultValue: "Authentication" })}</h1>
                     <p className="auth-subtitle">{t("authentication.subtitle", { defaultValue: "Please sign in or register" })}</p>
                 </div>
-
                 <div className="auth-tabs">
                     <button
                         className={`auth-tab ${activeTab === "login" ? "auth-tab-active" : ""}`}
@@ -654,28 +617,30 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                         {t("authentication.tabs.forgot_password", { defaultValue: "Forgot Password" })}
                     </button>
                 </div>
-
                 {error && (
                     <div className="auth-message auth-error" role="alert">
+                        <div className="auth-message-icon"></div>
+                        <span>{error}</span>
+                    </div>
+                )}
+                {successMessage && (
+                    <div className="auth-message auth-success" role="alert">
                         <div className="auth-message-icon"></div>
                         <span>{successMessage}</span>
                     </div>
                 )}
-
                 {loading && (
                     <div className="auth-loading">
                         <div className="spinner"></div>
                         <span>{t("authentication.loading", { defaultValue: "Loading..." })}</span>
                     </div>
                 )}
-
                 {activeTab === "login" && (
                     <div className="auth-content">
                         <div className="auth-form-header">
                             <h2 id="auth-title">{t("authentication.login.title", { defaultValue: "Login" })}</h2>
                             <p>{t("authentication.login.subtitle", { defaultValue: "Enter your credentials to access your account" })}</p>
                         </div>
-
                         <form className="auth-form" onSubmit={handleLoginSubmit}>
                             <div className="auth-form-group">
                                 <label htmlFor="login-email" className="auth-label">
@@ -695,7 +660,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     autoComplete="email"
                                 />
                             </div>
-
                             <div className="auth-form-group">
                                 <label htmlFor="login-password" className="auth-label">
                                     <FiLock className="auth-label-icon" />
@@ -725,26 +689,22 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     </button>
                                 </div>
                             </div>
-
                             <button type="submit" className="auth-submit-btn" disabled={loading}>
                                 <FiLogIn />
                                 {t("authentication.login.submit", { defaultValue: "Login" })}
                             </button>
                         </form>
-
                         <div className="auth-divider">
                             <span>{t("authentication.login.or", { defaultValue: "or" })}</span>
                         </div>
                     </div>
                 )}
-
                 {activeTab === "register" && (
                     <div className="auth-content">
                         <div className="auth-form-header">
                             <h2 id="auth-title">{t("authentication.register.title", { defaultValue: "Register" })}</h2>
                             <p>{t("authentication.register.subtitle", { defaultValue: "Create a new account" })}</p>
                         </div>
-
                         {!verificationStep ? (
                             <form className="auth-form" onSubmit={handleRegisterSubmit}>
                                 <div className="auth-form-group">
@@ -765,7 +725,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         <option value="Customer">{t("authentication.register.role_customer", { defaultValue: "Customer" })}</option>
                                     </select>
                                 </div>
-
                                 <div className="auth-name-grid">
                                     <div className="auth-form-group">
                                         <label htmlFor="register-first_name" className="auth-label">
@@ -804,7 +763,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         />
                                     </div>
                                 </div>
-
                                 <div className="auth-form-group">
                                     <label htmlFor="register-email" className="auth-label">
                                         <FiMail className="auth-label-icon" />
@@ -823,7 +781,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         autoComplete="email"
                                     />
                                 </div>
-
                                 <div className="auth-form-group">
                                     <label htmlFor="register-password" className="auth-label">
                                         <FiLock className="auth-label-icon" />
@@ -853,7 +810,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         </button>
                                     </div>
                                 </div>
-
                                 <div className="auth-form-group">
                                     <label htmlFor="register-confirm_password" className="auth-label">
                                         <FiLock className="auth-label-icon" />
@@ -883,7 +839,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         </button>
                                     </div>
                                 </div>
-
                                 <div className="auth-form-group">
                                     <label htmlFor="register-country" className="auth-label">
                                         <FiGlobe className="auth-label-icon" />
@@ -921,7 +876,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         )}
                                     </div>
                                 </div>
-
                                 <div className="auth-checkbox-group">
                                     <label className="auth-checkbox-label">
                                         <input
@@ -938,7 +892,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         </div>
                                         <span>{t("authentication.register.personal_data", { defaultValue: "I agree to the processing of personal data" })}</span>
                                     </label>
-
                                     <label className="auth-checkbox-label">
                                         <input
                                             type="checkbox"
@@ -954,7 +907,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         </div>
                                         <span>{t("authentication.register.terms", { defaultValue: "I accept the terms and conditions" })}</span>
                                     </label>
-
                                     <label className="auth-checkbox-label">
                                         <input
                                             type="checkbox"
@@ -970,7 +922,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         <span>{t("authentication.register.travel_tips", { defaultValue: "Subscribe to travel tips" })}</span>
                                     </label>
                                 </div>
-
                                 <button type="submit" className="auth-submit-btn" disabled={loading}>
                                     <FiUser />
                                     {t("authentication.register.submit", { defaultValue: "Register" })}
@@ -992,7 +943,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         }}
                                     />
                                 </div>
-
                                 <form className="auth-form" onSubmit={handleVerifyCode}>
                                     <div className="auth-form-group">
                                         <label htmlFor="verification-code" className="auth-label">
@@ -1013,12 +963,10 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             pattern="[0-9]{6}"
                                         />
                                     </div>
-
                                     <button type="submit" className="auth-submit-btn" disabled={loading}>
                                         <FiCheck />
                                         {t("authentication.register.verify_submit", { defaultValue: "Verify" })}
                                     </button>
-
                                     <button
                                         type="button"
                                         className="auth-resend-btn"
@@ -1033,14 +981,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                         )}
                     </div>
                 )}
-
                 {activeTab === "forgot" && (
                     <div className="auth-content">
                         <div className="auth-form-header">
                             <h2 id="auth-title">{t("authentication.forgot.title", { defaultValue: "Forgot Password" })}</h2>
                             <p>{t("authentication.forgot.subtitle", { defaultValue: "Reset your password" })}</p>
                         </div>
-
                         {!forgotStep ? (
                             <div className="auth-forgot-step">
                                 <div className="auth-forgot-icon">
@@ -1066,7 +1012,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             autoFocus
                                         />
                                     </div>
-
                                     <button type="submit" className="auth-submit-btn" disabled={loading}>
                                         <FiMail />
                                         {t("authentication.forgot.submit", { defaultValue: "Send Reset Code" })}
@@ -1089,7 +1034,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         }}
                                     />
                                 </div>
-
                                 <form className="auth-form" onSubmit={handleResetPassword}>
                                     <div className="auth-form-group">
                                         <label htmlFor="forgot-code" className="auth-label">
@@ -1111,7 +1055,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             pattern="[0-9]{6}"
                                         />
                                     </div>
-
                                     <div className="auth-form-group">
                                         <label htmlFor="forgot-new_password" className="auth-label">
                                             <FiLock className="auth-label-icon" />
@@ -1141,7 +1084,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             </button>
                                         </div>
                                     </div>
-
                                     <div className="auth-form-group">
                                         <label htmlFor="forgot-confirm_password" className="auth-label">
                                             <FiLock className="auth-label-icon" />
@@ -1171,12 +1113,10 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             </button>
                                         </div>
                                     </div>
-
                                     <button type="submit" className="auth-submit-btn" disabled={loading}>
                                         <FiCheck />
                                         {t("authentication.forgot.reset_submit", { defaultValue: "Reset Password" })}
                                     </button>
-
                                     <button
                                         type="button"
                                         className="auth-resend-btn"
@@ -1195,5 +1135,4 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         </div>
     );
 };
-
 export default Authentication;

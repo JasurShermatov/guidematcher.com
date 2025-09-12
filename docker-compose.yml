@@ -65,15 +65,17 @@ services:
     build:
       context: ./bot
       dockerfile: DockerfileBot
+    # Bot uchun alohida .env ishlatamiz
     env_file:
-      - .env
+      - ./bot/.env
     restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
     volumes:
       - ./bot:/app
-    depends_on:
-      backend:
-        condition: service_healthy
-
 
   # ───────────── Celery worker ────────
 

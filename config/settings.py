@@ -5,12 +5,33 @@
 import os
 from pathlib import Path
 from datetime import timedelta
-
-
 import environ
 
 from django.http import HttpResponse
 from django.views.decorators.http import require_safe
+
+
+
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+
+# Brevo API (anymail) ishlatganda:
+ANYMAIL = {
+    "BREVO_API_KEY": os.getenv("ANYMAIL_BREVO_API_KEY", ""),
+}
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "UzGuide <no-reply@example.com>")
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "15"))
+
+
+
+
+# ─── Bazaviy kataloglar ──────────────────────────────────────  
+BASE_DIR = Path(__file__).resolve().parent.parent
+env = environ.Env(
+    DEBUG=(bool, False),
+    ALLOWED_HOSTS=(list, []),
+)
+
+environ.Env.read_env(BASE_DIR / ".env")  # .env ni o'qish
 
 
 @require_safe
@@ -18,13 +39,14 @@ def health_check(request):
     return HttpResponse("OK", status=200)
 
 
-# ─── Bazaviy kataloglar ────────────────────────────────────────
-BASE_DIR = Path(__file__).resolve().parent.parent
-env = environ.Env(
-    DEBUG=(bool, False),
-    ALLOWED_HOSTS=(list, []),
-)
-environ.Env.read_env(BASE_DIR / ".env")  # .env ni o'qish
+
+SECURE_PROXY_SSL_HEADER = tuple(env.list("SECURE_PROXY_SSL_HEADER", default=["HTTP_X_FORWARDED_PROTO","https"]))
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=True)
+CSRF_COOKIE_SECURE    = env.bool("CSRF_COOKIE_SECURE", default=True)
+
+
+
 
 # ─── Asosiy parol va debug ─────────────────────────────────────
 SECRET_KEY = env("DJANGO_SECRET_KEY")
@@ -66,6 +88,7 @@ THIRD_PARTY_APPS = [
     "django_celery_results",  # Celery natijalarini DB'da saqlash
     "channels",  # WebSocket fazasida yoqasiz
     "admin_tools_stats",
+   "anymail", 
 ]
 
 LOCAL_APPS = [
@@ -133,6 +156,7 @@ DATABASES = {
 # ╰──────────────────────────────────────────────────────────────╯
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [] 
 
 # Static katalogini tekshirish
 if not os.path.exists(BASE_DIR / "static"):
@@ -380,11 +404,6 @@ LOGGING = {
     },
 }
 
-
-# settings.py
-ACCOUNTS_VERIFICATION_CODE_TTL_SECONDS = 300  # 5 minutes
-ACCOUNTS_VERIFICATION_CODE_LENGTH = 6
-DEFAULT_FROM_EMAIL = "feruzbekhamrayev2002@gmail.com"
 
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")

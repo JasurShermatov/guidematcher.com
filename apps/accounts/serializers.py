@@ -3,14 +3,16 @@ import datetime
 import secrets
 import string
 import logging
+
 from django.conf import settings
 from django.utils import timezone
+from django.db import transaction
 
+from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-
 from django.core.cache import cache
-from rest_framework import serializers
+
 from apps.users.models import User, Country
 from apps.accounts.models import EmailVerification
 from apps.accounts.tasks import send_verification_email, send_welcome_email
@@ -21,23 +23,29 @@ from .services import (
 
 logger = logging.getLogger(__name__)
 
+# Kod muddati (sekundlarda)
 DEFAULT_EXPIRE_SECONDS = getattr(
     settings, "ACCOUNTS_VERIFICATION_CODE_TTL_SECONDS", 300
 )
 
 
 def generate_code(length: int = 6) -> str:
+    """Faqat raqamlardan iborat tasodifiy kod."""
     return "".join(secrets.choice(string.digits) for _ in range(length))
 
 
+# ──────────────────────────────────────────────────────────────────────────────
+# 1) Verification code so‘rash
+# ──────────────────────────────────────────────────────────────────────────────
 class RequestVerificationCodeSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
     def validate_email(self, value):
         email = value.lower().strip()
+
+        # 15 daqiqada 3 martadan ko‘p so‘rashni cheklaymiz
         cache_key = f"verification_request:{email}"
         request_count = cache.get(cache_key, 0)
-
         if request_count >= 3:
             raise serializers.ValidationError(
                 "Too many verification code requests. Please wait 15 minutes and try again."
@@ -47,32 +55,44 @@ class RequestVerificationCodeSerializer(serializers.Serializer):
     def create(self, validated_data):
         email = validated_data["email"]
 
+        # Eski aktiv (is_used=False) yozuvlarni 'used' qilib qo‘yish (ixtiyoriy)
         EmailVerification.objects.filter(email=email, is_used=False).update(
             is_used=True
         )
 
         code = generate_code()
-        expires_at = timezone.now() + datetime.timedelta(seconds=DEFAULT_EXPIRE_SECONDS)
+        now = timezone.now()
+        expires_at = now + datetime.timedelta(seconds=DEFAULT_EXPIRE_SECONDS)
 
-        ev = EmailVerification.objects.create(
-            email=email,
-            code=code,
-            expires_at=expires_at,
-            is_used=False,
-            verified=False,
-        )
+        # 🔧 MUHIM: duplikatni bartaraf etish — bitta email uchun bitta qator
+        # bor bo‘lsa yangilanadi, bo‘lmasa yaratiladi.
+        with transaction.atomic():
+            ev, _created = EmailVerification.objects.update_or_create(
+                email=email,
+                defaults={
+                    "code": code,
+                    "created_at": now,  # agar modelda bo‘lsa
+                    "expires_at": expires_at,
+                    "is_used": False,
+                    "verified": False,
+                },
+            )
 
+        # email yuborishni Celery orqali fon rejimida boshlaymiz
         send_verification_email.delay(
             email, code, expires_in_seconds=DEFAULT_EXPIRE_SECONDS
         )
 
+        # Rate-limit hisoblagichini yangilash (15 daqiqa)
         cache_key = f"verification_request:{email}"
-        request_count = cache.get(cache_key, 0) + 1
-        cache.set(cache_key, request_count, timeout=15 * 60)  # 15 minutes
+        cache.set(cache_key, cache.get(cache_key, 0) + 1, timeout=15 * 60)
 
         return ev
 
 
+# ──────────────────────────────────────────────────────────────────────────────
+# 2) Ro‘yxatdan o‘tish
+# ──────────────────────────────────────────────────────────────────────────────
 class RegisterSerializer(serializers.ModelSerializer):
     code = serializers.CharField(write_only=True, max_length=6)
     role = serializers.CharField(max_length=20)
@@ -121,54 +141,61 @@ class RegisterSerializer(serializers.ModelSerializer):
         code = attrs.pop("code")
         country_name = attrs.pop("country").strip()
 
-        from django.db import transaction
-
         if User.objects.filter(email=email).exists():
             raise serializers.ValidationError(
                 {"email": "This email is already registered."}
             )
 
+        # Kodni tekshirish
         try:
             ev = EmailVerification.objects.get(email=email, code=code, is_used=False)
         except EmailVerification.DoesNotExist:
             raise serializers.ValidationError(
                 {"code": "Invalid or already used verification code."}
             )
-        if ev.is_expired():
+
+        if hasattr(ev, "is_expired") and ev.is_expired():
             raise serializers.ValidationError(
                 {"code": "Verification code has expired."}
             )
 
+        # Country obyektini olish yoki yaratish
         try:
             country_instance = Country.objects.get(name__iexact=country_name)
         except Country.DoesNotExist:
-            with transaction.atomic():  # race condition oldini oladi
-                country_instance, created = Country.objects.get_or_create(
+            with transaction.atomic():
+                country_instance, _ = Country.objects.get_or_create(
                     name=country_name, defaults={"is_active": True}
                 )
 
         attrs["country"] = country_instance
-        self.ev = ev
         attrs["email"] = email
+        self.ev = ev
         return attrs
 
     def create(self, validated_data):
         password = validated_data.pop("password")
+
         user = User.objects.create_user(**validated_data)
         user.set_password(password)
         user.is_verified = True
         user.is_active = True
         user.save()
 
-        self.ev.mark_used(save=False)
+        # Verifikatsiya yozuvini yakunlash
+        self.ev.is_used = True
         self.ev.verified = True
         self.ev.save(update_fields=["is_used", "verified"])
 
+        # Xush kelibsiz xati
         send_welcome_email.delay(user.email, user.first_name)
 
         return user
 
 
+# ──────────────────────────────────────────────────────────────────────────────
+# 3) JWT login serializer
+# ──────────────────────────────────────────────────────────────────────────────
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -189,6 +216,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 
+# ──────────────────────────────────────────────────────────────────────────────
+# 4) Password reset — code so‘rash
+# ──────────────────────────────────────────────────────────────────────────────
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -209,17 +239,17 @@ class PasswordResetRequestSerializer(serializers.Serializer):
     def create(self, validated_data):
         email = validated_data["email"]
 
+        # Rate-limit hisoblagichi (30 daqiqa)
         cache_key = f"password_reset_request:{email}"
-        request_count = cache.get(cache_key, 0) + 1
-        cache.set(cache_key, request_count, timeout=30 * 60)
+        cache.set(cache_key, cache.get(cache_key, 0) + 1, timeout=30 * 60)
 
         try:
             user = User.objects.get(email=email, is_active=True)
             create_and_send_password_reset_code(user)
             logger.info(f"Password reset code sent to {email}")
         except User.DoesNotExist:
+            # Xavfsizlik uchun jim turamiz
             logger.info(f"Password reset attempted for non-existent email: {email}")
-            pass
 
         return {
             "message": "If an account exists with this email, a password reset code has been sent.",
@@ -227,6 +257,9 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         }
 
 
+# ──────────────────────────────────────────────────────────────────────────────
+# 5) Password reset — tasdiqlash
+# ──────────────────────────────────────────────────────────────────────────────
 class PasswordResetConfirmSerializer(serializers.Serializer):
     email = serializers.EmailField()
     code = serializers.CharField(max_length=6)
@@ -277,6 +310,9 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         return user
 
 
+# ──────────────────────────────────────────────────────────────────────────────
+# 6) Logout
+# ──────────────────────────────────────────────────────────────────────────────
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField(
         required=True, help_text="Refresh token obtained from login"

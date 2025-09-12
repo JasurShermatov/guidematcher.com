@@ -45,7 +45,7 @@ const Footer = () => {
                             <div className="footer-logo-icon">
                                 <FiGlobe />
                             </div>
-                            <span className="footer-logo-text">{t("footer.logo_text", { defaultValue: "TourGuide" })}</span>
+                            <span className="footer-logo-text">{t("footer.logo_text", { defaultValue: "UzGuide" })}</span>
                         </div>
 
                         <p className="footer-company-description">

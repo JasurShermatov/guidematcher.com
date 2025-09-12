@@ -489,7 +489,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                         <div className="header-mobile-menu-header">
                             <div className="header-mobile-logo">
                                 <FiGlobe />
-                                <span>{t("header.logo_text") || "TourGuide"}</span>
+                                <span>{t("header.logo_text") || "UzGuide"}</span>
                             </div>
                             <button type="button" className="header-mobile-close-btn" onClick={toggleMenu}>
                                 <FiX />

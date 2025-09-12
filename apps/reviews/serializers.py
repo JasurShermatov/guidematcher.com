@@ -1,6 +1,8 @@
+# apps/reviews/serializers.py
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from apps.bookings.models import Booking
 from apps.profiles.models import CustomerProfile
 from apps.reviews.models import ReviewResponse, ReviewReaction
 from apps.users.models import User
@@ -138,19 +140,22 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
         if not booking:
             raise serializers.ValidationError({"booking": _("Booking is required.")})
 
-        # Check if booking is completed
-        if booking.status != "completed":
+        # ✅ Enum bilan tekshiruv
+        if booking.status != Booking.BookingStatus.COMPLETED:
             raise serializers.ValidationError(
                 {"booking": _("Booking must be completed to write a review.")}
             )
 
-        # Check for existing review
-        if Review.objects.filter(booking=booking).exists():
+        # Takroriy review’ni bloklash
+        if (
+            hasattr(booking, "review")
+            or Review.objects.filter(booking=booking).exists()
+        ):
             raise serializers.ValidationError(
                 {"booking": _("A review for this booking already exists.")}
             )
 
-        # Validate ratings
+        # 1..5 oralig'ini tekshirish
         for field in [
             "overall_rating",
             "communication_rating",
@@ -158,17 +163,24 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
             "punctuality_rating",
             "value_rating",
         ]:
-            if data.get(field) not in [1, 2, 3, 4, 5]:
+            v = data.get(field)
+            if v is not None and v not in [1, 2, 3, 4, 5]:
                 raise serializers.ValidationError(
                     {field: _("Rating must be between 1 and 5.")}
                 )
+
+        if not data.get("overall_rating"):
+            raise serializers.ValidationError(
+                {"overall_rating": _("This field is required.")}
+            )
 
         return data
 
     def create(self, validated_data):
         request = self.context.get("request")
-        booking = self.context.get("booking")
+        booking: Booking = self.context.get("booking")
         validated_data["booking"] = booking
         validated_data["client"] = request.user
-        validated_data["customer"] = booking.customer
+        # ✅ Sizda provider CustomerProfile'ga bog'langan
+        validated_data["customer"] = booking.customer_profile
         return super().create(validated_data)

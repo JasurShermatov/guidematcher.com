@@ -10,7 +10,6 @@ from django.db import models
 
 logger = logging.getLogger("apps.chat.consumers")
 
-# Custom close codes (must be 3000–4999 for user apps)
 CLOSE_CODES = {
     "BAD_REQUEST": 4000,
     "UNAUTHORIZED": 4001,

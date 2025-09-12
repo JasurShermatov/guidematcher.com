@@ -31,7 +31,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         user = serializer.user
         refresh = RefreshToken.for_user(user)
 
-        # optional profile id
         profile_id = None
         if user.role == "Client":
             from apps.profiles.models import ClientProfile
@@ -198,11 +197,9 @@ class LogoutView(generics.GenericAPIView):
             )
 
 
-# ✅ /api/v1/accounts/me/
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def me_view(request):
-    """Minimal bootstrap info for frontend."""
     user = request.user
     profile_id = None
     if user.role == "Customer" and hasattr(user, "customerprofile"):

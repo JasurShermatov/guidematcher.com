@@ -119,7 +119,9 @@ class RegisterSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         email = attrs.get("email").lower().strip()
         code = attrs.pop("code")
-        country_name = attrs.pop("country")
+        country_name = attrs.pop("country").strip()
+
+        from django.db import transaction
 
         if User.objects.filter(email=email).exists():
             raise serializers.ValidationError(
@@ -132,7 +134,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"code": "Invalid or already used verification code."}
             )
-
         if ev.is_expired():
             raise serializers.ValidationError(
                 {"code": "Verification code has expired."}
@@ -141,9 +142,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         try:
             country_instance = Country.objects.get(name__iexact=country_name)
         except Country.DoesNotExist:
-            country_instance = Country.objects.create(name=country_name)
-        attrs["country"] = country_instance
+            with transaction.atomic():  # race condition oldini oladi
+                country_instance, created = Country.objects.get_or_create(
+                    name=country_name, defaults={"is_active": True}
+                )
 
+        attrs["country"] = country_instance
         self.ev = ev
         attrs["email"] = email
         return attrs
@@ -160,7 +164,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         self.ev.verified = True
         self.ev.save(update_fields=["is_used", "verified"])
 
-        # Send welcome email
         send_welcome_email.delay(user.email, user.first_name)
 
         return user
@@ -208,7 +211,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
         cache_key = f"password_reset_request:{email}"
         request_count = cache.get(cache_key, 0) + 1
-        cache.set(cache_key, request_count, timeout=30 * 60)  # 30 minutes
+        cache.set(cache_key, request_count, timeout=30 * 60)
 
         try:
             user = User.objects.get(email=email, is_active=True)

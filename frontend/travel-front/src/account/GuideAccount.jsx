@@ -4,7 +4,8 @@ import { useTranslation } from "react-i18next";
 import {
     FiUser, FiImage, FiFileText,
     FiTrendingUp, FiCalendar, FiPlus, FiTrash2, FiSave, FiClock,
-    FiUpload, FiSettings, FiDollarSign, FiX, FiMessageSquare
+    FiUpload, FiSettings, FiDollarSign, FiX, FiMessageSquare, FiStar,
+    FiCheck, // ✅ ADDED
 } from "react-icons/fi";
 import api from "./api";
 import ChatWidgets from "./ChatWidgets";
@@ -78,6 +79,10 @@ export default function GuideAccount() {
     const [chatOpen, setChatOpen] = useState(false);
     const [chatPeerEmail, setChatPeerEmail] = useState(null);
 
+    // 🔵 Reviews (clientlardan kelgan)
+    const [reviews, setReviews] = useState([]);
+    const [reviewsLoading, setReviewsLoading] = useState(false);
+
     const stats = useMemo(
         () => ({
             totalBookings: profile?.total_bookings || 0,
@@ -92,21 +97,18 @@ export default function GuideAccount() {
        Booking fetch helper (GUIDE uchun)
        ======================= */
     const fetchGuideBookings = async () => {
-        // 1) incoming (agar backendda bor bo‘lsa)
         try {
             const r1 = await api.get("bookings/incoming/");
             const list1 = r1.data?.results || r1.data || [];
             if (Array.isArray(list1)) return list1;
         } catch (_) {}
 
-        // 2) as=guide param (ko‘pchilik backend shunday qo‘llab-quvvatlaydi)
         try {
             const r2 = await api.get("bookings/bookings/?as=guide");
             const list2 = r2.data?.results || r2.data || [];
             if (Array.isArray(list2)) return list2;
         } catch (_) {}
 
-        // 3) fallback — eski endpoint (bo‘sh bo‘lishi mumkin)
         try {
             const r3 = await api.get("bookings/bookings/");
             const list3 = r3.data?.results || r3.data || [];
@@ -137,20 +139,21 @@ export default function GuideAccount() {
                 setCities(citiesRes.data?.results || citiesRes.data || []);
                 setUserData(meUserRes.data);
 
-                // avatar URL ni serverdan alohida GET qiling (Header bilan mos)
                 const uid = myProfileRes?.data?.user?.id;
                 if (uid) {
                     const url = await fetchGuideAvatarUrl(uid);
                     setAvatarUrl(url);
                 }
 
-                // ✅ BOOKINGS — GUIDE uchun to‘g‘ri endpointlar orqali oling
                 const myBookings = await fetchGuideBookings();
                 setBookings(myBookings);
 
-                // unavailability
                 const myUAs = await api.get("profiles/unavailabilities/my/");
                 setUnavailabilities(myUAs.data?.results || myUAs.data || []);
+
+                if (myProfileRes?.data?.id) {
+                    await loadReviewsForCustomer(myProfileRes.data.id);
+                }
             } catch (e) {
                 console.error(e);
             } finally {
@@ -160,18 +163,29 @@ export default function GuideAccount() {
         return () => { mounted = false; };
     }, []);
 
+    const loadReviewsForCustomer = async (customerProfileId) => {
+        setReviewsLoading(true);
+        try {
+            const r = await api.get(`reviews/reviews/?customer=${customerProfileId}&ordering=-created_at`);
+            const list = r.data?.results || r.data || [];
+            setReviews(Array.isArray(list) ? list : []);
+        } catch (e) {
+            console.error(e);
+            setReviews([]);
+        } finally {
+            setReviewsLoading(false);
+        }
+    };
+
     /* =======================
        PROFILE (avatar & info)
        ======================= */
-
-    // Foydalanuvchi ma'lumotlari uchun ishonchli fallback (UserAccount dagi kabi)
     const safeUser = {
         first_name: userData?.first_name || profile?.user?.first_name || "",
         last_name:  userData?.last_name  || profile?.user?.last_name  || "",
         email:      userData?.email      || profile?.user?.email      || me?.email || "",
     };
 
-    // Avatar manbai (har doim qiymatga ega bo'ladi)
     const avatarSrc = toAbsMedia(
         avatarUrl ||
         profile?.avatar_url ||
@@ -191,7 +205,6 @@ export default function GuideAccount() {
             { headers: { "Content-Type": "multipart/form-data" } }
         );
 
-        // profil va avatar urlni yangilab oling
         const [refProfile, freshUrl] = await Promise.all([
             api.get("profiles/customers/my/"),
             fetchGuideAvatarUrl(profile.user.id),
@@ -203,7 +216,6 @@ export default function GuideAccount() {
         if (avatarInputRef.current) avatarInputRef.current.value = "";
     };
 
-    // 415 xatolar uchun: JSON o‘rniga FormData yuboramiz
     const saveProfileInfo = async () => {
         setSavingProfile(true);
         try {
@@ -215,7 +227,6 @@ export default function GuideAccount() {
             const refreshed = await api.get("profiles/customers/my/");
             setProfile(refreshed.data);
 
-            // ✅ muvaffaqiyat banneri
             setSaveProfileSuccess(true);
             setTimeout(() => setSaveProfileSuccess(false), 3000);
         } catch (e) {
@@ -246,7 +257,6 @@ export default function GuideAccount() {
             const refreshed = await api.get("profiles/customers/my/");
             setProfile(refreshed.data);
 
-            // ✅ muvaffaqiyat banneri
             setSaveServiceSuccess(true);
             setTimeout(() => setSaveServiceSuccess(false), 3000);
         } catch (e) {
@@ -286,7 +296,7 @@ export default function GuideAccount() {
     };
 
     /* =======================
-       BOOKINGS (ACCEPT / CANCEL / CHAT)
+       BOOKINGS (ACCEPT / CANCEL / COMPLETE / CHAT)
        ======================= */
     const refreshBookings = async () => {
         const myBookings = await fetchGuideBookings();
@@ -315,6 +325,17 @@ export default function GuideAccount() {
         }
     };
 
+    // ✅ COMPLETE tugmasi
+    const completeBooking = async (b) => {
+        try {
+            await api.post(`bookings/bookings/${b.id}/complete/`);
+            await refreshBookings();
+        } catch (e) {
+            console.error(e);
+            alert(t("action_failed"));
+        }
+    };
+
     const openChatForBooking = async (b) => {
         try {
             const otherEmail = b?.client_profile?.user?.email;
@@ -333,6 +354,24 @@ export default function GuideAccount() {
     };
 
     /* =======================
+       Reviews statistikasi (o‘rtacha ball, unikal mijozlar)
+       ======================= */
+    const avgFromReviews = useMemo(() => {
+        if (!reviews || reviews.length === 0) {
+            // Backenddan kelgan profil o‘rtacha bahosiga qaytamiz (fallback)
+            return Number(profile?.average_rating || 0);
+        }
+        const sum = reviews.reduce((acc, r) => acc + Number(r.overall_rating || 0), 0);
+        return sum / reviews.length;
+    }, [reviews, profile?.average_rating]);
+
+    const uniqueClientsCount = useMemo(() => {
+        if (!reviews || reviews.length === 0) return 0;
+        const ids = new Set(reviews.map(r => r?.client?.id).filter(Boolean));
+        return ids.size;
+    }, [reviews]);
+
+    /* =======================
        RENDER
        ======================= */
     if (initialLoading) {
@@ -349,7 +388,7 @@ export default function GuideAccount() {
             <div className="guide-account-tabs">
                 <button onClick={() => setTab(Tab.PROFILE)} className={tab===Tab.PROFILE?"active":""}><FiUser /> {t("profile")}</button>
                 <button onClick={() => setTab(Tab.SERVICE)} className={tab===Tab.SERVICE?"active":""}><FiSettings /> {t("service")}</button>
-                <button onClick={() => setTab(Tab.STATS)} className={tab===Tab.STATS?"active":""}><FiTrendingUp /> {t("stats")}</button>
+                <button onClick={() => setTab(Tab.STATS)} className={tab===Tab.STATS?"active":""}><FiTrendingUp /> {t("reviews")}</button>
                 <button onClick={() => setTab(Tab.BOOKINGS)} className={tab===Tab.BOOKINGS?"active":""}><FiCalendar /> {t("bookings")}</button>
                 <button onClick={() => setTab(Tab.UNAVAIL)} className={tab===Tab.UNAVAIL?"active":""}><FiClock /> {t("unavailability")}</button>
             </div>
@@ -359,7 +398,6 @@ export default function GuideAccount() {
                 <div className="guide-account-section">
                     <h3><FiUser /> {t("profile_information")}</h3>
 
-                    {/* ✅ Profil saqlandi banneri */}
                     {saveProfileSuccess && (
                         <div className="guide-account-alert success" role="status" aria-live="polite">
                             {t("changes_saved") || "Changes saved successfully"}
@@ -437,7 +475,6 @@ export default function GuideAccount() {
                 <div className="guide-account-section">
                     <h3><FiSettings /> {t("service_details")}</h3>
 
-                    {/* ✅ Service saqlandi banneri */}
                     {saveServiceSuccess && (
                         <div className="guide-account-alert success" role="status" aria-live="polite">
                             {t("changes_saved") || "Changes saved successfully"}
@@ -484,22 +521,64 @@ export default function GuideAccount() {
                 </div>
             )}
 
-            {/* STATS */}
+            {/* STATS → mijozlardan kelgan reviewlar + O'RTACHA BALL */}
             {tab === Tab.STATS && (
                 <div className="guide-account-section">
-                    <h3><FiTrendingUp /> {t("my_stats")}</h3>
+                    <h3><FiTrendingUp /> {t("reviews")}</h3>
+
+                    {/* 🔵 Reviewlar bo‘yicha umumiy ko‘rsatkichlar */}
                     <div className="guide-account-stats">
                         <div className="guide-account-stat">
-                            <div className="guide-account-stat-label">{t("bookings")}</div>
-                            <div className="guide-account-stat-value">{stats.totalBookings}</div>
+                            <div className="guide-account-stat-label">
+                                {t("average_rating") || "Average rating"}
+                            </div>
+                            <div className="guide-account-stat-value">
+                                {avgFromReviews.toFixed(2)}★
+                            </div>
                         </div>
                         <div className="guide-account-stat">
-                            <div className="guide-account-stat-label">{t("reviews")}</div>
-                            <div className="guide-account-stat-value">{stats.totalReviews} ({Number(stats.averageRating).toFixed(2)}★)</div>
+                            <div className="guide-account-stat-label">
+                                {t("reviews")} / {t("clients") || "Clients"}
+                            </div>
+                            <div className="guide-account-stat-value">
+                                {reviews.length} / {uniqueClientsCount}
+                            </div>
                         </div>
-                        <div className="guide-account-stat">
-                            <div className="guide-account-stat-label">{t("availability")}</div>
-                            <div className="guide-account-stat-value">{stats.isAvailable ? t("available") : t("not_available")}</div>
+                    </div>
+
+                    <div className="guide-account-reviews-panel">
+                        <div className="guide-account-reviews-list">
+                            {reviewsLoading && (
+                                <div className="guide-account-loading"><FiClock /> {t("loading")}...</div>
+                            )}
+
+                            {!reviewsLoading && reviews.length === 0 && (
+                                <div className="guide-account-empty">
+                                    {t("no_reviews_yet") || "No reviews yet"}
+                                </div>
+                            )}
+
+                            {!reviewsLoading && reviews.length > 0 && reviews.map((rv) => (
+                                <div key={rv.id} className="guide-account-review-card">
+                                    <div className="guide-account-review-head">
+                                        <div className="guide-account-review-title">
+                                            <FiStar style={{ marginRight: 6 }} />
+                                            {rv.title || t("no_title")}
+                                        </div>
+                                        <div className="guide-account-review-rating">
+                                            {Number(rv.overall_rating || 0)}★
+                                        </div>
+                                    </div>
+                                    <div className="guide-account-review-body">
+                                        <p>{rv.comment || "-"}</p>
+                                    </div>
+                                    <div className="guide-account-review-meta">
+                                        <span>{rv?.client ? `${rv.client.first_name || ""} ${rv.client.last_name || ""}` : t("client")}</span>
+                                        <span>•</span>
+                                        <span>{new Date(rv.created_at).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -533,11 +612,19 @@ export default function GuideAccount() {
                                         </>
                                     )}
                                     {b.status === "accepted" && (
-                                        <button className="guide-account-btn" onClick={()=>openChatForBooking(b)}>
-                                            {t("open_chat")}
-                                        </button>
+                                        <>
+                                            <button className="guide-account-btn" onClick={()=>openChatForBooking(b)}>
+                                                {t("open_chat")}
+                                            </button>
+                                            {/* ✅ COMPLETE TUGMASI */}
+                                            <button className="guide-account-btn primary" onClick={()=>completeBooking(b)}>
+                                                <FiCheck style={{marginRight:6}}/>
+                                                {t("mark_completed") || "Mark completed"}
+                                            </button>
+                                        </>
                                     )}
                                     {b.status === "cancelled" && <span>{t("cancelled")}</span>}
+                                    {b.status === "completed" && <span>{t("completed") || "Completed"}</span>}
                                 </div>
                             </div>
                         ))}
@@ -608,7 +695,7 @@ export default function GuideAccount() {
                 </div>
             )}
 
-            {/* ✅ Doimiy Chat FAB (past-o‘ng burchakda) */}
+            {/* ✅ Doimiy Chat FAB */}
             <button
                 className="guide-account-chat-fab"
                 title={t("chat")}

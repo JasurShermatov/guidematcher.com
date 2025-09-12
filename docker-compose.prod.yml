@@ -1,0 +1,46 @@
+services:
+  backend:
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings
+    ports: []
+    networks: [appnet]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sSf http://localhost:8000/health/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend/travel-front
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=https://uzguide.com/api/v1/
+    ports: []  # Nginx ichida 80 ga tinglaydi, tashqariga map qilmaymiz
+    networks: [appnet]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_started
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./public:/var/www/guidematcher.com/public:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [appnet]
+
+networks:
+  appnet:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:

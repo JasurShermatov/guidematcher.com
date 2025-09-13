@@ -6,21 +6,15 @@ __pycache__/
 .env.*
 *.log
 logs/
-media/
-staticfiles/
-static/
-public/
 *.pid
 
 # Node/React
 node_modules/
 frontend/**/build/
 frontend/**/dist/
-frontend/**/.env*
 *.map
 
 # Docker
-*.env.docker
 docker-data/
 *.tar
 

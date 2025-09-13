@@ -1,61 +1,37 @@
 # ────────────────────────────────────────────────────────────────
-#  Django settings – TravMatch / GuideMatcher
-#  Mode-agnostic (prod & dev) konfiguratsiya
+#  Django settings – GuideMatcher / TravMatch (Prod-ready)
 # ────────────────────────────────────────────────────────────────
 import os
 from pathlib import Path
 from datetime import timedelta
 import environ
+import logging
 
 from django.http import HttpResponse
 from django.views.decorators.http import require_safe
 
-
-
-EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
-
-# Brevo API (anymail) ishlatganda:
-ANYMAIL = {
-    "BREVO_API_KEY": os.getenv("ANYMAIL_BREVO_API_KEY", ""),
-}
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "UzGuide <no-reply@example.com>")
-EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "15"))
-
-
-
-
-# ─── Bazaviy kataloglar ──────────────────────────────────────  
+# ─── Bazaviy katalog ───────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# ─── .env ni o‘qish ────────────────────────────────────────────
 env = environ.Env(
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, []),
 )
+environ.Env.read_env(BASE_DIR / ".env")
 
-environ.Env.read_env(BASE_DIR / ".env")  # .env ni o'qish
 
-
+# ─── Health-check (Caddy/Nginx) ────────────────────────────────
 @require_safe
 def health_check(request):
     return HttpResponse("OK", status=200)
 
 
-
-SECURE_PROXY_SSL_HEADER = tuple(env.list("SECURE_PROXY_SSL_HEADER", default=["HTTP_X_FORWARDED_PROTO","https"]))
-CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
-SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=True)
-CSRF_COOKIE_SECURE    = env.bool("CSRF_COOKIE_SECURE", default=True)
-
-
-
-
-# ─── Asosiy parol va debug ─────────────────────────────────────
+# ─── Asosiy sozlamalar ─────────────────────────────────────────
 SECRET_KEY = env("DJANGO_SECRET_KEY")
-DEBUG = env.bool("DEBUG")
-ALLOWED_HOSTS = env.list(
-    "ALLOWED_HOSTS", default=["localhost", "127.0.0.1", "backend"]
-)  # WebSocket uchun yangilandi
+DEBUG = env.bool("DEBUG", default=False)
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1", "backend"])
 
-# ─── Global lokallashuv ────────────────────────────────────────
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = env("TIME_ZONE", default="UTC")
 USE_I18N = True
@@ -64,9 +40,15 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
 
-# ╭──────────────────────────────────────────────────────────────╮
-# | 1. Installed apps                                           |
-# ╰──────────────────────────────────────────────────────────────╯
+# ─── HTTPS/Proxy va CSRF ───────────────────────────────────────
+SECURE_PROXY_SSL_HEADER = tuple(
+    env.list("SECURE_PROXY_SSL_HEADER", default=["HTTP_X_FORWARDED_PROTO", "https"])
+)
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=True)
+CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", default=True)
+
+# ─── App’lar ───────────────────────────────────────────────────
 DJANGO_APPS = [
     "jazzmin",
     "daphne",
@@ -85,10 +67,10 @@ THIRD_PARTY_APPS = [
     "rangefilter",
     "corsheaders",
     "drf_spectacular",
-    "django_celery_results",  # Celery natijalarini DB'da saqlash
-    "channels",  # WebSocket fazasida yoqasiz
+    "django_celery_results",
+    "channels",
     "admin_tools_stats",
-   "anymail", 
+    "anymail",
 ]
 
 LOCAL_APPS = [
@@ -103,9 +85,7 @@ LOCAL_APPS = [
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
-# ╭──────────────────────────────────────────────────────────────╮
-# | 2. Middleware                                               |
-# ╰──────────────────────────────────────────────────────────────╯
+# ─── Middleware ────────────────────────────────────────────────
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",  # prod static
@@ -118,9 +98,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# ╭──────────────────────────────────────────────────────────────╮
-# | 4. Templates                                                |
-# ╰──────────────────────────────────────────────────────────────╯
+# ─── Templates ─────────────────────────────────────────────────
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -137,9 +115,12 @@ TEMPLATES = [
     },
 ]
 
-# ╭──────────────────────────────────────────────────────────────╮
-# | 5. Database (PostgreSQL)                                    |
-# ╰──────────────────────────────────────────────────────────────╯
+# ─── URL / WSGI / ASGI ────────────────────────────────────────
+ROOT_URLCONF = "config.urls"
+WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = "config.asgi.application"
+
+# ─── Database (PostgreSQL) ─────────────────────────────────────
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -151,18 +132,10 @@ DATABASES = {
     }
 }
 
-# ╭──────────────────────────────────────────────────────────────╮
-# | 6. Static / media                                           |
-# ╰──────────────────────────────────────────────────────────────╯
+# ─── Static / Media ────────────────────────────────────────────
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [] 
-
-# Static katalogini tekshirish
-if not os.path.exists(BASE_DIR / "static"):
-    os.makedirs(BASE_DIR / "static", exist_ok=True)
-
-STATICFILES_DIRS = [BASE_DIR / "static"] if os.path.exists(BASE_DIR / "static") else []
+STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
 
 STATICFILES_STORAGE = (
     "whitenoise.storage.CompressedManifestStaticFilesStorage"
@@ -170,46 +143,24 @@ STATICFILES_STORAGE = (
     else "django.contrib.staticfiles.storage.StaticFilesStorage"
 )
 
-MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
 
-# ╭──────────────────────────────────────────────────────────────╮
-# | 7. CORS - WebSocket uchun yangilandi                       |
-# ╰──────────────────────────────────────────────────────────────╯
+# ─── CORS (frontend domenlari) ─────────────────────────────────
 CORS_ALLOWED_ORIGINS = env.list(
     "CORS_ALLOWED_ORIGINS",
     default=[
+        "https://uzguide.com",
+        "https://www.uzguide.com",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:3003",
         "http://127.0.0.1:3003",
-        "http://localhost:8080",
-        "http://127.0.0.1:8080",
-        "http://localhost:8081",  # ✅ frontend port
-        "http://127.0.0.1:8081",  # ✅ qo‘shib qo‘yish kerak
     ],
 )
 CORS_ALLOW_CREDENTIALS = True
 
-# ╭──────────────────────────────────────────────────────────────╮
-# | 8. Password validation                                      |
-# ╰──────────────────────────────────────────────────────────────╯
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        "OPTIONS": {"min_length": 8},
-    },
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
-]
-
-# ╭──────────────────────────────────────────────────────────────╮
-# | 9. DRF + JWT                                                |
-# ╰──────────────────────────────────────────────────────────────╯
+# ─── DRF + JWT ────────────────────────────────────────────────
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -228,19 +179,15 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
-# ╭──────────────────────────────────────────────────────────────╮
-# | 10. drf-spectacular (Swagger / Redoc)                       |
-# ╰──────────────────────────────────────────────────────────────╯
 SPECTACULAR_SETTINGS = {
     "TITLE": "GuideMatcher API",
     "DESCRIPTION": "TravMatch platform REST API",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": True,
 }
-# ╭──────────────────────────────────────────────────────────────╮
-# | 11. E-mail (Gmail SMTP)                                     |
-# ╰──────────────────────────────────────────────────────────────╯
-# Development uchun console yoki real SMTP
+
+# ─── E-mail (SMTP) ────────────────────────────────────────────
+# DEBUG rejimida konsolga chiqarish (istasa .env bilan o‘chiradi)
 if DEBUG and env.bool("EMAIL_DEBUG_MODE", default=True):
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
@@ -248,24 +195,30 @@ else:
         "EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
     )
 
-EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
-EMAIL_PORT = env.int("EMAIL_PORT", default=587)
-EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
-EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+
+EMAIL_HOST = env("EMAIL_HOST", default="uz01.ahost.uz")
+# Ahost tavsiyasi: SSL/465
+EMAIL_PORT = env.int("EMAIL_PORT", default=465)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=True)
+
+# Kolliziya bo‘lsa, SSL ustun
+if EMAIL_USE_TLS and EMAIL_USE_SSL:
+    EMAIL_USE_TLS = False
+    logging.getLogger(__name__).warning(
+        "Both TLS & SSL True; forced TLS=False (SSL kept)."
+    )
+
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
+EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=15)
 
-# Gmail uchun maxsus sozlamalar
-if "gmail" in EMAIL_HOST:
-    EMAIL_USE_TLS = True
-    EMAIL_USE_SSL = False
-    EMAIL_PORT = 587
+# Anymail (Brevo) kalit ixtiyoriy
+ANYMAIL = {"BREVO_API_KEY": os.getenv("ANYMAIL_BREVO_API_KEY", "")}
 
-# ╭──────────────────────────────────────────────────────────────╮
-# | 12. Redis cache                                             |
-# ╰──────────────────────────────────────────────────────────────╯
+# ─── Redis Cache ──────────────────────────────────────────────
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
@@ -273,9 +226,7 @@ CACHES = {
     }
 }
 
-# ╭──────────────────────────────────────────────────────────────╮
-# | 13. Celery konfiguratsiyasi                                 |
-# ╰──────────────────────────────────────────────────────────────╯
+# ─── Celery ───────────────────────────────────────────────────
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://redis:6379/0")
 CELERY_RESULT_BACKEND = env("REDIS_URL", default="redis://redis:6379/1")
 CELERY_ACCEPT_CONTENT = ["json"]
@@ -283,15 +234,72 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 daqiqa
-
-# Development uchun
+CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_TASK_ALWAYS_EAGER = env.bool("CELERY_TASK_ALWAYS_EAGER", default=False)
 CELERY_TASK_EAGER_PROPAGATES = True
 
-# ╭──────────────────────────────────────────────────────────────╮
-# | 15. Sentry (prod)                                           |
-# ╰──────────────────────────────────────────────────────────────╯
+# ─── Channels / WebSocket ─────────────────────────────────────
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [env("CHANNEL_REDIS_URL", default="redis://redis:6379/2")],
+            "capacity": 1500,
+            "expiry": 60,
+        },
+    },
+}
+WEBSOCKET_TIMEOUT = 30
+if DEBUG:
+    os.environ.setdefault("DJANGO_ALLOW_ASYNC_UNSAFE", "true")
+
+# ─── Frontend URL’lar ─────────────────────────────────────────
+FRONTEND_PASSWORD_RESET_URL = env(
+    "FRONTEND_PASSWORD_RESET_URL",
+    default="https://uzguide.com/reset-password",
+)
+
+# ─── Logging ──────────────────────────────────────────────────
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+LOG_FILE = LOG_DIR / "project.log"
+if not LOG_FILE.exists():
+    LOG_FILE.touch()
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {"format": "{levelname} {asctime} {module} {message}", "style": "{"},
+        "simple": {"format": "{levelname} {message}", "style": "{"},
+    },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+        "file": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": str(LOG_FILE),
+            "maxBytes": 15 * 1024 * 1024,
+            "backupCount": 10,
+            "formatter": "verbose",
+        },
+    },
+    "root": {"handlers": ["console"], "level": "INFO"},
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "propagate": False,
+        },
+        "apps": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
+    },
+}
+
+# ─── Sentry (prod ixtiyoriy) ──────────────────────────────────
 SENTRY_DSN = env("SENTRY_DSN", default="")
 if SENTRY_DSN and not DEBUG:
     import sentry_sdk
@@ -303,108 +311,3 @@ if SENTRY_DSN and not DEBUG:
         traces_sample_rate=0.2,
         send_default_pii=False,
     )
-
-
-# ╭──────────────────────────────────────────────────────────────╮
-# | 3. URL / WSGI / ASGI                                        |
-# ╰──────────────────────────────────────────────────────────────╯
-# ↓ bor joyida
-ROOT_URLCONF = "config.urls"
-WSGI_APPLICATION = "config.wsgi.application"
-ASGI_APPLICATION = "config.asgi.application"  # <-- uncomment / qo'sh
-
-# ╭──────────────────────────────────────────────────────────────╮
-# | WebSocket / Channels - Yangilandi                           |
-# ╰──────────────────────────────────────────────────────────────╯
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [env("CHANNEL_REDIS_URL", default="redis://redis:6379/2")],
-            "capacity": 1500,  # Kanallar sonini cheklash
-            "expiry": 60,  # 60 soniya keyin tozalash
-        },
-    },
-}
-
-# WebSocket connection timeouts
-WEBSOCKET_TIMEOUT = 30  # 30 seconds
-
-# Development uchun async unsafe ruxsat etish
-if DEBUG:
-    os.environ.setdefault("DJANGO_ALLOW_ASYNC_UNSAFE", "true")
-
-FRONTEND_PASSWORD_RESET_URL = env.str(
-    "FRONTEND_PASSWORD_RESET_URL",
-    default="http://localhost:3003/reset-password",
-)
-
-CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
-
-
-# Logs papkasini dinamik yaratish
-LOG_DIR = BASE_DIR / "logs"
-LOG_DIR.mkdir(parents=True, exist_ok=True)  # 👈 parents=True muhim!
-
-# Log fayl yo'li
-LOG_FILE = LOG_DIR / "project.log"
-
-# Agar fayl yo'q bo'lsa, yaratish
-if not LOG_FILE.exists():
-    LOG_FILE.touch()  # 👈 Bo'sh fayl yaratish
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {message}",
-            "style": "{",
-        },
-        "simple": {
-            "format": "{levelname} {message}",
-            "style": "{",
-        },
-    },
-    "filters": {
-        "require_debug_false": {
-            "()": "django.utils.log.RequireDebugFalse",
-        },
-    },
-    "handlers": {
-        "console": {
-            "level": "INFO",
-            "class": "logging.StreamHandler",
-            "formatter": "simple",
-        },
-        "file": {
-            "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler",  # 👈 RotatingFileHandler yaxshiroq
-            "filename": str(LOG_FILE),  # 👈 str() muhim!
-            "maxBytes": 1024 * 1024 * 15,  # 15MB
-            "backupCount": 10,
-            "formatter": "verbose",
-        },
-    },
-    "root": {
-        "handlers": ["console"],  # 👈 Faqat console, file ni vaqtincha o'chirish
-        "level": "INFO",
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
-            "propagate": False,
-        },
-        "apps": {
-            "handlers": ["console"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-    },
-}
-
-
-
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "/media/"

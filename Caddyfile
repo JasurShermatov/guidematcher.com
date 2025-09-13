@@ -10,7 +10,7 @@ uzguide.com, www.uzguide.com {
   # --- MEDIA (Django) ---
   @media path /media/*
   handle @media {
-    reverse_proxy backend:8000
+    reverse_proxy backend:8
   }
 
   # --- ADMIN ROUTE ---

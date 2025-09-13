@@ -20,6 +20,7 @@ from drf_spectacular.views import (
 from django.http import HttpResponse
 from django.views.decorators.http import require_safe
 
+
 @require_safe
 def healthcheck_view(request):
     return HttpResponse("OK", status=200)
@@ -39,20 +40,20 @@ api_v1_patterns = [
 urlpatterns = [
     # Admin
     path("jonibek/", admin.site.urls),
-
     # JWT
     path("api/v1/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/v1/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/v1/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
-
     # API schema & docs
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
-
     # API v1
     path("api/v1/", include(api_v1_patterns)),
-
     # Healthcheck (Docker healthcheck uchun)
     path("health/", healthcheck_view, name="health"),
 ]

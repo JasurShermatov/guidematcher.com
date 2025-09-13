@@ -347,8 +347,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                             <div className="header-logo-glow"></div>
                         </div>
                         <div className="header-logo-text-container">
-                            <span className="header-logo-text">{t("" +
-                                ".logo_text") || "UzGuide"}</span>
+                            <span className="header-logo-text">"UzGuide"</span>
                             <span className="header-logo-tagline">{t("header.tagline") || "Explore Together"}</span>
                         </div>
                     </Link>

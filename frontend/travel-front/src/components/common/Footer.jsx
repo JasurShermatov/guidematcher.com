@@ -78,7 +78,7 @@ const Footer = () => {
                         {/*</div>*/}
                     </div>
 
-                     {/*Mobile App Section */}
+                     {/*Mobile App Sections */}
                     <div className="footer-section footer-app-section">
                     {/*    <h4 className="footer-title">{t("footer.app.title", { defaultValue: "Get Our App" })}</h4>*/}
                     {/*    <p className="footer-app-description">*/}

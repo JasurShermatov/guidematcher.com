@@ -13,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER}" ]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -50,22 +50,17 @@ services:
       redis:
         condition: service_started
     healthcheck:
-
       test: ["CMD-SHELL", "curl -sSf http://localhost:8000/health/ || exit 1"]
-
-
       interval: 30s
       timeout: 5s
       retries: 5
     networks:
       - app-network
 
-
   bot:
     build:
       context: ./bot
-      dockerfile: DockerfileBot
-    # Bot uchun alohida .env ishlatamiz
+      dockerfile: DockerfileBot   # <-- MUHIM: DockerfileBot ni ko'rsatdik
     env_file:
       - ./bot/.env
     restart: always
@@ -76,8 +71,6 @@ services:
       - app-network
     volumes:
       - ./bot:/app
-
-  # ───────────── Celery worker ────────
 
   celery:
     build: .
@@ -90,17 +83,15 @@ services:
         condition: service_started
       redis:
         condition: service_started
-
     networks:
       - app-network
-
 
   frontend:
     build:
       context: ./frontend/travel-front
       dockerfile: Dockerfile
       args:
-        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:8000/api/v1/}
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-https://uzguide.com/api/v1/}
     restart: unless-stopped
     ports:
       - "3003:80"
@@ -109,11 +100,34 @@ services:
         condition: service_started
     networks:
       - app-network
+    volumes:
+      - media_data:/app/media:ro
+      - ./frontend/travel-front/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_started
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
   static_data:
   media_data:
+  caddy_data:
+  caddy_config:
 
 networks:
   app-network:

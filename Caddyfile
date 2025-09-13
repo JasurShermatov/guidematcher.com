@@ -7,10 +7,10 @@ uzguide.com, www.uzguide.com {
     reverse_proxy backend:8000
   }
 
-  # --- MEDIA (Django) ---
+  # --- MEDIA (Frontend orqali berilmoqda) ---
   @media path /media/*
   handle @media {
-    reverse_proxy backend:8
+    reverse_proxy frontend:80
   }
 
   # --- ADMIN ROUTE ---
@@ -26,7 +26,6 @@ uzguide.com, www.uzguide.com {
   }
 
   # --- FRONTEND STATIC (React build) ---
-  # CRA odatdagi yo'llar: js/, css/, media/, fonts/ va ba'zi fayllar ildizda
   @fe_static path /static/js/* /static/css/* /static/media/* /static/fonts/* /asset-manifest.json /favicon.ico /manifest.json /logo192.png /logo512.png
   handle @fe_static {
     reverse_proxy frontend:80

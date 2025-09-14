@@ -91,7 +91,8 @@ services:
       context: ./frontend/travel-front
       dockerfile: Dockerfile
       args:
-        - REACT_APP_API_URL=${REACT_APP_API_URL:-https://uzguide.com/api/v1/}
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:8000/api/v1/}
+        - REACT_APP_WS_ORIGIN=${REACT_APP_WS_ORIGIN:-ws://localhost:8000}
     restart: unless-stopped
     ports:
       - "3003:80"
@@ -100,9 +101,6 @@ services:
         condition: service_started
     networks:
       - app-network
-    volumes:
-      - media_data:/app/media:ro
-      - ./frontend/travel-front/nginx.conf:/etc/nginx/conf.d/default.conf:ro
 
   caddy:
     image: caddy:2

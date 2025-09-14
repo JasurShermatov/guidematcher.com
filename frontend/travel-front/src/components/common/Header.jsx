@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
-    FiMenu,
-    FiX,
     FiSun,
     FiMoon,
     FiMonitor,
@@ -12,7 +10,6 @@ import {
     FiLogIn,
     FiCheck,
     FiLogOut,
-    FiUserPlus,
 } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 import { changeLanguage } from "../../i18n";
@@ -31,88 +28,59 @@ const api = axios.create({
 // Token Interceptor
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("access_token");
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
-        headers: config.headers,
-        data: config.data,
-    });
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
 });
 
 // Token Refresh Interceptor
 api.interceptors.response.use(
-    (response) => {
-        console.log(`API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-            status: response.status,
-            data: response.data,
-        });
-        return response;
-    },
+    (response) => response,
     async (error) => {
-        console.error(`API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
-            status: error.response?.status,
-            data: error.response?.data,
-            message: error.message,
-        });
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
                 const refreshToken = localStorage.getItem("refresh_token");
-                if (!refreshToken) {
-                    throw new Error("No refresh token available");
-                }
-                const refreshResponse = await api.post("token/refresh/", {
-                    refresh: refreshToken,
-                });
+                if (!refreshToken) throw new Error("No refresh token available");
+                const refreshResponse = await api.post("token/refresh/", { refresh: refreshToken });
                 const newAccessToken = refreshResponse.data.access_token || refreshResponse.data.access;
                 localStorage.setItem("access_token", newAccessToken);
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
-                console.error("Token refresh failed:", refreshError);
                 localStorage.removeItem("access_token");
                 localStorage.removeItem("refresh_token");
                 window.location.href = "/login";
                 return Promise.reject(refreshError);
             }
         }
-        let errorMessage = "Unknown error occurred";
+        let msg = "Unknown error occurred";
         if (error.response?.data) {
-            const data = error.response.data;
-            errorMessage =
-                data.detail ||
-                data.message ||
-                data.error ||
-                (data.email && data.email[0]) ||
-                (data.code && data.code[0]) ||
-                (data.non_field_errors && data.non_field_errors[0]) ||
-                JSON.stringify(data);
-        } else if (error.message) {
-            errorMessage = error.message;
-        }
-        return Promise.reject(new Error(errorMessage));
+            const d = error.response.data;
+            msg =
+                d.detail ||
+                d.message ||
+                d.error ||
+                (d.email && d.email[0]) ||
+                (d.code && d.code[0]) ||
+                (d.non_field_errors && d.non_field_errors[0]) ||
+                JSON.stringify(d);
+        } else if (error.message) msg = error.message;
+        return Promise.reject(new Error(msg));
     }
 );
 
 // Logout API Function
 const logoutUser = () => {
     const refreshToken = localStorage.getItem("refresh_token");
-    console.log("Logging out user");
-
     return api
-        .post("accounts/logout/", {
-            refresh: refreshToken,
-        })
+        .post("accounts/logout/", { refresh: refreshToken })
         .then((r) => {
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
             return r.data;
         })
-        .catch((error) => {
-            console.error("Logout error:", error);
+        .catch(() => {
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
             return { detail: "Logged out" };
@@ -122,26 +90,25 @@ const logoutUser = () => {
 // Avatar olish funksiyasi
 const getAvatar = async (userId, role) => {
     try {
-        const endpoint = role === "customer" ? `profiles/customers/${userId}/avatar/` : `profiles/clients/${userId}/avatar/`;
+        const endpoint =
+            role === "customer" ? `profiles/customers/${userId}/avatar/` : `profiles/clients/${userId}/avatar/`;
         const response = await api.get(endpoint);
         return response.data.avatar_url || null;
-    } catch (error) {
-        console.error("Avatar fetch error:", error.message);
+    } catch {
         return null;
     }
 };
 
-// React Component
 const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuthState }) => {
     const { t } = useTranslation();
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
     const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "default");
     const [language, setLanguage] = useState(() => localStorage.getItem("language") || "en");
     const [isThemeDropdownOpen, setIsThemeDropdownOpen] = useState(false);
     const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
     const [isAvatarDropdownOpen, setIsAvatarDropdownOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-    const [avatarUrl, setAvatarUrl] = useState(null); // Avatar URL uchun state
+    const [avatarUrl, setAvatarUrl] = useState(null);
 
     const themeDropdownRef = useRef(null);
     const langDropdownRef = useRef(null);
@@ -150,10 +117,10 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
     const location = useLocation();
 
     const themeOptions = [
-        { value: "light", label: t("theme.light") || "Light", icon: <FiSun />, description: t("theme.light_desc") || "Light theme" },
-        { value: "dark", label: t("theme.dark") || "Dark", icon: <FiMoon />, description: t("theme.dark_desc") || "Dark theme" },
-        { value: "default", label: t("theme.default") || "System", icon: <FiMonitor />, description: t("theme.default_desc") || "Follow system theme" },
-        { value: "auto", label: t("theme.auto") || "Auto", icon: <FiClock />, description: t("theme.auto_desc") || "Auto theme based on time" },
+        { value: "light", label: t("theme.light") || "Light", icon: <FiSun /> },
+        { value: "dark", label: t("theme.dark") || "Dark", icon: <FiMoon /> },
+        { value: "default", label: t("theme.default") || "System", icon: <FiMonitor /> },
+        { value: "auto", label: t("theme.auto") || "Auto", icon: <FiClock /> },
     ];
 
     const languageOptions = [
@@ -164,176 +131,132 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
         { value: "ar", label: t("language.ar") || "Arabic", nativeName: t("language.ar_native") || "العربية", flag: "🇸🇦", dir: "rtl" },
     ];
 
-    const currentLang = languageOptions.find((lang) => lang.value === language);
+    const currentLang = languageOptions.find((l) => l.value === language);
 
-    // Avatarni olish
+    // Avatar
     useEffect(() => {
-        if (isAuthenticated && user?.id && user?.role) {
-            getAvatar(user.id, user.role).then((url) => setAvatarUrl(url));
-        }
+        if (isAuthenticated && user?.id && user?.role) getAvatar(user.id, user.role).then(setAvatarUrl);
     }, [isAuthenticated, user]);
 
-    // Scroll hodisasini kuzatish
+    // Scroll soyasi
     useEffect(() => {
-        const handleScroll = () => setIsScrolled(window.scrollY > 20);
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+        const onScroll = () => setIsScrolled(window.scrollY > 20);
+        window.addEventListener("scroll", onScroll);
+        return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
-    // Theme sozlamalarini yuklash va qo'llash
+    // Theme init/apply
     useEffect(() => {
-        const savedTheme = localStorage.getItem("theme");
-        if (savedTheme && savedTheme !== theme) {
-            setTheme(savedTheme);
-        }
+        const saved = localStorage.getItem("theme");
+        if (saved && saved !== theme) setTheme(saved);
     }, [theme]);
 
-    // Language sozlamalarini yuklash
-    useEffect(() => {
-        const savedLanguage = localStorage.getItem("language");
-        if (savedLanguage && savedLanguage !== language) {
-            setLanguage(savedLanguage);
-            changeLanguage(savedLanguage);
-        }
-    }, [language]);
-
-    // Theme ni qo'llash
     useEffect(() => {
         const root = document.documentElement;
-        const updateTheme = () => {
+        const update = () => {
             if (theme === "auto") {
-                const hour = new Date().getHours();
-                root.setAttribute("data-theme", hour >= 6 && hour < 18 ? "light" : "dark");
+                const h = new Date().getHours();
+                root.setAttribute("data-theme", h >= 6 && h < 18 ? "light" : "dark");
             } else if (theme === "default") {
-                root.setAttribute(
-                    "data-theme",
-                    window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
-                );
-            } else {
-                root.setAttribute("data-theme", theme);
-            }
+                root.setAttribute("data-theme", window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+            } else root.setAttribute("data-theme", theme);
         };
-
-        updateTheme();
+        update();
         localStorage.setItem("theme", theme);
 
         let cleanup;
-
         if (theme === "auto") {
-            const interval = setInterval(updateTheme, 60000);
-            cleanup = () => clearInterval(interval);
+            const i = setInterval(update, 60000);
+            cleanup = () => clearInterval(i);
         }
-
         if (theme === "default") {
-            const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-            const handler = (e) => root.setAttribute("data-theme", e.matches ? "dark" : "light");
-            mediaQuery.addEventListener("change", handler);
-            cleanup = () => mediaQuery.removeEventListener("change", handler);
+            const mq = window.matchMedia("(prefers-color-scheme: dark)");
+            const h = (e) => root.setAttribute("data-theme", e.matches ? "dark" : "light");
+            mq.addEventListener("change", h);
+            cleanup = () => mq.removeEventListener("change", h);
         }
-
         return cleanup;
     }, [theme]);
 
-    // Tashqariga bosilgan hodisani kuzatish
+    // Language init
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (themeDropdownRef.current && !themeDropdownRef.current.contains(event.target)) {
+        const saved = localStorage.getItem("language");
+        if (saved && saved !== language) {
+            setLanguage(saved);
+            changeLanguage(saved);
+        }
+    }, [language]);
+
+    // Close dropdowns on outside click
+    useEffect(() => {
+        const handler = (e) => {
+            if (themeDropdownRef.current && !themeDropdownRef.current.contains(e.target)) setIsThemeDropdownOpen(false);
+            if (langDropdownRef.current && !langDropdownRef.current.contains(e.target)) setIsLangDropdownOpen(false);
+            if (avatarDropdownRef.current && !avatarDropdownRef.current.contains(e.target)) setIsAvatarDropdownOpen(false);
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
+
+    // Escape
+    useEffect(() => {
+        const onEsc = (e) => {
+            if (e.key === "Escape") {
                 setIsThemeDropdownOpen(false);
-            }
-            if (langDropdownRef.current && !langDropdownRef.current.contains(event.target)) {
                 setIsLangDropdownOpen(false);
-            }
-            if (avatarDropdownRef.current && !avatarDropdownRef.current.contains(event.target)) {
                 setIsAvatarDropdownOpen(false);
             }
         };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+        document.addEventListener("keydown", onEsc);
+        return () => document.removeEventListener("keydown", onEsc);
     }, []);
 
-    // Escape tugmasini bosish hodisasi
-    useEffect(() => {
-        const handleEscapeKey = (event) => {
-            if (event.key === "Escape") {
-                setIsMenuOpen(false);
-                setIsThemeDropdownOpen(false);
-                setIsLangDropdownOpen(false);
-                setIsAvatarDropdownOpen(false);
-            }
-        };
-        document.addEventListener("keydown", handleEscapeKey);
-        return () => document.removeEventListener("keydown", handleEscapeKey);
-    }, []);
-
-    const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
-    };
-
-    const handleThemeChange = (newTheme) => {
-        setTheme(newTheme);
-        localStorage.setItem("theme", newTheme);
+    const handleThemeChange = (v) => {
+        setTheme(v);
+        localStorage.setItem("theme", v);
         setIsThemeDropdownOpen(false);
     };
 
-    const handleLanguageChange = (newLang) => {
-        setLanguage(newLang);
-        localStorage.setItem("language", newLang);
-        changeLanguage(newLang);
+    const handleLanguageChange = (v) => {
+        setLanguage(v);
+        localStorage.setItem("language", v);
+        changeLanguage(v);
         setIsLangDropdownOpen(false);
+        // RTL qo'llab-quvvatlash
+        const dir = languageOptions.find((l) => l.value === v)?.dir || "ltr";
+        document.documentElement.setAttribute("dir", dir);
     };
 
     const handleLogout = async () => {
         try {
             await logoutUser();
-        } catch (error) {
-            console.error("Logout error:", error.message);
         } finally {
-            if (updateAuthState) {
-                updateAuthState(false, null);
-            } else {
+            if (updateAuthState) updateAuthState(false, null);
+            else {
                 localStorage.removeItem("access_token");
                 localStorage.removeItem("refresh_token");
                 localStorage.removeItem("user_data");
-                localStorage.removeItem("userAccount_isEditing");
-                localStorage.removeItem("userAccount_formData");
-                localStorage.removeItem("guideAccount_isEditing");
-                localStorage.removeItem("guideAccount_activeTab");
-                localStorage.removeItem("guideAccount_formData");
-                localStorage.removeItem("guideAccount_portfolioForm");
-                localStorage.removeItem("guideAccount_editingPortfolio");
-                localStorage.removeItem("guideAccount_availabilityForm");
-                localStorage.removeItem("guideAccount_editingAvailability");
-                localStorage.removeItem("guideAccount_documentForm");
-                setIsAuthenticated(false);
-                setUser(null);
             }
             setIsAvatarDropdownOpen(false);
             navigate("/");
         }
     };
 
-    const menuItems = [
-        { label: t("header.find_guides") || "Find Guides", href: "/find-guides" },
-        { label: t("header.blog") || "Blog", href: "#blog" },
-    ];
-
-    const hideMenu = isAuthenticated && location.pathname === "/account";
     const logoDestination = isAuthenticated ? "/account" : "/";
 
-    // Username ni aniqlash
-    const displayUsername = user?.username || user?.full_name || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || "User";
+    const displayUsername =
+        user?.username ||
+        user?.full_name ||
+        `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||
+        "User";
     const avatarLetter = displayUsername.charAt(0).toUpperCase();
 
-    // User role'ini ko'rsatish uchun
     const getUserRoleDisplay = () => {
         if (!user?.role) return "Client";
-
         const role = user.role.toLowerCase();
-        if (role === "customer") return "Guide";
+        if (role === "customer" || role === "guide") return "Guide";
         if (role === "client") return "Client";
-        if (role === "guide") return "Guide";
         if (role === "user") return "User";
-
         return user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase();
     };
 
@@ -347,7 +270,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                             <div className="header-logo-glow"></div>
                         </div>
                         <div className="header-logo-text-container">
-                            <span className="header-logo-text">"UzGuide"</span>
+                            <span className="header-logo-text">UzGuide</span>
                             <span className="header-logo-tagline">{t("header.tagline") || "Explore Together"}</span>
                         </div>
                     </Link>
@@ -359,7 +282,11 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                         <button
                             type="button"
                             className="header-control-btn header-lang-btn"
-                            onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
+                            onClick={() => {
+                                setIsLangDropdownOpen((v) => !v);
+                                setIsThemeDropdownOpen(false);
+                                setIsAvatarDropdownOpen(false);
+                            }}
                             aria-label={t("header.select_language") || "Select Language"}
                             aria-expanded={isLangDropdownOpen}
                         >
@@ -392,7 +319,11 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                         <button
                             type="button"
                             className="header-control-btn header-theme-btn"
-                            onClick={() => setIsThemeDropdownOpen(!isThemeDropdownOpen)}
+                            onClick={() => {
+                                setIsThemeDropdownOpen((v) => !v);
+                                setIsLangDropdownOpen(false);
+                                setIsAvatarDropdownOpen(false);
+                            }}
                             aria-label={t("header.choose_appearance") || "Choose Appearance"}
                             aria-expanded={isThemeDropdownOpen}
                         >
@@ -418,13 +349,17 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                         )}
                     </div>
 
-                    {/* Authentication Controls */}
+                    {/* Auth Controls */}
                     {isAuthenticated ? (
                         <div className="header-dropdown header-avatar-dropdown" ref={avatarDropdownRef}>
                             <button
                                 type="button"
                                 className="header-control-btn header-avatar-btn"
-                                onClick={() => setIsAvatarDropdownOpen(!isAvatarDropdownOpen)}
+                                onClick={() => {
+                                    setIsAvatarDropdownOpen((v) => !v);
+                                    setIsThemeDropdownOpen(false);
+                                    setIsLangDropdownOpen(false);
+                                }}
                                 aria-label={t("header.account") || "Account"}
                                 aria-expanded={isAvatarDropdownOpen}
                             >
@@ -433,7 +368,7 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                                         src={avatarUrl}
                                         alt={displayUsername}
                                         className="header-avatar-img"
-                                        onError={() => setAvatarUrl(null)} // Agar rasm yuklanmasa, fallback
+                                        onError={() => setAvatarUrl(null)}
                                     />
                                 ) : (
                                     <span className="header-avatar">{avatarLetter}</span>
@@ -445,12 +380,9 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                                 <div className="header-dropdown-menu header-avatar-menu">
                                     <div className="header-dropdown-header">{t("header.account") || "Account"}</div>
                                     <div className="header-user-info">
-                                        {process.env.NODE_ENV === 'development' && (
-                                            <span className="header-user-debug">Debug: {user?.role}</span>
-                                        )}
                                         <span className="header-user-role">{getUserRoleDisplay()}</span>
                                     </div>
-                                    <Link to="/account" className="header-dropdown-item">
+                                    <Link to="/account" className="header-dropdown-item" onClick={() => setIsAvatarDropdownOpen(false)}>
                                         <span className="header-theme-name">{t("header.profile") || "Profile"}</span>
                                     </Link>
                                     <button type="button" className="header-dropdown-item" onClick={handleLogout}>
@@ -461,139 +393,13 @@ const Header = ({ isAuthenticated, setIsAuthenticated, user, setUser, updateAuth
                             )}
                         </div>
                     ) : (
-                        <div className="header-auth-buttons">
-                            <Link to="/login" className="header-btn header-auth-btn header-signin-btn">
-                                <FiLogIn />
-                                <span>{t("header.sign_in") || "Sign In"}</span>
-                            </Link>
-                        </div>
+                        <Link to="/login" className="header-btn header-auth-btn header-signin-inline">
+                            <FiLogIn />
+                            <span>{t("header.sign_in") || "Sign In"}</span>
+                        </Link>
                     )}
-
-                    {/* Mobile Menu Toggle */}
-                    <button
-                        type="button"
-                        className="header-mobile-menu-toggle"
-                        onClick={toggleMenu}
-                        aria-label="Toggle menu"
-                        aria-expanded={isMenuOpen}
-                    >
-                        {isMenuOpen ? <FiX /> : <FiMenu />}
-                    </button>
                 </div>
             </div>
-
-            {/* Mobile Menu */}
-            {isMenuOpen && (
-                <div className="header-mobile-menu-overlay" onClick={toggleMenu}>
-                    <div className="header-mobile-menu" onClick={(e) => e.stopPropagation()}>
-                        <div className="header-mobile-menu-header">
-                            <div className="header-mobile-logo">
-                                <FiGlobe />
-                                <span>{t("header.logo_text") || "UzGuide"}</span>
-                            </div>
-                            <button type="button" className="header-mobile-close-btn" onClick={toggleMenu}>
-                                <FiX />
-                            </button>
-                        </div>
-
-                        <div className="header-mobile-controls">
-                            {/* Mobile Theme Controls */}
-                            <div className="header-mobile-control-group">
-                                <label>{t("header.choose_appearance") || "Choose Appearance"}</label>
-                                <div className="header-theme-buttons">
-                                    {themeOptions.map((option) => (
-                                        <button
-                                            key={option.value}
-                                            type="button"
-                                            className={`header-btn header-theme-option ${theme === option.value ? "header-active" : ""}`}
-                                            onClick={() => handleThemeChange(option.value)}
-                                        >
-                                            {option.icon}
-                                            <span>{option.label}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Mobile Language Controls */}
-                            <div className="header-mobile-control-group">
-                                <label>{t("header.select_language") || "Select Language"}</label>
-                                <div className="header-lang-buttons">
-                                    {languageOptions.map((option) => (
-                                        <button
-                                            key={option.value}
-                                            type="button"
-                                            className={`header-btn header-lang-option ${language === option.value ? "header-active" : ""}`}
-                                            onClick={() => handleLanguageChange(option.value)}
-                                        >
-                                            <span className="header-flag">{option.flag}</span>
-                                            <span>{option.nativeName}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Mobile Authentication */}
-                        <div className="header-mobile-menu-footer">
-                            {isAuthenticated ? (
-                                <div className="header-mobile-auth-section">
-                                    <div className="header-mobile-user-info">
-                                        {avatarUrl ? (
-                                            <img
-                                                src={avatarUrl}
-                                                alt={displayUsername}
-                                                className="header-mobile-avatar-img"
-                                                onError={() => setAvatarUrl(null)} // Agar rasm yuklanmasa, fallback
-                                            />
-                                        ) : (
-                                            <div className="header-mobile-avatar">{avatarLetter}</div>
-                                        )}
-                                        <div className="header-mobile-user-details">
-                                            <span className="header-mobile-username">{displayUsername}</span>
-                                            <span className="header-mobile-role">{getUserRoleDisplay()}</span>
-                                        </div>
-                                    </div>
-                                    <Link
-                                        to="/account"
-                                        className="header-btn header-mobile-auth-btn"
-                                        onClick={toggleMenu}
-                                    >
-                                        <span>{t("header.profile") || "Profile"}</span>
-                                    </Link>
-                                    <button
-                                        type="button"
-                                        className="header-btn header-mobile-logout-btn"
-                                        onClick={handleLogout}
-                                    >
-                                        <FiLogOut />
-                                        <span>{t("header.logout") || "Logout"}</span>
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="header-mobile-auth-actions">
-                                    <Link
-                                        to="/register"
-                                        className="header-btn header-mobile-auth-btn header-mobile-register-btn"
-                                        onClick={toggleMenu}
-                                    >
-                                        <FiUserPlus />
-                                        <span>{t("header.register") || "Register"}</span>
-                                    </Link>
-                                    <Link
-                                        to="/login"
-                                        className="header-btn header-mobile-auth-btn header-mobile-signin-btn"
-                                        onClick={toggleMenu}
-                                    >
-                                        <FiLogIn />
-                                        <span>{t("header.sign_in") || "Sign In"}</span>
-                                    </Link>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
         </header>
     );
 };

@@ -332,11 +332,12 @@ export default function ChatWidgets({ initialPeerEmail = null }) {
         const content = (composer || "").trim();
         if (!content || !activeConvId) return;
         try {
-            const res = await api.post("chat/messages/send/", {
-                conversation: activeConvId,
-                content,
-            });
-            setMessages((prev) => [...prev, res.data]);
+            // const res = await api.post("chat/messages/send/", {
+            //     conversation: activeConvId,
+            //     content,
+            // });
+            // setMessages((prev) => [...prev, res.data]);
+            await api.post("chat/messages/send/", { conversation: activeConvId, content });
             setComposer("");
             setTimeout(() => {
                 if (listRef.current)

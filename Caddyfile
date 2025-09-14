@@ -1,0 +1,43 @@
+uzguide.com, www.uzguide.com {
+  encode zstd gzip
+
+  # --- BACKEND STATIC (Django admin/jazzmin/vendor/DRF) ---
+  @admin_static path /static/admin/* /static/jazzmin/* /static/vendor/* /static/rest_framework/*
+  handle @admin_static {
+    reverse_proxy backend:8000
+  }
+
+  # --- MEDIA (Frontend orqali berilmoqda) ---
+  @media path /media/*
+  handle @media {
+    reverse_proxy frontend:80
+  }
+
+  # --- ADMIN ROUTE ---
+  @admin path /jonibek*
+  handle @admin {
+    reverse_proxy backend:8000
+  }
+
+  # --- API ROUTES ---
+  @api path /api/*
+  handle @api {
+    reverse_proxy backend:8000
+  }
+
+  # --- FRONTEND STATIC (React build) ---
+  @fe_static path /static/js/* /static/css/* /static/media/* /static/fonts/* /asset-manifest.json /favicon.ico /manifest.json /logo192.png /logo512.png
+  handle @fe_static {
+    reverse_proxy frontend:80
+  }
+
+  # --- DEFAULT: FRONTEND (SPA) ---
+  handle {
+    reverse_proxy frontend:80
+  }
+
+  log {
+    output stdout
+    format console
+  }
+}

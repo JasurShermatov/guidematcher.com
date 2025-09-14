@@ -81,11 +81,9 @@ class Conversation(models.Model):
         return f"{self.user1.full_name} - {self.user2.full_name}"
 
     def get_other_user(self, user):
-        """Get the other participant in the conversation"""
         return self.user2 if user == self.user1 else self.user1
 
     def has_user(self, user):
-        """Check if user is participant in conversation"""
         return user == self.user1 or user == self.user2
 
 
@@ -103,13 +101,11 @@ class Message(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # Delete status
     deleted_for = models.CharField(
         max_length=10, choices=DELETE_CHOICES, default="none"
     )
     deleted_at = models.DateTimeField(null=True, blank=True)
 
-    # Read status - simple boolean since it's only 1-on-1
     is_read = models.BooleanField(default=False)
     read_at = models.DateTimeField(null=True, blank=True)
 
@@ -122,14 +118,12 @@ class Message(models.Model):
         return f"Message from {self.sender.full_name}: {self.content[:50]}"
 
     def mark_as_read(self):
-        """Mark message as read"""
         if not self.is_read:
             self.is_read = True
             self.read_at = timezone.now()
             self.save(update_fields=["is_read", "read_at"])
 
     def delete_for_sender(self, user):
-        """Delete message for sender only"""
         if user == self.sender:
             self.deleted_for = "sender"
             self.deleted_at = timezone.now()
@@ -138,7 +132,6 @@ class Message(models.Model):
         return False
 
     def delete_for_both(self, user):
-        """Delete message for both users (only sender can do this)"""
         if user == self.sender:
             self.deleted_for = "both"
             self.deleted_at = timezone.now()
@@ -147,7 +140,6 @@ class Message(models.Model):
         return False
 
     def recover_message(self, user):
-        """Recover deleted message (only sender can recover their own deletions)"""
         if user == self.sender and self.deleted_for in ["sender", "both"]:
             self.deleted_for = "none"
             self.deleted_at = None
@@ -156,11 +148,9 @@ class Message(models.Model):
         return False
 
     def can_be_recovered(self, user):
-        """Check if message can be recovered by user"""
         return user == self.sender and self.deleted_for in ["sender", "both"]
 
     def is_visible_for_user(self, user):
-        """Check if message is visible for a specific user"""
         if self.deleted_for == "both":
             return False
         if self.deleted_for == "sender" and user == self.sender:
@@ -168,7 +158,6 @@ class Message(models.Model):
         return True
 
     def get_delete_status_for_user(self, user):
-        """Get delete status information for user"""
         return {
             "is_deleted": self.deleted_for != "none",
             "deleted_for": self.deleted_for,

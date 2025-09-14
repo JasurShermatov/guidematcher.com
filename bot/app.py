@@ -11,6 +11,7 @@ from handlers.users.admin.admin_spams import router as admin_spams_router
 from handlers.users.admin.admin import router as admin_router
 from middlewares.checksub import CheckSubscriptionMiddleware
 from dotenv import load_dotenv
+from handlers.users.files import router as files_router 
 
 load_dotenv()
 
@@ -47,12 +48,13 @@ def setup_handlers(dp: Dispatcher):
     # Admin spams router uchun middleware
     admin_spams_router.message.middleware(middleware)
     admin_spams_router.callback_query.middleware(middleware)
-
+    files_router.message.middleware(middleware) 
     # Routerlarni Dispatcher'ga ulash
+    
+    dp.include_router(files_router)  
     dp.include_router(admin_router)
     dp.include_router(start_router)
     dp.include_router(admin_spams_router)
-
     logger.info("Barcha handlerlar va middleware'lar ulandi")
 
 

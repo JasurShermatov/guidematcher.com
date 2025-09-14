@@ -78,6 +78,9 @@ api.interceptors.response.use(
                 (data.email && data.email[0]) ||
                 (data.code && data.code[0]) ||
                 (data.non_field_errors && data.non_field_errors[0]) ||
+                (data.password && data.password[0]) ||
+                (data.role && data.role[0]) ||
+                (data.country && data.country[0]) ||
                 JSON.stringify(data);
         } else if (error.message) {
             errorMessage = error.message;
@@ -95,12 +98,10 @@ const loginUser = (payload) => {
         user: r.data.user,
     }));
 };
-
 const requestCode = (data) => {
     console.log("Requesting verification code for:", data.email);
     return api.post("accounts/request-code/", data).then((r) => r.data);
 };
-
 const registerUser = (data) => {
     console.log("Registering user:", { ...data, password: "***" });
     return api.post("accounts/register/", data).then((r) => ({
@@ -109,13 +110,10 @@ const registerUser = (data) => {
         user: r.data.user,
     }));
 };
-
 const requestPasswordReset = (data) =>
     api.post("accounts/forgot-password/", data).then((r) => r.data);
-
 const confirmPasswordReset = (payload) =>
     api.post("accounts/reset-password/", payload).then((r) => r.data);
-
 const getCurrentUserShort = () => {
     console.log("Getting current user short info...");
     return api.get("auth/users/short/").then((r) => r.data);
@@ -124,7 +122,10 @@ const getCurrentUserShort = () => {
 // React Component
 const Authentication = ({ setIsAuthenticated, setUser }) => {
     const { t, i18n } = useTranslation("translation");
+
+    // 🔁 Endi tabs o‘rniga faqat activeTab holati
     const [activeTab, setActiveTab] = useState("login");
+
     const [loginForm, setLoginForm] = useState({ email: "", password: "" });
     const [registerForm, setRegisterForm] = useState({
         role: "Client",
@@ -141,12 +142,14 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         new_password: "",
         confirm_password: "",
     });
+
     const [verificationCode, setVerificationCode] = useState("");
     const [checkboxes, setCheckboxes] = useState({
         personalData: false,
         terms: false,
         travelTips: false,
     });
+
     const [error, setError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [loading, setLoading] = useState(false);
@@ -157,38 +160,39 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+
     const countryInputRef = useRef(null);
     const navigate = useNavigate();
 
-    // Debugging: Log current language and translations
+    // Debugging
     useEffect(() => {
         console.log("Authentication language:", i18n.language);
         console.log("Authentication translations:", i18n.getResourceBundle(i18n.language, "translation")?.authentication);
     }, [i18n.language]);
 
     const countries = [
-        "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
-        "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin",
-        "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
-        "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia",
-        "Comoros", "Congo (Congo-Brazzaville)", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia (Czech Republic)",
-        "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea",
-        "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany",
-        "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary",
-        "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan",
-        "Kazakhstan", "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kuwait", "Kyrgyzstan", "Laos", "Latvia",
-        "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi",
-        "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia",
-        "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar (Burma)", "Namibia", "Nauru",
-        "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Macedonia", "Norway", "Oman",
-        "Pakistan", "Palau", "Palestine State", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland",
-        "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines",
-        "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone",
-        "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Sudan", "Spain", "Sri Lanka",
-        "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste",
-        "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine",
-        "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City",
-        "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+        "Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia","Australia",
+        "Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin",
+        "Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi",
+        "Cabo Verde","Cambodia","Cameroon","Canada","Central African Republic","Chad","Chile","China","Colombia",
+        "Comoros","Congo (Congo-Brazzaville)","Costa Rica","Croatia","Cuba","Cyprus","Czechia (Czech Republic)",
+        "Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea",
+        "Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany",
+        "Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary",
+        "Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan",
+        "Kazakhstan","Kenya","Kiribati","Korea, North","Korea, South","Kuwait","Kyrgyzstan","Laos","Latvia",
+        "Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi",
+        "Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia",
+        "Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar (Burma)","Namibia","Nauru",
+        "Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Macedonia","Norway","Oman",
+        "Pakistan","Palau","Palestine State","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland",
+        "Portugal","Qatar","Romania","Russia","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines",
+        "Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone",
+        "Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Sudan","Spain","Sri Lanka",
+        "Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor-Leste",
+        "Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine",
+        "United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Vatican City",
+        "Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"
     ];
 
     useEffect(() => {
@@ -292,6 +296,49 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     const toggleShowNewPassword = () => setShowNewPassword(!showNewPassword);
     const toggleShowConfirmNewPassword = () => setShowConfirmNewPassword(!showConfirmNewPassword);
 
+    const getLoginErrorMessage = (errorMessage) => {
+        if (errorMessage.includes("No active account found") || errorMessage.includes("credentials")) {
+            return t("authentication.errors.invalid_email_or_password", { defaultValue: "Invalid email or password" });
+        } else if (errorMessage.includes("email")) {
+            return t("authentication.errors.invalid_email", { defaultValue: "Invalid email address" });
+        } else if (errorMessage.includes("password")) {
+            return t("authentication.errors.invalid_password", { defaultValue: "Invalid password" });
+        }
+        return errorMessage || t("authentication.errors.login_failed", { defaultValue: "Login failed" });
+    };
+
+    const getRegisterErrorMessage = (errorMessage) => {
+        if (errorMessage.includes("This email is already registered")) {
+            return t("authentication.errors.email_exists", { defaultValue: "This email is already registered" });
+        } else if (errorMessage.includes("Invalid or already used verification code")) {
+            return t("authentication.errors.invalid_code", { defaultValue: "Invalid or already used verification code" });
+        } else if (errorMessage.includes("Verification code has expired")) {
+            return t("authentication.errors.code_expired", { defaultValue: "Verification code has expired" });
+        } else if (errorMessage.includes("Role must be one of")) {
+            return t("authentication.errors.invalid_role", { defaultValue: "Invalid role selected" });
+        } else if (errorMessage.includes("country")) {
+            return t("authentication.errors.invalid_country", { defaultValue: "Invalid country" });
+        } else if (errorMessage.includes("Password must contain")) {
+            return t("authentication.errors.password_requirements", { defaultValue: "Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character (@$!%*?&)." });
+        }
+        return errorMessage || t("authentication.errors.registration_failed", { defaultValue: "Registration failed" });
+    };
+
+    const getForgotErrorMessage = (errorMessage) => {
+        if (errorMessage.includes("Too many password reset requests")) {
+            return t("authentication.errors.too_many_requests", { defaultValue: "Too many password reset requests. Please wait 30 minutes and try again." });
+        } else if (errorMessage.includes("Code has expired")) {
+            return t("authentication.errors.code_expired", { defaultValue: "Code has expired" });
+        } else if (errorMessage.includes("Invalid or already used code")) {
+            return t("authentication.errors.invalid_code", { defaultValue: "Invalid or already used code" });
+        } else if (errorMessage.includes("Too many failed attempts")) {
+            return t("authentication.errors.too_many_attempts", { defaultValue: "Too many failed attempts. Please request a new code." });
+        } else if (errorMessage.includes("email")) {
+            return t("authentication.errors.invalid_email", { defaultValue: "Invalid email address" });
+        }
+        return errorMessage || t("authentication.errors.password_reset_failed", { defaultValue: "Password reset failed" });
+    };
+
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
         clearMessages();
@@ -302,7 +349,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
             return;
         }
-
         if (!passwordRegex.test(loginForm.password)) {
             setError(t("authentication.errors.password_requirements", {
                 defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
@@ -320,6 +366,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             localStorage.setItem("refresh_token", tokenData.refresh);
             setIsAuthenticated(true);
             setUser(tokenData.user);
+
             if (tokenData.user.role === "Client") {
                 navigate("/user-account");
             } else if (tokenData.user.role === "Customer") {
@@ -329,7 +376,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             }
             setLoginForm({ email: "", password: "" });
         } catch (error) {
-            setError(error.message || t("authentication.errors.login_failed", { defaultValue: "Login failed" }));
+            setError(getLoginErrorMessage(error.message));
         } finally {
             setLoading(false);
         }
@@ -347,13 +394,11 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
             return;
         }
-
         if (password !== confirm_password) {
             setError(t("authentication.errors.passwords_do_not_match", { defaultValue: "Passwords do not match" }));
             setLoading(false);
             return;
         }
-
         if (!passwordRegex.test(password)) {
             setError(t("authentication.errors.password_requirements", {
                 defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
@@ -361,13 +406,11 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
             return;
         }
-
         if (!checkboxes.personalData || !checkboxes.terms) {
             setError(t("authentication.errors.required_checkboxes", { defaultValue: "You must agree to the required checkboxes" }));
             setLoading(false);
             return;
         }
-
         if (!countries.includes(country)) {
             setError(t("authentication.errors.invalid_country", { defaultValue: "Invalid country selected" }));
             setLoading(false);
@@ -379,12 +422,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setSuccessMessage(t("authentication.success.verification_code_sent", { defaultValue: "Verification code sent" }));
             setVerificationStep(true);
         } catch (error) {
-            const errorMsg = error.message.includes("Too many verification verification code requests")
-                ? t("authentication.errors.too_many_requests", { defaultValue: "Too many requests. Please try again later" })
-                : error.message.includes("already exists")
-                    ? t("authentication.errors.email_exists", { defaultValue: "Email already exists" })
-                    : error.message || t("authentication.errors.request_code_failed", { defaultValue: "Failed to request verification code" });
-            setError(errorMsg);
+            const errorMsg = getRegisterErrorMessage(error.message);
+            if (errorMsg.includes("Too many verification code requests")) {
+                setError(t("authentication.errors.too_many_requests", { defaultValue: "Too many verification code requests. Please wait 15 minutes and try again." }));
+            } else {
+                setError(errorMsg);
+            }
         } finally {
             setLoading(false);
         }
@@ -400,7 +443,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
             return;
         }
-
         if (!/^\d{6}$/.test(verificationCode)) {
             setError(t("authentication.errors.invalid_verification_code", { defaultValue: "Invalid verification code" }));
             setLoading(false);
@@ -423,6 +465,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setIsAuthenticated(true);
             setUser(tokenResponse.user);
             setSuccessMessage(t("authentication.success.registration_successful", { defaultValue: "Registration successful" }));
+
             if (tokenResponse.user.role === "Client") {
                 navigate("/user-account");
             } else if (tokenResponse.user.role === "Customer") {
@@ -432,14 +475,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             }
             resetRegisterForm();
         } catch (error) {
-            const errorMsg = error.message.includes("already exists")
-                ? t("authentication.errors.email_exists", { defaultValue: "Email already exists" })
-                : error.message.includes("expired")
-                    ? t("authentication.errors.code_expired", { defaultValue: "Verification code expired" })
-                    : error.message.includes("Invalid or already used")
-                        ? t("authentication.errors.invalid_code", { defaultValue: "Invalid or already used code" })
-                        : error.message || t("authentication.errors.registration_failed", { defaultValue: "Registration failed" });
-            setError(errorMsg);
+            setError(getRegisterErrorMessage(error.message));
         } finally {
             setLoading(false);
         }
@@ -452,10 +488,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             await requestCode({ email: registerForm.email.toLowerCase().trim() });
             setSuccessMessage(t("authentication.success.verification_code_sent", { defaultValue: "Verification code sent" }));
         } catch (error) {
-            const errorMsg = error.message.includes("Too many verification verification code requests")
-                ? t("authentication.errors.too_many_requests", { defaultValue: "Too many requests. Please try again later" })
-                : error.message || t("authentication.errors.resend_code_failed", { defaultValue: "Failed to resend code" });
-            setError(errorMsg);
+            const errorMsg = getRegisterErrorMessage(error.message);
+            if (errorMsg.includes("Too many verification code requests")) {
+                setError(t("authentication.errors.too_many_requests", { defaultValue: "Too many verification code requests. Please wait 15 minutes and try again." }));
+            } else {
+                setError(errorMsg);
+            }
         } finally {
             setLoading(false);
         }
@@ -477,10 +515,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setSuccessMessage(response.message || t("authentication.success.reset_code_sent", { defaultValue: "Password reset code sent" }));
             setForgotStep(true);
         } catch (error) {
-            const errorMsg = error.message.includes("Too many password reset requests")
-                ? t("authentication.errors.too_many_requests", { defaultValue: "Too many requests. Please try again later" })
-                : error.message || t("authentication.errors.request_code_failed", { defaultValue: "Failed to request code" });
-            setError(errorMsg);
+            setError(getForgotErrorMessage(error.message));
         } finally {
             setLoading(false);
         }
@@ -498,13 +533,11 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
             return;
         }
-
         if (new_password !== confirm_password) {
             setError(t("authentication.errors.passwords_do_not_match", { defaultValue: "Passwords do not match" }));
             setLoading(false);
             return;
         }
-
         if (!passwordRegex.test(new_password)) {
             setError(t("authentication.errors.password_requirements", {
                 defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
@@ -512,7 +545,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
             return;
         }
-
         if (!/^\d{6}$/.test(code)) {
             setError(t("authentication.errors.invalid_code", { defaultValue: "Invalid code" }));
             setLoading(false);
@@ -527,25 +559,10 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             });
             setSuccessMessage(t("authentication.success.password_reset_successful", { defaultValue: "Password reset successful" }));
             setTimeout(() => {
-                setActiveTab("login");
-                setForgotStep(false);
-                setForgotForm({
-                    email: "",
-                    code: "",
-                    new_password: "",
-                    confirm_password: "",
-                });
-                clearMessages();
+                switchTab("login");
             }, 2000);
         } catch (error) {
-            const errorMsg = error.message.includes("expired")
-                ? t("authentication.errors.code_expired", { defaultValue: "Code expired" })
-                : error.message.includes("Invalid")
-                    ? t("authentication.errors.invalid_code", { defaultValue: "Invalid code" })
-                    : error.message.includes("Too many failed attempts")
-                        ? t("authentication.errors.too_many_attempts", { defaultValue: "Too many failed attempts" })
-                        : error.message || t("authentication.errors.password_reset_failed", { defaultValue: "Password reset failed" });
-            setError(errorMsg);
+            setError(getForgotErrorMessage(error.message));
         } finally {
             setLoading(false);
         }
@@ -558,10 +575,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             const response = await requestPasswordReset({ email: forgotForm.email.toLowerCase().trim() });
             setSuccessMessage(response.message || t("authentication.success.reset_code_sent", { defaultValue: "Password reset code sent" }));
         } catch (error) {
-            const errorMsg = error.message.includes("Too many password reset requests")
-                ? t("authentication.errors.too_many_requests", { defaultValue: "Too many requests. Please try again later" })
-                : error.message || t("authentication.errors.resend_code_failed", { defaultValue: "Failed to resend code" });
-            setError(errorMsg);
+            setError(getForgotErrorMessage(error.message));
         } finally {
             setLoading(false);
         }
@@ -613,6 +627,45 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, []);
 
+    // 🔽 Pastda ko‘rinadigan tez o‘tish bloklari
+    const SwitchLinks = () => {
+        if (activeTab === "login") {
+            return (
+                <div className="auth-switches" aria-label="Other actions">
+                    <button type="button" className="auth-switch-btn" onClick={() => switchTab("register")}>
+                        <FiUser /> {t("authentication.tabs.register", { defaultValue: "Register" })}
+                    </button>
+                    <button type="button" className="auth-switch-btn" onClick={() => switchTab("forgot")}>
+                        <FiRotateCcw /> {t("authentication.tabs.forgot_password", { defaultValue: "Forgot Password" })}
+                    </button>
+                </div>
+            );
+        }
+        if (activeTab === "register") {
+            return (
+                <div className="auth-switches" aria-label="Other actions">
+                    <button type="button" className="auth-switch-btn" onClick={() => switchTab("login")}>
+                        <FiLogIn /> {t("authentication.tabs.login", { defaultValue: "Login" })}
+                    </button>
+                    <button type="button" className="auth-switch-btn" onClick={() => switchTab("forgot")}>
+                        <FiRotateCcw /> {t("authentication.tabs.forgot_password", { defaultValue: "Forgot Password" })}
+                    </button>
+                </div>
+            );
+        }
+        // forgot
+        return (
+            <div className="auth-switches" aria-label="Other actions">
+                <button type="button" className="auth-switch-btn" onClick={() => switchTab("login")}>
+                    <FiLogIn /> {t("authentication.tabs.login", { defaultValue: "Login" })}
+                </button>
+                <button type="button" className="auth-switch-btn" onClick={() => switchTab("register")}>
+                    <FiUser /> {t("authentication.tabs.register", { defaultValue: "Register" })}
+                </button>
+            </div>
+        );
+    };
+
     return (
         <div className="auth-overlay" onClick={closeModal} role="dialog" aria-labelledby="auth-title" aria-modal="true">
             <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
@@ -625,49 +678,20 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                     <p className="auth-subtitle">{t("authentication.subtitle", { defaultValue: "Please sign in or register" })}</p>
                 </div>
 
-                <div className="auth-tabs">
-                    <button
-                        className={`auth-tab ${activeTab === "login" ? "auth-tab-active" : ""}`}
-                        onClick={() => switchTab("login")}
-                        aria-selected={activeTab === "login"}
-                        disabled={loading}
-                    >
-                        <FiLogIn />
-                        {t("authentication.tabs.login", { defaultValue: "Login" })}
-                    </button>
-                    <button
-                        className={`auth-tab ${activeTab === "register" ? "auth-tab-active" : ""}`}
-                        onClick={() => switchTab("register")}
-                        aria-selected={activeTab === "register"}
-                        disabled={loading}
-                    >
-                        <FiUser />
-                        {t("authentication.tabs.register", { defaultValue: "Register" })}
-                    </button>
-                    <button
-                        className={`auth-tab ${activeTab === "forgot" ? "auth-tab-active" : ""}`}
-                        onClick={() => switchTab("forgot")}
-                        aria-selected={activeTab === "forgot"}
-                        disabled={loading}
-                    >
-                        <FiRotateCcw />
-                        {t("authentication.tabs.forgot_password", { defaultValue: "Forgot Password" })}
-                    </button>
-                </div>
+                {/* ❌ Tabs olib tashlandi */}
 
                 {error && (
                     <div className="auth-message auth-error" role="alert">
-                        <div className="auth-message-icon">⚠️</div>
+                        <div className="auth-message-icon"></div>
                         <span>{error}</span>
                     </div>
                 )}
                 {successMessage && (
                     <div className="auth-message auth-success" role="alert">
-                        <div className="auth-message-icon">✅</div>
+                        <div className="auth-message-icon"></div>
                         <span>{successMessage}</span>
                     </div>
                 )}
-
                 {loading && (
                     <div className="auth-loading">
                         <div className="spinner"></div>
@@ -675,6 +699,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                     </div>
                 )}
 
+                {/* LOGIN */}
                 {activeTab === "login" && (
                     <div className="auth-content">
                         <div className="auth-form-header">
@@ -741,9 +766,13 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                         <div className="auth-divider">
                             <span>{t("authentication.login.or", { defaultValue: "or" })}</span>
                         </div>
+
+                        {/* Pastki linklar */}
+                        <SwitchLinks />
                     </div>
                 )}
 
+                {/* REGISTER */}
                 {activeTab === "register" && (
                     <div className="auth-content">
                         <div className="auth-form-header">
@@ -944,7 +973,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         </div>
                                         <span>{t("authentication.register.personal_data", { defaultValue: "I agree to the processing of personal data" })}</span>
                                     </label>
-
                                     <label className="auth-checkbox-label">
                                         <input
                                             type="checkbox"
@@ -960,7 +988,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         </div>
                                         <span>{t("authentication.register.terms", { defaultValue: "I accept the terms and conditions" })}</span>
                                     </label>
-
                                     <label className="auth-checkbox-label">
                                         <input
                                             type="checkbox"
@@ -1019,12 +1046,10 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             pattern="[0-9]{6}"
                                         />
                                     </div>
-
                                     <button type="submit" className="auth-submit-btn" disabled={loading}>
                                         <FiCheck />
                                         {t("authentication.register.verify_submit", { defaultValue: "Verify" })}
                                     </button>
-
                                     <button
                                         type="button"
                                         className="auth-resend-btn"
@@ -1037,9 +1062,17 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                 </form>
                             </div>
                         )}
+
+                        <div className="auth-divider">
+                            <span>{t("authentication.login.or", { defaultValue: "or" })}</span>
+                        </div>
+
+                        {/* Pastki linklar */}
+                        <SwitchLinks />
                     </div>
                 )}
 
+                {/* FORGOT */}
                 {activeTab === "forgot" && (
                     <div className="auth-content">
                         <div className="auth-form-header">
@@ -1072,7 +1105,6 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             autoFocus
                                         />
                                     </div>
-
                                     <button type="submit" className="auth-submit-btn" disabled={loading}>
                                         <FiMail />
                                         {t("authentication.forgot.submit", { defaultValue: "Send Reset Code" })}
@@ -1195,6 +1227,13 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                 </form>
                             </div>
                         )}
+
+                        <div className="auth-divider">
+                            <span>{t("authentication.login.or", { defaultValue: "or" })}</span>
+                        </div>
+
+                        {/* Pastki linklar */}
+                        <SwitchLinks />
                     </div>
                 )}
             </div>

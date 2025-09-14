@@ -1,0 +1,97 @@
+x-env: &default-env
+  env_file:
+    - .env
+
+services:
+  backend:
+    build: .
+    <<: *default-env
+    restart: always
+    entrypoint: /entrypoint.sh
+    command: >
+      daphne -b 0.0.0.0 -p 8000 config.asgi:application
+    volumes:
+      - .:/app
+      - static_data:/app/staticfiles
+      - media_data:/app/media
+    depends_on:
+      - db
+      - redis
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sSf http://localhost:8000/health/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    networks:
+      - appnet
+
+  frontend:
+    build:
+      context: ./frontend/travel-front
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=https://uzguide.com/api/v1/
+    restart: unless-stopped
+    networks:
+      - appnet
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_started
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./public:/var/www/guidematcher.com/public:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - appnet
+
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - appnet
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - appnet
+
+  celery:
+    <<: *default-env
+    build: .
+    command: sh -lc 'celery -A config worker -l info'
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+    volumes:
+      - .:/app
+    networks:
+      - appnet
+
+volumes:
+  postgres_data:
+  static_data:
+  media_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  appnet:
+    driver: bridge

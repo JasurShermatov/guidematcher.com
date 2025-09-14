@@ -1,3 +1,4 @@
+// src/pages/HomePage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -17,11 +18,21 @@ import {
     FiX, FiCompass
 } from 'react-icons/fi';
 import './HomePage.css';
+
+// Hero slider rasmlari (sizdagi kabi)
 import desktopImage1 from '../images/desktop-image-1.jpeg';
 import desktopImage2 from '../images/desktop-image-2.jpg';
 import desktopImage3 from '../images/desktop-image-3.jpg';
 import desktopImage4 from '../images/desktop-image-4.jpg';
 import desktopImage5 from '../images/desktop-image-5.avif';
+
+// Popular destinations uchun LOKAL rasmlar
+import istanbulImage from '../images/istanbul.jpeg';
+import barcelonaImage from '../images/barcelona.jpeg';
+import tokyoImage from '../images/tokyo.jpeg';
+import parisImage from '../images/paris.jpeg';
+import dubaiImage from '../images/dubai.jpeg';
+import romeImage from '../images/rome.jpeg';
 
 const HomePage = () => {
     const { t } = useTranslation();
@@ -39,7 +50,7 @@ const HomePage = () => {
         {
             name: t('homepage.popular_destinations.istanbul.name'),
             guides: 234,
-            image: 'https://images.unsplash.com/photo-1602751584581-2e4f8243cc6d',
+            image: istanbulImage,
             rating: 4.8,
             price: t('homepage.popular_destinations.istanbul.price'),
             highlights: [
@@ -52,7 +63,7 @@ const HomePage = () => {
         {
             name: t('homepage.popular_destinations.barcelona.name'),
             guides: 189,
-            image: 'https://images.unsplash.com/photo-1549972890-1e9d1e0e9e38',
+            image: barcelonaImage,
             rating: 4.9,
             price: t('homepage.popular_destinations.barcelona.price'),
             highlights: [
@@ -65,7 +76,7 @@ const HomePage = () => {
         {
             name: t('homepage.popular_destinations.tokyo.name'),
             guides: 156,
-            image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf',
+            image: tokyoImage,
             rating: 4.7,
             price: t('homepage.popular_destinations.tokyo.price'),
             highlights: [
@@ -78,7 +89,7 @@ const HomePage = () => {
         {
             name: t('homepage.popular_destinations.paris.name'),
             guides: 298,
-            image: 'https://images.unsplash.com/photo-1502602898650-2c301a4391b1',
+            image: parisImage,
             rating: 4.8,
             price: t('homepage.popular_destinations.paris.price'),
             highlights: [
@@ -91,7 +102,7 @@ const HomePage = () => {
         {
             name: t('homepage.popular_destinations.dubai.name'),
             guides: 145,
-            image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c',
+            image: dubaiImage,
             rating: 4.6,
             price: t('homepage.popular_destinations.dubai.price'),
             highlights: [
@@ -104,7 +115,7 @@ const HomePage = () => {
         {
             name: t('homepage.popular_destinations.rome.name'),
             guides: 167,
-            image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5',
+            image: romeImage,
             rating: 4.9,
             price: t('homepage.popular_destinations.rome.price'),
             highlights: [
@@ -423,13 +434,13 @@ const HomePage = () => {
                             </div>
                         ))}
                     </div>
-                    <button
-                        className="homepage-btn homepage-btn-outline"
-                        onClick={() => navigate('/popular-destinations')}
-                        aria-label={t('homepage.popular_destinations.view_all')}
-                    >
-                        {t('homepage.popular_destinations.view_all')}
-                    </button>
+                    {/*<button*/}
+                    {/*    className="homepage-btn homepage-btn-outline"*/}
+                    {/*    onClick={() => navigate('/popular-destinations')}*/}
+                    {/*    aria-label={t('homepage.popular_destinations.view_all')}*/}
+                    {/*>*/}
+                    {/*    {t('homepage.popular_destinations.view_all')}*/}
+                    {/*</button>*/}
                     {isDestinationModalOpen && selectedDestination && (
                         <div
                             className="homepage-destination-modal-overlay"

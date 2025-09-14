@@ -7,10 +7,10 @@ uzguide.com, www.uzguide.com {
     reverse_proxy backend:8000
   }
 
-  # --- MEDIA (Frontend orqali berilmoqda) ---
-  @media path /media/*
-  handle @media {
-    reverse_proxy frontend:80
+  # --- MEDIA (avatar, uploads) ---
+  handle_path /media/* {
+    root * /var/www/guidematcher.com/media
+    file_server browse
   }
 
   # --- ADMIN ROUTE ---
@@ -26,7 +26,7 @@ uzguide.com, www.uzguide.com {
   }
 
   # --- FRONTEND STATIC (React build) ---
-  @fe_static path /static/js/* /static/css/* /static/media/* /static/fonts/* /asset-manifest.json /favicon.ico /manifest.json /logo192.png /logo512.png
+  @fe_static path /static/js/* /static/css/* /static/media/* /static/fonts/* /asset-manifest.json /favicon.ico /manifest.json
   handle @fe_static {
     reverse_proxy frontend:80
   }

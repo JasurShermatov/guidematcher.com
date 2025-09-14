@@ -3,6 +3,39 @@ x-env: &default-env
     - .env
 
 services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # Healthcheck: redis-cli ping (image ichida bor)
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
   backend:
     build: .
     <<: *default-env
@@ -14,76 +47,125 @@ services:
       - .:/app
       - static_data:/app/staticfiles
       - media_data:/app/media
+    ports:
+      - "8000:8000"
+      - "587:587"   # Agar backend SMTP relay qilsa, shu port ochiq qoladi
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # Healthcheck: Django ichidagi /health/ endpoint
     healthcheck:
-      test: ["CMD-SHELL", "curl -sSf http://localhost:8000/health/ || exit 1"]
+      test: ["CMD-SHELL", "curl -sSf http://localhost:8000/health/ > /dev/null || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 5
     networks:
-      - appnet
+      - app-network
+
+  bot:
+    build:
+      context: ./bot
+      dockerfile: DockerfileBot
+    env_file:
+      - ./bot/.env
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      backend:          # agar bot backend API’ga ulanadigan bo‘lsa foydali
+        condition: service_started
+    networks:
+      - app-network
+    volumes:
+      - ./bot:/app
+    # Healthcheck:
+    # 1) Telegram API ga /getMe (TOKEN .env da bo‘lishi shart)
+    # 2) DB DNS resolve
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - >
+          set -e;
+          getent hosts db >/dev/null 2>&1;
+          curl -sSf https://api.telegram.org/bot$${TELEGRAM_BOT_TOKEN}/getMe | grep -q '"ok":true'
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  celery:
+    build: .
+    <<: *default-env
+    restart: always
+    entrypoint: ""
+    command: celery -A config worker -l info --concurrency=4
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_started   # settings va broker/DB tayyor bo‘lsin
+    networks:
+      - app-network
+    # Healthcheck:
+    # Oddiy usul: process mavjudligini tekshirish (pgrep)
+    # (Agar busy-lansa, celery inspect ping ham ishlatish mumkin)
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'celery.*worker' >/dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   frontend:
     build:
       context: ./frontend/travel-front
       dockerfile: Dockerfile
       args:
-        - REACT_APP_API_URL=https://uzguide.com/api/v1/
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:8000/api/v1/}
+        - REACT_APP_WS_ORIGIN=${REACT_APP_WS_ORIGIN:-ws://localhost:8000}
     restart: unless-stopped
-    networks:
-      - appnet
-
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
+    ports:
+      - "3003:80"
     depends_on:
       backend:
         condition: service_started
-      frontend:
-        condition: service_started
+    networks:
+      - app-network
+    # Healthcheck: nginx static server / (agar alpine nginx image bo‘lsa curl mavjud bo‘ladi;
+    # yo‘q bo‘lsa, `apk add --no-cache curl`ni Dockerfile’da qo‘shing)
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sSf http://localhost/ >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./public:/var/www/guidematcher.com/public:ro
       - caddy_data:/data
       - caddy_config:/config
-    networks:
-      - appnet
-
-  db:
-    image: postgres:15-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - appnet
-
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    networks:
-      - appnet
-
-  celery:
-    <<: *default-env
-    build: .
-    command: sh -lc 'celery -A config worker -l info'
+      - media_data:/var/www/guidematcher.com/media
     depends_on:
-      - db
-      - redis
-    restart: unless-stopped
-    volumes:
-      - .:/app
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_started
     networks:
-      - appnet
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sSf http://localhost:80/ >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
@@ -93,5 +175,5 @@ volumes:
   caddy_config:
 
 networks:
-  appnet:
+  app-network:
     driver: bridge

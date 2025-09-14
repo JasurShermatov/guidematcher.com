@@ -112,6 +112,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+      - media_data:/var/www/guidematcher.com/media
     depends_on:
       backend:
         condition: service_started

@@ -186,37 +186,23 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": True,
 }
 
-# ─── E-mail (SMTP) ────────────────────────────────────────────
-# DEBUG rejimida konsolga chiqarish (istasa .env bilan o‘chiradi)
+# ─── E-mail (Anymail / Brevo — ONLY API, no SMTP) ─────────────
+# Devda (DEBUG=True) konsolga chiqarish; prod’da Anymail API
 if DEBUG and env.bool("EMAIL_DEBUG_MODE", default=True):
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
-    EMAIL_BACKEND = env(
-        "EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
-    )
+    EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
 
-
-EMAIL_HOST = env("EMAIL_HOST", default="uz01.ahost.uz")
-# Ahost tavsiyasi: SSL/465
-EMAIL_PORT = env.int("EMAIL_PORT", default=465)
-EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
-EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=True)
-
-# Kolliziya bo‘lsa, SSL ustun
-if EMAIL_USE_TLS and EMAIL_USE_SSL:
-    EMAIL_USE_TLS = False
-    logging.getLogger(__name__).warning(
-        "Both TLS & SSL True; forced TLS=False (SSL kept)."
-    )
-
-EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
-EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="info@uzguide.com")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=15)
 
-# Anymail (Brevo) kalit ixtiyoriy
-ANYMAIL = {"BREVO_API_KEY": os.getenv("ANYMAIL_BREVO_API_KEY", "")}
+# Anymail konfiguratsiyasi (Brevo)
+ANYMAIL = {
+    "BREVO_API_KEY": env("ANYMAIL_BREVO_API_KEY", default=None),
+    "BREVO_API_URL": "https://api.brevo.com/v3",
+}
+
 
 # ─── Redis Cache ──────────────────────────────────────────────
 CACHES = {

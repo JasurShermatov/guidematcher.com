@@ -4,7 +4,7 @@ from django.dispatch import receiver
 from django.db import transaction
 from apps.users.models import User
 from apps.profiles.models import ClientProfile, CustomerProfile
-
+from apps.users.models import UserNotificationSettings
 
 @receiver(post_save, sender=User)
 def create_related_objects(sender, instance: User, created, **kwargs):

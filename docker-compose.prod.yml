@@ -46,10 +46,7 @@ services:
     volumes:
       - .:/app
       - static_data:/app/staticfiles
-      - media_data:/app/media
-    ports:
-      - "8000:8000"
-      - "587:587"   # Agar backend SMTP relay qilsa, shu port ochiq qoladi
+      - media_data:/app/mediai
     depends_on:
       db:
         condition: service_healthy
@@ -107,12 +104,13 @@ services:
       redis:
         condition: service_healthy
       backend:
-        condition: service_started   # settings va broker/DB tayyor bo‘lsin
+        condition: service_started
+    volumes:
+      - .:/app
+      - static_data:/app/staticfiles
+      - media_data:/app/media
     networks:
       - app-network
-    # Healthcheck:
-    # Oddiy usul: process mavjudligini tekshirish (pgrep)
-    # (Agar busy-lansa, celery inspect ping ham ishlatish mumkin)
     healthcheck:
       test: ["CMD-SHELL", "pgrep -f 'celery.*worker' >/dev/null"]
       interval: 30s

@@ -67,7 +67,6 @@ export default function FindGuide({ user }) {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // filters (text-based like in UserAccount)
     const [filters, setFilters] = useState({ country: "", city: "", rating: "" });
     const [isSearching, setIsSearching] = useState(false);
     const [guides, setGuides] = useState([]);
@@ -91,7 +90,7 @@ export default function FindGuide({ user }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
-    // fetch all customers once; then filter on front-end (like UserAccount)
+    // fetch all customers once; then filter on front-end
     useEffect(() => {
         let mounted = true;
         (async () => {
@@ -129,7 +128,6 @@ export default function FindGuide({ user }) {
 
     const onSubmit = (e) => {
         e.preventDefault();
-        // we already filter in-memory; this just re-triggers render
         setFilters({ ...filters });
     };
 
@@ -137,7 +135,6 @@ export default function FindGuide({ user }) {
         const guideUserId = g?.user?.id;
         if (!guideUserId) return;
 
-        // redirect to login if not authenticated
         if (!user) {
             navigate("/login", { state: { pendingBookGuideUserId: guideUserId } });
             return;
@@ -154,15 +151,15 @@ export default function FindGuide({ user }) {
     };
 
     return (
-        <div className="fg-wrapper">
-            <div className="fg-panel">
-                <div className="fg-header">
+        <div className="find-guide-wrapper">
+            <div className="find-guide-panel">
+                <div className="find-guide-header">
                     <FiSearch />
                     <span>{t("find_guides") || "Find Guides"}</span>
                 </div>
 
-                <form className="fg-filters" onSubmit={onSubmit}>
-                    <div className="fg-field">
+                <form className="find-guide-filters" onSubmit={onSubmit}>
+                    <div className="find-guide-field">
                         <label>{t("country") || "Country"}</label>
                         <input
                             placeholder={t("country") || "Country"}
@@ -171,7 +168,7 @@ export default function FindGuide({ user }) {
                         />
                     </div>
 
-                    <div className="fg-field">
+                    <div className="find-guide-field">
                         <label>{t("city") || "City"}</label>
                         <input
                             placeholder={t("city") || "City"}
@@ -180,7 +177,7 @@ export default function FindGuide({ user }) {
                         />
                     </div>
 
-                    <div className="fg-field">
+                    <div className="find-guide-field">
                         <label>{t("min_rating") || "Minimum Rating"}</label>
                         <input
                             placeholder={t("min_rating") || "Minimum Rating"}
@@ -193,40 +190,43 @@ export default function FindGuide({ user }) {
                         />
                     </div>
 
-                    <button className="fg-search-btn" disabled={isSearching}>
-                        <FiSearch /> <span>{isSearching ? (t("searching") || "Searching") : (t("search") || "Search")}</span>
+                    <button className="find-guide-search-btn" disabled={isSearching}>
+                        <FiSearch />{" "}
+                        <span>
+                            {isSearching ? (t("searching") || "Searching") : (t("search") || "Search")}
+                        </span>
                     </button>
                 </form>
 
                 {/* Results */}
-                {error && <div className="fg-error">{error}</div>}
+                {error && <div className="find-guide-error">{error}</div>}
 
                 {!error && filteredGuides.length === 0 && (
-                    <div className="fg-empty">{t("no_guides_found") || "No guides found."}</div>
+                    <div className="find-guide-empty">{t("no_guides_found") || "No guides found."}</div>
                 )}
 
-                <div className="fg-grid">
+                <div className="find-guide-grid">
                     {filteredGuides.map((g) => (
-                        <div key={g.id} className="fg-card">
-                            <div className="fg-card-main">
+                        <div key={g.id} className="find-guide-card">
+                            <div className="find-guide-card-main">
                                 <img
-                                    className="fg-avatar"
+                                    className="find-guide-avatar"
                                     src={toAbsMedia(g.avatar)}
                                     alt={g.full_name || ""}
                                     onError={(e) => {
                                         e.currentTarget.src = "/placeholder-avatar.png";
                                     }}
                                 />
-                                <div className="fg-info">
-                                    <div className="fg-name">{g.full_name}</div>
-                                    <div className="fg-loc">
+                                <div className="find-guide-info">
+                                    <div className="find-guide-name">{g.full_name}</div>
+                                    <div className="find-guide-loc">
                                         <FiMapPin />
                                         <span>
-                      {g.country_name}
+                                            {g.country_name}
                                             {g.city_name ? `, ${g.city_name}` : ""}
-                    </span>
+                                        </span>
                                     </div>
-                                    <div className="fg-rating">
+                                    <div className="find-guide-rating">
                                         <FiStar />
                                         <span>{Number(g.average_rating || 0).toFixed(2)}</span>
                                         <small>({g.total_reviews || 0})</small>
@@ -234,7 +234,11 @@ export default function FindGuide({ user }) {
                                 </div>
                             </div>
 
-                            <button className="fg-book-btn" onClick={() => handleBook(g)} title={t("book") || "Book"}>
+                            <button
+                                className="find-guide-book-btn"
+                                onClick={() => handleBook(g)}
+                                title={t("book") || "Book"}
+                            >
                                 <FiCalendar /> <span>{t("book") || "Book"}</span>
                             </button>
                         </div>

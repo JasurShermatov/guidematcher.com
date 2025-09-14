@@ -1,26 +1,26 @@
 :root {
-    --fg-bg: #0f1b2b;           /* page background */
-    --fg-panel: #18263a;        /* panel/card background */
-    --fg-panel-2: #203248;      /* inputs background */
-    --fg-border: #30465f;       /* soft borders */
-    --fg-text: #e6edf5;         /* primary text */
-    --fg-muted: #a7b3c3;        /* muted text */
-    --fg-brand: #7aa2ff;        /* brand / accents */
-    --fg-success: #59d499;      /* for subtle accents */
+    --fg-bg: #0f1b2b;
+    --fg-panel: #18263a;
+    --fg-panel-2: #203248;
+    --fg-border: #30465f;
+    --fg-text: #e6edf5;
+    --fg-muted: #a7b3c3;
+    --fg-brand: #7aa2ff;
+    --fg-success: #59d499;
     --fg-shadow: 0 8px 24px rgba(0,0,0,.35);
     --fg-radius: 12px;
     --fg-pad: 16px;
 }
 
 /* layout */
-.fg-wrapper {
+.find-guide-wrapper {
     min-height: 100vh;
     background: var(--fg-bg);
     color: var(--fg-text);
     padding: 16px;
 }
 
-.fg-panel {
+.find-guide-panel {
     max-width: 1140px;
     margin: 0 auto;
     background: var(--fg-panel);
@@ -31,7 +31,7 @@
 }
 
 /* header */
-.fg-header {
+.find-guide-header {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -42,12 +42,10 @@
     color: var(--fg-text);
 }
 
-.fg-header svg {
-    opacity: .9;
-}
+.find-guide-header svg { opacity: .9; }
 
 /* filters row */
-.fg-filters {
+.find-guide-filters {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr auto;
     gap: 16px;
@@ -55,18 +53,18 @@
     align-items: end;
 }
 
-.fg-field {
+.find-guide-field {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.fg-field label {
+.find-guide-field label {
     font-size: 12px;
     color: var(--fg-muted);
 }
 
-.fg-field input {
+.find-guide-field input {
     width: 100%;
     border-radius: 10px;
     border: 1px solid var(--fg-border);
@@ -76,17 +74,15 @@
     outline: none;
 }
 
-.fg-field input::placeholder {
-    color: #7b8aa1;
-}
+.find-guide-field input::placeholder { color: #7b8aa1; }
 
-.fg-field input:focus {
+.find-guide-field input:focus {
     border-color: var(--fg-brand);
     box-shadow: 0 0 0 3px rgba(122,162,255,.15);
 }
 
 /* search button */
-.fg-search-btn {
+.find-guide-search-btn {
     height: 38px;
     padding: 0 16px;
     border-radius: 10px;
@@ -99,32 +95,33 @@
     cursor: pointer;
 }
 
-.fg-search-btn:hover {
+.find-guide-search-btn:hover {
     border-color: var(--fg-brand);
     color: #fff;
 }
 
 /* empty + error */
-.fg-empty, .fg-error {
+.find-guide-empty,
+.find-guide-error {
     padding: 8px 16px 16px;
     color: var(--fg-muted);
 }
 
-.fg-error { color: #ffb4b4; }
+.find-guide-error { color: #ffb4b4; }
 
 /* grid + card */
-.fg-grid {
+.find-guide-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
     padding: 8px 16px 18px;
 }
 @media (max-width: 900px) {
-    .fg-filters { grid-template-columns: 1fr; }
-    .fg-grid { grid-template-columns: 1fr; }
+    .find-guide-filters { grid-template-columns: 1fr; }
+    .find-guide-grid { grid-template-columns: 1fr; }
 }
 
-.fg-card {
+.find-guide-card {
     background: var(--fg-panel-2);
     border: 1px solid var(--fg-border);
     border-radius: var(--fg-radius);
@@ -135,13 +132,13 @@
     gap: 12px;
 }
 
-.fg-card-main {
+.find-guide-card-main {
     display: flex;
     align-items: center;
     gap: 14px;
 }
 
-.fg-avatar {
+.find-guide-avatar {
     width: 48px;
     height: 48px;
     border-radius: 999px;
@@ -149,14 +146,15 @@
     border: 2px solid var(--fg-brand);
 }
 
-.fg-info { display: grid; gap: 6px; }
+.find-guide-info { display: grid; gap: 6px; }
 
-.fg-name {
+.find-guide-name {
     font-weight: 700;
     line-height: 1.1;
 }
 
-.fg-loc, .fg-rating {
+.find-guide-loc,
+.find-guide-rating {
     display: inline-flex;
     gap: 8px;
     align-items: center;
@@ -164,10 +162,10 @@
     color: var(--fg-muted);
 }
 
-.fg-rating small { opacity: .75; margin-left: 4px; }
+.find-guide-rating small { opacity: .75; margin-left: 4px; }
 
 /* book button on the right */
-.fg-book-btn {
+.find-guide-book-btn {
     height: 40px;
     padding: 0 14px;
     border-radius: 10px;
@@ -180,7 +178,7 @@
     cursor: pointer;
 }
 
-.fg-book-btn:hover {
+.find-guide-book-btn:hover {
     background: rgba(122,162,255,.08);
     border-color: var(--fg-brand);
 }

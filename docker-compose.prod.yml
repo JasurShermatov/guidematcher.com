@@ -152,6 +152,8 @@ services:
       - static_data:/var/www/static
       - ./media:/var/www/media
       - /var/log/nginx:/var/log/nginx
+      - /etc/letsencrypt/live/uzguide.com/fullchain.pem:/etc/letsencrypt/live/uzguide.com/fullchain.pem:ro
+      - /etc/letsencrypt/live/uzguide.com/privkey.pem:/etc/letsencrypt/live/uzguide.com/privkey.pem:ro
     depends_on:
       backend:
         condition: service_started

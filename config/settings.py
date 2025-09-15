@@ -133,7 +133,7 @@ DATABASES = {
 }
 
 # ─── Static / Media ────────────────────────────────────────────
-STATIC_URL = "/static/"
+STATIC_URL = "/django-static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
 

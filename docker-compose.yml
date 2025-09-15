@@ -22,6 +22,23 @@ services:
     networks:
       - app-network
 
+  bot_db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    env_file:
+      - ./bot/.env
+    volumes:
+      - bot_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - app-network
+    ports:
+      - "5434:5432"
+
   redis:
     image: redis:7-alpine
     restart: unless-stopped
@@ -40,7 +57,7 @@ services:
     volumes:
       - .:/app
       - static_data:/app/staticfiles
-      - media_data:/app/media
+      - ./media:/app/media
     ports:
       - "8000:8000"
       - "587:587"
@@ -65,7 +82,7 @@ services:
       - ./bot/.env
     restart: always
     depends_on:
-      db:
+      bot_db:
         condition: service_healthy
     networks:
       - app-network
@@ -102,17 +119,15 @@ services:
     networks:
       - app-network
 
-  caddy:
-    image: caddy:2
+  nginx:
+    image: nginx:1.29-alpine
     restart: unless-stopped
     ports:
       - "80:80"
-      - "443:443"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-      - media_data:/var/www/guidematcher.com/media
+      - ./nginx/local.conf:/etc/nginx/conf.d/default.conf
+      - static_data:/var/www/static
+      - ./media:/var/www/media
     depends_on:
       backend:
         condition: service_started
@@ -125,8 +140,7 @@ volumes:
   postgres_data:
   static_data:
   media_data:
-  caddy_data:
-  caddy_config:
+  bot_postgres_data:
 
 networks:
   app-network:

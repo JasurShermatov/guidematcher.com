@@ -45,8 +45,6 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    """Write serializer (create/update)"""
-
     client_profile = serializers.PrimaryKeyRelatedField(
         queryset=ClientProfile.objects.all(),
         required=False,
@@ -58,7 +56,8 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at", "conversation")
+        read_only_fields = ("id", "created_at", "updated_at", "conversation",
+                            "client_profile", "status")
 
     def create(self, validated_data):
         if "client_profile" not in validated_data:

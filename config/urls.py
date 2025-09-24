@@ -1,24 +1,22 @@
 # config/urls.py
-
-from django.contrib import admin
-from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
-)
+# ---- Health endpoint (oddiy, tayyor) ----
+from django.http import HttpResponse
+from django.urls import path, include
+from django.views.decorators.http import require_safe
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
     SpectacularRedocView,
 )
-
-# ---- Health endpoint (oddiy, tayyor) ----
-from django.http import HttpResponse
-from django.views.decorators.http import require_safe
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
 
 
 @require_safe

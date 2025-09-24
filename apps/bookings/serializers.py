@@ -56,8 +56,14 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at", "conversation",
-                            "client_profile", "status")
+        read_only_fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "conversation",
+            "client_profile",
+            "status",
+        )
 
     def create(self, validated_data):
         if "client_profile" not in validated_data:

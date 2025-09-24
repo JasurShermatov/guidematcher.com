@@ -99,7 +99,6 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         return self.role == self.UserRole.SUPERADMIN
 
 
-
 class UserNotificationSettings(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="notify")
     allow_marketing = models.BooleanField(default=True)

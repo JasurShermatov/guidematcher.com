@@ -1,6 +1,7 @@
-from rest_framework.routers import DefaultRouter
+# apps/profiles/urls.py
 from django.urls import path, include
-from apps.profiles.views import (
+from rest_framework.routers import DefaultRouter
+from .views import (
     ClientProfileViewSet,
     CustomerProfileViewSet,
     PortfolioViewSet,
@@ -9,13 +10,14 @@ from apps.profiles.views import (
 )
 
 router = DefaultRouter()
-router.register(r"clients", ClientProfileViewSet, basename="client-profile")
-router.register(r"customers", CustomerProfileViewSet, basename="customer-profile")
-router.register(r"portfolios", PortfolioViewSet, basename="portfolio")
+# lookup_field = user_id bo‘lgani uchun route shunaqa:
+router.register(r"clients", ClientProfileViewSet, basename="client-profiles")
+router.register(r"customers", CustomerProfileViewSet, basename="customer-profiles")
+router.register(r"portfolio", PortfolioViewSet, basename="portfolio")
 router.register(
-    r"verifications", VerificationDocumentViewSet, basename="verification-document"
+    r"verification-docs", VerificationDocumentViewSet, basename="verification-docs"
 )
-router.register(r"unavailabilities", UnavailabilityViewSet, basename="unavailability")
+router.register(r"unavailability", UnavailabilityViewSet, basename="unavailability")
 
 urlpatterns = [
     path("", include(router.urls)),

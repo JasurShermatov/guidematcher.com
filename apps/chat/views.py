@@ -1,4 +1,6 @@
 # apps/chat/views.py
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -111,18 +113,14 @@ class MessageListView(generics.ListAPIView):
 
 @extend_schema(tags=["Chat"])
 class MessageCreateView(generics.CreateAPIView):
-
     serializer_class = MessageCreateSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
     def perform_create(self, serializer):
         message = serializer.save(sender=self.request.user)
-
-        # Update conversation timestamp
         message.conversation.updated_at = timezone.now()
-        message.conversation.save()
-
+        message.conversation.save(update_fields=["updated_at"])
         return message
 
     def create(self, request, *args, **kwargs):
@@ -130,10 +128,16 @@ class MessageCreateView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         message = self.perform_create(serializer)
 
-        message_serializer = MessageListSerializer(
-            message, context={"request": request}
+        # 🔔 WS orqali shu suhbat guruhiga real-time event
+        channel_layer = get_channel_layer()
+        group_name = f"chat_{message.conversation_id}"
+
+        payload = MessageListSerializer(message, context={"request": request}).data
+        async_to_sync(channel_layer.group_send)(
+            group_name, {"type": "chat_message", "message": payload}
         )
-        return Response(message_serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(payload, status=status.HTTP_201_CREATED)
 
 
 @extend_schema(tags=["Chat"])

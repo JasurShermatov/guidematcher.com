@@ -36,14 +36,12 @@ def load_config() -> Config:
         int(admin_id.strip()) for admin_id in admin_ids_str if admin_id.strip()
     ]
 
-    # Create a PostgreSQL connection URL for SQLAlchemy
-    db_user = os.getenv("DB_USER", "postgres")
-    db_pass = os.getenv("DB_PASS", "postgres")
-    db_host = os.getenv("DB_HOST", "localhost")
-    db_name = os.getenv("DB_NAME", "postgres")
-    db_port = os.getenv(
-        "DB_PORT", "5432"
-    )  # Note: Changed "PORT" to "DB_PORT" to avoid conflicts with other apps
+    db_user = os.getenv("POSTGRES_USER", "postgres")
+    db_pass = os.getenv("POSTGRES_PASSWORD", "postgres")  # <— changed from DB_PASS
+    db_host = os.getenv("POSTGRES_HOST", "bot_db")  # <— changed from DB_HOST
+    db_name = os.getenv("POSTGRES_DB", "postgres")  # <— changed from DB_NAME
+    db_port = os.getenv("POSTGRES_PORT", "5433")  # <— changed from DB_PORT
+
     sqlalchemy_database_url = (
         f"postgresql+asyncpg://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
     )

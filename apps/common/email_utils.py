@@ -13,7 +13,6 @@ def send_email(to_email, subject, content):
         sib_api_v3_sdk.ApiClient(configuration)
     )
 
-
     # ✉️ Email ma’lumotlari
     send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
         to=[{"email": to_email}],

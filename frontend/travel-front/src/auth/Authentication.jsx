@@ -6,14 +6,17 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import "./Authentication.css";
+
 // API Configuration
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/";
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
 const api = axios.create({
     baseURL: API_URL,
     headers: { "Content-Type": "application/json" },
     withCredentials: false,
 });
+
 // Token Interceptor
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("access_token");
@@ -26,6 +29,7 @@ api.interceptors.request.use((config) => {
     });
     return config;
 });
+
 // Token Refresh Interceptor
 api.interceptors.response.use(
     (response) => {
@@ -84,6 +88,7 @@ api.interceptors.response.use(
         return Promise.reject(new Error(errorMessage));
     }
 );
+
 // Necessary API Functions for Authentication
 const loginUser = (payload) => {
     console.log("Logging in user:", { ...payload, password: "***" });
@@ -113,10 +118,14 @@ const getCurrentUserShort = () => {
     console.log("Getting current user short info...");
     return api.get("auth/users/short/").then((r) => r.data);
 };
+
 // React Component
 const Authentication = ({ setIsAuthenticated, setUser }) => {
     const { t, i18n } = useTranslation("translation");
+
+    // 🔁 Endi tabs o‘rniga faqat activeTab holati
     const [activeTab, setActiveTab] = useState("login");
+
     const [loginForm, setLoginForm] = useState({ email: "", password: "" });
     const [registerForm, setRegisterForm] = useState({
         role: "Client",
@@ -133,12 +142,14 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         new_password: "",
         confirm_password: "",
     });
+
     const [verificationCode, setVerificationCode] = useState("");
     const [checkboxes, setCheckboxes] = useState({
         personalData: false,
         terms: false,
         travelTips: false,
     });
+
     const [error, setError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [loading, setLoading] = useState(false);
@@ -149,37 +160,41 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+
     const countryInputRef = useRef(null);
     const navigate = useNavigate();
-    // Debugging: Log current language and translations
+
+    // Debugging
     useEffect(() => {
         console.log("Authentication language:", i18n.language);
         console.log("Authentication translations:", i18n.getResourceBundle(i18n.language, "translation")?.authentication);
     }, [i18n.language]);
+
     const countries = [
-        "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
-        "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin",
-        "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
-        "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia",
-        "Comoros", "Congo (Congo-Brazzaville)", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia (Czech Republic)",
-        "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea",
-        "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany",
-        "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary",
-        "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan",
-        "Kazakhstan", "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kuwait", "Kyrgyzstan", "Laos", "Latvia",
-        "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi",
-        "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia",
-        "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar (Burma)", "Namibia", "Nauru",
-        "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Macedonia", "Norway", "Oman",
-        "Pakistan", "Palau", "Palestine State", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland",
-        "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines",
-        "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone",
-        "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Sudan", "Spain", "Sri Lanka",
-        "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste",
-        "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine",
-        "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City",
-        "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+        "Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia","Australia",
+        "Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin",
+        "Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi",
+        "Cabo Verde","Cambodia","Cameroon","Canada","Central African Republic","Chad","Chile","China","Colombia",
+        "Comoros","Congo (Congo-Brazzaville)","Costa Rica","Croatia","Cuba","Cyprus","Czechia (Czech Republic)",
+        "Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea",
+        "Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany",
+        "Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary",
+        "Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan",
+        "Kazakhstan","Kenya","Kiribati","Korea, North","Korea, South","Kuwait","Kyrgyzstan","Laos","Latvia",
+        "Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi",
+        "Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia",
+        "Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar (Burma)","Namibia","Nauru",
+        "Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Macedonia","Norway","Oman",
+        "Pakistan","Palau","Palestine State","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland",
+        "Portugal","Qatar","Romania","Russia","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines",
+        "Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone",
+        "Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Sudan","Spain","Sri Lanka",
+        "Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor-Leste",
+        "Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine",
+        "United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Vatican City",
+        "Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"
     ];
+
     useEffect(() => {
         const checkAuth = async () => {
             const token = localStorage.getItem("access_token");
@@ -205,27 +220,33 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         };
         checkAuth();
     }, [setIsAuthenticated, setUser, navigate]);
+
     const clearMessages = () => {
         setError("");
         setSuccessMessage("");
     };
+
     const handleLoginChange = (e) => {
         setLoginForm({ ...loginForm, [e.target.name]: e.target.value });
         clearMessages();
     };
+
     const handleRegisterChange = (e) => {
         const { name, value } = e.target;
         setRegisterForm({ ...registerForm, [name]: value });
         clearMessages();
+
         if (name === "country") {
             const filteredSuggestions = countries
                 .filter((country) => country.toLowerCase().startsWith(value.toLowerCase()))
                 .slice(0, 5);
             setCountrySuggestions(filteredSuggestions);
         }
+
         if (name === "password" || name === "confirm_password") {
             const currentPassword = name === "password" ? value : registerForm.password;
             const currentConfirmPassword = name === "confirm_password" ? value : registerForm.confirm_password;
+
             if (value && !passwordRegex.test(value)) {
                 setError(t("authentication.errors.password_requirements", {
                     defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
@@ -237,13 +258,16 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             }
         }
     };
+
     const handleForgotChange = (e) => {
         const { name, value } = e.target;
         setForgotForm({ ...forgotForm, [name]: value });
         clearMessages();
+
         if (name === "new_password" || name === "confirm_password") {
             const currentNewPassword = name === "new_password" ? value : forgotForm.new_password;
             const currentConfirmPassword = name === "confirm_password" ? value : forgotForm.confirm_password;
+
             if (value && !passwordRegex.test(value)) {
                 setError(t("authentication.errors.password_requirements", {
                     defaultValue: "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
@@ -255,19 +279,23 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             }
         }
     };
+
     const handleCountrySelect = (country) => {
         setRegisterForm({ ...registerForm, country });
         setCountrySuggestions([]);
         if (countryInputRef.current) countryInputRef.current.focus();
     };
+
     const handleCheckboxChange = (e) => {
         setCheckboxes({ ...checkboxes, [e.target.name]: e.target.checked });
         clearMessages();
     };
+
     const toggleShowPassword = () => setShowPassword(!showPassword);
     const toggleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
     const toggleShowNewPassword = () => setShowNewPassword(!showNewPassword);
     const toggleShowConfirmNewPassword = () => setShowConfirmNewPassword(!showConfirmNewPassword);
+
     const getLoginErrorMessage = (errorMessage) => {
         if (errorMessage.includes("No active account found") || errorMessage.includes("credentials")) {
             return t("authentication.errors.invalid_email_or_password", { defaultValue: "Invalid email or password" });
@@ -278,6 +306,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         }
         return errorMessage || t("authentication.errors.login_failed", { defaultValue: "Login failed" });
     };
+
     const getRegisterErrorMessage = (errorMessage) => {
         if (errorMessage.includes("This email is already registered")) {
             return t("authentication.errors.email_exists", { defaultValue: "This email is already registered" });
@@ -294,6 +323,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         }
         return errorMessage || t("authentication.errors.registration_failed", { defaultValue: "Registration failed" });
     };
+
     const getForgotErrorMessage = (errorMessage) => {
         if (errorMessage.includes("Too many password reset requests")) {
             return t("authentication.errors.too_many_requests", { defaultValue: "Too many password reset requests. Please wait 30 minutes and try again." });
@@ -308,10 +338,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         }
         return errorMessage || t("authentication.errors.password_reset_failed", { defaultValue: "Password reset failed" });
     };
+
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
         clearMessages();
         setLoading(true);
+
         if (!loginForm.email || !loginForm.password) {
             setError(t("authentication.errors.all_fields_required", { defaultValue: "All fields are required" }));
             setLoading(false);
@@ -324,6 +356,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
             return;
         }
+
         try {
             const tokenData = await loginUser({
                 email: loginForm.email.toLowerCase().trim(),
@@ -333,6 +366,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             localStorage.setItem("refresh_token", tokenData.refresh);
             setIsAuthenticated(true);
             setUser(tokenData.user);
+
             if (tokenData.user.role === "Client") {
                 navigate("/user-account");
             } else if (tokenData.user.role === "Customer") {
@@ -347,11 +381,14 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
         }
     };
+
     const handleRegisterSubmit = async (e) => {
         e.preventDefault();
         clearMessages();
         setLoading(true);
+
         const { role, first_name, last_name, email, password, confirm_password, country } = registerForm;
+
         if (!role || !first_name || !last_name || !email || !password || !confirm_password || !country) {
             setError(t("authentication.errors.all_fields_required", { defaultValue: "All fields are required" }));
             setLoading(false);
@@ -379,6 +416,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
             return;
         }
+
         try {
             await requestCode({ email: email.toLowerCase().trim() });
             setSuccessMessage(t("authentication.success.verification_code_sent", { defaultValue: "Verification code sent" }));
@@ -394,10 +432,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
         }
     };
+
     const handleVerifyCode = async (e) => {
         e.preventDefault();
         clearMessages();
         setLoading(true);
+
         if (!verificationCode) {
             setError(t("authentication.errors.verification_code_required", { defaultValue: "Verification code is required" }));
             setLoading(false);
@@ -408,6 +448,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
             return;
         }
+
         try {
             const { role, first_name, last_name, email, password, country } = registerForm;
             const tokenResponse = await registerUser({
@@ -424,6 +465,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setIsAuthenticated(true);
             setUser(tokenResponse.user);
             setSuccessMessage(t("authentication.success.registration_successful", { defaultValue: "Registration successful" }));
+
             if (tokenResponse.user.role === "Client") {
                 navigate("/user-account");
             } else if (tokenResponse.user.role === "Customer") {
@@ -438,6 +480,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
         }
     };
+
     const handleResendCode = async () => {
         clearMessages();
         setLoading(true);
@@ -455,15 +498,18 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
         }
     };
+
     const handleForgotSubmit = async (e) => {
         e.preventDefault();
         clearMessages();
         setLoading(true);
+
         if (!forgotForm.email) {
             setError(t("authentication.errors.all_fields_required", { defaultValue: "All fields are required" }));
             setLoading(false);
             return;
         }
+
         try {
             const response = await requestPasswordReset({ email: forgotForm.email.toLowerCase().trim() });
             setSuccessMessage(response.message || t("authentication.success.reset_code_sent", { defaultValue: "Password reset code sent" }));
@@ -474,11 +520,14 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
         }
     };
+
     const handleResetPassword = async (e) => {
         e.preventDefault();
         clearMessages();
         setLoading(true);
+
         const { email, code, new_password, confirm_password } = forgotForm;
+
         if (!code || !new_password || !confirm_password) {
             setError(t("authentication.errors.all_fields_required", { defaultValue: "All fields are required" }));
             setLoading(false);
@@ -501,6 +550,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
             return;
         }
+
         try {
             await confirmPasswordReset({
                 email: email.toLowerCase().trim(),
@@ -509,15 +559,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             });
             setSuccessMessage(t("authentication.success.password_reset_successful", { defaultValue: "Password reset successful" }));
             setTimeout(() => {
-                setActiveTab("login");
-                setForgotStep(false);
-                setForgotForm({
-                    email: "",
-                    code: "",
-                    new_password: "",
-                    confirm_password: "",
-                });
-                clearMessages();
+                switchTab("login");
             }, 2000);
         } catch (error) {
             setError(getForgotErrorMessage(error.message));
@@ -525,6 +567,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
         }
     };
+
     const handleResendResetCode = async () => {
         clearMessages();
         setLoading(true);
@@ -537,9 +580,11 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
             setLoading(false);
         }
     };
+
     const handleSocialLogin = (provider) => {
         alert(t("authentication.social_login_under_development", { provider, defaultValue: `Social login with ${provider} is under development` }));
     };
+
     const resetRegisterForm = () => {
         setRegisterForm({
             role: "Client",
@@ -555,6 +600,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setVerificationStep(false);
         clearMessages();
     };
+
     const closeModal = () => {
         navigate(-1);
         resetRegisterForm();
@@ -562,6 +608,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setCountrySuggestions([]);
         clearMessages();
     };
+
     const switchTab = (tab) => {
         setActiveTab(tab);
         setVerificationStep(false);
@@ -571,6 +618,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         setLoginForm({ email: "", password: "" });
         setForgotForm({ email: "", code: "", new_password: "", confirm_password: "" });
     };
+
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === "Escape") closeModal();
@@ -578,45 +626,60 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, []);
+
+    // 🔽 Pastda ko‘rinadigan tez o‘tish bloklari
+    const SwitchLinks = () => {
+        if (activeTab === "login") {
+            return (
+                <div className="auth-switches" aria-label="Other actions">
+                    <button type="button" className="auth-switch-btn" onClick={() => switchTab("register")}>
+                        <FiUser /> {t("authentication.tabs.register", { defaultValue: "Register" })}
+                    </button>
+                    <button type="button" className="auth-switch-btn" onClick={() => switchTab("forgot")}>
+                        <FiRotateCcw /> {t("authentication.tabs.forgot_password", { defaultValue: "Forgot Password" })}
+                    </button>
+                </div>
+            );
+        }
+        if (activeTab === "register") {
+            return (
+                <div className="auth-switches" aria-label="Other actions">
+                    <button type="button" className="auth-switch-btn" onClick={() => switchTab("login")}>
+                        <FiLogIn /> {t("authentication.tabs.login", { defaultValue: "Login" })}
+                    </button>
+                    <button type="button" className="auth-switch-btn" onClick={() => switchTab("forgot")}>
+                        <FiRotateCcw /> {t("authentication.tabs.forgot_password", { defaultValue: "Forgot Password" })}
+                    </button>
+                </div>
+            );
+        }
+        // forgot
+        return (
+            <div className="auth-switches" aria-label="Other actions">
+                <button type="button" className="auth-switch-btn" onClick={() => switchTab("login")}>
+                    <FiLogIn /> {t("authentication.tabs.login", { defaultValue: "Login" })}
+                </button>
+                <button type="button" className="auth-switch-btn" onClick={() => switchTab("register")}>
+                    <FiUser /> {t("authentication.tabs.register", { defaultValue: "Register" })}
+                </button>
+            </div>
+        );
+    };
+
     return (
         <div className="auth-overlay" onClick={closeModal} role="dialog" aria-labelledby="auth-title" aria-modal="true">
             <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
                 <button className="auth-close-btn" onClick={closeModal} aria-label={t("authentication.close", { defaultValue: "Close" })}>
                     <FiX />
                 </button>
+
                 <div className="auth-header">
                     <h1 className="auth-brand">{t("authentication.brand", { defaultValue: "Authentication" })}</h1>
                     <p className="auth-subtitle">{t("authentication.subtitle", { defaultValue: "Please sign in or register" })}</p>
                 </div>
-                <div className="auth-tabs">
-                    <button
-                        className={`auth-tab ${activeTab === "login" ? "auth-tab-active" : ""}`}
-                        onClick={() => switchTab("login")}
-                        aria-selected={activeTab === "login"}
-                        disabled={loading}
-                    >
-                        <FiLogIn />
-                        {t("authentication.tabs.login", { defaultValue: "Login" })}
-                    </button>
-                    <button
-                        className={`auth-tab ${activeTab === "register" ? "auth-tab-active" : ""}`}
-                        onClick={() => switchTab("register")}
-                        aria-selected={activeTab === "register"}
-                        disabled={loading}
-                    >
-                        <FiUser />
-                        {t("authentication.tabs.register", { defaultValue: "Register" })}
-                    </button>
-                    <button
-                        className={`auth-tab ${activeTab === "forgot" ? "auth-tab-active" : ""}`}
-                        onClick={() => switchTab("forgot")}
-                        aria-selected={activeTab === "forgot"}
-                        disabled={loading}
-                    >
-                        <FiRotateCcw />
-                        {t("authentication.tabs.forgot_password", { defaultValue: "Forgot Password" })}
-                    </button>
-                </div>
+
+                {/* ❌ Tabs olib tashlandi */}
+
                 {error && (
                     <div className="auth-message auth-error" role="alert">
                         <div className="auth-message-icon"></div>
@@ -635,12 +698,15 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                         <span>{t("authentication.loading", { defaultValue: "Loading..." })}</span>
                     </div>
                 )}
+
+                {/* LOGIN */}
                 {activeTab === "login" && (
                     <div className="auth-content">
                         <div className="auth-form-header">
                             <h2 id="auth-title">{t("authentication.login.title", { defaultValue: "Login" })}</h2>
                             <p>{t("authentication.login.subtitle", { defaultValue: "Enter your credentials to access your account" })}</p>
                         </div>
+
                         <form className="auth-form" onSubmit={handleLoginSubmit}>
                             <div className="auth-form-group">
                                 <label htmlFor="login-email" className="auth-label">
@@ -660,6 +726,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     autoComplete="email"
                                 />
                             </div>
+
                             <div className="auth-form-group">
                                 <label htmlFor="login-password" className="auth-label">
                                     <FiLock className="auth-label-icon" />
@@ -689,22 +756,30 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                     </button>
                                 </div>
                             </div>
+
                             <button type="submit" className="auth-submit-btn" disabled={loading}>
                                 <FiLogIn />
                                 {t("authentication.login.submit", { defaultValue: "Login" })}
                             </button>
                         </form>
+
                         <div className="auth-divider">
                             <span>{t("authentication.login.or", { defaultValue: "or" })}</span>
                         </div>
+
+                        {/* Pastki linklar */}
+                        <SwitchLinks />
                     </div>
                 )}
+
+                {/* REGISTER */}
                 {activeTab === "register" && (
                     <div className="auth-content">
                         <div className="auth-form-header">
                             <h2 id="auth-title">{t("authentication.register.title", { defaultValue: "Register" })}</h2>
                             <p>{t("authentication.register.subtitle", { defaultValue: "Create a new account" })}</p>
                         </div>
+
                         {!verificationStep ? (
                             <form className="auth-form" onSubmit={handleRegisterSubmit}>
                                 <div className="auth-form-group">
@@ -725,6 +800,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         <option value="Customer">{t("authentication.register.role_customer", { defaultValue: "Customer" })}</option>
                                     </select>
                                 </div>
+
                                 <div className="auth-name-grid">
                                     <div className="auth-form-group">
                                         <label htmlFor="register-first_name" className="auth-label">
@@ -763,6 +839,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         />
                                     </div>
                                 </div>
+
                                 <div className="auth-form-group">
                                     <label htmlFor="register-email" className="auth-label">
                                         <FiMail className="auth-label-icon" />
@@ -781,6 +858,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         autoComplete="email"
                                     />
                                 </div>
+
                                 <div className="auth-form-group">
                                     <label htmlFor="register-password" className="auth-label">
                                         <FiLock className="auth-label-icon" />
@@ -810,6 +888,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         </button>
                                     </div>
                                 </div>
+
                                 <div className="auth-form-group">
                                     <label htmlFor="register-confirm_password" className="auth-label">
                                         <FiLock className="auth-label-icon" />
@@ -839,6 +918,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         </button>
                                     </div>
                                 </div>
+
                                 <div className="auth-form-group">
                                     <label htmlFor="register-country" className="auth-label">
                                         <FiGlobe className="auth-label-icon" />
@@ -876,6 +956,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         )}
                                     </div>
                                 </div>
+
                                 <div className="auth-checkbox-group">
                                     <label className="auth-checkbox-label">
                                         <input
@@ -922,6 +1003,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         <span>{t("authentication.register.travel_tips", { defaultValue: "Subscribe to travel tips" })}</span>
                                     </label>
                                 </div>
+
                                 <button type="submit" className="auth-submit-btn" disabled={loading}>
                                     <FiUser />
                                     {t("authentication.register.submit", { defaultValue: "Register" })}
@@ -943,6 +1025,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         }}
                                     />
                                 </div>
+
                                 <form className="auth-form" onSubmit={handleVerifyCode}>
                                     <div className="auth-form-group">
                                         <label htmlFor="verification-code" className="auth-label">
@@ -979,14 +1062,24 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                 </form>
                             </div>
                         )}
+
+                        <div className="auth-divider">
+                            <span>{t("authentication.login.or", { defaultValue: "or" })}</span>
+                        </div>
+
+                        {/* Pastki linklar */}
+                        <SwitchLinks />
                     </div>
                 )}
+
+                {/* FORGOT */}
                 {activeTab === "forgot" && (
                     <div className="auth-content">
                         <div className="auth-form-header">
                             <h2 id="auth-title">{t("authentication.forgot.title", { defaultValue: "Forgot Password" })}</h2>
                             <p>{t("authentication.forgot.subtitle", { defaultValue: "Reset your password" })}</p>
                         </div>
+
                         {!forgotStep ? (
                             <div className="auth-forgot-step">
                                 <div className="auth-forgot-icon">
@@ -1034,6 +1127,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                         }}
                                     />
                                 </div>
+
                                 <form className="auth-form" onSubmit={handleResetPassword}>
                                     <div className="auth-form-group">
                                         <label htmlFor="forgot-code" className="auth-label">
@@ -1055,6 +1149,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             pattern="[0-9]{6}"
                                         />
                                     </div>
+
                                     <div className="auth-form-group">
                                         <label htmlFor="forgot-new_password" className="auth-label">
                                             <FiLock className="auth-label-icon" />
@@ -1084,6 +1179,7 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             </button>
                                         </div>
                                     </div>
+
                                     <div className="auth-form-group">
                                         <label htmlFor="forgot-confirm_password" className="auth-label">
                                             <FiLock className="auth-label-icon" />
@@ -1113,10 +1209,12 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                             </button>
                                         </div>
                                     </div>
+
                                     <button type="submit" className="auth-submit-btn" disabled={loading}>
                                         <FiCheck />
                                         {t("authentication.forgot.reset_submit", { defaultValue: "Reset Password" })}
                                     </button>
+
                                     <button
                                         type="button"
                                         className="auth-resend-btn"
@@ -1129,10 +1227,18 @@ const Authentication = ({ setIsAuthenticated, setUser }) => {
                                 </form>
                             </div>
                         )}
+
+                        <div className="auth-divider">
+                            <span>{t("authentication.login.or", { defaultValue: "or" })}</span>
+                        </div>
+
+                        {/* Pastki linklar */}
+                        <SwitchLinks />
                     </div>
                 )}
             </div>
         </div>
     );
 };
+
 export default Authentication;

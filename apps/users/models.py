@@ -97,3 +97,12 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     @property
     def is_superadmin(self) -> bool:
         return self.role == self.UserRole.SUPERADMIN
+
+
+class UserNotificationSettings(BaseModel):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="notify")
+    allow_marketing = models.BooleanField(default=True)
+    allow_system = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"NotifySettings({self.user.email})"

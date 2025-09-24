@@ -1,518 +1,250 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { FiSearch, FiFilter, FiStar, FiMapPin, FiUsers } from 'react-icons/fi';
-import { useTranslation } from 'react-i18next';
-import axios from 'axios';
-import './FindGuide.css';
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { FiSearch, FiCalendar, FiMapPin, FiStar } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
+import axios from "axios";
+import "./FindGuide.css";
 
-// Simple debounce function
-const debounce = (func, wait) => {
-    let timeout;
-    return (...args) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func(...args), wait);
-    };
-};
-
-// API Configuration
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/";
-
+/* ======================= Axios (inline, as requested) ======================= */
+const API_URL = (process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1/").replace(/\/+$/, "") + "/";
 const api = axios.create({
     baseURL: API_URL,
     headers: { "Content-Type": "application/json" },
     withCredentials: false,
 });
 
-// Token Interceptor
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("access_token");
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
-        headers: config.headers,
-        data: config.data,
-    });
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
 });
 
-// Token Refresh Interceptor
 api.interceptors.response.use(
-    (response) => {
-        console.log(`API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-            status: response.status,
-            data: response.data,
-        });
-        return response;
-    },
+    (r) => r,
     async (error) => {
-        console.error(`API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
-            status: error.response?.status,
-            data: error.response?.data,
-            message: error.message,
-        });
-        const originalRequest = error.config;
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
+        const original = error.config || {};
+        if (error?.response?.status === 401 && !original._retry) {
+            original._retry = true;
             try {
-                const refreshToken = localStorage.getItem("refresh_token");
-                if (!refreshToken) {
-                    throw new Error("No refresh token available");
-                }
-                const refreshResponse = await api.post("token/refresh/", {
-                    refresh: refreshToken,
-                });
-                const newAccessToken = refreshResponse.data.access_token || refreshResponse.data.access;
-                localStorage.setItem("access_token", newAccessToken);
-                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                return api(originalRequest);
-            } catch (refreshError) {
-                console.error("Token refresh failed:", refreshError);
+                const refresh = localStorage.getItem("refresh_token");
+                if (!refresh) throw new Error("No refresh token");
+                const rr = await api.post("token/refresh/", { refresh });
+                const newAccess = rr.data?.access_token || rr.data?.access;
+                if (!newAccess) throw new Error("No access in refresh response");
+                localStorage.setItem("access_token", newAccess);
+                original.headers.Authorization = `Bearer ${newAccess}`;
+                return api(original);
+            } catch (e) {
                 localStorage.removeItem("access_token");
                 localStorage.removeItem("refresh_token");
                 window.location.href = "/login";
-                return Promise.reject(refreshError);
+                return Promise.reject(e);
             }
         }
-        let errorMessage = "Unknown error occurred";
-        if (error.response?.data) {
-            const data = error.response.data;
-            errorMessage =
-                data.detail ||
-                data.message ||
-                data.error ||
-                (data.email && data.email[0]) ||
-                (data.code && data.code[0]) ||
-                (data.non_field_errors && data.non_field_errors[0]) ||
-                JSON.stringify(data);
-        } else if (error.message) {
-            errorMessage = error.message;
-        }
-        return Promise.reject(new Error(errorMessage));
+        const msg =
+            error?.response?.data?.detail ||
+            error?.response?.data?.message ||
+            error?.response?.data?.error ||
+            error?.message ||
+            "Unknown error";
+        return Promise.reject(new Error(msg));
     }
 );
 
-// API Functions
-const getCustomerProfiles = (params = {}) => {
-    console.log("Getting customer profiles...", params);
-    return api.get("profiles/customers/", { params }).then((r) => r.data);
+/* ======================= Small helpers ======================= */
+const BACKEND_ORIGIN = API_URL.replace(/\/api\/v1\/?$/, "");
+const toAbsMedia = (url) => {
+    if (!url) return "/placeholder-avatar.png";
+    if (/^https?:\/\//i.test(url)) return url;
+    if (url.startsWith("/media")) return BACKEND_ORIGIN + url;
+    if (url.startsWith("media/")) return `${BACKEND_ORIGIN}/${url}`;
+    return url;
 };
 
-const getCountries = () => {
-    console.log("Getting countries...");
-    return api.get("common/countries/").then((r) => r.data);
-};
-
-const getCities = (countryId = null) => {
-    const params = countryId ? { country: countryId } : {};
-    console.log("Getting cities...", params);
-    return api.get("common/cities/", { params }).then((r) => r.data);
-};
-
-const getLanguages = () => {
-    console.log("Getting languages...");
-    return api.get("common/languages/").then((r) => r.data);
-};
-
-const createBooking = (payload) => {
-    console.log("Creating booking:", payload);
-    return api.post("bookings/bookings/", payload).then((r) => r.data);
-};
-
-const FindGuide = ({ user }) => {
-    const { t, i18n } = useTranslation('translation'); // Specify namespace explicitly
-    const [guides, setGuides] = useState([]);
-    const [countries, setCountries] = useState([]);
-    const [cities, setCities] = useState([]);
-    const [languages, setLanguages] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filters, setFilters] = useState({
-        country: '',
-        city: '',
-        language: '',
-        rating: 0,
-    });
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+/* ======================= Component ======================= */
+export default function FindGuide({ user }) {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Debugging: Log current language
-    useEffect(() => {
-        console.log('Current language:', i18n.language);
-        console.log('Available translations:', i18n.options.resources[i18n.language]?.translation?.find_guide);
-    }, [i18n.language]);
+    const [filters, setFilters] = useState({ country: "", city: "", rating: "" });
+    const [isSearching, setIsSearching] = useState(false);
+    const [guides, setGuides] = useState([]);
+    const [error, setError] = useState("");
 
-    // Handle pending booking after login
+    // read "auto-book" after login
     useEffect(() => {
         const { pendingBookGuideUserId } = location.state || {};
         if (user && pendingBookGuideUserId) {
-            console.log('Attempting auto-booking for userId:', pendingBookGuideUserId);
-            handleAutoBooking(pendingBookGuideUserId);
+            (async () => {
+                try {
+                    await api.post("bookings/bookings/", { customer: pendingBookGuideUserId });
+                    alert(t("booking_request_sent") || "Booking created successfully");
+                    navigate("/my-bookings", { replace: true });
+                } catch (e) {
+                    console.error(e);
+                    setError(t("find_guide.errors.booking_failed") || "Failed to create booking");
+                }
+            })();
         }
-    }, [user, location.state]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
 
-    // Fetch countries and languages on mount
+    // fetch all customers once; then filter on front-end
     useEffect(() => {
-        const fetchInitialData = async () => {
+        let mounted = true;
+        (async () => {
+            setIsSearching(true);
+            setError("");
             try {
-                setIsLoading(true);
-                const [countriesData, languagesData] = await Promise.all([
-                    getCountries(),
-                    getLanguages(),
-                ]);
-                console.log('Fetched countries:', countriesData);
-                console.log('Fetched languages:', languagesData);
-                setCountries(Array.isArray(countriesData) ? countriesData : []);
-                setLanguages(Array.isArray(languagesData) ? languagesData : []);
-            } catch (err) {
-                console.error('Error fetching initial data:', err);
-                setError(t('find_guide.errors.fetch_data', { defaultValue: 'An error occurred while fetching data' }));
+                const res = await api.get("profiles/customers/");
+                const list = res.data?.results || res.data || [];
+                if (mounted) setGuides(Array.isArray(list) ? list : []);
+            } catch (e) {
+                console.error(e);
+                if (mounted) setError(e.message || "Failed to load guides");
             } finally {
-                setIsLoading(false);
+                if (mounted) setIsSearching(false);
             }
+        })();
+        return () => {
+            mounted = false;
         };
-        fetchInitialData();
-    }, [t]);
+    }, []);
 
-    // Fetch cities when country changes
-    useEffect(() => {
-        if (filters.country) {
-            console.log('Fetching cities for country:', filters.country);
-            setIsLoading(true);
-            getCities(filters.country)
-                .then(data => {
-                    console.log('Fetched cities:', data);
-                    setCities(Array.isArray(data) ? data : []);
-                })
-                .catch(err => {
-                    console.error('Error fetching cities:', err);
-                    setError(t('find_guide.errors.fetch_cities', { defaultValue: 'An error occurred while fetching cities' }));
-                    setCities([]);
-                })
-                .finally(() => setIsLoading(false));
-        } else {
-            setCities([]);
-        }
-    }, [filters.country, t]);
+    const filteredGuides = useMemo(() => {
+        const c = (s) => String(s || "").toLowerCase().trim();
+        const wantCountry = c(filters.country);
+        const wantCity = c(filters.city);
+        const wantMinRating = Number(filters.rating || 0);
 
-    // Fetch guides based on search and filters
-    const fetchGuides = useCallback(
-        debounce(async () => {
-            try {
-                setIsLoading(true);
-                const params = {};
-                if (searchQuery) params.q = searchQuery;
-                if (filters.country) params.country = filters.country;
-                if (filters.city) params.city = filters.city;
-                if (filters.language) params.language = filters.language;
-                if (filters.rating) params.min_rating = filters.rating;
-                params.is_available = true;
-                params.limit = 100;
-                params.offset = 0;
+        return guides.filter((g) => {
+            const okCountry = !wantCountry || c(g.country_name).includes(wantCountry);
+            const okCity = !wantCity || c(g.city_name).includes(wantCity);
+            const okRate = Number(g.average_rating || 0) >= wantMinRating;
+            return okCountry && okCity && okRate;
+        });
+    }, [guides, filters]);
 
-                console.log('Fetching guides with params:', params);
-                const data = await getCustomerProfiles(params);
-                console.log('Fetched guides raw data:', data);
-
-                let guidesData = Array.isArray(data) ? data : (data.results || []);
-
-                if (!Array.isArray(guidesData)) {
-                    console.error('API response is not an array:', guidesData);
-                    setError(t('find_guide.errors.fetch_guides', { defaultValue: 'An error occurred while fetching guides' }));
-                    setGuides([]);
-                    return;
-                }
-
-                const mappedGuides = guidesData.map(profile => {
-                    const rating = typeof profile.average_rating === 'number' && !isNaN(profile.average_rating)
-                        ? profile.average_rating
-                        : 0;
-
-                    if (!profile.average_rating) {
-                        console.warn('Invalid or missing average_rating for profile:', profile);
-                    }
-
-                    return {
-                        id: profile.id || profile.profile_id || null,
-                        name: profile.full_name || t('find_guide.unknown_guide', { defaultValue: 'Unknown Guide' }),
-                        location: profile.city_name
-                            ? `${profile.city_name}, ${profile.country_name || t('find_guide.unknown_location', { defaultValue: 'Unknown' })}`
-                            : profile.country_name || t('find_guide.unknown_location', { defaultValue: 'Unknown Location' }),
-                        languages: Array.isArray(profile.languages) ? profile.languages.map(l => l.name || t('find_guide.unknown_language', { defaultValue: 'Unknown' })) : [],
-                        rating: rating,
-                        tours: Array.isArray(profile.service_types) ? profile.service_types.map(s => s.name || t('find_guide.unknown_tour', { defaultValue: 'Unknown' })) : [],
-                        price: profile.hourly_rate || 0,
-                        image: profile.user?.avatar || 'https://placehold.co/150x150',
-                        isOnline: profile.is_available || false,
-                        userId: profile.user?.id || null,
-                    };
-                });
-                console.log('Mapped guides:', mappedGuides);
-                setGuides(mappedGuides);
-                if (mappedGuides.length === 0) {
-                    setError(t('find_guide.errors.no_guides', { defaultValue: 'No guides found matching your criteria' }));
-                } else {
-                    setError('');
-                }
-            } catch (err) {
-                console.error('Error fetching guides:', err);
-                setError(t('find_guide.errors.fetch_guides', { defaultValue: 'An error occurred while fetching guides' }));
-                setGuides([]);
-            } finally {
-                setIsLoading(false);
-            }
-        }, 500),
-        [searchQuery, filters, t]
-    );
-
-    useEffect(() => {
-        console.log('useEffect triggered with searchQuery:', searchQuery, 'filters:', filters);
-        fetchGuides();
-    }, [fetchGuides]);
-
-    const handleSearchChange = (e) => {
-        setSearchQuery(e.target.value);
+    const onSubmit = (e) => {
+        e.preventDefault();
+        setFilters({ ...filters });
     };
 
-    const handleFilterChange = (e) => {
-        const { name, value } = e.target;
-        console.log('Filter changed:', { name, value });
-        setFilters(prev => ({ ...prev, [name]: value }));
-        if (name === 'country') {
-            setFilters(prev => ({ ...prev, city: '' }));
-        }
-    };
+    const handleBook = async (g) => {
+        const guideUserId = g?.user?.id;
+        if (!guideUserId) return;
 
-    const toggleFilter = () => {
-        setIsFilterOpen(!isFilterOpen);
-    };
-
-    const handleAutoBooking = async (guideUserId) => {
-        try {
-            console.log('Auto-booking guide with userId:', guideUserId);
-            await createBooking({ customer: guideUserId });
-            alert(t('find_guide.success_booking', { defaultValue: 'Booking created successfully' }));
-            navigate('/my-bookings', { replace: true });
-        } catch (err) {
-            console.error('Auto-booking failed:', err);
-            setError(t('find_guide.errors.booking_failed', { defaultValue: 'Failed to create booking' }));
-        }
-    };
-
-    const handleBookGuide = async (guide) => {
         if (!user) {
-            console.log('User not logged in, redirecting to login with guide userId:', guide.userId);
-            navigate('/login', { state: { pendingBookGuideUserId: guide.userId } });
+            navigate("/login", { state: { pendingBookGuideUserId: guideUserId } });
             return;
         }
-        try {
-            console.log('Booking guide with userId:', guide.userId);
-            await createBooking({ customer: guide.userId });
-            alert(t('find_guide.success_booking', { defaultValue: 'Booking created successfully' }));
-            navigate('/my-bookings');
-        } catch (err) {
-            console.error('Booking failed:', err);
-            setError(t('find_guide.errors.booking_failed', { defaultValue: 'Failed to create booking' }));
-        }
-    };
 
-    const handleMessageGuide = (guide) => {
-        if (!user) {
-            console.log('User not logged in, redirecting to login for messaging');
-            navigate('/login');
-            return;
+        try {
+            await api.post("bookings/bookings/", { customer: guideUserId });
+            alert(t("booking_request_sent") || "Booking created successfully");
+            navigate("/my-bookings");
+        } catch (e) {
+            console.error(e);
+            alert((t("booking_failed") || "Booking failed") + ": " + e.message);
         }
-        console.log('Navigating to chat with guide userId:', guide.userId);
-        navigate(`/chat/${guide.userId}`);
     };
 
     return (
-        <div className="find-guide">
-            <div className="find-guide-container">
-                <header className="find-guide-header">
-                    <h1 className="find-guide-title">{t('find_guide.title', { defaultValue: 'Find a Guide' })}</h1>
-                    <p className="find-guide-subtitle">{t('find_guide.subtitle', { defaultValue: 'Discover the best local guides for your next adventure' })}</p>
-                </header>
-                <div className="find-guide-search-section">
-                    <div className="find-guide-search-bar">
-                        <FiSearch className="find-guide-search-icon" />
+        <div className="find-guide-wrapper">
+            <div className="find-guide-panel">
+                <div className="find-guide-header">
+                    <FiSearch />
+                    <span>{t("find_guides") || "Find Guides"}</span>
+                </div>
+
+                <form className="find-guide-filters" onSubmit={onSubmit}>
+                    <div className="find-guide-field">
+                        <label>{t("country") || "Country"}</label>
                         <input
-                            type="text"
-                            placeholder={t('find_guide.search_placeholder', { defaultValue: 'Search guides by name or keyword' })}
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                            className="find-guide-search-input"
-                            aria-label={t('find_guide.search_aria_label', { defaultValue: 'Search guides' })}
+                            placeholder={t("country") || "Country"}
+                            value={filters.country}
+                            onChange={(e) => setFilters((f) => ({ ...f, country: e.target.value }))}
                         />
                     </div>
-                    <button
-                        className="find-guide-filter-toggle"
-                        onClick={toggleFilter}
-                        aria-label={t('find_guide.toggle_filters', { defaultValue: 'Toggle filters' })}
-                    >
-                        <FiFilter />
-                        <span>{t('find_guide.filters', { defaultValue: 'Filters' })}</span>
-                    </button>
-                </div>
-                {error && <p className="find-guide-error">{error}</p>}
-                {isLoading && <p className="find-guide-loading">{t('find_guide.loading', { defaultValue: 'Loading...' })}</p>}
-                {isFilterOpen && (
-                    <div className="find-guide-filter-section">
-                        <div className="find-guide-filter-grid">
-                            <div className="find-guide-form-group">
-                                <label htmlFor="country">{t('find_guide.country', { defaultValue: 'Country' })}</label>
-                                <select
-                                    id="country"
-                                    name="country"
-                                    value={filters.country}
-                                    onChange={handleFilterChange}
-                                    className="find-guide-select"
-                                    aria-label={t('find_guide.select_country', { defaultValue: 'Select country' })}
-                                >
-                                    <option value="">{t('find_guide.all_countries', { defaultValue: 'All Countries' })}</option>
-                                    {countries.map(country => (
-                                        <option key={country.id} value={country.id}>
-                                            {country.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="find-guide-form-group">
-                                <label htmlFor="city">{t('find_guide.city', { defaultValue: 'City' })}</label>
-                                <select
-                                    id="city"
-                                    name="city"
-                                    value={filters.city}
-                                    onChange={handleFilterChange}
-                                    className="find-guide-select"
-                                    disabled={!filters.country}
-                                    aria-label={t('find_guide.select_city', { defaultValue: 'Select city' })}
-                                >
-                                    <option value="">{t('find_guide.all_cities', { defaultValue: 'All Cities' })}</option>
-                                    {cities.map(city => (
-                                        <option key={city.id} value={city.id}>
-                                            {city.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="find-guide-form-group">
-                                <label htmlFor="language">{t('find_guide.language', { defaultValue: 'Language' })}</label>
-                                <select
-                                    id="language"
-                                    name="language"
-                                    value={filters.language}
-                                    onChange={handleFilterChange}
-                                    className="find-guide-select"
-                                    aria-label={t('find_guide.select_language', { defaultValue: 'Select language' })}
-                                >
-                                    <option value="">{t('find_guide.all_languages', { defaultValue: 'All Languages' })}</option>
-                                    {languages.map(lang => (
-                                        <option key={lang.id} value={lang.id}>
-                                            {lang.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="find-guide-form-group">
-                                <label htmlFor="rating">{t('find_guide.minimum_rating', { defaultValue: 'Minimum Rating' })}</label>
-                                <select
-                                    id="rating"
-                                    name="rating"
-                                    value={filters.rating}
-                                    onChange={handleFilterChange}
-                                    className="find-guide-select"
-                                    aria-label={t('find_guide.select_rating', { defaultValue: 'Select minimum rating' })}
-                                >
-                                    <option value={0}>{t('find_guide.all_ratings', { defaultValue: 'All Ratings' })}</option>
-                                    <option value={4}>{t('find_guide.4_stars', { defaultValue: '4 Stars' })}</option>
-                                    <option value={4.5}>{t('find_guide.4_5_stars', { defaultValue: '4.5 Stars' })}</option>
-                                    <option value={5}>{t('find_guide.5_stars', { defaultValue: '5 Stars' })}</option>
-                                </select>
-                            </div>
-                        </div>
+
+                    <div className="find-guide-field">
+                        <label>{t("city") || "City"}</label>
+                        <input
+                            placeholder={t("city") || "City"}
+                            value={filters.city}
+                            onChange={(e) => setFilters((f) => ({ ...f, city: e.target.value }))}
+                        />
                     </div>
+
+                    <div className="find-guide-field">
+                        <label>{t("min_rating") || "Minimum Rating"}</label>
+                        <input
+                            placeholder={t("min_rating") || "Minimum Rating"}
+                            type="number"
+                            min={0}
+                            max={5}
+                            step="0.1"
+                            value={filters.rating}
+                            onChange={(e) => setFilters((f) => ({ ...f, rating: e.target.value }))}
+                        />
+                    </div>
+
+                    <button className="find-guide-search-btn" disabled={isSearching}>
+                        <FiSearch />{" "}
+                        <span>
+                            {isSearching ? (t("searching") || "Searching") : (t("search") || "Search")}
+                        </span>
+                    </button>
+                </form>
+
+                {/* Results */}
+                {error && <div className="find-guide-error">{error}</div>}
+
+                {!error && filteredGuides.length === 0 && (
+                    <div className="find-guide-empty">{t("no_guides_found") || "No guides found."}</div>
                 )}
+
                 <div className="find-guide-grid">
-                    {guides.length > 0 ? (
-                        guides.map(guide => (
-                            <div key={guide.id} className="find-guide-card">
-                                <div className="find-guide-card-header">
-                                    <div className="find-guide-avatar-container">
-                                        <img
-                                            src={guide.image}
-                                            alt={guide.name}
-                                            className="find-guide-avatar"
-                                            onError={(e) => { e.target.src = 'https://placehold.co/150x150'; }}
-                                        />
-                                        <span
-                                            className={`find-guide-online-status ${guide.isOnline ? 'find-guide-online' : 'find-guide-offline'}`}
-                                        ></span>
+                    {filteredGuides.map((g) => (
+                        <div key={g.id} className="find-guide-card">
+                            <div className="find-guide-card-main">
+                                <img
+                                    className="find-guide-avatar"
+                                    src={toAbsMedia(g.avatar)}
+                                    alt={g.full_name || ""}
+                                    onError={(e) => {
+                                        e.currentTarget.src = "/placeholder-avatar.png";
+                                    }}
+                                />
+                                <div className="find-guide-info">
+                                    <div className="find-guide-name">{g.full_name}</div>
+                                    <div className="find-guide-loc">
+                                        <FiMapPin />
+                                        <span>
+                                            {g.country_name}
+                                            {g.city_name ? `, ${g.city_name}` : ""}
+                                        </span>
                                     </div>
-                                    <div className="find-guide-info">
-                                        <h3 className="find-guide-name">{guide.name}</h3>
-                                        <p className="find-guide-location">
-                                            <FiMapPin /> {guide.location}
-                                        </p>
-                                        <div className="find-guide-rating">
-                                            <FiStar /> {guide.rating === 0 ? t('find_guide.no_rating', { defaultValue: 'N/A' }) : guide.rating.toFixed(1)}
-                                        </div>
+                                    <div className="find-guide-rating">
+                                        <FiStar />
+                                        <span>{Number(g.average_rating || 0).toFixed(2)}</span>
+                                        <small>({g.total_reviews || 0})</small>
                                     </div>
-                                </div>
-                                <div className="find-guide-details">
-                                    <div className="find-guide-languages">
-                                        <strong>{t('find_guide.languages', { defaultValue: 'Languages' })}</strong>
-                                        <div className="find-guide-language-tags">
-                                            {guide.languages.length > 0 ? (
-                                                guide.languages.map((lang, index) => (
-                                                    <span key={index} className="find-guide-language-tag">{lang}</span>
-                                                ))
-                                            ) : (
-                                                <span className="find-guide-language-tag">{t('find_guide.none', { defaultValue: 'None' })}</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="find-guide-tours">
-                                        <strong>{t('find_guide.tours', { defaultValue: 'Tours' })}</strong>
-                                        <div className="find-guide-tour-tags">
-                                            {guide.tours.length > 0 ? (
-                                                guide.tours.map((tour, index) => (
-                                                    <span key={index} className="find-guide-tour-tag">{tour}</span>
-                                                ))
-                                            ) : (
-                                                <span className="find-guide-tour-tag">{t('find_guide.none', { defaultValue: 'None' })}</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="find-guide-price">
-                                        <strong>{t('find_guide.price', { defaultValue: 'Price' })}</strong> ${guide.price.toFixed(2)}/{t('find_guide.hour', { defaultValue: 'hour' })}
-                                    </div>
-                                </div>
-                                <div className="find-guide-actions">
-                                    <button
-                                        className="find-guide-btn find-guide-book-btn"
-                                        onClick={() => handleBookGuide(guide)}
-                                        disabled={!guide.userId || isLoading}
-                                        aria-label={`${t('find_guide.book_now', { defaultValue: 'Book Now' })} ${guide.name}`}
-                                    >
-                                        {t('find_guide.book_now', { defaultValue: 'Book Now' })}
-                                    </button>
                                 </div>
                             </div>
-                        ))
-                    ) : (
-                        <div className="find-guide-empty-state">
-                            <FiUsers size={48} />
-                            <h3>{t('find_guide.no_guides', { defaultValue: 'No Guides Found' })}</h3>
-                            <p>{t('find_guide.no_guides_description', { defaultValue: 'Try adjusting your search or filters to find available guides.' })}</p>
+
+                            <button
+                                className="find-guide-book-btn"
+                                onClick={() => handleBook(g)}
+                                title={t("book") || "Book"}
+                            >
+                                <FiCalendar /> <span>{t("book") || "Book"}</span>
+                            </button>
                         </div>
-                    )}
+                    ))}
                 </div>
             </div>
         </div>
     );
-};
-
-export default FindGuide;
+}

@@ -6,14 +6,22 @@ COPY package*.json ./
 RUN npm ci --legacy-peer-deps
 
 ############################################
-# 2-bosqich: build layer  ->  ALIAS = builder
+# 2-bosqich: build layer
 FROM deps AS builder
 WORKDIR /app
 COPY . .
+
+# --- API va WS uchun ARG ---
 ARG REACT_APP_API_URL=http://localhost:8000/api/v1/
+ARG REACT_APP_WS_ORIGIN=ws://localhost:8000
+
+# --- React build vaqtida ENV ---
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
+ENV REACT_APP_WS_ORIGIN=$REACT_APP_WS_ORIGIN
+
 ENV NODE_OPTIONS="--max_old_space_size=1024"
 ENV CI=false
+
 RUN npm run build
 
 ############################################

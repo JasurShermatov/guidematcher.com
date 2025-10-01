@@ -1,4 +1,6 @@
 # apps/profiles/views.py
+from uuid import UUID
+
 from django.core.files.storage import default_storage
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
@@ -74,7 +76,7 @@ class AvatarMixin:
 
 # ---------- Base profile viewset ----------
 class BaseProfileViewSet(viewsets.ModelViewSet):
-    lookup_field = "user_id"
+    lookup_field = "user__id"
     lookup_url_kwarg = "user_id"
     parser_classes = [JSONParser, MultiPartParser, FormParser]
 
@@ -94,13 +96,23 @@ class BaseProfileViewSet(viewsets.ModelViewSet):
                 return getattr(self.request.user, self.profile_attr)
             except self.model.DoesNotExist:
                 raise NotFound({"detail": "Profile not found."})
-        user_id = self.kwargs.get(self.lookup_url_kwarg)
+
+        ident = self.kwargs.get(self.lookup_url_kwarg)
+        if ident is None:
+            raise NotFound({"detail": "Identifier is required."})
+
+        # 1) Avval User UUID sifatida (lookup_field = user__id)
         try:
-            return self.model.objects.get(user_id=user_id)
+            UUID(str(ident))
+            return self.model.objects.get(user__id=str(ident))
+        except Exception:
+            pass
+
+        # 2) Keyin modelning o‘z PK’i sifatida (int/uuid)
+        try:
+            return self.model.objects.get(pk=ident)
         except self.model.DoesNotExist:
-            raise NotFound(
-                {"detail": f"No {self.model.__name__} matches this user ID."}
-            )
+            raise NotFound({"detail": f"No {self.model.__name__} found for given id."})
 
     @action(detail=False, methods=["get", "put", "patch"], url_path="my")
     def my_profile(self, request):
@@ -121,7 +133,7 @@ class BaseProfileViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         if self.model.objects.filter(user=self.request.user).exists():
             raise ValidationError({"detail": "You already have a profile."})
-        if getattr(self.request.user, "role", None) != self.user_role:
+        if str(getattr(self.request.user, "role", "")).lower() != str(self.user_role).lower():
             raise ValidationError(
                 {"detail": f"Only {self.user_role}s can create profile."}
             )
@@ -215,6 +227,74 @@ class CustomerProfileViewSet(AvatarMixin, BaseProfileViewSet):
     profile_attr = "customerprofile"
     user_role = "customer"
 
+    @action(detail=False, methods=["get"], url_path="resolve", permission_classes=[AllowAny])
+    def resolve(self, request):
+        user = request.query_params.get("user")
+        if not user:
+            return Response({"detail": "user is required"}, status=400)
+        # UUID tekshiruvi
+        try:
+            UUID(str(user))
+        except ValueError:
+            return Response({"detail": "Invalid user UUID"}, status=400)
+
+        obj = self.model.objects.select_related("user").filter(user__id=user).first()
+        if not obj:
+            return Response({"detail": "Not found"}, status=404)
+
+        ser = self.get_serializer(obj)
+        return Response(ser.data)
+
+    @action(
+        detail=False,
+        methods=["get", "put", "delete"],
+        url_path="my/avatar",
+        permission_classes=[IsAuthenticated],
+        parser_classes=[MultiPartParser, FormParser],
+    )
+    def my_avatar(self, request):
+        # current user customer profile
+        try:
+            profile = request.user.customerprofile
+        except CustomerProfile.DoesNotExist:
+            return Response({"detail": "Profile not found."}, status=404)
+
+        if request.method == "GET":
+            url = request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
+            return Response({"avatar_url": url})
+
+        if request.method in ["PUT", "PATCH"]:
+            avatar = request.FILES.get("avatar")
+            if not avatar:
+                return Response({"detail": "No avatar file uploaded."}, status=400)
+            # optional validation
+            if avatar.size > 5 * 1024 * 1024:
+                return Response({"detail": "Max 5MB."}, status=400)
+            if avatar.content_type not in ["image/jpeg", "image/png", "image/gif", "image/webp"]:
+                return Response({"detail": "Only JPG/PNG/GIF/WEBP."}, status=400)
+
+            # remove old
+            if profile.avatar:
+                old_path = profile.avatar.path
+                profile.avatar.delete(save=False)
+                if default_storage.exists(old_path):
+                    default_storage.delete(old_path)
+
+            profile.avatar = avatar
+            profile.save(update_fields=["avatar"])
+            url = request.build_absolute_uri(profile.avatar.url)
+            return Response({"detail": "Avatar uploaded successfully.", "avatar_url": url})
+
+        # DELETE
+        if not profile.avatar:
+            return Response({"detail": "No avatar to delete.", "avatar_url": None}, status=404)
+        path = profile.avatar.path
+        profile.avatar.delete(save=False)
+        if default_storage.exists(path):
+            default_storage.delete(path)
+        profile.save(update_fields=["avatar"])
+        return Response({"detail": "Avatar deleted successfully.", "avatar_url": None})
+
 
 class CustomerOwnedModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
@@ -227,10 +307,17 @@ class CustomerOwnedModelViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        user = self.request.user
-        return (
-            qs if getattr(user, "is_admin", False) else qs.filter(customer__user=user)
-        )
+        customer_id = self.request.query_params.get("customer")
+        if customer_id:
+            # avval user UUID sifatida
+            try:
+                UUID(str(customer_id))
+                return qs.filter(customer__user__id=customer_id)
+            except Exception:
+                pass
+            # keyin profile PK sifatida
+            qs = qs.filter(customer_id=customer_id)
+        return qs
 
     def perform_create(self, serializer):
         customer = self.get_customer_profile()
@@ -253,6 +340,14 @@ class PortfolioViewSet(CustomerOwnedModelViewSet):
     serializer_class = PortfolioSerializer
     queryset = Portfolio.objects.select_related("customer", "customer__user")
     parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        customer_id = self.request.query_params.get("customer")
+        if customer_id:
+            # UUID bo‘yicha filterlash
+            qs = qs.filter(customer__user__id=customer_id)
+        return qs
 
 
 # ---------- Verification docs ----------

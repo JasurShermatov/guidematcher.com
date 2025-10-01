@@ -1,33 +1,28 @@
-############################################
-# 1-bosqich: dependency layer
-FROM node:20-alpine AS deps
+# Multi-stage: 1-qadam - React build, 2-qadam - Nginx serve
+FROM node:18-alpine AS build
+
+# Ish papkasi
 WORKDIR /app
+
+# Package fayllarini ko'chiring va o'rnating
 COPY package*.json ./
-RUN npm ci --legacy-peer-deps
+RUN npm ci --only=production
 
-############################################
-# 2-bosqich: build layer
-FROM deps AS builder
-WORKDIR /app
+# Kodni ko'chiring va build qiling
 COPY . .
-
-# --- API va WS uchun ARG ---
-ARG REACT_APP_API_URL=http://localhost:8000/api/v1/
-ARG REACT_APP_WS_ORIGIN=ws://localhost:8000
-
-# --- React build vaqtida ENV ---
-ENV REACT_APP_API_URL=$REACT_APP_API_URL
-ENV REACT_APP_WS_ORIGIN=$REACT_APP_WS_ORIGIN
-
-ENV NODE_OPTIONS="--max_old_space_size=1024"
-ENV CI=false
-
 RUN npm run build
 
-############################################
-# 3-bosqich: runtime layer (nginx)
-FROM nginx:1.25-alpine
-COPY --from=builder /app/build /usr/share/nginx/html
+# Production stage: Nginx
+FROM nginx:1.21-alpine
+
+# Nginx config ni ko'chiring
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Build natijasini Nginx ga ko'chiring
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Port 80
 EXPOSE 80
+
+# Nginx ni ishga tushiring
 CMD ["nginx", "-g", "daemon off;"]

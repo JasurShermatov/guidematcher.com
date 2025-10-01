@@ -22,26 +22,20 @@ class UserSimpleSerializer(serializers.ModelSerializer):
 
 
 class ClientProfileSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk', read_only=True)          # <-- PK string
     user = UserSimpleSerializer(read_only=True)
-
     class Meta:
         model = ClientProfile
         fields = ["id", "user"]
 
 
 class CustomerProfileSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk', read_only=True)          # <-- PK string
     user = UserSimpleSerializer(read_only=True)
-
     class Meta:
         model = CustomerProfile
-        fields = [
-            "id",
-            "user",
-            "city",
-            "service_areas",
-            "is_available",
-            "average_rating",
-        ]
+        fields = ["id", "user", "city", "service_areas", "is_available", "average_rating"]
+
 
 
 class BookingSerializer(serializers.ModelSerializer):

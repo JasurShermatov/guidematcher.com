@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
@@ -9,32 +9,33 @@ import {
     ROLE_GUIDE,
     ROLE_TOURIST,
 } from "./context/UserContext";
-import AuthPage from "./pages/AuthPage";
-
-// Yangi importlar:
-import BookingPage from "./pages/BookingPage";
-import ChatPage from "./pages/ChatPage";
-import SearchPage from "./pages/SearchPage";
 
 import { ThemeProvider } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
 
 import Navbar from "./components/Navbar";
-import LandingPage from "./pages/LandingPage";
-import TouristDashboard from "./pages/TouristDashboard";
-import GuideDashboard from "./pages/GuideDashboard";
 import Footer from "./components/Footer";
 
-import GuideProfile from "./pages/GuideProfile";
+/** === LAZY PAGES (route-based code splitting) === */
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const AuthPage = lazy(() => import("./pages/AuthPage"));
+const BookingPage = lazy(() => import("./pages/BookingPage"));
+const ChatPage = lazy(() => import("./pages/ChatPage"));
+const TouristDashboard = lazy(() => import("./pages/TouristDashboard"));
+const GuideDashboard = lazy(() => import("./pages/GuideDashboard"));
+const GuideProfile = lazy(() => import("./pages/GuideProfile"));
 
-/** Layout: dashboard yo‘llarida Footer ko‘rinmaydi */
 function AppShell({ children }) {
     const location = useLocation();
     const isDashboard = location.pathname.startsWith("/dashboard");
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-dark-950 transition-colors">
             <Navbar />
-            <main className="pt-16">{children}</main>
+            <main className="pt-16">
+                <Suspense fallback={<div className="p-8 text-center text-gray-600">Loading…</div>}>
+                    {children}
+                </Suspense>
+            </main>
             <Toaster position="top-right" />
             {!isDashboard && <Footer />}
         </div>
@@ -46,11 +47,9 @@ function AppRoutes() {
         <Routes>
             <Route path="/" element={<LandingPage />} />
 
-            {/* Siz hozir combined komponentdan foydalangansiz: /search -> GuideProfile (listing + detail) */}
-            <Route path="/search" element={<SearchPage />} />
+            {/* Bitta komponent: /guides (qidiruv) va /guides/:id (profil) */}
+            <Route path="/guides" element={<GuideProfile />} />
             <Route path="/guides/:id" element={<GuideProfile />} />
-            {/*<Route path="/booking/:id" element={<BookingPage />} />*/}
-
 
             {/* Auth */}
             <Route path="/auth" element={<AuthPage />} />
@@ -78,7 +77,6 @@ function AppRoutes() {
                 }
             />
 
-            {/* >>> Qo‘shimcha kerak bo‘ladigan route’lar <<< */}
             <Route
                 path="/booking/:id"
                 element={
@@ -87,6 +85,7 @@ function AppRoutes() {
                     </RequireRole>
                 }
             />
+
             <Route
                 path="/chat"
                 element={

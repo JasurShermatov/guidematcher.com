@@ -1,4 +1,5 @@
-// src/pages/ChatPage.jsx (responsive, sticky input, mobile-safe height)
+// src/pages/ChatPage.jsx
+// (fixed: correct sticky offsets, mobile-safe height, full i18n)
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Send, MoreVertical, Smile, ArrowLeft, Search } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
@@ -144,11 +145,14 @@ const ChatPage = () => {
     // Scroll
     const listRef = useRef(null);
 
-    /** ===== Mobile-safe 100vh (accounts for browser chrome & keyboard) ===== */
+    /** ===== Mobile-safe 100vh + safe-area & navbar offset ===== */
     useEffect(() => {
         const setVh = () => {
             const vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty("--app-vh", `${vh}px`);
+            // iOS safe-areas
+            document.documentElement.style.setProperty("--safe-top", "env(safe-area-inset-top, 0px)");
+            document.documentElement.style.setProperty("--safe-bottom", "env(safe-area-inset-bottom, 0px)");
         };
         setVh();
         window.addEventListener("resize", setVh);
@@ -159,11 +163,13 @@ const ChatPage = () => {
         };
     }, []);
 
-    // If you have a fixed top navbar ~64px (pt-16), keep it as a CSS var we subtract from full height
+    // If you have a fixed top navbar ~64px (h-16), we account for it
     const WRAPPER_STYLE = {
+        // Height excludes the fixed navbar + safe-area top
         height: "calc(var(--app-vh, 1vh) * 100 - var(--top-offset, 0px))",
-        // Tailwind pt-16 = 4rem = 64px
-        ["--top-offset"]: "4rem",
+        // 4rem (64px) + safe-area top
+        ["--top-offset"]: "calc(4rem + var(--safe-top, 0px))",
+        ["--safe-bottom"]: "var(--safe-bottom, 0px)",
     };
 
     useEffect(() => {
@@ -187,7 +193,7 @@ const ChatPage = () => {
         const mine =
             m?.is_mine ??
             (m?.sender?.id && myUserId ? String(m.sender.id) === String(myUserId) : false);
-        const senderName = m?.sender?.full_name || m?.sender?.email || "User";
+        const senderName = m?.sender?.full_name || m?.sender?.email || t("chat.user");
         const senderAvatar = pickAnyAvatarUrl(
             m?.sender,
             m?.sender?.avatar_updated_at || m?.created_at
@@ -212,7 +218,7 @@ const ChatPage = () => {
         });
     };
 
-    const pickName = (chat) => chat?.other_user?.full_name || chat?.other_user?.email || "User";
+    const pickName = (chat) => chat?.other_user?.full_name || chat?.other_user?.email || t("chat.user");
     const pickHeaderAvatar = (chat) =>
         pickAnyAvatarUrl(chat?.other_user, chat?.other_user?.avatar_updated_at || chat?.updated_at);
 
@@ -389,7 +395,7 @@ const ChatPage = () => {
                     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
                 });
             } catch {
-                setMsgError("Failed to load messages");
+                setMsgError(t("chat.errLoadMessages"));
             } finally {
                 setMsgLoading(false);
             }
@@ -400,7 +406,7 @@ const ChatPage = () => {
             setIsOtherTyping(false);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedChat]);
+    }, [selectedChat, t]);
 
     /** ================= Load older ================= */
     const [loadingOlderLock, setLoadingOlderLock] = useState(false);
@@ -451,7 +457,7 @@ const ChatPage = () => {
             timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
             type: "text",
             is_read: false,
-            senderName: "Me",
+            senderName: t("chat.me"),
             senderAvatar: null, // WS kelgach to‘liq ma’lumot bilan yangilanadi
         };
 
@@ -467,7 +473,7 @@ const ChatPage = () => {
             // haqiqiy xabar WS orqali keladi
         } catch {
             setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
-            alert("Failed to send message");
+            alert(t("chat.errSend"));
         } finally {
             setMessage("");
         }
@@ -523,7 +529,7 @@ const ChatPage = () => {
 
     return (
         <div
-            className="bg-gray-50 dark:bg-dark-950 pt-16 transition-colors"
+            className="bg-gray-50 dark:bg-dark-950 transition-colors"
             style={WRAPPER_STYLE}
         >
             <div className="mx-auto h-full flex lg:max-w-7xl lg:px-8 lg:flex-row flex-col">
@@ -533,7 +539,8 @@ const ChatPage = () => {
                         isMobile ? (showListMobile ? "block" : "hidden") : "block"
                     } ${isMobile ? "w-full" : "w-1/3"}`}
                 >
-                    <div className="sticky top-0 z-10 p-4 bg-white dark:bg-dark-900 border-b border-gray-200 dark:border-dark-800">
+                    {/* Sticky header under navbar */}
+                    <div className="sticky top-[var(--top-offset)] z-10 p-4 bg-white dark:bg-dark-900 border-b border-gray-200 dark:border-dark-800">
                         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t("chat.title")}</h2>
                         <p className="text-sm text-gray-600 dark:text-gray-400">{t("chat.description")}</p>
                         <div className="mt-3 relative">
@@ -550,7 +557,7 @@ const ChatPage = () => {
 
                     <div className="flex-1 overflow-y-auto min-h-0">
                         {convLoading ? (
-                            <div className="p-4 text-center text-gray-500">Loading...</div>
+                            <div className="p-4 text-center text-gray-500 dark:text-gray-400">{t("common.loading")}</div>
                         ) : filteredConvs.length ? (
                             filteredConvs.map((chat) => {
                                 const name = pickName(chat);
@@ -590,7 +597,7 @@ const ChatPage = () => {
                                 );
                             })
                         ) : (
-                            <div className="p-6 text-center text-gray-500">No conversations</div>
+                            <div className="p-6 text-center text-gray-500 dark:text-gray-400">{t("chat.noConversations")}</div>
                         )}
                     </div>
                 </div>
@@ -604,13 +611,13 @@ const ChatPage = () => {
                     {current ? (
                         <>
                             {/* Header (sticky) */}
-                            <div className="sticky top-0 z-10 bg-white dark:bg-dark-900 p-3 lg:p-4 border-b border-gray-200 dark:border-dark-800 flex items-center justify-between">
+                            <div className="sticky top-[var(--top-offset)] z-10 bg-white dark:bg-dark-900 p-3 lg:p-4 border-b border-gray-200 dark:border-dark-800 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     {isMobile && (
                                         <button
                                             onClick={goBackToList}
                                             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-800 text-gray-700 dark:text-gray-300"
-                                            aria-label="Back"
+                                            aria-label={t("chat.back")}
                                         >
                                             <ArrowLeft className="w-5 h-5" />
                                         </button>
@@ -630,7 +637,7 @@ const ChatPage = () => {
                                     </div>
                                 </div>
 
-                                <button className="text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-800">
+                                <button className="text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-800" aria-label={t("chat.more")}>
                                     <MoreVertical className="h-5 w-5" />
                                 </button>
                             </div>
@@ -645,15 +652,15 @@ const ChatPage = () => {
                                         <button
                                             onClick={loadOlder}
                                             disabled={msgLoading}
-                                            className="px-3 py-1 text-sm border rounded-lg bg-white hover:bg-gray-50 disabled:opacity-50"
+                                            className="px-3 py-1 text-sm border rounded-lg bg-white dark:bg-dark-900 border-gray-200 dark:border-dark-700 hover:bg-gray-50 dark:hover:bg-dark-800 disabled:opacity-50"
                                         >
-                                            {msgLoading ? "Loading..." : "Load older messages"}
+                                            {msgLoading ? t("common.loading") : t("chat.loadOlder")}
                                         </button>
                                     </div>
                                 )}
 
                                 {msgLoading && !messages.length ? (
-                                    <div className="text-center text-gray-500">Loading...</div>
+                                    <div className="text-center text-gray-500 dark:text-gray-400">{t("common.loading")}</div>
                                 ) : msgError ? (
                                     <div className="text-center text-red-600">{msgError}</div>
                                 ) : (
@@ -680,7 +687,7 @@ const ChatPage = () => {
                                                 <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
                                                 <p
                                                     className={`text-[10px] mt-1 ${
-                                                        msg.sender === "me" ? "text-blue-100" : "text-gray-500"
+                                                        msg.sender === "me" ? "text-blue-100" : "text-gray-500 dark:text-gray-400"
                                                     }`}
                                                 >
                                                     {msg.timestamp}
@@ -713,8 +720,8 @@ const ChatPage = () => {
                                 )}
                             </div>
 
-                            {/* Composer (sticky at bottom, always visible) */}
-                            <div className="sticky bottom-0 z-10 bg-white/95 dark:bg-dark-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-t border-gray-200 dark:border-dark-800">
+                            {/* Composer (sticky at bottom, safe-area aware) */}
+                            <div className="sticky bottom-[var(--safe-bottom)] z-10 bg-white/95 dark:bg-dark-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-t border-gray-200 dark:border-dark-800">
                                 <form onSubmit={handleSendMessage} className="p-3 lg:p-4 relative">
                                     {/* Emoji picker anchored above composer */}
                                     {showEmojiPicker && (
@@ -730,6 +737,7 @@ const ChatPage = () => {
                                                             sendTyping();
                                                         }}
                                                         className="text-xl hover:bg-gray-100 dark:hover:bg-dark-700 rounded p-1"
+                                                        aria-label={t("chat.insertEmoji")}
                                                     >
                                                         {emoji}
                                                     </button>
@@ -744,14 +752,14 @@ const ChatPage = () => {
                                                 type="text"
                                                 value={message}
                                                 onChange={(e) => setMessage(e.target.value)}
-                                                placeholder="Type your message…"
+                                                placeholder={t("chat.typeMessage")}
                                                 className="w-full pr-12 pl-3 py-3 rounded-lg border border-gray-300 dark:border-dark-700 bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => setShowEmojiPicker((s) => !s)}
                                                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 dark:text-gray-400 hover:text-blue-600"
-                                                aria-label="Emojis"
+                                                aria-label={t("chat.emojis")}
                                             >
                                                 <Smile className="h-5 w-5" />
                                             </button>
@@ -761,23 +769,23 @@ const ChatPage = () => {
                                             type="submit"
                                             disabled={!message.trim()}
                                             className="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                                            aria-label="Send"
+                                            aria-label={t("chat.send")}
                                         >
                                             <Send className="h-5 w-5" />
                                         </button>
                                     </div>
 
                                     <div className="mt-2 text-center">
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Real-time chat is enabled.</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("chat.rtcEnabled")}</p>
                                     </div>
                                 </form>
                             </div>
                         </>
                     ) : (
                         <div
-                            className={`flex-1 min-h-0 ${isMobile ? "hidden" : "flex"} items-center justify-center text-gray-500`}
+                            className={`flex-1 min-h-0 ${isMobile ? "hidden" : "flex"} items-center justify-center text-gray-500 dark:text-gray-400`}
                         >
-                            Select a conversation
+                            {t("chat.selectConversation")}
                         </div>
                     )}
                 </div>

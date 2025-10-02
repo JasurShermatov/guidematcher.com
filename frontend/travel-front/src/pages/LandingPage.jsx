@@ -1,76 +1,174 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, Star, Clock, Shield, Globe, Camera, Car, ShoppingBag, Users, Play, ArrowRight } from 'lucide-react';
+import {
+    MapPin, Star, Clock, Shield, Globe, Camera, Car,
+    ShoppingBag, Users, Play
+} from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { getCustomers } from '../api/profiles';
+
+const val = (x) => (x === null || x === undefined ? null : x);
+
+const resolveGuideRouteId = (g) => (
+    val(g?.user_id) ||
+    val(g?.user) ||
+    val(g?.user?.id) ||
+    val(g?.user?.uuid) ||
+    val(g?.profile_id) ||
+    val(g?.id) ||
+    null
+);
+
+const pickName = (g) =>
+    g?.user_full_name || g?.full_name || g?.first_name || g?.user?.full_name || 'Guide';
+
+const pickLocation = (g) => {
+    const city = g?.city_name || g?.city || '';
+    const country = g?.country_name || g?.country || '';
+    if (city && country) return `${city}, ${country}`;
+    return country || city || '—';
+};
+
+const pickAvatar = (g) =>
+    g?.avatar_url || g?.user?.avatar_url || g?.avatar ||
+    'https://placehold.co/600x400/png?text=Guide';
+
+const pickServices = (g) => {
+    const svc = Array.isArray(g?.service_types)
+        ? g.service_types
+        : Array.isArray(g?.services)
+            ? g.services
+            : Array.isArray(g?.service_types_display)
+                ? g.service_types_display
+                : [];
+
+    const names = svc
+        .map((s) => (typeof s === 'string' ? s : s?.name || s?.title || null))
+        .filter(Boolean);
+
+    if (names.length) return names.slice(0, 3);
+
+    const langs = Array.isArray(g?.languages)
+        ? g.languages.map((l) => (typeof l === 'string' ? l : l?.name || null)).filter(Boolean)
+        : [];
+    return langs.slice(0, 3);
+};
+
+const pickRating = (g) => {
+    const r =
+        Number(g?.average_rating) ||
+        Number(g?.rating) ||
+        Number(g?.avg_rating) ||
+        Number(g?.score);
+    return Number.isFinite(r) ? r : null;
+};
+
+const pickReviews = (g) => {
+    const n =
+        Number(g?.total_reviews) ||
+        Number(g?.reviews_count) ||
+        Number(g?.reviews) ||
+        0;
+    return Number.isFinite(n) ? n : 0;
+};
+
+const pickPrice = (g) => {
+    if (g?.rate_text) return g.rate_text;
+    if (g?.hourly_rate && g?.currency) return `${g.hourly_rate} ${g.currency}/hour`;
+    if (g?.hourly_rate) return `$${g.hourly_rate}/hour`;
+    if (g?.rate && g?.currency) return `${g.rate} ${g.currency}`;
+    if (g?.rate) return `$${g.rate}`;
+    return null;
+};
+
+const popularServicesStatic = (t) => ([
+    { name: t('service.tourGuide'), icon: <MapPin className="h-6 w-6" />, count: "2,500+ guides" },
+    { name: t('service.translator'), icon: <Globe className="h-6 w-6" />, count: "1,800+ guides" },
+    { name: t('service.photographer'), icon: <Camera className="h-6 w-6" />, count: "950+ guides" },
+    { name: t('service.driver'), icon: <Car className="h-6 w-6" />, count: "1,200+ guides" },
+    { name: t('service.shoppingHelper'), icon: <ShoppingBag className="h-6 w-6" />, count: "650+ guides" },
+    { name: t('service.groupTours'), icon: <Users className="h-6 w-6" />, count: "300+ guides" }
+]);
+
+const featuredCitiesStatic = [
+    { name: "Paris", country: "France", guides: 150, image: "https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop" },
+    { name: "Tokyo", country: "Japan", guides: 120, image: "https://images.pexels.com/photos/248195/pexels-photo-248195.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop" },
+    { name: "New York", country: "USA", guides: 200, image: "https://images.pexels.com/photos/290386/pexels-photo-290386.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop" },
+    { name: "Barcelona", country: "Spain", guides: 95, image: "https://images.pexels.com/photos/1388030/pexels-photo-1388030.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop" }
+];
 
 const LandingPage = () => {
     const { t } = useLanguage();
 
-    const topGuides = [
-        {
-            id: 1,
-            name: "Maria Rodriguez",
-            location: "Barcelona, Spain",
-            rating: 4.9,
-            reviews: 156,
-            services: ["Tour Guide", "Translator", "Photographer"],
-            price: "$35/hour",
-            image: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop"
-        },
-        {
-            id: 2,
-            name: "Ahmed Hassan",
-            location: "Cairo, Egypt",
-            rating: 4.8,
-            reviews: 203,
-            services: ["Tour Guide", "Fixer", "Cultural Expert"],
-            price: "$25/hour",
-            image: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop"
-        },
-        {
-            id: 3,
-            name: "Yuki Tanaka",
-            location: "Tokyo, Japan",
-            rating: 5.0,
-            reviews: 89,
-            services: ["Shopping Helper", "Translator", "Food Guide"],
-            price: "$40/hour",
-            image: "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop"
-        }
-    ];
+    const [topGuides, setTopGuides] = useState([]);
+    const [loadingTop, setLoadingTop] = useState(true);
+    const [errTop, setErrTop] = useState('');
 
-    const popularServices = [
-        { name: t('service.tourGuide'), icon: <MapPin className="h-6 w-6" />, count: "2,500+ guides" },
-        { name: t('service.translator'), icon: <Globe className="h-6 w-6" />, count: "1,800+ guides" },
-        { name: t('service.photographer'), icon: <Camera className="h-6 w-6" />, count: "950+ guides" },
-        { name: t('service.driver'), icon: <Car className="h-6 w-6" />, count: "1,200+ guides" },
-        { name: t('service.shoppingHelper'), icon: <ShoppingBag className="h-6 w-6" />, count: "650+ guides" },
-        { name: t('service.groupTours'), icon: <Users className="h-6 w-6" />, count: "300+ guides" }
-    ];
+    useEffect(() => {
+        let mounted = true;
+        (async () => {
+            setLoadingTop(true);
+            setErrTop('');
+            try {
+                const params = { ordering: '-average_rating', page_size: 20 };
+                const res = await getCustomers(params).then((r) => r?.data ?? r);
+                const results = Array.isArray(res?.results) ? res.results : Array.isArray(res) ? res : [];
 
-    const featuredCities = [
-        { name: "Paris", country: "France", guides: 150, image: "https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop" },
-        { name: "Tokyo", country: "Japan", guides: 120, image: "https://images.pexels.com/photos/248195/pexels-photo-248195.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop" },
-        { name: "New York", country: "USA", guides: 200, image: "https://images.pexels.com/photos/290386/pexels-photo-290386.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop" },
-        { name: "Barcelona", country: "Spain", guides: 95, image: "https://images.pexels.com/photos/1388030/pexels-photo-1388030.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop" }
-    ];
+                const normalizedAll = results
+                    .map((g) => {
+                        const routeId = resolveGuideRouteId(g);
+                        if (!routeId) return null;
+                        const rating = pickRating(g);
+                        return {
+                            raw: g,
+                            id: String(routeId),
+                            name: pickName(g),
+                            location: pickLocation(g),
+                            rating,
+                            reviews: pickReviews(g),
+                            services: pickServices(g),
+                            price: pickPrice(g),
+                            image: pickAvatar(g),
+                        };
+                    })
+                    .filter(Boolean);
+
+                const top3 = normalizedAll
+                    .filter((x) => Number(x.rating) > 0)
+                    .sort((a, b) => {
+                        if (b.rating !== a.rating) return b.rating - a.rating;
+                        return (b.reviews || 0) - (a.reviews || 0);
+                    })
+                    .slice(0, 3);
+
+                if (mounted) setTopGuides(top3);
+            } catch (e) {
+                if (mounted) setErrTop('Failed to load guides');
+            } finally {
+                if (mounted) setLoadingTop(false);
+            }
+        })();
+        return () => { mounted = false; };
+    }, []);
+
+    const popularServices = useMemo(() => popularServicesStatic(t), [t]);
 
     return (
         <div className="min-h-screen">
-            {/* Hero Section */}
-            <section className="relative overflow-hidden py-12" style={{
-                backgroundImage: 'url(https://images.pexels.com/photos/1371360/pexels-photo-1371360.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-            }}>
-                {/* Dark overlay for text readability */}
+            {/* Hero */}
+            <section
+                className="relative overflow-hidden py-12"
+                style={{
+                    backgroundImage: 'url(https://images.pexels.com/photos/1371360/pexels-photo-1371360.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                }}
+            >
                 <div className="absolute inset-0 bg-black/40"></div>
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
                     <div className="grid lg:grid-cols-2 gap-12 items-center relative z-10">
-
-                        {/* Left Side - Content & Search */}
                         <div className="space-y-8">
                             <div className="space-y-6">
                                 <h1 className="text-5xl lg:text-6xl font-bold text-white leading-tight">
@@ -82,11 +180,9 @@ const LandingPage = () => {
                                 </p>
                             </div>
 
-                            {/* Search Form */}
-                            {/* Search Form (side-by-side on md+) */}
+                            {/* Search */}
                             <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
                                 <div className="space-y-4 md:space-y-0 md:flex md:items-stretch md:gap-4">
-                                    {/* Input */}
                                     <div className="relative flex-1">
                                         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                                         <input
@@ -95,17 +191,14 @@ const LandingPage = () => {
                                             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         />
                                     </div>
-
-                                    {/* Button */}
                                     <Link
-                                        to="/search"
+                                        to="/guides"
                                         className="w-full md:w-auto bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium inline-flex items-center justify-center"
                                     >
                                         {t('landing.hero.searchGuides')}
                                     </Link>
                                 </div>
                             </div>
-
 
                             {/* Stats */}
                             <div className="grid grid-cols-3 gap-6">
@@ -124,9 +217,8 @@ const LandingPage = () => {
                             </div>
                         </div>
 
-                        {/* Right Side - Interactive Images */}
+                        {/* Right visuals */}
                         <div className="relative">
-                            {/* Main Featured Image */}
                             <div className="relative group cursor-pointer">
                                 <img
                                     src="https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop"
@@ -140,7 +232,6 @@ const LandingPage = () => {
                                     </div>
                                 </div>
                             </div>
-
 
                             <div className="absolute -bottom-4 -left-4 bg-white rounded-xl p-4 shadow-lg animate-float animation-delay-2000">
                                 <div className="text-center">
@@ -156,7 +247,6 @@ const LandingPage = () => {
                                 </div>
                             </div>
 
-                            {/* Background Decorative Elements */}
                             <div className="absolute -z-10 top-10 right-10 w-32 h-32 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
                             <div className="absolute -z-10 bottom-10 left-10 w-24 h-24 bg-orange-100 rounded-full blur-2xl opacity-50"></div>
                         </div>
@@ -164,54 +254,87 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* Top Guides Section */}
+            {/* Top Guides */}
             <section className="py-20 bg-white dark:bg-dark-900 transition-colors">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t('landing.topGuides.title')}</h2>
-                        <p className="text-xl text-gray-600 dark:text-gray-300">{t('landing.topGuides.description')}</p>
+                        <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                            {t('landing.topGuides.title')}
+                        </h2>
+                        <p className="text-xl text-gray-600 dark:text-gray-300">
+                            {t('landing.topGuides.description')}
+                        </p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-8">
-                        {topGuides.map(guide => (
-                            <Link
-                                key={guide.id}
-                                to={`/guide/${guide.id}`}
-                                className="guide-card bg-white dark:bg-dark-800 rounded-2xl overflow-hidden transition-colors"
-                            >
-                                <div className="relative">
-                                    <img
-                                        src={guide.image}
-                                        alt={guide.name}
-                                        className="w-full h-64 object-cover"
-                                    />
-                                    <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 flex items-center space-x-1">
-                                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                                        <span className="text-sm font-medium">{guide.rating}</span>
+                    {loadingTop ? (
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {[...Array(3)].map((_, i) => (
+                                <div key={i} className="animate-pulse bg-white dark:bg-dark-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-dark-700">
+                                    <div className="w-full h-64 bg-gray-200 dark:bg-dark-700" />
+                                    <div className="p-6 space-y-3">
+                                        <div className="h-5 w-1/2 bg-gray-200 dark:bg-dark-700 rounded" />
+                                        <div className="h-4 w-2/3 bg-gray-200 dark:bg-dark-700 rounded" />
+                                        <div className="flex gap-2">
+                                            <div className="h-6 w-16 bg-gray-200 dark:bg-dark-700 rounded-full" />
+                                            <div className="h-6 w-20 bg-gray-200 dark:bg-dark-700 rounded-full" />
+                                        </div>
                                     </div>
                                 </div>
+                            ))}
+                        </div>
+                    ) : errTop ? (
+                        <div className="text-center text-red-600">{errTop}</div>
+                    ) : topGuides.length ? (
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {topGuides.map((guide) => (
+                                <Link
+                                    key={guide.id}
+                                    to={`/guide/${encodeURIComponent(guide.id)}`}
+                                    className="guide-card bg-white dark:bg-dark-800 rounded-2xl overflow-hidden transition-colors border border-gray-100 dark:border-dark-700 hover:shadow-lg"
+                                >
+                                    <div className="relative">
+                                        <img
+                                            src={guide.image}
+                                            alt={guide.name}
+                                            className="w-full h-64 object-cover"
+                                        />
+                                        {guide.rating != null && (
+                                            <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 flex items-center space-x-1 shadow">
+                                                <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                                                <span className="text-sm font-medium">
+                          {Number(guide.rating).toFixed(1)}
+                        </span>
+                                            </div>
+                                        )}
+                                    </div>
 
-                                <div className="p-6">
-                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{guide.name}</h3>
-                                    <p className="text-gray-600 dark:text-gray-300 mb-3 flex items-center">
-                                        <MapPin className="h-4 w-4 mr-1" />
-                                        {guide.location}
-                                    </p>
-                                    <div className="flex flex-wrap gap-2 mb-4">
-                                        {guide.services.map(service => (
-                                            <span key={service} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                        {service}
-                      </span>
-                                        ))}
+                                    <div className="p-6">
+                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                                            {guide.name}
+                                        </h3>
+                                        <p className="text-gray-600 dark:text-gray-300 mb-3 flex items-center">
+                                            <MapPin className="h-4 w-4 mr-1" />
+                                            {guide.location}
+                                        </p>
+                                        {!!guide.services?.length && (
+                                            <div className="flex flex-wrap gap-2 mb-4">
+                                                {guide.services.map((s) => (
+                                                    <span key={s} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            {s}
+                          </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <div className="flex justify-between items-center" />
                                     </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-lg font-bold text-blue-600">{guide.price}</span>
-                                        <span className="text-sm text-gray-500 dark:text-gray-400">{guide.reviews} reviews</span>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center text-gray-500">
+                            {t('landing.topGuides.empty') || 'No guides yet'}
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -219,17 +342,23 @@ const LandingPage = () => {
             <section className="py-20 bg-gray-50 dark:bg-dark-950 transition-colors">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t('landing.services.title')}</h2>
-                        <p className="text-xl text-gray-600 dark:text-gray-300">{t('landing.services.description')}</p>
+                        <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                            {t('landing.services.title')}
+                        </h2>
+                        <p className="text-xl text-gray-600 dark:text-gray-300">
+                            {t('landing.services.description')}
+                        </p>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                         {popularServices.map(service => (
-                            <div key={service.name} className="service-card bg-white dark:bg-dark-900 rounded-xl p-6 text-center cursor-pointer transition-colors">
-                                <div className="text-blue-600 mb-4 flex justify-center">
+                            <div key={service.name} className="service-card bg-white dark:bg-dark-900 rounded-xl p-6 text-center cursor-pointer transition-colors border border-gray-100 dark:border-dark-800">
+                                <div className="mb-4 flex justify-center">
                                     {service.icon}
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{service.name}</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                    {service.name}
+                                </h3>
                                 <p className="text-gray-600 dark:text-gray-300">{service.count}</p>
                             </div>
                         ))}
@@ -241,12 +370,16 @@ const LandingPage = () => {
             <section className="py-20 bg-white dark:bg-dark-900 transition-colors">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t('landing.cities.title')}</h2>
-                        <p className="text-xl text-gray-600 dark:text-gray-300">{t('landing.cities.description')}</p>
+                        <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                            {t('landing.cities.title')}
+                        </h2>
+                        <p className="text-xl text-gray-600 dark:text-gray-300">
+                            {t('landing.cities.description')}
+                        </p>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        {featuredCities.map(city => (
+                        {featuredCitiesStatic.map(city => (
                             <div key={city.name} className="group cursor-pointer">
                                 <div className="relative overflow-hidden rounded-xl">
                                     <img
@@ -267,12 +400,16 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* Features Section */}
+            {/* Features */}
             <section className="py-20 bg-blue-600 dark:bg-blue-800 transition-colors">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-white mb-4">{t('landing.features.title')}</h2>
-                        <p className="text-xl text-blue-100 dark:text-blue-200">{t('landing.features.description')}</p>
+                        <h2 className="text-4xl font-bold text-white mb-4">
+                            {t('landing.features.title')}
+                        </h2>
+                        <p className="text-xl text-blue-100 dark:text-blue-200">
+                            {t('landing.features.description')}
+                        </p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">
@@ -295,16 +432,18 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* CTA Section */}
+            {/* CTA */}
             <section className="py-20 bg-white dark:bg-dark-900 transition-colors">
                 <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">{t('landing.cta.title')}</h2>
+                    <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                        {t('landing.cta.title')}
+                    </h2>
                     <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
                         {t('landing.cta.description')}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
-                            to="/search"
+                            to="/guides"
                             className="bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition-colors text-lg font-medium"
                         >
                             {t('landing.cta.findGuide')}

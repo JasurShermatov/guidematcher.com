@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from apps.common.models import BaseModel
 from apps.users.models import User
+from django.utils.timezone import localdate
 
 
 class AbstractProfile(BaseModel):
@@ -145,6 +146,17 @@ class CustomerProfile(AbstractProfile):
     @property
     def is_verified(self):
         return self.verification_status == self.VerificationStatus.VERIFIED
+
+    @property
+    def member_since(self):
+        dt = getattr(self, "created_at", None) or getattr(
+            self.user, "date_joined", None
+        )
+        return localdate(dt) if dt else None
+
+    @property
+    def member_since_year(self):
+        return self.member_since.year if self.member_since else None
 
 
 class AbstractCustomerRelatedModel(BaseModel):

@@ -12,6 +12,7 @@ FILES_DIR.mkdir(parents=True, exist_ok=True)
 
 ALLOWED_EXTS = (".xlsx", ".xls", ".csv")
 
+
 @router.message(F.document)  # keng filter: HAR QANDAY hujjat kiradi
 async def handle_any_document(message: Message):
     doc = message.document
@@ -20,8 +21,12 @@ async def handle_any_document(message: Message):
     # Fayl nomiga qarab filtrlash (MIME emas, chunki ba’zan octet-stream bo'ladi)
     lower = name.lower()
     if not lower.endswith(ALLOWED_EXTS):
-        logging.info("Document rejected (ext mismatch): %s | mime=%s | size=%s",
-                     name, doc.mime_type, doc.file_size)
+        logging.info(
+            "Document rejected (ext mismatch): %s | mime=%s | size=%s",
+            name,
+            doc.mime_type,
+            doc.file_size,
+        )
         await message.answer("❗ Iltimos, Excel (.xlsx/.xls) yoki CSV yuboring.")
         return
 
@@ -33,8 +38,13 @@ async def handle_any_document(message: Message):
         # v3 usuli: file_path orqali yuklab olish
         await message.bot.download(tg_file.file_path, destination=dest)
 
-        logging.info("✅ Saved document: %s | mime=%s | size=%s -> %s",
-                     name, doc.mime_type, doc.file_size, dest)
+        logging.info(
+            "✅ Saved document: %s | mime=%s | size=%s -> %s",
+            name,
+            doc.mime_type,
+            doc.file_size,
+            dest,
+        )
         await message.answer(f"✅ Saqlandi: {dest.name}")
     except Exception as e:
         logging.exception("❌ Download failed for %s", name)

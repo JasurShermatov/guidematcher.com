@@ -218,3 +218,31 @@ def me_view(request):
             "profile_id": profile_id,
         }
     )
+
+# apps/accounts/views.py
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def me_view(request):
+    user = request.user
+    role_lower = (user.role or "").lower()
+
+    profile_id = None
+    if role_lower == "customer" and hasattr(user, "customerprofile"):
+        profile_id = user.customerprofile.id
+    elif role_lower == "client" and hasattr(user, "clientprofile"):
+        profile_id = user.clientprofile.id
+
+    return Response(
+        {
+            "id": user.id,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            # Front normalizeRole() bor, shuning uchun asl qiymatni qaytaramiz:
+            "role": user.role,  # "Customer" yoki "Client"
+            # Oldindan ishlatganingizga mos:
+            "country": user.country_name if getattr(user, "country", None) else None,
+            "profile_id": profile_id,
+        },
+        status=200,
+    )

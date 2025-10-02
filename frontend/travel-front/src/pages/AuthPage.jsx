@@ -195,7 +195,14 @@ export default function AuthPage({ userType }) {
             });
             const data = await res.json();
             if (res.ok) {
-                login(data.user, data.access_token, data.refresh_token);
+                const access = data.access_token || data.access;
+                const refresh = data.refresh_token || data.refresh;
+                if (!access || !refresh) {
+                    toast.error("Auth tokens missing");
+                    setIsLoading(false);
+                    return;
+                }
+                login(data.user, access, refresh);
                 navigate(getDashboardPath(data.user.role), { replace: true });
             } else {
                 toast.error((typeof data === "object" && Object.values(data)[0]) || "Login failed");
@@ -271,7 +278,14 @@ export default function AuthPage({ userType }) {
             });
             const data = await res.json();
             if (res.ok) {
-                login(data.user, data.access_token, data.refresh_token);
+                const access = data.access_token || data.access;
+                const refresh = data.refresh_token || data.refresh;
+                if (!access || !refresh) {
+                    toast.error("Auth tokens missing");
+                    setIsLoading(false);
+                    return;
+                }
+                login(data.user, access, refresh);
                 navigate(getDashboardPath(data.user.role), { replace: true });
             } else {
                 toast.error((typeof data === "object" && Object.values(data)[0]) || "Registration failed");

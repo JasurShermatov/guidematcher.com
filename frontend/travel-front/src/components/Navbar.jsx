@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
-import { Search, Globe, Moon, Sun, Menu, X, ChevronDown } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
-import { useTheme } from '../context/ThemeContext';
-import { useUser } from '../context/UserContext';
-import { getDashboardPath } from '../context/UserContext'; // ✅ fixed import
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Globe, Moon, Sun, Menu, X, ChevronDown } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
+import { useTheme } from "../context/ThemeContext";
+import { useUser, getDashboardPath } from "../context/UserContext";
 
-// Portal komponenti
 function Portal({ children }) {
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
@@ -17,53 +15,64 @@ function Portal({ children }) {
 
 export default function Navbar() {
     const navigate = useNavigate();
+    const location = useLocation();
+
     const { language, setLanguage, t } = useLanguage();
     const { isDark, toggleTheme } = useTheme();
     const { isAuthenticated, user, role, logout } = useUser();
 
-    const [q, setQ] = useState('');
     const [open, setOpen] = useState(false);
     const [langOpen, setLangOpen] = useState(false);
 
     useEffect(() => {
         if (!open) return;
         const prev = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = "hidden";
         return () => { document.body.style.overflow = prev; };
     }, [open]);
 
     const languages = [
-        { code: 'en', label: 'English', flag: '🇺🇸' },
-        { code: 'uz', label: "O'zbek", flag: '🇺🇿' },
-        { code: 'ru', label: 'Русский', flag: '🇷🇺' },
-        { code: 'kz', label: 'Қазақ', flag: '🇰🇿' },
+        { code: "en", label: "English", flag: "🇺🇸" },
+        { code: "uz", label: "O'zbek", flag: "🇺🇿" },
+        { code: "ru", label: "Русский", flag: "🇷🇺" },
+        { code: "kz", label: "Қазақ", flag: "🇰🇿" },
     ];
 
-    const onSearch = (e) => {
-        e.preventDefault();
-        setOpen(false);
-        if (q.trim()) navigate(`/search?q=${encodeURIComponent(q.trim())}`);
-        else navigate('/search');
-    };
-
-    // My Dashboard ga o'tish: role bo'yicha
     const goMyDashboard = () => {
-        if (!isAuthenticated) return navigate('/auth');
-        if (!role) return navigate('/');
-        navigate(getDashboardPath(role), { replace: true });
+        if (!isAuthenticated) return navigate("/auth");
+        const target = getDashboardPath(role);
+        navigate(target, { replace: true });
     };
 
-    // Sign Out
     const onSignOut = async () => {
         await logout();
         setOpen(false);
-        navigate('/', { replace: true });
+        navigate("/", { replace: true });
+    };
+
+    /** LOGO bosilganda navigatsiya:
+     * - login bo‘lsa: doimo o‘z dashboard bosh sahifasiga
+     * - login bo‘lmasa:
+     *    - guides detailda turgan bo‘lsa -> /guides
+     *    - aks holda -> /
+     */
+    const onLogoClick = () => {
+        if (isAuthenticated) {
+            const target = getDashboardPath(role);
+            navigate(target, { replace: true });
+        } else {
+            if (location.pathname.startsWith("/guides/")) {
+                navigate("/guides", { replace: true });
+            } else {
+                navigate("/", { replace: true });
+            }
+        }
     };
 
     return (
         <header className="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-[#161616]/90 text-gray-900 dark:text-white backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-[#161616]/70 shadow-sm">
             <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                <button onClick={() => navigate('/')} className="flex items-center gap-2">
+                <button onClick={onLogoClick} className="flex items-center gap-2">
                     <img src="/image.png" alt="UzGuide" className="h-7 w-7 rounded" />
                     <span className="text-xl font-semibold text-rose-500">UzGuide</span>
                 </button>
@@ -71,10 +80,10 @@ export default function Navbar() {
                 <div className="flex items-center gap-3">
                     <div className="hidden lg:flex items-center gap-3">
                         <button
-                            onClick={() => navigate('/search')}
+                            onClick={() => navigate("/guides")}
                             className="px-3 py-2 rounded-lg border border-gray-200/60 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-sm"
                         >
-                            {t('nav.findGuides') || 'Find Guides'}
+                            {t("nav.findGuides") || "Find Guides"}
                         </button>
 
                         {/* Language dropdown */}
@@ -85,7 +94,7 @@ export default function Navbar() {
                             >
                                 <Globe className="h-4 w-4" />
                                 <span className="hidden xl:inline">
-                  {languages.find((l) => l.code === language)?.label || 'Language'}
+                  {languages.find((l) => l.code === language)?.label || "Language"}
                 </span>
                                 <ChevronDown className="h-4 w-4" />
                             </button>
@@ -98,7 +107,7 @@ export default function Navbar() {
                                         <button
                                             key={l.code}
                                             onClick={() => { setLanguage(l.code); setLangOpen(false); }}
-                                            className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-gray-100 dark:hover:bg-white/10 ${language === l.code ? 'bg-gray-100 dark:bg-white/10' : ''}`}
+                                            className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-gray-100 dark:hover:bg-white/10 ${language === l.code ? "bg-gray-100 dark:bg-white/10" : ""}`}
                                         >
                                             <span className="mr-2">{l.flag}</span>{l.label}
                                         </button>
@@ -123,7 +132,7 @@ export default function Navbar() {
                                     onClick={goMyDashboard}
                                     className="px-4 py-2 rounded-full border border-gray-200/60 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-sm"
                                 >
-                                    {user?.first_name ? `Hi, ${user.first_name}` : 'My dashboard'}
+                                    {user?.first_name ? `Hi, ${user.first_name}` : "My dashboard"}
                                 </button>
                                 <button
                                     onClick={onSignOut}
@@ -134,10 +143,10 @@ export default function Navbar() {
                             </>
                         ) : (
                             <button
-                                onClick={() => navigate('/auth')}
+                                onClick={() => navigate("/auth")}
                                 className="ml-1 bg-gradient-to-r from-rose-500 to-orange-500 px-5 py-2 rounded-full text-sm font-medium text-white"
                             >
-                                {t('nav.signIn') || 'Sign In'}
+                                {t("nav.signIn") || "Sign In"}
                             </button>
                         )}
                     </div>
@@ -160,7 +169,7 @@ export default function Navbar() {
                         <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
                         <div className="absolute right-0 top-0 h-full w-80 max-w-[85%] bg-white dark:bg-[#141414] text-gray-900 dark:text-white border-l border-gray-200 dark:border-white/10 p-4 flex flex-col shadow-xl">
                             <div className="flex items-center justify-between mb-4">
-                                <button onClick={() => { setOpen(false); navigate('/'); }} className="flex items-center gap-2">
+                                <button onClick={() => { setOpen(false); onLogoClick(); }} className="flex items-center gap-2">
                                     <img src="/image.png" alt="UzGuide" className="h-7 w-7 rounded" />
                                     <span className="text-xl font-semibold text-rose-500">UzGuide</span>
                                 </button>
@@ -193,7 +202,7 @@ export default function Navbar() {
                                                 <button
                                                     key={l.code}
                                                     onClick={() => { setLanguage(l.code); setLangOpen(false); }}
-                                                    className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-gray-100 dark:hover:bg-white/10 ${language === l.code ? 'bg-gray-100 dark:bg-white/10' : ''}`}
+                                                    className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-gray-100 dark:hover:bg-white/10 ${language === l.code ? "bg-gray-100 dark:bg-white/10" : ""}`}
                                                 >
                                                     <span className="mr-2">{l.flag}</span>{l.label}
                                                 </button>
@@ -206,7 +215,7 @@ export default function Navbar() {
                                     onClick={toggleTheme}
                                     className="p-2 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10"
                                     aria-label="Toggle theme"
-                                    title={isDark ? 'Switch to light' : 'Switch to dark'}
+                                    title={isDark ? "Switch to light" : "Switch to dark"}
                                 >
                                     {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                                 </button>
@@ -214,10 +223,10 @@ export default function Navbar() {
 
                             <div className="flex flex-col gap-2">
                                 <button
-                                    onClick={() => { setOpen(false); navigate('/search'); }}
+                                    onClick={() => { setOpen(false); navigate("/guides"); }}
                                     className="px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-left"
                                 >
-                                    {t('nav.findGuides') || 'Find Guides'}
+                                    {t("nav.findGuides") || "Find Guides"}
                                 </button>
 
                                 {isAuthenticated ? (
@@ -226,7 +235,7 @@ export default function Navbar() {
                                             onClick={() => { setOpen(false); goMyDashboard(); }}
                                             className="px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-left"
                                         >
-                                            {user?.first_name ? `Hi, ${user.first_name}` : 'My dashboard'}
+                                            {user?.first_name ? `Hi, ${user.first_name}` : "My dashboard"}
                                         </button>
                                         <button
                                             onClick={onSignOut}
@@ -237,10 +246,10 @@ export default function Navbar() {
                                     </>
                                 ) : (
                                     <button
-                                        onClick={() => { setOpen(false); navigate('/auth'); }}
+                                        onClick={() => { setOpen(false); navigate("/auth"); }}
                                         className="mt-2 inline-flex justify-center items-center rounded-full bg-gradient-to-r from-rose-500 to-orange-500 px-4 py-2 font-medium text-white"
                                     >
-                                        {t('nav.signIn') || 'Sign In'}
+                                        {t("nav.signIn") || "Sign In"}
                                     </button>
                                 )}
                             </div>

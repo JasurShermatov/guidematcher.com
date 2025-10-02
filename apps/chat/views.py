@@ -134,11 +134,11 @@ class MessageCreateView(generics.CreateAPIView):
 
         payload = MessageListSerializer(message, context={"request": request}).data
         async_to_sync(channel_layer.group_send)(
-            group_name,
-            {"type": "chat_message", "message": payload}
+            group_name, {"type": "chat_message", "message": payload}
         )
 
         return Response(payload, status=status.HTTP_201_CREATED)
+
 
 @extend_schema(tags=["Chat"])
 @api_view(["POST"])

@@ -12,6 +12,7 @@ FILES_DIR.mkdir(parents=True, exist_ok=True)
 
 ALLOWED_EXTS = (".xlsx", ".xls", ".csv")
 
+
 @router.message(F.document)  # keng filter: har qanday hujjat
 async def handle_any_document(message: Message):
     doc = message.document
@@ -22,7 +23,9 @@ async def handle_any_document(message: Message):
     if not lower.endswith(ALLOWED_EXTS):
         logging.info(
             "Document rejected (ext mismatch): %s | mime=%s | size=%s",
-            name, doc.mime_type, doc.file_size
+            name,
+            doc.mime_type,
+            doc.file_size,
         )
         await message.answer("❗ Iltimos, Excel (.xlsx/.xls) yoki CSV yuboring.")
         return
@@ -35,7 +38,10 @@ async def handle_any_document(message: Message):
 
         logging.info(
             "✅ Saved document: %s | mime=%s | size=%s -> %s",
-            name, doc.mime_type, doc.file_size, dest
+            name,
+            doc.mime_type,
+            doc.file_size,
+            dest,
         )
         await message.answer(f"✅ Saqlandi: {dest.name}")
     except Exception as e:

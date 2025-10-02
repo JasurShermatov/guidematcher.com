@@ -22,26 +22,20 @@ class UserSimpleSerializer(serializers.ModelSerializer):
 
 
 class ClientProfileSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk', read_only=True)          # <-- PK string
     user = UserSimpleSerializer(read_only=True)
-
     class Meta:
         model = ClientProfile
         fields = ["id", "user"]
 
 
 class CustomerProfileSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='pk', read_only=True)          # <-- PK string
     user = UserSimpleSerializer(read_only=True)
-
     class Meta:
         model = CustomerProfile
-        fields = [
-            "id",
-            "user",
-            "city",
-            "service_areas",
-            "is_available",
-            "average_rating",
-        ]
+        fields = ["id", "user", "city", "service_areas", "is_available", "average_rating"]
+
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -56,8 +50,14 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at", "conversation",
-                            "client_profile", "status")
+        read_only_fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "conversation",
+            "client_profile",
+            "status",
+        )
 
     def create(self, validated_data):
         if "client_profile" not in validated_data:

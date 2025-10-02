@@ -12,6 +12,18 @@ from .models import (
 )
 
 
+class LanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Language
+        fields = ["id", "name", "code", "native_name"]
+
+
+class ServiceTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceType
+        fields = ["id", "name"]
+
+
 class ClientProfileCreateUpdateSerializer(serializers.ModelSerializer):
 
     languages = serializers.PrimaryKeyRelatedField(
@@ -37,6 +49,8 @@ class ClientProfileSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(source="user.full_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
     profile_id = serializers.IntegerField(source="id", read_only=True)
+    languages = LanguageSerializer(many=True, read_only=True)
+    avatar_url = serializers.SerializerMethodField()
 
     class Meta:
         model = ClientProfile
@@ -50,6 +64,7 @@ class ClientProfileSerializer(serializers.ModelSerializer):
             "preferred_contact",
             "languages",
             "avatar",
+            "avatar_url",
             "created_at",
             "updated_at",
         ]
@@ -61,6 +76,12 @@ class ClientProfileSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+    def get_avatar_url(self, obj):
+        if not obj.avatar:
+            return None
+        req = self.context.get("request")
+        return req.build_absolute_uri(obj.avatar.url) if req else obj.avatar.url
 
 
 class ClientProfileShortSerializer(serializers.ModelSerializer):
@@ -97,7 +118,7 @@ class CustomerProfileCreateUpdateSerializer(serializers.ModelSerializer):
         ]
 
     def validate_years_of_experience(self, value):
-        if value < 0:
+        if value is not None and value < 0:
             raise serializers.ValidationError("Years of experience cannot be negative.")
         return value
 
@@ -111,16 +132,29 @@ class CustomerProfileCreateUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Daily rate cannot be negative.")
         return value
 
+    def create(self, validated_data):
+        languages = validated_data.pop("languages", [])
+        service_types = validated_data.pop("service_types", [])
+        instance = super().create(validated_data)
+        if languages:
+            instance.languages.set(languages)
+        if service_types:
+            instance.service_types.set(service_types)
+        return instance
+
     def update(self, instance, validated_data):
         languages = validated_data.pop("languages", None)
         service_types = validated_data.pop("service_types", None)
+
         for attr, val in validated_data.items():
             setattr(instance, attr, val)
         instance.save()
+
         if languages is not None:
             instance.languages.set(languages)
         if service_types is not None:
             instance.service_types.set(service_types)
+
         return instance
 
 
@@ -128,9 +162,18 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
     user = UserShortSerializer(read_only=True)
     full_name = serializers.CharField(source="user.full_name", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
+
     profile_id = serializers.IntegerField(source="id", read_only=True)
     city_name = serializers.CharField(source="city.name", read_only=True)
-    country_name = serializers.CharField(source="user.country_name", read_only=True)
+    country_name = serializers.CharField(source="country", read_only=True)
+
+    languages = LanguageSerializer(many=True, read_only=True)
+    service_types = ServiceTypeSerializer(many=True, read_only=True)
+
+    member_since = serializers.DateField(read_only=True)
+    member_since_year = serializers.IntegerField(read_only=True)
+
+    avatar_url = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomerProfile
@@ -158,7 +201,10 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             "average_rating",
             "is_available",
             "is_verified",
+            "member_since",
+            "member_since_year",
             "avatar",
+            "avatar_url",
             "created_at",
             "updated_at",
         ]
@@ -175,14 +221,25 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             "total_reviews",
             "average_rating",
             "is_verified",
+            "member_since",
+            "member_since_year",
+            "avatar_url",
             "created_at",
             "updated_at",
         ]
+
+    def get_avatar_url(self, obj):
+        if not obj.avatar:
+            return None
+        request = self.context.get("request")
+        return request.build_absolute_uri(obj.avatar.url) if request else obj.avatar.url
 
 
 class CustomerProfileShortSerializer(serializers.ModelSerializer):
     user = UserShortSerializer(read_only=True)
     city_name = serializers.CharField(source="city.name", read_only=True)
+    avatar_url = serializers.SerializerMethodField()
+    member_since_year = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = CustomerProfile
@@ -194,15 +251,31 @@ class CustomerProfileShortSerializer(serializers.ModelSerializer):
             "is_verified",
             "hourly_rate",
             "is_available",
-            "avatar",
+            "avatar_url",
+            "member_since_year",
         ]
-        read_only_fields = ["id", "user", "city_name", "average_rating", "is_verified"]
+        read_only_fields = [
+            "id",
+            "user",
+            "city_name",
+            "average_rating",
+            "is_verified",
+            "avatar_url",
+            "member_since_year",
+        ]
+
+    def get_avatar_url(self, obj):
+        if not obj.avatar:
+            return None
+        request = self.context.get("request")
+        return request.build_absolute_uri(obj.avatar.url) if request else obj.avatar.url
 
 
 class PortfolioSerializer(serializers.ModelSerializer):
     customer_name = serializers.CharField(
         source="customer.user.full_name", read_only=True
     )
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Portfolio
@@ -211,12 +284,27 @@ class PortfolioSerializer(serializers.ModelSerializer):
             "customer",
             "customer_name",
             "image",
+            "image_url",
             "title",
             "description",
             "order",
             "created_at",
         ]
         read_only_fields = ["id", "customer", "customer_name", "created_at"]
+
+    def get_image_url(self, obj):
+        if not obj.image:
+            return None
+        req = self.context.get("request")
+        return req.build_absolute_uri(obj.image.url) if req else obj.image.url
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        customer = getattr(user, "customerprofile", None)
+        if not customer:
+            raise serializers.ValidationError("You don't have a customer profile yet.")
+        validated_data["customer"] = customer
+        return super().create(validated_data)
 
 
 class VerificationDocumentSerializer(serializers.ModelSerializer):

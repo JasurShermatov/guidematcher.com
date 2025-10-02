@@ -1,511 +1,680 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Calendar, MessageCircle, Star, MapPin, Clock, Heart, CreditCard, Settings } from 'lucide-react';
+// src/pages/TouristDashboard.jsx
+import React, { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+    Calendar, Clock, MapPin, Users, MessageCircle, Search,
+    ChevronLeft, ChevronRight, XCircle, RefreshCw,
+    User as UserIcon, Save, Trash, Camera, CheckCircle
+} from "lucide-react";
+import api from "../api/api";
+import { getMe, patchMe } from "../api/users";
+import { getMyClientProfile, uploadMyClientAvatar, deleteMyClientAvatar } from "../api/profiles";
+import { actOnBooking } from "../api/bookings";
+import * as chatApi from "../api/chat";
+import { useLanguage } from "../context/LanguageContext";
 
-const TouristDashboard = () => {
-    const [activeTab, setActiveTab] = useState('bookings');
+const BOOKINGS_URL = "bookings/bookings/";
 
-    const upcomingBookings = [
-        {
-            id: 1,
-            guide: {
-                name: "Elena Popova",
-                avatar: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop",
-                rating: 4.9
-            },
-            service: "Historical Tour Guide",
-            date: "2024-03-15",
-            time: "10:00 AM",
-            duration: 3,
-            location: "Prague, Czech Republic",
-            status: "confirmed",
-            total: 90
-        },
-        {
-            id: 2,
-            guide: {
-                name: "Marco Silva",
-                avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop",
-                rating: 4.8
-            },
-            service: "Food Guide",
-            date: "2024-03-20",
-            time: "2:00 PM",
-            duration: 4,
-            location: "Lisbon, Portugal",
-            status: "pending",
-            total: 100
-        }
-    ];
+async function safeGet(url, { params } = {}) {
+    try {
+        const { data } = await api.get(url, { params });
+        return data ?? null;
+    } catch (e) {
+        console.error("GET failed:", url, e.response?.data || e.message);
+        return null;
+    }
+}
 
-    const pastBookings = [
-        {
-            id: 3,
-            guide: {
-                name: "Aisha Okonkwo",
-                avatar: "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop",
-                rating: 5.0
-            },
-            service: "Cultural Guide",
-            date: "2024-02-28",
-            time: "9:00 AM",
-            duration: 6,
-            location: "Lagos, Nigeria",
-            status: "completed",
-            total: 120,
-            reviewed: false
-        }
-    ];
+/** UUID yoki har qanday identifikatordan CustomerProfile PK (raqamli string) ni aniqlash */
+async function resolveCustomerPk(maybeId) {
+    if (!maybeId) return null;
+    const s = String(maybeId);
+    if (/^\d+$/.test(s)) return s;
+    let d = await safeGet(`profiles/customers/${encodeURIComponent(s)}/`, { def: null });
+    if (!d) d = await safeGet(`profiles/customers/by-user/${encodeURIComponent(s)}/`, { def: null });
+    if (!d) d = await safeGet(`profiles/customers/resolve/`, { params: { user: s }, def: null });
+    const id = d?.id || d?.profile_id;
+    return id ? String(id) : null;
+}
 
-    const favoriteGuides = [
-        {
-            id: 1,
-            name: "Elena Popova",
-            location: "Prague, Czech Republic",
-            rating: 4.9,
-            reviews: 127,
-            avatar: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-            services: ["Tour Guide", "Photographer"]
-        },
-        {
-            id: 2,
-            name: "Yuki Tanaka",
-            location: "Tokyo, Japan",
-            rating: 5.0,
-            reviews: 89,
-            avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-            services: ["Shopping Helper", "Translator"]
-        }
-    ];
+function normalizeBooking(b) {
+    const status = (b?.status || b?.status_display || "pending").toString().toLowerCase();
+    const cp = b?.customer_profile || {};
+    const cpUser = cp?.user || {};
 
-    const paymentHistory = [
-        {
-            id: 1,
-            date: "2024-02-28",
-            description: "Cultural Guide - Aisha Okonkwo",
-            amount: 120,
-            status: "completed"
-        },
-        {
-            id: 2,
-            date: "2024-02-15",
-            description: "Photography Tour - Chen Wei",
-            amount: 180,
-            status: "completed"
-        },
-        {
-            id: 3,
-            date: "2024-03-15",
-            description: "Historical Tour - Elena Popova",
-            amount: 90,
-            status: "pending"
-        }
-    ];
+    const customerUserId =
+        cpUser?.id ||
+        b?.customer_profile_user ||
+        b?.customer_user ||
+        b?.customer ||
+        b?.customer_id ||
+        null;
 
-    const renderBookingCard = (booking, isPast = false) => (
-        <div key={booking.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-4">
-                    <img
-                        src={booking.guide.avatar}
-                        alt={booking.guide.name}
-                        className="w-12 h-12 rounded-full object-cover"
-                    />
+    const customerProfileId =
+        cp?.id ||
+        b?.customer_profile_id ||
+        (typeof b?.customer_profile === "string" ? b.customer_profile : null) ||
+        null;
+
+    const avatar =
+        b?.customer_avatar ||
+        b?.guide?.avatar_url ||
+        b?.provider_avatar ||
+        cp?.avatar_url ||
+        cpUser?.avatar_url ||
+        b?.customer_avatar_url ||
+        null;
+
+    const customerName =
+        b?.customer_name ||
+        cpUser?.full_name ||
+        cp?.full_name ||
+        (cpUser?.first_name && cpUser?.last_name ? `${cpUser.first_name} ${cpUser.last_name}` : "") ||
+        "";
+
+    return {
+        id: b?.id,
+        title: b?.title || b?.service_name || "Booking",
+        status,
+        status_display: b?.status_display || (status[0]?.toUpperCase() + status.slice(1)),
+        date: b?.date || b?.start_date || b?.start || b?.start_datetime?.slice(0, 10) || "—",
+        time: b?.time || b?.start_time || (b?.start_datetime
+            ? new Date(b.start_datetime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+            : ""),
+        end_date: b?.end_date || b?.end || "—",
+        guests: Number(b?.guests || b?.guest_count || b?.number_of_people || 0),
+        duration: Number(b?.duration_hours || b?.duration || 0),
+        price: b?.price || b?.amount || b?.total_price || 0,
+        city: b?.city_name || b?.city || b?.location || "",
+        customer_user: customerUserId,
+        customer_profile_id: customerProfileId,
+        customer_name: customerName,
+        customer_avatar: avatar,
+    };
+}
+
+function statusBadgeClass(status) {
+    const s = (status || "").toLowerCase();
+    if (s === "pending") return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300";
+    if (s === "accepted" || s === "confirmed") return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300";
+    if (s === "completed") return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300";
+    if (s === "cancelled" || s === "canceled" || s === "rejected") return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
+    return "bg-gray-100 text-gray-700 dark:bg-dark-800 dark:text-gray-300";
+}
+
+function BookingCard({ item, onCancel, onComplete, onOpenChat, onBookAgain, onWriteReview, t }) {
+    const isConfirmed = ["accepted", "confirmed"].includes(String(item.status).toLowerCase());
+    const isCompleted = String(item.status).toLowerCase() === "completed";
+    return (
+        <div className="bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-lg p-4">
+            <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start space-x-3">
                     <div>
-                        <h3 className="font-semibold text-gray-900">{booking.guide.name}</h3>
-                        <div className="flex items-center text-sm text-gray-600">
-                            <Star className="h-3 w-3 text-yellow-400 fill-current mr-1" />
-                            <span>{booking.guide.rating}</span>
+                        <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-gray-900 dark:text-white">{item.title}</h3>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${statusBadgeClass(item.status)}`}>
+                {item.status_display}
+              </span>
                         </div>
+                        <div className="mt-1 text-sm text-gray-600 dark:text-gray-300 flex flex-wrap gap-4">
+                            <div className="flex items-center gap-1">
+                                <Calendar className="h-4 w-4" />
+                                <span>{item.date}</span>
+                                {item.time && <span>• {item.time}</span>}
+                            </div>
+                            {!!item.duration && (
+                                <div className="flex items-center gap-1">
+                                    <Clock className="h-4 w-4" />
+                                    <span>{item.duration} h</span>
+                                </div>
+                            )}
+                            {!!item.guests && (
+                                <div className="flex items-center gap-1">
+                                    <Users className="h-4 w-4" />
+                                    <span>{item.guests} {item.guests === 1 ? t('booking.guest') : t('booking.guests')}</span>
+                                </div>
+                            )}
+                            {item.city && (
+                                <div className="flex items-center gap-1">
+                                    <MapPin className="h-4 w-4" />
+                                    <span>{item.city}</span>
+                                </div>
+                            )}
+                            {!!item.price && <div className="font-medium">${item.price}</div>}
+                        </div>
+                        {item.customer_name && (
+                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                {t('dashboard.viewGuide')}: {item.customer_name}
+                            </div>
+                        )}
                     </div>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                        booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-gray-100 text-gray-800'
-                }`}>
-          {booking.status}
-        </span>
-            </div>
-
-            <div className="space-y-2 mb-4">
-                <p className="font-medium text-gray-900">{booking.service}</p>
-                <div className="flex items-center text-sm text-gray-600">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    <span>{booking.location}</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    <span>{booking.date} at {booking.time}</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                    <Clock className="h-4 w-4 mr-1" />
-                    <span>{booking.duration} hours</span>
-                </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-blue-600">${booking.total}</span>
-                <div className="flex space-x-2">
-                    <Link
-                        to="/chat"
-                        className="text-blue-600 hover:text-blue-700 p-2 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
-                    >
-                        <MessageCircle className="h-4 w-4" />
-                    </Link>
-                    {isPast && !booking.reviewed && (
-                        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
-                            Leave Review
+                <div className="flex items-center gap-2 flex-wrap justify-end">
+                    {item.customer_user && (
+                        <button
+                            onClick={() => onOpenChat(item.customer_user)}
+                            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-dark-700 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-800 flex items-center gap-1 text-gray-800 dark:text-gray-200"
+                            title={t('chat.title')}
+                        >
+                            <MessageCircle className="h-4 w-4" />
+                            {t('chat.title')}
                         </button>
                     )}
-                    {!isPast && (
-                        <Link
-                            to={`/guide/${booking.guide.name.toLowerCase().replace(' ', '-')}`}
-                            className="text-gray-600 hover:text-gray-700 text-sm underline"
+                    {item.customer_user && (
+                        <button
+                            onClick={() => onBookAgain(item.customer_user)}
+                            className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                            title={t('dashboard.findGuide')}
                         >
-                            View Guide
-                        </Link>
+                            {t('dashboard.findGuide')}
+                        </button>
+                    )}
+                    {["pending", "accepted", "confirmed"].includes((item.status || "").toLowerCase()) && (
+                        <button
+                            onClick={() => onCancel(item.id)}
+                            className="px-3 py-1.5 text-sm border border-red-600 text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+                            title={t('dashboard.cancel')}
+                        >
+                            {t('dashboard.cancel')}
+                        </button>
+                    )}
+                    {isConfirmed && (
+                        <button
+                            onClick={() => onComplete(item.id)}
+                            className="px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700"
+                            title={t('dashboard.markComplete')}
+                        >
+                            {t('dashboard.markComplete')}
+                        </button>
+                    )}
+                    {isCompleted && item.customer_profile_id && (
+                        <button
+                            onClick={() => onWriteReview(item)}
+                            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-dark-700 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-800 text-gray-800 dark:text-gray-200"
+                            title={t('dashboard.leaveReview')}
+                        >
+                            {t('dashboard.leaveReview')}
+                        </button>
                     )}
                 </div>
             </div>
         </div>
     );
+}
+
+export default function TouristDashboard() {
+    const { t } = useLanguage();
+    const navigate = useNavigate();
+    const [activeTab, setActiveTab] = useState("bookings");
+
+    /** BOOKINGS */
+    const [loading, setLoading] = useState(true);
+    const [list, setList] = useState([]);
+    const [pageInfo, setPageInfo] = useState({ next: null, previous: null, count: 0, page: 1 });
+    const [cancelingId, setCancelingId] = useState(null);
+    const [completingId, setCompletingId] = useState(null);
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    const loadBookings = async (page = 1) => {
+        setLoading(true);
+        try {
+            const params = { as: "client", page };
+            const data = await safeGet(BOOKINGS_URL, { params });
+            let items = [], next = null, previous = null, count = 0;
+            if (Array.isArray(data)) {
+                items = data;
+            } else if (data && Array.isArray(data.results)) {
+                items = data.results; next = data.next || null; previous = data.previous || null; count = Number(data.count || 0);
+            }
+            setList(items.map(normalizeBooking));
+            setPageInfo({ next, previous, count, page });
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => { loadBookings(1); }, [refreshKey]);
+
+    const upcoming = useMemo(
+        () => list.filter((b) => ["pending", "accepted"].includes((b.status || "").toLowerCase())),
+        [list]
+    );
+    const past = useMemo(
+        () => list.filter((b) => ["completed", "cancelled", "canceled", "rejected"].includes((b.status || "").toLowerCase())),
+        [list]
+    );
+
+    const handleCancel = async (id) => {
+        if (!id) return;
+        if (!window.confirm(t('dashboard.confirmCancel'))) return;
+        setCancelingId(id);
+        const ok = await actOnBooking(id, "cancel");
+        setCancelingId(null);
+        if (ok) {
+            setList((xs) => xs.map((b) => (b.id === id ? { ...b, status: "cancelled", status_display: t('dashboard.statusCancelled') } : b)));
+        } else {
+            alert(t('dashboard.errCancel'));
+        }
+    };
+
+    const handleComplete = async (id) => {
+        if (!id) return;
+        if (!window.confirm(t('dashboard.confirmComplete'))) return;
+        setCompletingId(id);
+        const ok = await actOnBooking(id, "complete");
+        setCompletingId(null);
+        if (ok) {
+            setList((xs) => xs.map((b) => (b.id === id ? { ...b, status: "completed", status_display: t('dashboard.statusCompleted') } : b)));
+        } else {
+            alert(t('dashboard.errComplete'));
+        }
+    };
+
+    const openChatWithGuide = async (customerUserId) => {
+        try {
+            navigate(`/chat?user=${customerUserId}`);
+            const res = await chatApi.createConversation({
+                user_id: String(customerUserId),
+                message: t('chat.helloDefault'),
+            }).then(r => r?.data ?? r);
+            if (res?.id) return navigate(`/chat?c=${res.id}`);
+            navigate(`/chat?user=${customerUserId}`);
+        } catch {
+            alert(t('chat.errOpen'));
+        }
+    };
+
+    /*** Book again → har doim CustomerProfile PK bilan /booking/:pk ***/
+    const bookAgain = async (item) => {
+        const pk = item?.customer_profile_id;
+        if (!pk) return alert(t('dashboard.errResolveProfile'));
+        navigate(`/booking/${encodeURIComponent(pk)}`);
+    };
+
+    // Completed booking → BookingPage (review)
+    const openWriteReview = (item) => {
+        const bookingId = item?.id;
+        const profilePk = item?.customer_profile_id;
+        if (!bookingId || !profilePk) {
+            alert(t('dashboard.errResolveReview'));
+            return;
+        }
+        navigate(`/booking/${encodeURIComponent(profilePk)}?booking_id=${encodeURIComponent(String(bookingId))}`);
+    };
+
+    const goSearch = () => navigate("/guides");
+
+    /** PROFILE (user + client profile/avatar) */
+    const [meForm, setMeForm] = useState({ first_name: "", last_name: "", email: "", phone: "" });
+    const [savingMe, setSavingMe] = useState(false);
+    const [clientProfile, setClientProfile] = useState(null);
+    const [uploadPreview, setUploadPreview] = useState(null);
+    const [uploadFile, setUploadFile] = useState(null);
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+    const loadProfileBundle = async () => {
+        const meRes = await getMe().catch(() => ({ data: null }));
+        const me = meRes?.data ?? meRes;
+        setMeForm({
+            first_name: me?.first_name || "",
+            last_name: me?.last_name || "",
+            email: me?.email || "",
+            phone: me?.phone || me?.phone_number || "",
+        });
+        const cpRes = await getMyClientProfile().catch(() => ({ data: null }));
+        const cp = cpRes?.data ?? cpRes;
+        setClientProfile(cp);
+    };
+
+    const saveMe = async () => {
+        setSavingMe(true);
+        const ok = await patchMe({
+            first_name: meForm.first_name || "",
+            last_name: meForm.last_name || "",
+            phone: meForm.phone || undefined,
+        });
+        setSavingMe(false);
+        if (ok) {
+            await loadProfileBundle();
+            alert(t('dashboard.saved'));
+        } else {
+            alert(t('dashboard.errSave'));
+        }
+    };
+
+    const onPickAvatar = (e) => {
+        const f = e.target.files?.[0];
+        if (!f) return;
+        if (f.size > 5 * 1024 * 1024) return alert(t('dashboard.avatarMax'));
+        if (!/^image\/(jpeg|png|gif|webp)$/.test(f.type)) return alert(t('dashboard.avatarTypes'));
+        setUploadFile(f);
+        const reader = new FileReader();
+        reader.onload = (ev) => setUploadPreview(ev?.target?.result || null);
+        reader.readAsDataURL(f);
+    };
+
+    const saveAvatar = async () => {
+        if (!uploadFile) return;
+        setIsUploadingImage(true);
+        try {
+            await uploadMyClientAvatar(uploadFile);
+            await loadProfileBundle();
+            setUploadFile(null);
+            setUploadPreview(null);
+            alert(t('dashboard.avatarUpdated'));
+        } catch {
+            alert(t('dashboard.errAvatarUpload'));
+        } finally {
+            setIsUploadingImage(false);
+        }
+    };
+
+    const removeAvatar = async () => {
+        try {
+            await deleteMyClientAvatar();
+            await loadProfileBundle();
+            setUploadFile(null);
+            setUploadPreview(null);
+            alert(t('dashboard.avatarRemoved'));
+        } catch {
+            alert(t('dashboard.errAvatarRemove'));
+        }
+    };
+
+    useEffect(() => {
+        if (activeTab === "profile") loadProfileBundle();
+    }, [activeTab]);
+
+    /** UI */
+    if (loading && activeTab === "bookings") {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-dark-950 pt-16 grid place-items-center text-gray-600 dark:text-gray-300">
+                {t('common.loading')}
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-dark-950 pt-8 transition-colors">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">My Dashboard</h1>
-                    <p className="text-gray-600">Manage your bookings, guides, and travel experiences</p>
+                <div className="mb-8 flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('dashboard.title')}</h1>
+                        <p className="text-gray-600 dark:text-gray-400">{t('dashboard.description')}</p>
+                    </div>
+                    {activeTab === "bookings" && (
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setRefreshKey((k) => k + 1)}
+                                className="px-3 py-2 border border-gray-300 dark:border-dark-700 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-800 flex items-center gap-2 text-gray-800 dark:text-gray-200"
+                                title={t('dashboard.refresh')}
+                            >
+                                <RefreshCw className="h-4 w-4" />
+                                {t('dashboard.refresh')}
+                            </button>
+                            <button
+                                onClick={() => navigate("/guides")}
+                                className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                            >
+                                <Search className="h-4 w-4" />
+                                {t('dashboard.findGuide')}
+                            </button>
+                        </div>
+                    )}
                 </div>
 
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div className="bg-white rounded-xl p-6 shadow-sm">
-                        <div className="flex items-center">
-                            <Calendar className="h-8 w-8 text-blue-600" />
-                            <div className="ml-4">
-                                <p className="text-sm text-gray-600">Upcoming Bookings</p>
-                                <p className="text-2xl font-bold text-gray-900">{upcomingBookings.length}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-xl p-6 shadow-sm">
-                        <div className="flex items-center">
-                            <Star className="h-8 w-8 text-yellow-500" />
-                            <div className="ml-4">
-                                <p className="text-sm text-gray-600">Reviews Given</p>
-                                <p className="text-2xl font-bold text-gray-900">12</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-xl p-6 shadow-sm">
-                        <div className="flex items-center">
-                            <Heart className="h-8 w-8 text-red-500" />
-                            <div className="ml-4">
-                                <p className="text-sm text-gray-600">Favorite Guides</p>
-                                <p className="text-2xl font-bold text-gray-900">{favoriteGuides.length}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-xl p-6 shadow-sm">
-                        <div className="flex items-center">
-                            <CreditCard className="h-8 w-8 text-green-600" />
-                            <div className="ml-4">
-                                <p className="text-sm text-gray-600">Total Spent</p>
-                                <p className="text-2xl font-bold text-gray-900">$420</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Navigation Tabs */}
-                <div className="border-b border-gray-200 mb-8">
+                {/* Tabs */}
+                <div className="border-b border-gray-200 dark:border-dark-800 mb-8">
                     <nav className="-mb-px flex space-x-8">
                         {[
-                            { id: 'bookings', label: 'My Bookings', icon: Calendar },
-                            { id: 'favorites', label: 'Favorite Guides', icon: Heart },
-                            { id: 'payments', label: 'Payment History', icon: CreditCard },
-                            { id: 'settings', label: 'Account Settings', icon: Settings }
-                        ].map(tab => {
-                            const Icon = tab.icon;
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 transition-colors ${
-                                        activeTab === tab.id
-                                            ? 'border-blue-500 text-blue-600'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                    }`}
-                                >
-                                    <Icon className="h-4 w-4" />
-                                    <span>{tab.label}</span>
-                                </button>
-                            );
-                        })}
+                            { id: "bookings", label: t('dashboard.myBookings') },
+                            { id: "profile", label: t('dashboard.profileInfo') },
+                        ].map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                                    activeTab === tab.id
+                                        ? "border-blue-500 text-blue-600"
+                                        : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-dark-700"
+                                }`}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
                     </nav>
                 </div>
 
-                {/* Tab Content */}
-                {activeTab === 'bookings' && (
-                    <div className="space-y-8">
-
-                        {/* Upcoming Bookings */}
-                        <div>
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">Upcoming Bookings</h2>
-                            {upcomingBookings.length > 0 ? (
-                                <div className="grid gap-6">
-                                    {upcomingBookings.map(booking => renderBookingCard(booking))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-12">
-                                    <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-600">No upcoming bookings</p>
-                                    <Link
-                                        to="/search"
-                                        className="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                                    >
-                                        Find a Guide
-                                    </Link>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Past Bookings */}
-                        <div>
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">Past Bookings</h2>
-                            {pastBookings.length > 0 ? (
-                                <div className="grid gap-6">
-                                    {pastBookings.map(booking => renderBookingCard(booking, true))}
-                                </div>
-                            ) : (
-                                <p className="text-gray-600 text-center py-8">No past bookings</p>
-                            )}
-                        </div>
-                    </div>
-                )}
-
-                {activeTab === 'favorites' && (
-                    <div>
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-gray-900">Favorite Guides</h2>
-                            <Link
-                                to="/search"
-                                className="text-blue-600 hover:text-blue-700 font-medium"
-                            >
-                                Discover More Guides →
-                            </Link>
-                        </div>
-
-                        {favoriteGuides.length > 0 ? (
-                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {favoriteGuides.map(guide => (
-                                    <div key={guide.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
-                                        <div className="text-center mb-4">
-                                            <img
-                                                src={guide.avatar}
-                                                alt={guide.name}
-                                                className="w-20 h-20 rounded-full object-cover mx-auto mb-3"
-                                            />
-                                            <h3 className="font-semibold text-gray-900 mb-1">{guide.name}</h3>
-                                            <div className="flex items-center justify-center text-sm text-gray-600 mb-2">
-                                                <Star className="h-3 w-3 text-yellow-400 fill-current mr-1" />
-                                                <span>{guide.rating} ({guide.reviews} reviews)</span>
-                                            </div>
-                                            <p className="text-sm text-gray-600 flex items-center justify-center">
-                                                <MapPin className="h-3 w-3 mr-1" />
-                                                {guide.location}
-                                            </p>
-                                        </div>
-
-                                        <div className="mb-4">
-                                            <div className="flex flex-wrap justify-center gap-1">
-                                                {guide.services.map(service => (
-                                                    <span
-                                                        key={service}
-                                                        className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
-                                                    >
-                            {service}
-                          </span>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex space-x-2">
-                                            <Link
-                                                to={`/guide/${guide.id}`}
-                                                className="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                                            >
-                                                View Profile
-                                            </Link>
-                                            <Link
-                                                to={`/booking/${guide.id}`}
-                                                className="flex-1 border border-blue-600 text-blue-600 text-center py-2 px-4 rounded-lg hover:bg-blue-50 transition-colors text-sm"
-                                            >
-                                                Book Now
-                                            </Link>
-                                        </div>
-                                    </div>
-                                ))}
+                {/* ---------- BOOKINGS ---------- */}
+                {activeTab === "bookings" && (
+                    <div className="space-y-10">
+                        {/* Stats */}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
+                            <div className="bg-white dark:bg-dark-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-dark-800">
+                                <div className="text-sm text-gray-600 dark:text-gray-300">{t('dashboard.upcomingBookings')}</div>
+                                <div className="text-2xl font-bold text-gray-900 dark:text-white">{upcoming.length}</div>
                             </div>
-                        ) : (
-                            <div className="text-center py-12">
-                                <Heart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                <p className="text-gray-600 mb-4">No favorite guides yet</p>
-                                <Link
-                                    to="/search"
-                                    className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                            <div className="bg-white dark:bg-dark-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-dark-800">
+                                <div className="text-sm text-gray-600 dark:text-gray-300">{t('dashboard.pastBookings')}</div>
+                                <div className="text-2xl font-bold text-gray-900 dark:text-white">{past.length}</div>
+                            </div>
+                            <div className="bg-white dark:bg-dark-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-dark-800">
+                                <div className="text-sm text-gray-600 dark:text-gray-300">{t('dashboard.total')}</div>
+                                <div className="text-2xl font-bold text-gray-900 dark:text-white">{list.length}</div>
+                            </div>
+                            <div className="bg-white dark:bg-dark-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-dark-800">
+                                <div className="text-sm text-gray-600 dark:text-gray-300">{t('dashboard.status')}</div>
+                                <div className="text-2xl font-bold text-gray-900 dark:text-white">OK</div>
+                            </div>
+                        </div>
+
+                        {/* Upcoming */}
+                        <section>
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('dashboard.upcomingBookingsTitle')}</h2>
+                                {pageInfo?.count ? (
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                                        {t('dashboard.pageXofN', { x: pageInfo.page, n: pageInfo.count })}
+                                    </div>
+                                ) : null}
+                            </div>
+                            {upcoming.length ? (
+                                <div className="grid gap-4">
+                                    {upcoming.map((b) => (
+                                        <BookingCard
+                                            key={b.id}
+                                            item={b}
+                                            onCancel={handleCancel}
+                                            onComplete={handleComplete}
+                                            onOpenChat={() => openChatWithGuide(b.customer_user)}
+                                            onBookAgain={() => bookAgain(b)}
+                                            onWriteReview={openWriteReview}
+                                            t={t}
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-lg p-6 text-gray-600 dark:text-gray-300">
+                                    {t('dashboard.noUpcoming')}{" "}
+                                    <button onClick={goSearch} className="text-blue-600 hover:underline">
+                                        {t('dashboard.findGuide')}
+                                    </button>{" "}
+                                    {t('dashboard.planNext')}
+                                </div>
+                            )}
+                        </section>
+
+                        {/* Past */}
+                        <section>
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t('dashboard.pastBookings')}</h2>
+                            {past.length ? (
+                                <div className="grid gap-4">
+                                    {past.map((b) => (
+                                        <BookingCard
+                                            key={b.id}
+                                            item={b}
+                                            onCancel={handleCancel}
+                                            onComplete={handleComplete}
+                                            onOpenChat={() => openChatWithGuide(b.customer_user)}
+                                            onBookAgain={() => bookAgain(b)}
+                                            onWriteReview={() => openWriteReview(b)}
+                                            t={t}
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-lg p-6 text-gray-600 dark:text-gray-300">
+                                    {t('dashboard.noPast')}
+                                </div>
+                            )}
+                        </section>
+
+                        {/* Pagination */}
+                        {(pageInfo.previous || pageInfo.next) && (
+                            <div className="flex items-center justify-center gap-3">
+                                <button
+                                    disabled={!pageInfo.previous}
+                                    onClick={() => loadBookings(Math.max(1, pageInfo.page - 1))}
+                                    className="px-3 py-2 border border-gray-300 dark:border-dark-700 rounded-lg disabled:opacity-50 flex items-center gap-1 text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-dark-800"
                                 >
-                                    Discover Guides
-                                </Link>
+                                    <ChevronLeft className="h-4 w-4" />
+                                    {t('common.prev')}
+                                </button>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {t('dashboard.page', { x: pageInfo.page })}
+                </span>
+                                <button
+                                    disabled={!pageInfo.next}
+                                    onClick={() => loadBookings(pageInfo.page + 1)}
+                                    className="px-3 py-2 border border-gray-300 dark:border-dark-700 rounded-lg disabled:opacity-50 flex items-center gap-1 text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-dark-800"
+                                >
+                                    {t('common.next')}
+                                    <ChevronRight className="h-4 w-4" />
+                                </button>
                             </div>
                         )}
                     </div>
                 )}
 
-                {activeTab === 'payments' && (
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-900 mb-6">Payment History</h2>
+                {/* ---------- PROFILE ---------- */}
+                {activeTab === "profile" && (
+                    <div className="bg-white dark:bg-dark-900 rounded-lg p-6 border border-gray-200 dark:border-dark-800 max-w-3xl">
+                        <div className="flex items-center gap-3 mb-6">
+                            <UserIcon className="h-5 w-5 text-gray-500" />
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('dashboard.profileInfo')}</h2>
+                        </div>
 
-                        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-gray-50">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Date
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Description
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Amount
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Status
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                    {paymentHistory.map(payment => (
-                                        <tr key={payment.id}>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {payment.date}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {payment.description}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                ${payment.amount}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              payment.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                  'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {payment.status}
-                          </span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
+                        {/* Avatar */}
+                        <div className="flex items-start gap-4 mb-6">
+                            <div className="relative">
+                                <img
+                                    src={uploadPreview || clientProfile?.avatar_url || "https://placehold.co/96x96"}
+                                    alt="avatar"
+                                    className="w-24 h-24 rounded-full object-cover border-4 border-gray-200 dark:border-dark-800"
+                                />
+                                <label className="absolute bottom-0 right-0 bg-blue-600 rounded-full p-2 cursor-pointer hover:bg-blue-700 transition-colors">
+                                    <Camera className="h-4 w-4 text-white" />
+                                    <input type="file" accept="image/*" onChange={onPickAvatar} className="hidden" />
+                                </label>
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">{t('dashboard.avatarHint')}</div>
+                                <div className="flex flex-wrap gap-3">
+                                    {uploadPreview && (
+                                        <button
+                                            onClick={saveAvatar}
+                                            disabled={isUploadingImage}
+                                            className={`px-4 py-2 rounded-lg text-white ${isUploadingImage ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"}`}
+                                        >
+                                            {isUploadingImage ? t('dashboard.uploading') : t('dashboard.uploadPhoto')}
+                                        </button>
+                                    )}
+                                    {(clientProfile?.avatar_url || uploadPreview) && (
+                                        <button
+                                            onClick={removeAvatar}
+                                            className="px-4 py-2 border border-gray-300 dark:border-dark-700 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-800 flex items-center gap-2 text-gray-800 dark:text-gray-200"
+                                        >
+                                            <Trash className="h-4 w-4" />
+                                            {t('dashboard.removePhoto')}
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
 
-                {activeTab === 'settings' && (
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-900 mb-6">Account Settings</h2>
-
-                        <div className="grid lg:grid-cols-2 gap-8">
-                            {/* Profile Settings */}
-                            <div className="bg-white rounded-lg p-6 shadow-sm">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Profile Information</h3>
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                                        <input
-                                            type="text"
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                            placeholder="John Doe"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                                        <input
-                                            type="email"
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                            placeholder="john@example.com"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                                        <input
-                                            type="tel"
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                            placeholder="+1 (555) 123-4567"
-                                        />
-                                    </div>
-                                    <button className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
-                                        Update Profile
-                                    </button>
-                                </div>
+                        {/* User fields */}
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">{t('dashboard.firstName')}</label>
+                                <input
+                                    type="text"
+                                    value={meForm.first_name}
+                                    onChange={(e) => setMeForm((x) => ({ ...x, first_name: e.target.value }))}
+                                    className="w-full p-3 border border-gray-300 dark:border-dark-700 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100"
+                                />
                             </div>
-
-                            {/* Preferences */}
-                            <div className="bg-white rounded-lg p-6 shadow-sm">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Preferences</h3>
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Language</label>
-                                        <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                            <option>English</option>
-                                            <option>Spanish</option>
-                                            <option>French</option>
-                                            <option>German</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
-                                        <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                            <option>USD ($)</option>
-                                            <option>EUR (€)</option>
-                                            <option>GBP (£)</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-3">
-                                        <label className="block text-sm font-medium text-gray-700">Notifications</label>
-                                        <div className="space-y-2">
-                                            <label className="flex items-center">
-                                                <input type="checkbox" className="mr-2" defaultChecked />
-                                                <span className="text-sm text-gray-700">Email notifications</span>
-                                            </label>
-                                            <label className="flex items-center">
-                                                <input type="checkbox" className="mr-2" defaultChecked />
-                                                <span className="text-sm text-gray-700">SMS notifications</span>
-                                            </label>
-                                            <label className="flex items-center">
-                                                <input type="checkbox" className="mr-2" />
-                                                <span className="text-sm text-gray-700">Marketing emails</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <button className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
-                                        Save Preferences
-                                    </button>
-                                </div>
+                            <div>
+                                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">{t('dashboard.lastName')}</label>
+                                <input
+                                    type="text"
+                                    value={meForm.last_name}
+                                    onChange={(e) => setMeForm((x) => ({ ...x, last_name: e.target.value }))}
+                                    className="w-full p-3 border border-gray-300 dark:border-dark-700 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100"
+                                />
                             </div>
+                            <div>
+                                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">{t('dashboard.emailReadonly')}</label>
+                                <input
+                                    type="email"
+                                    readOnly
+                                    value={meForm.email}
+                                    className="w-full p-3 border border-gray-300 dark:border-dark-700 rounded-lg bg-gray-50 dark:bg-dark-800 text-gray-600 dark:text-gray-300"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">{t('dashboard.phone')}</label>
+                                <input
+                                    type="tel"
+                                    value={meForm.phone}
+                                    onChange={(e) => setMeForm((x) => ({ ...x, phone: e.target.value }))}
+                                    className="w-full p-3 border border-gray-300 dark:border-dark-700 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex justify-end mt-6">
+                            <button
+                                onClick={saveMe}
+                                disabled={savingMe}
+                                className={`px-4 py-2 rounded-lg text-white flex items-center gap-2 ${
+                                    savingMe ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+                                }`}
+                            >
+                                <Save className="h-4 w-4" />
+                                {savingMe ? t('dashboard.saving') : t('dashboard.saveChanges')}
+                            </button>
                         </div>
                     </div>
                 )}
             </div>
+
+            {/* Cancel overlay */}
+            {cancelingId && (
+                <div className="fixed inset-0 bg-black/30 grid place-items-center z-50">
+                    <div className="bg-white dark:bg-dark-900 px-6 py-4 rounded-xl shadow-md flex items-center gap-3 border border-gray-200 dark:border-dark-800">
+                        <XCircle className="h-5 w-5 text-red-600" />
+                        <span className="text-sm text-gray-800 dark:text-gray-200">{t('dashboard.cancelling')}</span>
+                    </div>
+                </div>
+            )}
+            {/* Complete overlay */}
+            {completingId && (
+                <div className="fixed inset-0 bg-black/30 grid place-items-center z-50">
+                    <div className="bg-white dark:bg-dark-900 px-6 py-4 rounded-xl shadow-md flex items-center gap-3 border border-gray-200 dark:border-dark-800">
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                        <span className="text-sm text-gray-800 dark:text-gray-200">{t('dashboard.completing')}</span>
+                    </div>
+                </div>
+            )}
         </div>
     );
-};
-
-export default TouristDashboard;
+}

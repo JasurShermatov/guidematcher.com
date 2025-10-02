@@ -1,29 +1,21 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
 
-/** API base helper */
 const API_BASE = (process.env.REACT_APP_API_URL ?? "/api/v1/").replace(/\/+$/, "/");
+export const ROLE_GUIDE = "customer";
+export const ROLE_TOURIST = "client";
 
-/** Backend role constants */
-export const ROLE_GUIDE = "Customer"; // guide uchun backend roli
-export const ROLE_TOURIST = "Client"; // tourist uchun backend roli
-
-/** Normalizatsiya: kiruvchi role har xil yozilishi mumkin */
 function normalizeRole(raw) {
-    if (!raw || typeof raw !== "string") return null;
-    const v = raw.trim().toLowerCase();
-    if (["customer", "guide", "guides", "gid"].includes(v)) return ROLE_GUIDE;
-    if (["client", "tourist", "traveler", "cliente"].includes(v)) return ROLE_TOURIST;
-    if (raw === ROLE_GUIDE || raw === ROLE_TOURIST) return raw;
-    return null;
+    if (!raw) return null;
+    const v = String(raw).trim().toLowerCase();
+    if (["customer", "guide", "gid", "provider"].includes(v)) return "customer";
+    if (["client", "tourist", "traveler"].includes(v)) return "client";
+    return v;
 }
 
-/** Dashboard path builder */
 export const getDashboardPath = (role) =>
     normalizeRole(role) === ROLE_GUIDE ? "/dashboard/guide" : "/dashboard/tourist";
 
 const UserContext = createContext(undefined);
-
 export const useUser = () => {
     const ctx = useContext(UserContext);
     if (!ctx) throw new Error("useUser must be used within a UserProvider");
@@ -32,23 +24,19 @@ export const useUser = () => {
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [accessToken, setAccessToken] = useState(null);
-    const [refreshToken, setRefreshToken] = useState(null);
+    const [accessToken, setAccessToken] = useState(localStorage.getItem("access_token"));
+    const [refreshToken, setRefreshToken] = useState(localStorage.getItem("refresh_token"));
     const [isBootstrapping, setIsBootstrapping] = useState(true);
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
-        const storedAccess = localStorage.getItem("access_token");
-        const storedRefresh = localStorage.getItem("refresh_token");
-        if (storedUser && storedAccess && storedRefresh) {
+        if (storedUser && accessToken && refreshToken) {
             try {
                 const parsed = JSON.parse(storedUser);
-                if (parsed && parsed.role) parsed.role = normalizeRole(parsed.role);
+                parsed.role = normalizeRole(parsed.role);
                 setUser(parsed);
             } catch {}
-            setAccessToken(storedAccess);
-            setRefreshToken(storedRefresh);
-            fetchMe(storedAccess, storedRefresh).finally(() => setIsBootstrapping(false));
+            fetchMe(accessToken, refreshToken).finally(() => setIsBootstrapping(false));
         } else {
             setIsBootstrapping(false);
         }
@@ -57,7 +45,7 @@ export const UserProvider = ({ children }) => {
 
     const fetchMe = async (access, refresh) => {
         try {
-            const res = await fetch(`${API_BASE}accounts/me/`, {
+            const res = await fetch(`${API_BASE}auth/users/me/`, {
                 headers: { Authorization: `Bearer ${access}` },
             });
             if (res.ok) {
@@ -80,22 +68,22 @@ export const UserProvider = ({ children }) => {
 
     const refreshAccessToken = async (refresh) => {
         try {
-            const res = await fetch(`${API_BASE}accounts/refresh/`, {
+            const res = await fetch(`${API_BASE}token/refresh/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ refresh }),
             });
             if (res.ok) {
                 const data = await res.json();
-                if (data.access_token) {
-                    setAccessToken(data.access_token);
-                    localStorage.setItem("access_token", data.access_token);
+                if (data.access) {
+                    setAccessToken(data.access);
+                    localStorage.setItem("access_token", data.access);
                 }
-                if (data.refresh_token) {
-                    setRefreshToken(data.refresh_token);
-                    localStorage.setItem("refresh_token", data.refresh_token);
+                if (data.refresh) {
+                    setRefreshToken(data.refresh);
+                    localStorage.setItem("refresh_token", data.refresh);
                 }
-                return data.access_token || null;
+                return data.access || null;
             }
         } catch (e) {
             console.error(e);
@@ -156,45 +144,34 @@ export const UserProvider = ({ children }) => {
     );
 };
 
-/** Guard: only signed-in users */
 export function AuthGuard() {
     const { isAuthenticated, isBootstrapping } = useUser();
-    if (isBootstrapping) {
-        return <div className="w-full py-24 text-center text-gray-500 dark:text-gray-400">Loading...</div>;
-    }
-    // ⬇️ Logoutsiz kirsa -> LandingPage
-    if (!isAuthenticated) return <Navigate to="/" replace />;
-    return <Outlet />;
+    if (isBootstrapping) return <div className="w-full py-24 text-center text-gray-500">Loading...</div>;
+    if (!isAuthenticated) return <div className="w-full py-24 text-center">Please sign in</div>;
+    return <OutletShim />;
 }
 
-/** Safer role guard (element-as-children pattern) */
+// Outlet shim (react-router v6 outlet talab qilganimiz uchun)
+const OutletShim = ({ children }) => children || <div />;
+
 export function RequireRole({ roles, children }) {
     const { isAuthenticated, isBootstrapping, role } = useUser();
-    const location = useLocation();
-
-    if (isBootstrapping) {
-        return <div className="w-full py-24 text-center text-gray-500 dark:text-gray-400">Loading...</div>;
-    }
-    // ⬇️ Endi unauth -> '/' (Landing)
-    if (!isAuthenticated) {
-        return <Navigate to="/" replace state={{ from: location }} />;
-    }
-    if (!role) {
-        return <Navigate to="/dashboard" replace />;
-    }
-    if (!roles.includes(role)) {
-        return <Navigate to={getDashboardPath(role)} replace />;
-    }
+    if (isBootstrapping) return <div className="w-full py-24 text-center text-gray-500">Loading...</div>;
+    if (!isAuthenticated) return <div className="w-full py-24 text-center">Please sign in</div>;
+    if (!role) return <div className="w-full py-24 text-center">No role detected</div>;
+    if (!roles.includes(role)) return <div className="w-full py-24 text-center">Unauthorized</div>;
     return children;
 }
 
-/** /dashboard -> user ro‘liga mos bo‘lim */
 export function DashboardRedirect() {
     const { isBootstrapping, isAuthenticated, role } = useUser();
-    if (isBootstrapping) {
-        return <div className="w-full py-24 text-center text-gray-500 dark:text-gray-400">Loading...</div>;
-    }
-    // ⬇️ Endi unauth -> '/'
-    if (!isAuthenticated) return <Navigate to="/" replace />;
-    return <Navigate to={getDashboardPath(role)} replace />;
+    if (isBootstrapping) return <div className="w-full py-24 text-center text-gray-500">Loading...</div>;
+    if (!isAuthenticated) return <NavigateShim to="/" />;
+    return <NavigateShim to={getDashboardPath(role)} />;
 }
+
+// Navigate shim (hooklarsiz oddiy render)
+const NavigateShim = ({ to }) => {
+    useEffect(() => { window.location.replace(to); }, [to]);
+    return null;
+};

@@ -1,67 +1,55 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+// src/context/ThemeContext.jsx
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const ThemeContext = createContext(undefined);
+const THEME_KEY = "theme"; // 'light' | 'dark'
 
-export const useTheme = () => {
-    const context = useContext(ThemeContext);
-    if (context === undefined) {
-        throw new Error('useTheme must be used within a ThemeProvider');
-    }
-    return context;
+const getInitial = () => {
+    try {
+        const saved = localStorage.getItem(THEME_KEY);
+        if (saved === "light" || saved === "dark") return saved;
+    } catch {}
+    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+    return prefersDark ? "dark" : "light";
+};
+
+const applyTheme = (t) => {
+    const root = document.documentElement;
+    if (t === "dark") root.classList.add("dark");
+    else root.classList.remove("dark");
+    root.setAttribute("data-theme", t);
 };
 
 export const ThemeProvider = ({ children }) => {
-    const isBrowser = typeof window !== 'undefined';
+    const [theme, setTheme] = useState(getInitial);
 
-    const getInitialTheme = () => {
-        if (!isBrowser) return 'light';
-        const saved = localStorage.getItem('theme');
-        if (saved === 'light' || saved === 'dark') return saved;
-        const prefersDark =
-            window.matchMedia &&
-            window.matchMedia('(prefers-color-scheme: dark)').matches;
-        return prefersDark ? 'dark' : 'light';
-    };
-
-    const [theme, setTheme] = useState(getInitialTheme);
-
-    const toggleTheme = () => {
-        const next = theme === 'light' ? 'dark' : 'light';
-        setTheme(next);
-        if (isBrowser) localStorage.setItem('theme', next);
-    };
-
-    // Apply theme class to <html>
     useEffect(() => {
-        if (!isBrowser) return;
-        const root = document.documentElement;
-        if (theme === 'dark') root.classList.add('dark');
-        else root.classList.remove('dark');
-    }, [theme, isBrowser]);
+        applyTheme(theme);
+        try { localStorage.setItem(THEME_KEY, theme); } catch {}
+    }, [theme]);
 
-    // Sync with system theme if user hasn't explicitly chosen one
+    // (ixtiyoriy) tizimdagi o‘zgarishni faqat localStorage bo‘lmasa qabul qiladi
     useEffect(() => {
-        if (!isBrowser) return;
-        const mq = window.matchMedia('(prefers-color-scheme: dark)');
-
-        const handleChange = (e) => {
-            // Respect explicit user choice stored in localStorage
-            const saved = localStorage.getItem('theme');
-            if (!saved) setTheme(e.matches ? 'dark' : 'light');
+        const mq = window.matchMedia?.("(prefers-color-scheme: dark)");
+        if (!mq) return;
+        const onChange = (e) => {
+            const saved = localStorage.getItem(THEME_KEY);
+            if (!saved) setTheme(e.matches ? "dark" : "light");
         };
+        mq.addEventListener?.("change", onChange);
+        return () => mq.removeEventListener?.("change", onChange);
+    }, []);
 
-        if (mq.addEventListener) mq.addEventListener('change', handleChange);
-        else if (mq.addListener) mq.addListener(handleChange); // older Safari
+    const isDark = theme === "dark";
+    const toggleTheme = () => setTheme((p) => (p === "dark" ? "light" : "dark"));
 
-        return () => {
-            if (mq.removeEventListener) mq.removeEventListener('change', handleChange);
-            else if (mq.removeListener) mq.removeListener(handleChange);
-        };
-    }, [isBrowser]);
+    const value = useMemo(() => ({ theme, isDark, setTheme, toggleTheme }), [theme, isDark]);
 
-    return (
-        <ThemeContext.Provider value={{ theme, toggleTheme, isDark: theme === 'dark' }}>
-            {children}
-        </ThemeContext.Provider>
-    );
+    return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+};
+
+export const useTheme = () => {
+    const ctx = useContext(ThemeContext);
+    if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
+    return ctx;
 };

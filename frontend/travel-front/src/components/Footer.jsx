@@ -1,7 +1,23 @@
+// src/components/Footer.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { MapPin, Phone, Mail, Twitter, Instagram } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+
+/** Minimal Telegram logotipi (SVG) — lucide-react'da yo‘q */
+function TelegramIcon({ className = "h-5 w-5" }) {
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            focusable="false"
+            className={className}
+            fill="currentColor"
+        >
+            <path d="M9.96 15.47 9.8 19.5c.29 0 .42-.13.57-.28l2.74-2.62 4.54 3.32c.83.46 1.42.22 1.65-.77l3-14.04c.27-1.26-.46-1.76-1.26-1.46L1.7 9.2c-1.23.48-1.22 1.17-.21 1.48l4.96 1.55L18.8 5.44c.6-.37 1.14-.17.69.2L9.96 15.47z" />
+        </svg>
+    );
+}
 
 const Footer = () => {
     const { t } = useLanguage();
@@ -10,8 +26,7 @@ const Footer = () => {
         <footer className="bg-gray-900 dark:bg-dark-950 text-white transition-colors">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-
-                    {/* Brand Section */}
+                    {/* Brand */}
                     <div className="space-y-4">
                         <div className="flex items-center space-x-2">
                             <img src="/image.png" alt="UzGuide" className="h-8 w-8" />
@@ -20,18 +35,39 @@ const Footer = () => {
                         <p className="text-gray-300 dark:text-gray-400 text-sm leading-relaxed">
                             {t('footer.description')}
                         </p>
+
                         <div className="flex space-x-4">
-                            <a href="#" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors">
-                                <Facebook className="h-5 w-5" />
-                            </a>
-                            <a href="#" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors">
+                            {/* Twitter */}
+                            <a
+                                href="https://twitter.com/your_handle"
+                                target="_blank" rel="noopener noreferrer"
+                                className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
+                                aria-label="Twitter"
+                                title="Twitter"
+                            >
                                 <Twitter className="h-5 w-5" />
                             </a>
-                            <a href="#" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors">
+
+                            {/* Instagram */}
+                            <a
+                                href="https://instagram.com/your_handle"
+                                target="_blank" rel="noopener noreferrer"
+                                className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
+                                aria-label="Instagram"
+                                title="Instagram"
+                            >
                                 <Instagram className="h-5 w-5" />
                             </a>
-                            <a href="#" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors">
-                                <Youtube className="h-5 w-5" />
+
+                            {/* Telegram (custom icon) */}
+                            <a
+                                href="https://t.me/your_username"
+                                target="_blank" rel="noopener noreferrer"
+                                className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
+                                aria-label="Telegram"
+                                title="Telegram"
+                            >
+                                <TelegramIcon className="h-5 w-5" />
                             </a>
                         </div>
                     </div>
@@ -117,28 +153,13 @@ const Footer = () => {
                                 <span className="text-gray-300 dark:text-gray-400 text-sm">info@uzguide.com</span>
                             </div>
                         </div>
-
-                        {/* Newsletter */}
-                        <div className="mt-6">
-                            <h4 className="font-medium mb-2">{t('footer.newsletter')}</h4>
-                            <div className="flex">
-                                <input
-                                    type="email"
-                                    placeholder={t('footer.yourEmail')}
-                                    className="flex-1 px-3 py-2 bg-gray-800 dark:bg-gray-900 border border-gray-700 dark:border-gray-600 rounded-l-lg text-sm focus:outline-none focus:border-red-500 text-white placeholder-gray-400"
-                                />
-                                <button className="bg-red-500 dark:bg-red-600 text-white px-4 py-2 rounded-r-lg hover:bg-red-600 dark:hover:bg-red-700 transition-colors text-sm">
-                                    {t('footer.subscribe')}
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                {/* Bottom Section */}
+                {/* Bottom */}
                 <div className="border-t border-gray-800 dark:border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
                     <p className="text-gray-400 dark:text-gray-500 text-sm">
-                        © 2024 UzGuide. {t('footer.allRightsReserved')}
+                        © {new Date().getFullYear()} UzGuide. {t('footer.allRightsReserved')}
                     </p>
                     <div className="flex space-x-6 mt-4 md:mt-0">
                         <Link to="/sitemap" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 text-sm transition-colors">

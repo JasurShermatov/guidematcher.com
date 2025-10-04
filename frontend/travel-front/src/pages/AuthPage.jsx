@@ -1,3 +1,4 @@
+// src/pages/AuthPage.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, Globe, RotateCcw } from "lucide-react";
@@ -296,7 +297,7 @@ export default function AuthPage({ userType }) {
         setIsLoading(false);
     };
 
-    // Forgot password (AuthPage ichida)
+    // Forgot password
     const handleForgotSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -373,19 +374,19 @@ export default function AuthPage({ userType }) {
     };
 
     const SwitchLinks = () => (
-        <div className="flex flex-col space-y-2 mt-4">
+        <div className="flex flex-col space-y-1.5 mt-3">
             {activeTab !== "login" && (
-                <button onClick={() => switchTab("login")} className="text-red-600 hover:underline" type="button">
+                <button onClick={() => switchTab("login")} className="text-red-600 hover:underline text-sm" type="button">
                     Login
                 </button>
             )}
             {activeTab !== "register" && (
-                <button onClick={() => switchTab("register")} className="text-red-600 hover:underline" type="button">
+                <button onClick={() => switchTab("register")} className="text-red-600 hover:underline text-sm" type="button">
                     Register
                 </button>
             )}
             {activeTab !== "forgot" && (
-                <button onClick={() => switchTab("forgot")} className="text-red-600 hover:underline" type="button">
+                <button onClick={() => switchTab("forgot")} className="text-red-600 hover:underline text-sm" type="button">
                     Forgot Password
                 </button>
             )}
@@ -393,54 +394,65 @@ export default function AuthPage({ userType }) {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-dark-950 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-colors">
-            <div className="max-w-md w-full space-y-8">
-                <div>
-                    <Globe className="h-12 w-12 text-red-600 mx-auto" />
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-                        {activeTab === "login" ? t("auth.signIn") || "Sign In" : activeTab === "register" ? t("auth.signUp") || "Sign Up" : "Forgot Password"}
+        <div className="min-h-screen bg-gray-50 dark:bg-dark-950 flex items-center justify-center py-8 px-3 sm:px-6 transition-colors">
+            <div className="w-full max-w-md space-y-6">
+                <div className="text-center">
+                    <Globe className="h-10 w-10 text-red-600 mx-auto" />
+                    <h2 className="mt-3 text-2xl font-bold text-gray-900 dark:text-white">
+                        {activeTab === "login"
+                            ? t("auth.signIn") || "Sign In"
+                            : activeTab === "register"
+                                ? t("auth.signUp") || "Sign Up"
+                                : "Forgot Password"}
                     </h2>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Please fill in the fields below
+                    </p>
                 </div>
 
-                {error && <div className="bg-red-100 text-red-700 p-2 rounded">{error}</div>}
-                {successMessage && <div className="bg-green-100 text-green-700 p-2 rounded">{successMessage}</div>}
+                {error && <div className="bg-red-100 text-red-700 p-2 rounded text-sm">{error}</div>}
+                {successMessage && <div className="bg-green-100 text-green-700 p-2 rounded text-sm">{successMessage}</div>}
 
                 {/* LOGIN */}
                 {activeTab === "login" && (
-                    <form onSubmit={handleLoginSubmit} className="space-y-4">
+                    <form onSubmit={handleLoginSubmit} className="space-y-3">
                         <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                             <input
                                 name="email"
                                 type="email"
                                 value={loginForm.email}
                                 onChange={handleLoginChange}
                                 placeholder="Email"
-                                className="pl-10 p-3 border rounded w-full"
+                                className="pl-9 p-2.5 border rounded w-full text-sm bg-white dark:bg-dark-900 dark:border-dark-700 dark:text-gray-100"
                                 required
                             />
                         </div>
                         <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                             <input
                                 name="password"
                                 type={showPassword ? "text" : "password"}
                                 value={loginForm.password}
                                 onChange={handleLoginChange}
                                 placeholder="Password"
-                                className="pl-10 pr-10 p-3 border rounded w-full"
+                                className="pl-9 pr-9 p-2.5 border rounded w-full text-sm bg-white dark:bg-dark-900 dark:border-dark-700 dark:text-gray-100"
                                 required
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                                 aria-label="Toggle password"
                             >
-                                {showPassword ? <EyeOff /> : <Eye />}
+                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                         </div>
-                        <button type="submit" disabled={isLoading} className="w-full bg-red-600 text-white p-3 rounded">
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full bg-red-600 text-white px-3 py-2 rounded text-sm font-medium hover:bg-red-700 disabled:opacity-70"
+                        >
                             {isLoading ? "Loading..." : "Sign In"}
                         </button>
                         <SwitchLinks />
@@ -451,36 +463,100 @@ export default function AuthPage({ userType }) {
                 {activeTab === "register" && (
                     <div>
                         {!verificationStep ? (
-                            <form onSubmit={handleRegisterSubmit} className="space-y-4">
-                                <select name="role" value={registerForm.role} onChange={handleRegisterChange} className="w-full p-3 border rounded">
+                            <form onSubmit={handleRegisterSubmit} className="space-y-3">
+                                <select
+                                    name="role"
+                                    value={registerForm.role}
+                                    onChange={handleRegisterChange}
+                                    className="w-full p-2.5 border rounded text-sm bg-white dark:bg-dark-900 dark:border-dark-700 dark:text-gray-100"
+                                >
                                     <option value="Customer">Guide</option>
                                     <option value="Client">Tourist</option>
                                 </select>
 
-                                <input name="first_name" value={registerForm.first_name} onChange={handleRegisterChange} placeholder="First name" className="w-full p-3 border rounded" />
-                                <input name="last_name" value={registerForm.last_name} onChange={handleRegisterChange} placeholder="Last name" className="w-full p-3 border rounded" />
-                                <input name="email" type="email" value={registerForm.email} onChange={handleRegisterChange} placeholder="Email" className="w-full p-3 border rounded" />
+                                {/* First / Last name side-by-side (even on mobile) */}
+                                <div className="grid grid-cols-2 gap-2.5">
+                                    <input
+                                        name="first_name"
+                                        value={registerForm.first_name}
+                                        onChange={handleRegisterChange}
+                                        placeholder="First name"
+                                        className="w-full p-2.5 border rounded text-sm bg-white dark:bg-dark-900 dark:border-dark-700 dark:text-gray-100"
+                                    />
+                                    <input
+                                        name="last_name"
+                                        value={registerForm.last_name}
+                                        onChange={handleRegisterChange}
+                                        placeholder="Last name"
+                                        className="w-full p-2.5 border rounded text-sm bg-white dark:bg-dark-900 dark:border-dark-700 dark:text-gray-100"
+                                    />
+                                </div>
+
+                                <input
+                                    name="email"
+                                    type="email"
+                                    value={registerForm.email}
+                                    onChange={handleRegisterChange}
+                                    placeholder="Email"
+                                    className="w-full p-2.5 border rounded text-sm bg-white dark:bg-dark-900 dark:border-dark-700 dark:text-gray-100"
+                                />
 
                                 <div className="relative">
-                                    <input name="password" type={showConfirmPassword ? "text" : "password"} value={registerForm.password} onChange={handleRegisterChange} placeholder="Password" className="w-full p-3 border rounded pr-10" />
-                                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Toggle password">
-                                        {showConfirmPassword ? <EyeOff /> : <Eye />}
+                                    <input
+                                        name="password"
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        value={registerForm.password}
+                                        onChange={handleRegisterChange}
+                                        placeholder="Password"
+                                        className="w-full p-2.5 border rounded pr-9 text-sm bg-white dark:bg-dark-900 dark:border-dark-700 dark:text-gray-100"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                                        aria-label="Toggle password"
+                                    >
+                                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                     </button>
                                 </div>
 
                                 <div className="relative">
-                                    <input name="confirm_password" type={showConfirmNewPassword ? "text" : "password"} value={registerForm.confirm_password} onChange={handleRegisterChange} placeholder="Confirm password" className="w-full p-3 border rounded pr-10" />
-                                    <button type="button" onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Toggle confirm password">
-                                        {showConfirmNewPassword ? <EyeOff /> : <Eye />}
+                                    <input
+                                        name="confirm_password"
+                                        type={showConfirmNewPassword ? "text" : "password"}
+                                        value={registerForm.confirm_password}
+                                        onChange={handleRegisterChange}
+                                        placeholder="Confirm password"
+                                        className="w-full p-2.5 border rounded pr-9 text-sm bg-white dark:bg-dark-900 dark:border-dark-700 dark:text-gray-100"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                                        aria-label="Toggle confirm password"
+                                    >
+                                        {showConfirmNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                     </button>
                                 </div>
 
                                 <div className="relative">
-                                    <input name="country" ref={countryInputRef} value={registerForm.country} onChange={handleRegisterChange} placeholder="Country" className="w-full p-3 border rounded" />
+                                    <input
+                                        name="country"
+                                        ref={countryInputRef}
+                                        value={registerForm.country}
+                                        onChange={handleRegisterChange}
+                                        placeholder="Country"
+                                        className="w-full p-2.5 border rounded text-sm bg-white dark:bg-dark-900 dark:border-dark-700 dark:text-gray-100"
+                                    />
                                     {countrySuggestions.length > 0 && (
-                                        <div className="absolute z-10 mt-1 w-full bg-white border rounded shadow">
+                                        <div className="absolute z-10 mt-1 w-full bg-white dark:bg-dark-900 border dark:border-dark-700 rounded shadow">
                                             {countrySuggestions.map((c) => (
-                                                <button type="button" key={c} className="block w-full text-left px-3 py-2 hover:bg-gray-100" onClick={() => handleCountrySelect(c)}>
+                                                <button
+                                                    type="button"
+                                                    key={c}
+                                                    className="block w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-dark-800 text-sm"
+                                                    onClick={() => handleCountrySelect(c)}
+                                                >
                                                     {c}
                                                 </button>
                                             ))}
@@ -488,42 +564,60 @@ export default function AuthPage({ userType }) {
                                     )}
                                 </div>
 
-                                <button type="submit" disabled={isLoading} className="w-full bg-red-600 text-white p-3 rounded">
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="w-full bg-red-600 text-white px-3 py-2 rounded text-sm font-medium hover:bg-red-700 disabled:opacity-70"
+                                >
                                     {isLoading ? "Loading..." : "Request Code"}
                                 </button>
 
-                                <div className="text-center text-sm text-gray-500 mt-2">
+                                <div className="text-center text-xs text-gray-500 mt-1.5">
                                     Already have a code?{" "}
-                                    <button type="button" onClick={() => { setVerificationStep(true); setResendLeft(0); }} className="text-red-600 hover:underline">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setVerificationStep(true);
+                                            setResendLeft(0);
+                                        }}
+                                        className="text-red-600 hover:underline"
+                                    >
                                         Enter code
                                     </button>
                                 </div>
                             </form>
                         ) : (
-                            <form onSubmit={handleVerifyCode} className="space-y-4">
+                            <form onSubmit={handleVerifyCode} className="space-y-3">
                                 <input
                                     type="text"
                                     value={verificationCode}
-                                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                                    onChange={(e) =>
+                                        setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                                    }
                                     placeholder="6-digit code"
                                     maxLength={6}
-                                    className="w-full p-3 border rounded"
+                                    className="w-full p-2.5 border rounded text-sm bg-white dark:bg-dark-900 dark:border-dark-700 dark:text-gray-100"
                                 />
 
-                                <button type="submit" className="w-full bg-red-600 text-white p-3 rounded">Verify</button>
+                                <button
+                                    type="submit"
+                                    className="w-full bg-red-600 text-white px-3 py-2 rounded text-sm font-medium hover:bg-red-700"
+                                >
+                                    Verify
+                                </button>
 
                                 <button
                                     type="button"
                                     onClick={resendVerificationCode}
                                     disabled={resendLeft > 0}
-                                    className="w-full mt-2 inline-flex items-center justify-center border border-gray-300 dark:border-white/10 rounded p-2 text-sm hover:bg-gray-50 dark:hover:bg-white/10"
+                                    className="w-full mt-2 inline-flex items-center justify-center border border-gray-300 dark:border-white/10 rounded px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-white/10"
                                     title="Resend code"
                                 >
                                     <RotateCcw className="h-4 w-4 mr-2" />
                                     {resendLeft > 0 ? `Resend in ${resendLeft}s` : "Resend code"}
                                 </button>
 
-                                <div className="text-center text-xs text-gray-500">
+                                <div className="text-center text-[11px] text-gray-500">
                                     Didn’t get email? You can still enter the code you see in DB.
                                 </div>
                             </form>
@@ -534,30 +628,77 @@ export default function AuthPage({ userType }) {
 
                 {/* FORGOT */}
                 {activeTab === "forgot" && (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         {!forgotStep ? (
-                            <form onSubmit={handleForgotSubmit} className="space-y-4">
-                                <input name="email" type="email" value={forgotForm.email} onChange={handleForgotChange} placeholder="Email" className="w-full p-3 border rounded" required />
-                                <button type="submit" disabled={isLoading} className="w-full bg-red-600 text-white p-3 rounded">
+                            <form onSubmit={handleForgotSubmit} className="space-y-3">
+                                <input
+                                    name="email"
+                                    type="email"
+                                    value={forgotForm.email}
+                                    onChange={handleForgotChange}
+                                    placeholder="Email"
+                                    className="w-full p-2.5 border rounded text-sm bg-white dark:bg-dark-900 dark:border-dark-700 dark:text-gray-100"
+                                    required
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="w-full bg-red-600 text-white px-3 py-2 rounded text-sm font-medium hover:bg-red-700 disabled:opacity-70"
+                                >
                                     {isLoading ? "Loading..." : "Send Code"}
                                 </button>
                             </form>
                         ) : (
-                            <form onSubmit={handleResetPassword} className="space-y-4">
-                                <input name="code" value={forgotForm.code} onChange={handleForgotChange} placeholder="6-digit code" className="w-full p-3 border rounded" maxLength={6} />
+                            <form onSubmit={handleResetPassword} className="space-y-3">
+                                <input
+                                    name="code"
+                                    value={forgotForm.code}
+                                    onChange={handleForgotChange}
+                                    placeholder="6-digit code"
+                                    className="w-full p-2.5 border rounded text-sm bg-white dark:bg-dark-900 dark:border-dark-700 dark:text-gray-100"
+                                    maxLength={6}
+                                />
                                 <div className="relative">
-                                    <input name="new_password" type={showNewPassword ? "text" : "password"} value={forgotForm.new_password} onChange={handleForgotChange} placeholder="New password" className="w-full p-3 border rounded pr-10" />
-                                    <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Toggle new password">
-                                        {showNewPassword ? <EyeOff /> : <Eye />}
+                                    <input
+                                        name="new_password"
+                                        type={showNewPassword ? "text" : "password"}
+                                        value={forgotForm.new_password}
+                                        onChange={handleForgotChange}
+                                        placeholder="New password"
+                                        className="w-full p-2.5 border rounded pr-9 text-sm bg-white dark:bg-dark-900 dark:border-dark-700 dark:text-gray-100"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                                        aria-label="Toggle new password"
+                                    >
+                                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                     </button>
                                 </div>
                                 <div className="relative">
-                                    <input name="confirm_password" type={showConfirmNewPassword ? "text" : "password"} value={forgotForm.confirm_password} onChange={handleForgotChange} placeholder="Confirm new password" className="w-full p-3 border rounded pr-10" />
-                                    <button type="button" onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Toggle confirm new password">
-                                        {showConfirmNewPassword ? <EyeOff /> : <Eye />}
+                                    <input
+                                        name="confirm_password"
+                                        type={showConfirmNewPassword ? "text" : "password"}
+                                        value={forgotForm.confirm_password}
+                                        onChange={handleForgotChange}
+                                        placeholder="Confirm new password"
+                                        className="w-full p-2.5 border rounded pr-9 text-sm bg-white dark:bg-dark-900 dark:border-dark-700 dark:text-gray-100"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                                        aria-label="Toggle confirm new password"
+                                    >
+                                        {showConfirmNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                     </button>
                                 </div>
-                                <button type="submit" disabled={isLoading} className="w-full bg-red-600 text-white p-3 rounded">
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="w-full bg-red-600 text-white px-3 py-2 rounded text-sm font-medium hover:bg-red-700 disabled:opacity-70"
+                                >
                                     {isLoading ? "Loading..." : "Reset Password"}
                                 </button>
                             </form>

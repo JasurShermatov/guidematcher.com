@@ -212,7 +212,27 @@ const ChatPage = () => {
 
     const appendIncomingMessage = (msg) => {
         const atBottom = isNearBottom(listRef.current);
-        setMessages((prev) => (prev.some((x) => x.id === msg.id) ? prev : [...prev, normalizeMsg(msg)]));
+        const mine =
+           msg?.is_mine ??
+           (msg?.sender?.id && myUserId ? String(msg.sender.id) === String(myUserId) : false);
+        const norm = normalizeMsg(msg);
+        setMessages((prev) => {
+        // Agar allaqachon shu server-ID bilan bor bo‘lsa — o‘zgartirmaymiz
+           if (prev.some((x) => x.id === norm.id)) return prev;
+           // Menga tegishli xabar bo‘lsa, o‘xshash optimistikni olib tashlaymiz (content bo‘yicha)
+           if (mine) {
+             const idx = [...prev].reverse().findIndex(
+                (x) => x.optimistic && x.sender === "me" && x.content === norm.content
+             );
+             if (idx !== -1) {
+               const realIdx = prev.length - 1 - idx;
+               const copy = prev.slice();
+               copy.splice(realIdx, 1); // optimistikni olib tashladik
+               return [...copy, norm];
+             }
+           }
+           return [...prev, norm];
+        });
         queueMicrotask(() => {
             if (atBottom && listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
         });
@@ -459,6 +479,8 @@ const ChatPage = () => {
             is_read: false,
             senderName: t("chat.me"),
             senderAvatar: null, // WS kelgach to‘liq ma’lumot bilan yangilanadi
+            optimistic: true,          // <— BELGI
+            echoKey: content.trim(),
         };
 
         const atBottom = isNearBottom(listRef.current);
@@ -469,8 +491,12 @@ const ChatPage = () => {
         });
 
         try {
-            await chatApi.createMessage({ conversation: selectedChat, content });
-            // haqiqiy xabar WS orqali keladi
+            const created = await chatApi.createMessage({ conversation: selectedChat, content })
+                            .then(r => r?.data ?? r);
+            if (created?.id) {
+               // optimistikni server xabari bilan almashtiramiz
+               setMessages(prev => prev.map(m => m.id === optimistic.id ? normalizeMsg(created) : m));
+            }
         } catch {
             setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
             alert(t("chat.errSend"));

@@ -1,4 +1,3 @@
-// src/components/Footer.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Twitter, Instagram } from 'lucide-react';
@@ -59,7 +58,7 @@ const Footer = () => {
                                 <Instagram className="h-5 w-5" />
                             </a>
 
-                            {/* Telegram (custom icon) */}
+                            {/* Telegram */}
                             <a
                                 href="https://t.me/your_username"
                                 target="_blank" rel="noopener noreferrer"
@@ -76,31 +75,11 @@ const Footer = () => {
                     <div>
                         <h3 className="font-semibold text-lg mb-4">{t('footer.quickLinks')}</h3>
                         <ul className="space-y-2">
-                            <li>
-                                <Link to="/search" className="text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-gray-300 transition-colors text-sm">
-                                    {t('footer.findGuides')}
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/auth" className="text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-gray-300 transition-colors text-sm">
-                                    {t('footer.becomeGuide')}
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/about" className="text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-gray-300 transition-colors text-sm">
-                                    {t('footer.aboutUs')}
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/how-it-works" className="text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-gray-300 transition-colors text-sm">
-                                    {t('footer.howItWorks')}
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/safety" className="text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-gray-300 transition-colors text-sm">
-                                    {t('footer.safety')}
-                                </Link>
-                            </li>
+                            <li><Link to="/search" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors text-sm">{t('footer.findGuides')}</Link></li>
+                            <li><Link to="/auth" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors text-sm">{t('footer.becomeGuide')}</Link></li>
+                            <li><Link to="/about" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors text-sm">{t('footer.aboutUs')}</Link></li>
+                            <li><Link to="/how-it-works" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors text-sm">{t('footer.howItWorks')}</Link></li>
+                            <li><Link to="/safety" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors text-sm">{t('footer.safety')}</Link></li>
                         </ul>
                     </div>
 
@@ -108,31 +87,10 @@ const Footer = () => {
                     <div>
                         <h3 className="font-semibold text-lg mb-4">{t('footer.support')}</h3>
                         <ul className="space-y-2">
-                            <li>
-                                <Link to="/help" className="text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-gray-300 transition-colors text-sm">
-                                    {t('footer.helpCenter')}
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/contact" className="text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-gray-300 transition-colors text-sm">
-                                    {t('footer.contactUs')}
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/terms" className="text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-gray-300 transition-colors text-sm">
-                                    {t('footer.termsOfService')}
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/privacy" className="text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-gray-300 transition-colors text-sm">
-                                    {t('footer.privacyPolicy')}
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/cancellation" className="text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-gray-300 transition-colors text-sm">
-                                    {t('footer.cancellationPolicy')}
-                                </Link>
-                            </li>
+                            <li><Link to="/help" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors text-sm">{t('footer.helpCenter')}</Link></li>
+                            <li><Link to="/contact" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors text-sm">{t('footer.contactUs')}</Link></li>
+                            <li><Link to="/terms" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors text-sm">{t('footer.termsOfService')}</Link></li>
+                            <li><Link to="/cancellation" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors text-sm">{t('footer.cancellationPolicy')}</Link></li>
                         </ul>
                     </div>
 
@@ -144,10 +102,10 @@ const Footer = () => {
                                 <MapPin className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                                 <span className="text-gray-300 dark:text-gray-400 text-sm">Tashkent, Uzbekistan</span>
                             </div>
-                            <div className="flex items-center space-x-3">
-                                <Phone className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                                <span className="text-gray-300 dark:text-gray-400 text-sm">+998 90 123 45 67</span>
-                            </div>
+                            {/*<div className="flex items-center space-x-3">*/}
+                            {/*    <Phone className="h-4 w-4 text-gray-400 dark:text-gray-500" />*/}
+                            {/*    <span className="text-gray-300 dark:text-gray-400 text-sm">+998 90 123 45 67</span>*/}
+                            {/*</div>*/}
                             <div className="flex items-center space-x-3">
                                 <Mail className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                                 <span className="text-gray-300 dark:text-gray-400 text-sm">info@uzguide.com</span>
@@ -157,10 +115,22 @@ const Footer = () => {
                 </div>
 
                 {/* Bottom */}
-                <div className="border-t border-gray-800 dark:border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-                    <p className="text-gray-400 dark:text-gray-500 text-sm">
-                        © {new Date().getFullYear()} UzGuide. {t('footer.allRightsReserved')}
-                    </p>
+                <div className="border-t border-gray-800 dark:border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+                    <div>
+                        <p className="text-gray-400 dark:text-gray-500 text-sm">
+                            © {new Date().getFullYear()} UzGuide. {t('footer.allRightsReserved')}
+                        </p>
+                        {/* 🔹 Privacy Policy link pastda joylashgan */}
+                        <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
+                            <Link
+                                to="/privacy"
+                                className="hover:text-white dark:hover:text-gray-300 transition-colors underline"
+                            >
+                                Privacy Policy
+                            </Link>
+                        </p>
+                    </div>
+
                     <div className="flex space-x-6 mt-4 md:mt-0">
                         <Link to="/sitemap" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 text-sm transition-colors">
                             {t('footer.sitemap')}

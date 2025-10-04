@@ -27,7 +27,7 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// ---- Response: 401 bo'lsa refresh qilib qayta yuborish
+// ---- Response: 401 bo'lsa refresh qilib qayta yuborish (yoki public GETni authsiz qayta sinash)
 let refreshingPromise = null;
 
 api.interceptors.response.use(
@@ -35,37 +35,62 @@ api.interceptors.response.use(
     async (error) => {
         const original = error.config;
 
-        // Server javobi yo'q yoki 401 emas -> odatdagidek xato
+        // Tarmoq xatosi yoki 401 emas -> odatdagidek qaytarish
         if (!error.response || error.response.status !== 401 || original._retry) {
             return Promise.reject(error);
         }
 
         original._retry = true;
 
-        // Bir vaqtning o'zida bitta refresh
+        // Bir vaqtning o'zida bitta refresh ishlasin
         if (!refreshingPromise) {
             const refreshToken = getRefresh();
             refreshingPromise = (async () => {
                 if (!refreshToken) throw new Error("No refresh token");
-                const { data } = await axios.post(`${API_BASE}token/refresh/`, { refresh: refreshToken }, {
-                    headers: { "Content-Type": "application/json" },
-                });
-                // accessni yangila, refresh ham kelsa yangila
+                const { data } = await axios.post(
+                    `${API_BASE}token/refresh/`,
+                    { refresh: refreshToken },
+                    { headers: { "Content-Type": "application/json" } }
+                );
+                // accessni yangilash, refresh ham kelsa yangilash
                 setTokens({ access: data.access, refresh: data.refresh });
                 return data.access;
-            })().catch((e) => {
-                clearTokens();
-                throw e;
-            }).finally(() => {
-                // queue tugagach nolga qaytariladi
-                refreshingPromise = null;
-            });
+            })()
+                .catch((e) => {
+                    clearTokens();
+                    return null; // muhim: refresh bo'lmadi -> null qaytaramiz
+                })
+                .finally(() => {
+                    refreshingPromise = null;
+                });
         }
 
-        // refresh tugashini kutamiz, so'ng original requestni qayta yuboramiz
         const newAccess = await refreshingPromise;
-        original.headers.Authorization = `Bearer ${newAccess}`;
-        return api(original);
+
+        // 1) Refresh muvaffaqiyatli bo'lsa — originalni yangilangan token bilan yuboramiz
+        if (newAccess) {
+            original.headers = { ...(original.headers || {}), Authorization: `Bearer ${newAccess}` };
+            return api(original);
+        }
+
+        // 2) Refresh bo'lmadi (token yo'q/eskirgan) — PUBLIC GET bo'lsa, Authorization’siz qayta yuboramiz
+        const method = (original.method || "get").toLowerCase();
+        if (method === "get") {
+            const retried = { ...original };
+            // Headerlardan Authorization’ni olib tashlaymiz
+            if (retried.headers) {
+                delete retried.headers.Authorization;
+            }
+            // Qayta yuborish — bu safar oddiy guest sifatida
+            try {
+                return await api(retried);
+            } catch (e2) {
+                return Promise.reject(e2);
+            }
+        }
+
+        // 3) Aks holda — xato qaytariladi
+        return Promise.reject(error);
     }
 );
 

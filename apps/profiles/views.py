@@ -219,7 +219,7 @@ class ClientProfileViewSet(BaseProfileViewSet):
 @extend_schema(tags=["Customer Profile"])
 class CustomerProfileViewSet(AvatarMixin, BaseProfileViewSet):
     model = CustomerProfile
-    queryset = CustomerProfile.objects.select_related("user", "city").prefetch_related(
+    queryset = CustomerProfile.objects.select_related("user", "user__country", "city").prefetch_related(
         "languages", "service_types"
     )
     serializer_class = CustomerProfileSerializer
@@ -295,6 +295,26 @@ class CustomerProfileViewSet(AvatarMixin, BaseProfileViewSet):
         profile.save(update_fields=["avatar"])
         return Response({"detail": "Avatar deleted successfully.", "avatar_url": None})
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        q = self.request.query_params.get("q")
+        country_name = self.request.query_params.get("country_name")
+        min_rating = self.request.query_params.get("min_rating")
+
+        if q:
+            qs = qs.filter(user__full_name__icontains=q)
+
+        if country_name:
+            # ESKI IZOH O‘RNIGA: FK bo‘lsa name orqali filterlash
+            qs = qs.filter(country__name__iexact=country_name)
+
+        if min_rating:
+            try:
+                qs = qs.filter(average_rating__gte=float(min_rating))
+            except ValueError:
+                pass
+
+        return qs
 
 class CustomerOwnedModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]

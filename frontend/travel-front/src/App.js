@@ -15,6 +15,7 @@ import { LanguageProvider } from "./context/LanguageContext";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import PrivacyPolicy from "./pages/PrivacyPolicy"; // <— YANGI import
 
 /** === LAZY PAGES (route-based code splitting) === */
 const LandingPage = lazy(() => import("./pages/LandingPage"));
@@ -94,6 +95,9 @@ function AppRoutes() {
                     </RequireRole>
                 }
             />
+
+            {/* 🔹 Yangi Privacy Policy sahifasi */}
+            <Route path="/privacy" element={<PrivacyPolicy />} />
 
             {/* 404 */}
             <Route path="*" element={<Navigate to="/" replace />} />

@@ -165,13 +165,19 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
 
     profile_id = serializers.IntegerField(source="id", read_only=True)
     city_name = serializers.CharField(source="city.name", read_only=True)
-    country_name = serializers.CharField(source="country", read_only=True)
+
+    # ESKI: country_name = serializers.CharField(source="country", read_only=True)
+    # YANGI: universal usul — User.country FK bo‘lsa ham, Char bo‘lsa ham ishlaydi,
+    #        shuningdek CustomerProfile.country bo‘lsa ham ishlaydi.
+    country_name = serializers.SerializerMethodField()
 
     languages = LanguageSerializer(many=True, read_only=True)
     service_types = ServiceTypeSerializer(many=True, read_only=True)
 
-    member_since = serializers.DateField(read_only=True)
-    member_since_year = serializers.IntegerField(read_only=True)
+    # ESKI: member_since, member_since_year read_only deya e’lon qilingan edi, lekin qiymat kelmasdi.
+    #       Endi ularni hisoblab beramiz (user.date_joined’dan).
+    member_since = serializers.SerializerMethodField()
+    member_since_year = serializers.SerializerMethodField()
 
     avatar_url = serializers.SerializerMethodField()
 
@@ -227,6 +233,59 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+    def get_country_name(self, obj):
+        """
+        Quyidagi ketma-ketlikda urinamiz:
+        1) obj.user.country name maydoni bor bo‘lsa (FK) -> name
+        2) obj.user.country CharField bo‘lsa -> string qiymat
+        3) obj.country (profil darajasida) mavjud bo‘lsa -> name yoki o‘zi
+        """
+        # 1) User.country (FK->Country.name yoki CharField)
+        user = getattr(obj, "user", None)
+        if user is not None:
+            c = getattr(user, "country", None)
+            if c:
+                # FK bo‘lsa .name bo‘ladi
+                name = getattr(c, "name", None)
+                if name:
+                    return name
+                # CharField bo‘lsa to‘g‘ridan o‘zi
+                if isinstance(c, str):
+                    return c
+
+        # 2) Profile.country (agar sizda shu maydon bo‘lsa)
+        pc = getattr(obj, "country", None)
+        if pc:
+            name = getattr(pc, "name", None)
+            if name:
+                return name
+            if isinstance(pc, str):
+                return pc
+
+        return None
+
+    def get_member_since(self, obj):
+        """
+        ISO formatdagi sana (YYYY-MM-DD) qaytaramiz.
+        """
+        user = getattr(obj, "user", None)
+        dt = getattr(user, "date_joined", None) if user is not None else None
+        if not dt:
+            return None
+        try:
+            return dt.date().isoformat()
+        except Exception:
+            # Agar allaqachon date bo‘lsa
+            return getattr(dt, "isoformat", lambda: None)()
+
+    def get_member_since_year(self, obj):
+        user = getattr(obj, "user", None)
+        dt = getattr(user, "date_joined", None) if user is not None else None
+        try:
+            return dt.year if dt else None
+        except Exception:
+            return None
 
     def get_avatar_url(self, obj):
         if not obj.avatar:

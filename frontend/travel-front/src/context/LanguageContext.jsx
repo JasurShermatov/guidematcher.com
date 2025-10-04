@@ -93,24 +93,37 @@ const translations = {
         'search.speaks': 'Speaks',
         'search.responds': 'Typically responds',
 
-        // Guide Profile
-        // Guide List (search)
-        'guide.list.title': 'Find a guide',
-        'guide.list.apply': 'Apply filters',
-        'guide.list.placeholder': 'Search by name, lastname…',
-        'guide.list.allCountries': 'All countries',
-        'guide.list.anyRating': 'Any rating',
-        'guide.list.search': 'Search',
-        'guide.list.clear': 'Clear',
-        'guide.list.error': 'Failed to load guides',
-        'guide.list.empty': 'No guides found',
-        'guide.list.experience': 'Experience',
-        'guide.list.years': 'years',
-        'guide.list.viewProfile': 'View profile',
-        'guide.list.prev': 'Prev',
-        'guide.list.next': 'Next',
-        'guide.list.page': 'Page',
-        'guide.list.of': 'of',
+        // Guide Dashboard
+      "guide.dashboard.title": "Mening Boshqaruv Panelim",
+      "guide.dashboard.description": "Rezervatsiyalaringizni, xizmatlaringizni va tajribalaringizni boshqaring",
+      "guide.dashboard.bookings": "Rezervatsiyalar",
+      "guide.dashboard.earnings": "Daromadlar",
+      "guide.dashboard.reviews": "Sharhlar",
+      "guide.dashboard.settings": "Sozlamalar",
+      "guide.dashboard.activeBookings": "Faol Rezervatsiyalar",
+      "guide.dashboard.averageRating": "O'rtacha Baho",
+      "guide.dashboard.responseRate": "Javob Berish Foizi",
+      "guide.dashboard.saveChanges": "O'zgarishlarni Saqlash",
+      "guide.dashboard.changeProfilePicture": "Profil Rasmini O'zgartirish",
+      "guide.dashboard.uploadNewPhoto": "Yangi Rasm Yuklash",
+      "guide.dashboard.removePhoto": "Rasmni O'chirish",
+      "guide.dashboard.photoRequirements": "Rasm hajmi 5MB dan oshmasligi kerak, faqat JPEG, PNG yoki GIF formatlari qabul qilinadi",
+      "guide.dashboard.saved": "Profil ma'lumotlari muvaffaqiyatli saqlandi",
+      "guide.dashboard.saveFailed": "Profil ma'lumotlarini saqlashda xatolik yuz berdi",
+      "guide.dashboard.services": "Xizmatlar",
+      "guide.dashboard.addService": "Yangi Xizmat Qo'shish",
+      "guide.dashboard.cancel": "Bekor Qilish",
+      "guide.dashboard.saveService": "Xizmatni Saqlash",
+      "guide.dashboard.deleteService": "Xizmatni O'chirish",
+      "guide.dashboard.serviceName": "Xizmat Nomi",
+
+
+      // Guide Bookings
+      "guide.bookings.acceptFailed": "Rezervatsiyani qabul qilishda xatolik yuz berdi",
+      "guide.bookings.declineFailed": "Rezervatsiyani rad etishda xatolik yuz berdi",
+      "guide.bookings.completeFailed": "Rezervatsiyani tugallandi deb belgilashda xatolik yuz berdi",
+      "guide.bookings.bookingsRefreshed": "Rezervatsiyalar muvaffaqiyatli yangilandi",
+
 
 // Guide Detail
         'guide.detail.notFound': 'Guide not found',
@@ -349,6 +362,24 @@ const translations = {
 // Reviews
         'guide.reviews.count': 'reviews',
         'guide.reviews.none': 'No reviews yet',
+
+        // Guide List (search)
+          "guide.list.title": "Find Guides",
+          "guide.list.apply": "Apply Filters",
+          "guide.list.placeholder": "Search by name or surname...",
+          "guide.list.allCountries": "All Countries",
+          "guide.list.anyRating": "Any Rating",
+          "guide.list.search": "Search",
+          "guide.list.clear": "Clear Filters",
+          "guide.list.error": "Error loading guides",
+          "guide.list.empty": "No guides found",
+          "guide.list.experience": "Experience",
+          "guide.list.years": "Years",
+          "guide.list.viewProfile": "View Profile",
+          "guide.list.prev": "Previous",
+          "guide.list.next": "Next",
+          "guide.list.page": "Page",
+          "guide.list.of": "of",
 
 // Stats / analytics
         'guide.stats.week': 'Bookings This Week',

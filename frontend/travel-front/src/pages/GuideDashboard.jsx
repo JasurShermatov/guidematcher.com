@@ -110,7 +110,9 @@ export default function GuideDashboard() {
     const transactions = [];
 
     const avgRating = useMemo(() => Number(customerMe?.average_rating || 0).toFixed(1), [customerMe]);
-    const fullName = userMe?.full_name || t('guide.common.yourName');
+    const fullName = useMemo(() => {
+        return `${userMe?.first_name || ''} ${userMe?.last_name || ''}`.trim() || t('guide.common.yourName');
+    }, [userMe?.first_name, userMe?.last_name]);
 
     // helpers
     const mapLanguagesToIds = (csv) => {

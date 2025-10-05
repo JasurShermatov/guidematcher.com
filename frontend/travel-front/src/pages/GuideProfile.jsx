@@ -407,7 +407,7 @@ export default function GuideProfile() {
     const [showForm, setShowForm] = useState(false);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [guests, setGuests] = useState(1);
+    const [guests, setGuests] = useState("");
     const [note, setNote] = useState("");
 
     const [checkingAvailability, setCheckingAvailability] = useState(false);
@@ -445,11 +445,13 @@ export default function GuideProfile() {
         setResult({ ok: null, msg: "" });
 
         const params = new URLSearchParams({
-            start_date: startDate,
-            end_date: endDate,
-            guests: String(guests || 1),
-            ...(note ? { description: note } : {}),
+           start_date: startDate,
+           end_date: endDate,
+           ...(note ? { description: note } : {}),
         });
+        if (guests !== "" && Number(guests) > 0) {
+           params.set("guests", String(guests));
+        }
 
         const profileId = await resolveCustomerPk(bookingTargetId);
         if (!profileId) { setResult({ ok: false, msg: t("guide.detail.resolveError") }); setCreating(false); return; }
@@ -761,7 +763,17 @@ export default function GuideProfile() {
                                                 <div>
                                                     <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t("guide.detail.guests")}</label>
                                                     <div className="relative">
-                                                        <input type="number" min={1} value={guests} onChange={(e) => setGuests(Number(e.target.value) || 1)} className="w-full p-2 sm:p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm bg-white dark:bg-dark-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-dark-700" required />
+                                                        <input
+                                                            type="number"
+                                                            min={1}
+                                                            placeholder={t("guide.detail.guests")}  // ixtiyoriy: placeholder
+                                                            value={guests === "" ? "" : String(guests)}
+                                                            onChange={(e) => {
+                                                              const v = e.target.value;
+                                                              setGuests(v === "" ? "" : Number(v));
+                                                            }}
+                                                            className="w-full p-2 sm:p-3 border rounded-lg ..."
+                                                          />
                                                         <Users className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 absolute right-2 sm:right-3 top-2.5 sm:top-3.5" />
                                                     </div>
                                                 </div>
@@ -789,7 +801,7 @@ export default function GuideProfile() {
                                                     >
                                                         {t("guide.detail.submit")}
                                                     </button>
-                                                    <button type="button" onClick={() => { setShowForm(false); setStartDate(""); setEndDate(""); setGuests(1); setNote(""); setAvailabilityOk(null); setResult({ ok: null, msg: "" }); }} className="px-4 py-2 sm:px-5 sm:py-3 bg-gray-300 text-gray-800 dark:bg-dark-700 dark:text-gray-100 rounded-lg hover:bg-gray-400 dark:hover:bg-dark-600 text-xs sm:text-base">
+                                                    <button type="button" onClick={() => { setShowForm(false); setStartDate(""); setEndDate(""); setGuests(""); setNote(""); setAvailabilityOk(null); setResult({ ok: null, msg: "" }); }} className="px-4 py-2 sm:px-5 sm:py-3 bg-gray-300 text-gray-800 dark:bg-dark-700 dark:text-gray-100 rounded-lg hover:bg-gray-400 dark:hover:bg-dark-600 text-xs sm:text-base">
                                                         {t("common.cancel")}
                                                     </button>
                                                 </div>

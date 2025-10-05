@@ -84,7 +84,7 @@ export default function GuideDashboard() {
     const [openPortfolioForm, setOpenPortfolioForm] = useState(false);
     const [pfTitle, setPfTitle] = useState("");
     const [pfDesc, setPfDesc] = useState("");
-    const [pfOrder, setPfOrder] = useState(0);
+    const [pfOrder, setPfOrder] = useState("");
 
     const [loading, setLoading] = useState(true);
 
@@ -961,11 +961,18 @@ export default function GuideDashboard() {
                                                         <textarea value={pfDesc} onChange={(e) => setPfDesc(e.target.value)} className="w-full p-2.5 md:p-3 border border-gray-300 dark:border-dark-700 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 text-sm md:text-base" rows={3} placeholder={t('guide.service.descPh')} />
                                                     </div>
                                                     <div>
-                                                        <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('guide.service.orderLabel')}</label>
-                                                        <input type="number"
-                                                               value={pfOrder}
-                                                               onChange={(e) => setPfOrder(Number(e.target.value))}
-                                                               className="w-full p-2.5 md:p-3 border border-gray-300 dark:border-dark-700 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 text-sm md:text-base" />
+                                                        <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                                            {t('guide.service.orderLabel')}
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            value={pfOrder}
+                                                            onChange={(e) => setPfOrder(e.target.value)}
+                                                            placeholder="Raqam kiriting (ixtiyoriy)"
+                                                            className="w-full p-2.5 md:p-3 border border-gray-300 dark:border-dark-700
+                                                                       rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100
+                                                                       text-sm md:text-base"
+                                                        />
                                                     </div>
                                                     <div className="flex items-center justify-end gap-2 md:gap-3 pt-1 md:pt-2">
                                                         <button type="button" onClick={() => setOpenPortfolioForm(false)} className="px-3 md:px-4 py-2 border border-gray-300 dark:border-dark-700 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-800 text-gray-800 dark:text-gray-200 text-sm">{t('guide.dashboard.cancel')}</button>

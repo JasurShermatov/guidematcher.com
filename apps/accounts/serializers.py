@@ -141,35 +141,38 @@ class RegisterSerializer(serializers.ModelSerializer):
         code = attrs.pop("code")
         country_name = attrs.pop("country").strip()
 
+        # 1️⃣ Email tekshirish
         if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError(
-                {"email": "This email is already registered."}
-            )
+            raise serializers.ValidationError({"email": "This email is already registered."})
 
-        # Kodni tekshirish
+        # 2️⃣ Kodni tekshirish
         try:
             ev = EmailVerification.objects.get(email=email, code=code, is_used=False)
         except EmailVerification.DoesNotExist:
-            raise serializers.ValidationError(
-                {"code": "Invalid or already used verification code."}
-            )
+            raise serializers.ValidationError({"code": "Invalid or already used verification code."})
 
         if hasattr(ev, "is_expired") and ev.is_expired():
-            raise serializers.ValidationError(
-                {"code": "Verification code has expired."}
-            )
+            raise serializers.ValidationError({"code": "Verification code has expired."})
 
-        try:
-            country_instance = Country.objects.get(name__iexact=country_name)
-        except Country.DoesNotExist:
-            # 2 ta belgilik ISO-like code
-            code = country_name[:2].upper()
+        # 3️⃣ Country tekshirish va yaratish (xatolik shu yerda edi)
+        country_instance = Country.objects.filter(name__iexact=country_name).first()
+        if not country_instance:
+            base_code = country_name[:2].upper()
+            code_candidate = base_code
+            counter = 1
+            # kod unique bo‘lishi uchun loop
+            while Country.objects.filter(code=code_candidate).exists():
+                code_candidate = f"{base_code}{counter}"
+                counter += 1
+
             with transaction.atomic():
-                country_instance, _ = Country.objects.get_or_create(
+                country_instance = Country.objects.create(
                     name=country_name,
-                    defaults={"is_active": True, "code": code},
+                    code=code_candidate,
+                    is_active=True,
                 )
 
+        # 4️⃣ Natijani qaytarish
         attrs["country"] = country_instance
         attrs["email"] = email
         self.ev = ev

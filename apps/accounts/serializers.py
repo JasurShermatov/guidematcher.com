@@ -7,7 +7,7 @@ import logging
 from django.conf import settings
 from django.utils import timezone
 from django.db import transaction
-
+from django.utils.text import slugify
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -159,13 +159,14 @@ class RegisterSerializer(serializers.ModelSerializer):
                 {"code": "Verification code has expired."}
             )
 
-        # Country obyektini olish yoki yaratish
         try:
             country_instance = Country.objects.get(name__iexact=country_name)
         except Country.DoesNotExist:
+            code = slugify(country_name)[:10].upper()  # masalan "united-states"
             with transaction.atomic():
                 country_instance, _ = Country.objects.get_or_create(
-                    name=country_name, defaults={"is_active": True}
+                    name=country_name,
+                    defaults={"is_active": True, "code": code},
                 )
 
         attrs["country"] = country_instance

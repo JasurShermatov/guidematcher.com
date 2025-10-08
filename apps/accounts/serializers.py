@@ -162,7 +162,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         try:
             country_instance = Country.objects.get(name__iexact=country_name)
         except Country.DoesNotExist:
-            code = slugify(country_name)[:10].upper()  # masalan "united-states"
+            # 2 ta belgilik ISO-like code
+            code = country_name[:2].upper()
             with transaction.atomic():
                 country_instance, _ = Country.objects.get_or_create(
                     name=country_name,

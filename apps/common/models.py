@@ -18,14 +18,13 @@ class BaseModel(models.Model):
 
 
 class Country(BaseModel):
-
     code = models.CharField(
         max_length=2,
         unique=True,
         verbose_name=_("Country code"),
         help_text=_("ISO 3166-1 alpha-2 code (e.g., UZ, US)"),
     )
-    name = models.CharField(max_length=100, verbose_name=_("Country name"))
+    name = models.CharField(max_length=100, unique=True, verbose_name=_("Country name"))
     flag = models.CharField(max_length=10, blank=True, verbose_name=_("Flag emoji"))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
 
@@ -42,8 +41,10 @@ class Country(BaseModel):
         return f"{self.flag} {self.name}" if self.flag else self.name
 
     def save(self, *args, **kwargs):
-        # always store uppercase country code
-        if self.code:
+        # ✅ Agar code kiritilmagan bo‘lsa, avtomatik hosil bo‘ladi
+        if not self.code and self.name:
+            self.code = self.name[:2].upper()
+        else:
             self.code = self.code.upper()
         super().save(*args, **kwargs)
 

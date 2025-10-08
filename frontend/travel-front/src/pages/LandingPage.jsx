@@ -19,6 +19,12 @@ const resolveGuideRouteId = (g) => (
     null
 );
 
+const pickCountry = (g) =>
+    g?.country_name ||
+    (typeof g?.user?.country === 'string' ? g.user.country : g?.user?.country?.name) ||
+    g?.country ||
+    '';
+
 const pickName = (g) =>
     g?.user_full_name || g?.full_name || g?.first_name || g?.user?.full_name || 'Guide';
 
@@ -124,8 +130,9 @@ const LandingPage = () => {
                             id: String(routeId),
                             name: pickName(g),
                             location: pickLocation(g),
+                            country: pickCountry(g),          // 👈 qo'shildi
                             rating,
-                            reviews: pickReviews(g),
+                            reviews: pickReviews(g),          // 👈 bor edi — ishlatamiz
                             services: pickServices(g),
                             price: pickPrice(g),
                             image: pickAvatar(g),
@@ -298,12 +305,14 @@ const LandingPage = () => {
                                             alt={guide.name}
                                             className="w-full h-64 object-cover"
                                         />
-                                        {guide.rating != null && (
-                                            <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 flex items-center space-x-1 shadow">
+
+                                        {/* Reyting + reviews (o'ng yuqori) */}
+                                        {(guide.rating != null || (guide.reviews ?? 0) > 0) && (
+                                            <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 flex items-center gap-1 shadow">
                                                 <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                                                <span className="text-sm font-medium">
-                          {Number(guide.rating).toFixed(1)}
-                        </span>
+                                                {guide.rating != null && (
+                                                    <span className="text-sm font-medium">{Number(guide.rating).toFixed(1)}</span>
+                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -312,22 +321,37 @@ const LandingPage = () => {
                                         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                                             {guide.name}
                                         </h3>
-                                        <p className="text-gray-600 dark:text-gray-300 mb-3 flex items-center">
-                                            <MapPin className="h-4 w-4 mr-1" />
-                                            {guide.location}
-                                        </p>
+
+                                        {/* Country + Reviews in one line */}
+                                        <div className="mb-3 flex items-center justify-between text-gray-600 dark:text-gray-300 w-full">
+  <span className="inline-flex items-center">
+    <MapPin className="h-4 w-4 mr-1" />
+      {guide.country || guide.location}
+  </span>
+                                            {(guide.reviews ?? 0) > 0 && (
+                                                <span className="inline-flex items-center">
+      <span className="text-gray-500 ml-2">Reviews: ({guide.reviews})</span>
+    </span>
+                                            )}
+                                        </div>
+
+
                                         {!!guide.services?.length && (
                                             <div className="flex flex-wrap gap-2 mb-4">
                                                 {guide.services.map((s) => (
-                                                    <span key={s} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                            {s}
-                          </span>
+                                                    <span
+                                                        key={s}
+                                                        className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
+                                                    >
+                                                      {s}
+                                                    </span>
                                                 ))}
                                             </div>
                                         )}
                                         <div className="flex justify-between items-center" />
                                     </div>
                                 </Link>
+
                             ))}
                         </div>
                     ) : (

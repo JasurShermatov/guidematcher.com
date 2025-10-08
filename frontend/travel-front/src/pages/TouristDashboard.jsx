@@ -206,11 +206,12 @@ export default function TouristDashboard() {
     const { t } = useLanguage();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("bookings");
+    const PAGE_SIZE = 10; // kerakli qiymatni tanlang
 
     /** BOOKINGS */
     const [loading, setLoading] = useState(true);
     const [list, setList] = useState([]);
-    const [pageInfo, setPageInfo] = useState({ next: null, previous: null, count: 0, page: 1 });
+    const [pageInfo, setPageInfo] = useState({ next: null, previous: null, count: 0, page: 1, totalPages: 1 });
     const [cancelingId, setCancelingId] = useState(null);
     const [completingId, setCompletingId] = useState(null);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -218,7 +219,7 @@ export default function TouristDashboard() {
     const loadBookings = async (page = 1) => {
         setLoading(true);
         try {
-            const params = { as: "client", page };
+            const params = { as: "client", page, page_size: PAGE_SIZE };
             const data = await safeGet(BOOKINGS_URL, { params });
             let items = [], next = null, previous = null, count = 0;
             if (Array.isArray(data)) {
@@ -227,7 +228,8 @@ export default function TouristDashboard() {
                 items = data.results; next = data.next || null; previous = data.previous || null; count = Number(data.count || 0);
             }
             setList(items.map(normalizeBooking));
-            setPageInfo({ next, previous, count, page });
+            const totalPages = Math.max(1, Math.ceil((count || 0) / PAGE_SIZE));
+            setPageInfo({ next, previous, count, page, totalPages });
         } finally {
             setLoading(false);
         }
@@ -474,7 +476,10 @@ export default function TouristDashboard() {
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('dashboard.upcomingBookingsTitle')}</h2>
                                 {pageInfo?.count ? (
                                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                                        {t('dashboard.pageXofN', { x: pageInfo.page, n: pageInfo.count })}
+                                        {/* Agar i18n’da alohida “page” va “of” kalitlari bo‘lsa: */}
+                                        {/* {t('dashboard.page')} {pageInfo.page} {t('dashboard.of')} {pageInfo.totalPages} */}
+                                        {/* Aks holda oddiy inglizcha: */}
+                                        Page {pageInfo.page} of {pageInfo.totalPages}
                                     </div>
                                 ) : null}
                             </div>

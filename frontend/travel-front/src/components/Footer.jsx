@@ -38,7 +38,7 @@ const Footer = () => {
                         <div className="flex space-x-4">
                             {/* Twitter */}
                             <a
-                                href="https://twitter.com/your_handle"
+                                href="https://t.me/uzguidecombot"
                                 target="_blank" rel="noopener noreferrer"
                                 className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                                 aria-label="Twitter"
@@ -49,7 +49,7 @@ const Footer = () => {
 
                             {/* Instagram */}
                             <a
-                                href="https://instagram.com/your_handle"
+                                href="https://t.me/uzguidecombot"
                                 target="_blank" rel="noopener noreferrer"
                                 className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                                 aria-label="Instagram"
@@ -60,7 +60,7 @@ const Footer = () => {
 
                             {/* Telegram */}
                             <a
-                                href="https://t.me/your_username"
+                                href="https://t.me/uzguidecombot"
                                 target="_blank" rel="noopener noreferrer"
                                 className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors"
                                 aria-label="Telegram"

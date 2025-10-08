@@ -208,8 +208,8 @@ const translations = {
         "guide.detail.endAfterStart": "End date must be after start date",
         "guide.detail.notAvailable": "Guide is not available for these dates",
         "guide.detail.redirecting": "Redirecting to booking page...",
-        "guide.detail.portfolio": "Portfolio",
-        "guide.detail.noPortfolio": "No portfolio items available",
+        "guide.detail.portfolio": "Service",
+        "guide.detail.noPortfolio": "No Service items available",
         // // common
         "common.cancel": "Cancel",
 
@@ -694,8 +694,8 @@ const translations = {
         "guide.detail.endAfterStart": "Tugash sanasi boshlanish sanasidan keyin bo‘lishi kerak",
         "guide.detail.notAvailable": "Bu sanalar uchun gid band",
         "guide.detail.redirecting": "Bron sahifasiga yo‘naltirilmoqda...",
-        "guide.detail.portfolio": "Portfel",
-        "guide.detail.noPortfolio": "Portfel elementlari yo‘q",
+        "guide.detail.portfolio": "Servis",
+        "guide.detail.noPortfolio": "Servis elementlari yo‘q",
 
         // // common
         "common.cancel": "Bekor qilish",
@@ -1186,8 +1186,8 @@ const translations = {
         "guide.detail.endAfterStart": "Дата окончания должна быть позже даты начала",
         "guide.detail.notAvailable": "На эти даты гид занят",
         "guide.detail.redirecting": "Переход на страницу бронирования...",
-        "guide.detail.portfolio": "Портфолио",
-        "guide.detail.noPortfolio": "Нет элементов портфолио",
+        "guide.detail.portfolio": "сервис",
+        "guide.detail.noPortfolio": "Нет элементов сервис",
 
         // // common
         "common.cancel": "Отменить",
@@ -1678,8 +1678,8 @@ const translations = {
         "guide.detail.endAfterStart": "Аяқталу күні басталу күнінен кейін болуы тиіс",
         "guide.detail.notAvailable": "Бұл күндерге гид бос емес",
         "guide.detail.redirecting": "Брондау бетіне ауыстырылуда...",
-        "guide.detail.portfolio": "Портфолио",
-        "guide.detail.noPortfolio": "Портфолио элементтері жоқ",
+        "guide.detail.portfolio": "қызмет",
+        "guide.detail.noPortfolio": "қызмет элементтері жоқ",
 
         // // common
         "common.cancel": "Бас тарту",

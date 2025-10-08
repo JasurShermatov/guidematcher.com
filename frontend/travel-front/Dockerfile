@@ -1,28 +1,32 @@
-# Multi-stage: 1-qadam - React build, 2-qadam - Nginx serve
+# --- 1-qadam: React build ---
 FROM node:18-alpine AS build
 
 # Ish papkasi
 WORKDIR /app
 
-# Package fayllarini ko'chiring va o'rnating
+# Package fayllarini ko'chiring
 COPY package*.json ./
-RUN npm ci --only=production
 
-# Kodni ko'chiring va build qiling
+# Dev dependency-larni ham o‘rnatamiz (tailwind, postcss, autoprefixer uchun kerak)
+RUN npm ci --include=dev
+
+# Barcha kodni ko‘chiramiz
 COPY . .
+
+# Build jarayoni
 RUN npm run build
 
-# Production stage: Nginx
+# --- 2-qadam: Nginx orqali serve ---
 FROM nginx:1.21-alpine
 
-# Nginx config ni ko'chiring
+# Nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Build natijasini Nginx ga ko'chiring
+# Build natijasini Nginx papkasiga ko‘chirish
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Port 80
+# Port ochish
 EXPOSE 80
 
-# Nginx ni ishga tushiring
+# Nginx ni ishga tushirish
 CMD ["nginx", "-g", "daemon off;"]

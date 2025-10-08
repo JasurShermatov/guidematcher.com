@@ -157,7 +157,8 @@ export default function BookingPage() {
                 ...prev,
                 start_date: start_date || prev.start_date || "",
                 end_date: end_date || prev.end_date || "",
-                number_of_people: guests ? Number(guests) : prev.number_of_people || 1,
+                // number_of_people: guests ? Number(guests) : prev.number_of_people || 1,
+                number_of_people: guests !== undefined && guests !== "" ? Number(guests) : prev.number_of_people ?? null,
                 description: description || prev.description || "",
                 country: country || prev.country || "",
             }));

@@ -373,13 +373,14 @@ export default function GuideProfile() {
                 });
 
                 // 2) Portfolio (mavjud endpoint)
+                // 2) Portfolio → faqat autentifikatsiya qilinganda
                 const userUUID = guideData?.user_id || guideData?.user_uuid || guideData?.user?.id || id;
-                if (userUUID) {
+                if (isAuthenticated && userUUID) {
                     const pRes = await portfolioList({ customer: userUUID }).catch(() => ({ results: [] }));
                     const pList = Array.isArray(pRes?.results) ? pRes.results : Array.isArray(pRes) ? pRes : [];
                     setPortfolio(pList);
                 } else {
-                    setPortfolio([]);
+                   setPortfolio([]);
                 }
 
                 // 3) My Services — faqat profil ma’lumotidan (hech qanday GET yo‘q)
@@ -585,10 +586,10 @@ export default function GuideProfile() {
                                                     <span>{countryText}</span>
                                                 </div>
                                             )}
-                                            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                                                <MapPin className="w-5 h-5" />
-                                                <span>{pickLocation(guide)}</span>
-                                            </div>
+                                            {/*<div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">*/}
+                                            {/*    <MapPin className="w-5 h-5" />*/}
+                                            {/*    <span>{pickLocation(guide)}</span>*/}
+                                            {/*</div>*/}
                                             {/*{(typeof guide?.average_rating === "number" || guide?.total_reviews) && (*/}
                                             {/*    <div className="flex items-center gap-2">*/}
                                             {/*        <Star className="w-5 h-5 text-yellow-500 fill-current" />*/}
@@ -810,18 +811,26 @@ export default function GuideProfile() {
                                     </div>
 
                                     {/* Portfolio */}
-                                    <div className="bg-white dark:bg-dark-900 rounded-2xl border border-gray-200 dark:border-dark-700 p-4 sm:p-5">
-                                        <div className="font-semibold mb-2 text-base sm:text-lg text-gray-900 dark:text-white">{t("guide.detail.portfolio")}</div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-                                            {portfolio.map((item) => (
-                                                <div key={item.id} className="border border-gray-200 dark:border-dark-700 rounded-lg p-3 sm:p-4 bg-white dark:bg-dark-900">
-                                                    <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-gray-100">{item.title}</h3>
-                                                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">{item.description}</p>
-                                                </div>
-                                            ))}
-                                            {!portfolio?.length && <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-300">{t("guide.detail.noPortfolio")}</div>}
+                                    {isAuthenticated && (
+                                        <div className="bg-white dark:bg-dark-900 rounded-2xl border border-gray-200 dark:border-dark-700 p-4 sm:p-5">
+                                            <div className="font-semibold mb-2 text-base sm:text-lg text-gray-900 dark:text-white">
+                                                {t("guide.detail.portfolio")}
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                                               {portfolio.map((item) => (
+                                                  <div key={item.id} className="border border-gray-200 dark:border-dark-700 rounded-lg p-3 sm:p-4 bg-white dark:bg-dark-900">
+                                                     <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-gray-100">{item.title}</h3>
+                                                     <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">{item.description}</p>
+                                                  </div>
+                                               ))}
+                                               {!portfolio?.length && (
+                                                   <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-300">
+                                                      {t("guide.detail.noPortfolio")}
+                                                   </div>
+                                               )}
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </section>
                             </div>
                         </>

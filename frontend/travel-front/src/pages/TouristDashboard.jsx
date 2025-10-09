@@ -636,15 +636,6 @@ export default function TouristDashboard() {
                                     className="w-full p-3 border border-gray-300 dark:border-dark-700 rounded-lg bg-gray-50 dark:bg-dark-800 text-gray-600 dark:text-gray-300"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">{t('dashboard.phone')}</label>
-                                <input
-                                    type="tel"
-                                    value={meForm.phone}
-                                    onChange={(e) => setMeForm((x) => ({ ...x, phone: e.target.value }))}
-                                    className="w-full p-3 border border-gray-300 dark:border-dark-700 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100"
-                                />
-                            </div>
                         </div>
                         <div className="flex justify-end mt-6">
                             <button

@@ -32,7 +32,7 @@ from .serializers import (
 
 # ---------- Shared mixin for avatar ----------
 class AvatarMixin:
-    parser_classes = [MultiPartParser, FormParser]
+    # parser_classes = [MultiPartParser, FormParser]
 
     @action(detail=True, methods=["get"], url_path="avatar")
     def get_avatar(self, request, *args, **kwargs):
@@ -226,6 +226,7 @@ class CustomerProfileViewSet(AvatarMixin, BaseProfileViewSet):
     create_update_serializer_class = CustomerProfileCreateUpdateSerializer
     profile_attr = "customerprofile"
     user_role = "customer"
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     @action(detail=False, methods=["get"], url_path="resolve", permission_classes=[AllowAny])
     def resolve(self, request):
@@ -327,29 +328,35 @@ class CustomerOwnedModelViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        customer_id = self.request.query_params.get("customer")
-        if customer_id:
-            # avval user UUID sifatida
-            try:
-                UUID(str(customer_id))
-                return qs.filter(customer__user__id=customer_id)
-            except Exception:
-                pass
-            # keyin profile PK sifatida
-            qs = qs.filter(customer_id=customer_id)
-        return qs
 
-    def perform_create(self, serializer):
-        customer = self.get_customer_profile()
-        if not customer and not getattr(self.request.user, "is_admin", False):
-            raise PermissionDenied(
-                {"detail": "You must be a customer to create this resource."}
-            )
-        serializer.save(customer=customer)
+        customer_param = self.request.query_params.get("customer")
+        if customer_param:
+            try:
+                UUID(str(customer_param))
+                qs = qs.filter(customer__user__id=customer_param)
+            except Exception:
+                qs = qs.filter(customer_id=customer_param)
+            return qs
+
+        user = self.request.user
+        if not getattr(user, "is_admin", False):
+            customer = self.get_customer_profile()
+            if customer is None:
+                return qs.none()
+            qs = qs.filter(customer=customer)
+
+        return qs
 
     @action(detail=False, methods=["get"], url_path="my")
     def my_items(self, request):
-        qs = self.filter_queryset(self.get_queryset())
+        customer = self.get_customer_profile()
+        if not customer:
+            # Profil yo'q bo‘lsa bo‘sh ro‘yxat
+            return Response([], status=200)
+
+        qs = self.filter_queryset(
+            super().get_queryset().filter(customer=customer)
+        )
         ser = self.get_serializer(qs, many=True, context={"request": request})
         return Response(ser.data)
 

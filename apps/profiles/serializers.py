@@ -94,12 +94,15 @@ class ClientProfileShortSerializer(serializers.ModelSerializer):
 
 
 class CustomerProfileCreateUpdateSerializer(serializers.ModelSerializer):
+    # Mavjud ro‘yxat-PK maydon (o‘z holicha qolsin — xohlaganda ishlatish mumkin)
     languages = serializers.PrimaryKeyRelatedField(
         queryset=Language.objects.all(), many=True, required=False
     )
     service_types = serializers.PrimaryKeyRelatedField(
         queryset=ServiceType.objects.all(), many=True, required=False
     )
+    # YANGI: frontdan bitta input yuborasiz: {"language": "English"}
+    language = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = CustomerProfile
@@ -112,7 +115,8 @@ class CustomerProfileCreateUpdateSerializer(serializers.ModelSerializer):
             "hourly_rate",
             "daily_rate",
             "currency",
-            "languages",
+            "languages",     # eski PK ro‘yxati — o‘z holicha turadi
+            "language",      # YANGI bitta matnli input
             "is_available",
             "avatar",
         ]
@@ -132,17 +136,45 @@ class CustomerProfileCreateUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Daily rate cannot be negative.")
         return value
 
+    def _apply_single_language(self, instance, language_value: str | None):
+        """
+        Bitta inputdan kelgan tilni profilga o‘rnatadi.
+        - Bo‘sh bo‘lsa: hech narsa qilmaydi (yoki xohlasangiz clear()).
+        - Mavjud tilni name bo‘yicha (iexact) topadi; topilmasa KIRITILGANCHA yaratadi.
+        - So‘ng instance.languages.set([lang]) — to‘liq almashtirish (bitta input bo‘lgani uchun).
+        """
+        if language_value is None:
+            return
+        name = language_value.strip()
+        if not name:
+            # Agar bo‘sh yuborilsa, hech narsa qilmaymiz (yoki: instance.languages.clear())
+            instance.languages.clear()
+            return
+        lang = Language.objects.filter(name__iexact=name).first()
+        if not lang:
+            lang = Language.objects.create(name=name)  # aynan kiritilgancha saqlanadi
+        instance.languages.set([lang])
+
     def create(self, validated_data):
+        language_value = validated_data.pop("language", None)
         languages = validated_data.pop("languages", [])
         service_types = validated_data.pop("service_types", [])
         instance = super().create(validated_data)
+
+        # Avval bitta inputdan kelgan tilni qo‘llaymiz (ustuvor)
+        self._apply_single_language(instance, language_value)
+
+        # Agar languages (PK ro‘yxati) ham yuborilgan bo‘lsa, ustidan yozmaymiz,
+        # balki set qilamiz. (Bitta input ustuvor bo‘lsin desangiz, bu blokni olib tashlang.)
         if languages:
             instance.languages.set(languages)
+
         if service_types:
             instance.service_types.set(service_types)
         return instance
 
     def update(self, instance, validated_data):
+        language_value = validated_data.pop("language", None)
         languages = validated_data.pop("languages", None)
         service_types = validated_data.pop("service_types", None)
 
@@ -150,6 +182,10 @@ class CustomerProfileCreateUpdateSerializer(serializers.ModelSerializer):
             setattr(instance, attr, val)
         instance.save()
 
+        # Bitta input til kelsa — o‘rnatamiz
+        self._apply_single_language(instance, language_value)
+
+        # Agar ro‘yxat-PK maydon yuborilsa — set qilamiz (optional)
         if languages is not None:
             instance.languages.set(languages)
         if service_types is not None:

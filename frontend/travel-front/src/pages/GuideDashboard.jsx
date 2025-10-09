@@ -115,20 +115,50 @@ export default function GuideDashboard() {
     }, [userMe?.first_name, userMe?.last_name]);
 
     // helpers
+    // --- GuideDashboard.jsx: mapLanguagesToIds (yangilangan) ---
     const mapLanguagesToIds = (csv) => {
-        const parts = (csv || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+        const UUID_RE =
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+        const parts = String(csv || "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
         if (!parts.length) return [];
+
         return parts
-            .map((v) => {
-                const hit = allLanguages.find((l) => {
-                    const fields = [l?.name, l?.code, l?.native_name, l?.title, l?.iso2, l?.iso_639_1, l?.isoCode]
-                        .filter(Boolean).map(String).map((x) => x.toLowerCase());
+            .map((raw) => {
+                // 1) To‘g‘ridan-to‘g‘ri UUID/ID kiritilgan bo‘lsa
+                if (UUID_RE.test(raw)) return raw;
+
+                const v = raw.toLowerCase();
+
+                // 2) Avval code bo‘yicha (aniq moslik)
+                let hit = allLanguages.find(
+                    (l) => String(l?.code || "").toLowerCase() === v
+                );
+                if (hit?.id) return hit.id;
+
+                // 3) So‘ng name/native_name/title/iso bo‘yicha
+                hit = allLanguages.find((l) => {
+                    const fields = [
+                        l?.name,
+                        l?.native_name,
+                        l?.title,
+                        l?.iso2,
+                        l?.iso_639_1,
+                        l?.isoCode,
+                    ]
+                        .filter(Boolean)
+                        .map((x) => String(x).toLowerCase());
                     return fields.includes(v);
                 });
-                return hit?.id;
+
+                return hit?.id ?? null;
             })
             .filter(Boolean);
     };
+
     const findCountryId = (val) => {
         if (!val) return null;
         const v = String(val).trim().toLowerCase();
@@ -221,7 +251,7 @@ export default function GuideDashboard() {
                     email: u?.email || "",
                     location: u?.country_name || "",
                     bio: c?.professional_bio || "",
-                    languages: (c?.languages || []).map((l) => l.name).join(", "),
+                    languages: (c?.languages?.[0]?.name) || "",
                     experience_years: Number(c?.years_of_experience || 0),
                 });
                 const [langs, countries] = await Promise.all([
@@ -301,32 +331,47 @@ export default function GuideDashboard() {
     };
 
     // save profile
+    // --- GuideDashboard.jsx: saveProfile (yangilangan) ---
     const saveProfile = async () => {
         try {
             const countryId = findCountryId(edit.location);
-            const langIds = mapLanguagesToIds(edit.languages);
+
             await patchMe({
                 first_name: edit.first_name || "",
                 last_name: edit.last_name || "",
                 ...(countryId ? { country: countryId } : {}),
             });
+
             const payload = {
                 professional_bio: edit.bio || "",
                 years_of_experience: Number(edit.experience_years) || 0,
+                // MUHIM: bo‘sh bo‘lsa ham yuboramiz
+                language: (edit.languages || "").trim(),
             };
-            if (Array.isArray(langIds) && langIds.length) payload.languages = langIds;
-            await updateMyCustomerProfile(payload);
+
+            const upd = await updateMyCustomerProfile(payload);
+
             const [u, c] = await Promise.all([
                 getMe().then((r) => r.data ?? r),
                 getMyCustomerProfile().then((r) => r.data ?? r),
             ]);
+
             setUserMe(u);
             setCustomerMe(c);
-            alert(t('guide.dashboard.saved'));
+
+            // Inputni ham serverdan qaytgan holatga moslab yangilaymiz
+            setEdit((x) => ({
+                ...x,
+                languages: (c?.languages?.[0]?.name) || "",
+            }));
+
+            alert(t("guide.dashboard.saved"));
         } catch (e) {
-            alert(t('guide.dashboard.saveFailed'));
+            console.error("saveProfile error:", e);
+            alert(t("guide.dashboard.saveFailed"));
         }
     };
+
 
     // SERVICES form (no image)
     const submitPortfolio = async (e) => {
@@ -880,16 +925,8 @@ export default function GuideDashboard() {
                                                     value={edit.languages}
                                                     onChange={(e) => setEdit((x) => ({ ...x, languages: e.target.value }))}
                                                     className="w-full p-2.5 md:p-3 border border-gray-300 dark:border-dark-700 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 text-sm md:text-base"
-                                                    placeholder={t('guide.profile.languagesPh')}
+                                                    placeholder="e.g. English"
                                                 />
-                                                {!!allLanguages.length ? (
-                                                    <p className="text-[11px] md:text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                        {t('guide.profile.known')}: {allLanguages.slice(0, 6).map((l) => l.code).join(", ")}
-                                                        {allLanguages.length > 6 ? "…" : ""}
-                                                    </p>
-                                                ) : (
-                                                    <p className="text-[11px] md:text-xs text-gray-400 mt-1">{t('guide.profile.langsNotLoaded')}</p>
-                                                )}
                                             </div>
                                             <div>
                                                 <label className="block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('guide.profile.years')}</label>

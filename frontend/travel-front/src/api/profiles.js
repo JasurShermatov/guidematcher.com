@@ -88,24 +88,43 @@ export const getMyCustomerProfile = async () => {
     return api.get('profiles/customers/my/');
 };
 
+// src/api/profiles.js
 export const updateMyCustomerProfile = async (data) => {
-    let form;
-    if (data instanceof FormData) {
-        form = data;
-    } else {
-        form = new FormData();
-        Object.entries(data || {}).forEach(([k, v]) => {
-            if (Array.isArray(v)) {
-                v.forEach((item) => form.append(k, item));
-            } else if (v !== undefined && v !== null) {
-                form.append(k, v);
-            }
+    // Fayl yo‘q bo‘lsa JSON yuboramiz — bo‘sh array (masalan, languages: []) ham to‘g‘ri ketadi
+    const hasFile =
+        data instanceof FormData ||
+        Object.values(data || {}).some(
+            (v) => v instanceof File || v instanceof Blob
+        );
+
+    // JSON branch (eng barqaror: arrays va primitivlar to‘g‘ri ketadi)
+    if (!hasFile && !(data instanceof FormData)) {
+        return api.patch("profiles/customers/my/", data, {
+            headers: { "Content-Type": "application/json" },
         });
     }
-    return api.patch('profiles/customers/my/', form, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-    });
+
+    // Multipart branch (fayl bo‘lsa yoki FormData berilgan bo‘lsa)
+    const form =
+        data instanceof FormData
+            ? data
+            : (() => {
+                const f = new FormData();
+                Object.entries(data || {}).forEach(([k, v]) => {
+                    if (Array.isArray(v)) {
+                        // DRF ko‘pincha bir xil kalitni takror-takror qabul qiladi:
+                        // languages=1&languages=2&...
+                        v.forEach((item) => f.append(k, item));
+                    } else if (v !== undefined && v !== null) {
+                        f.append(k, v);
+                    }
+                });
+                return f;
+            })();
+
+    return api.patch("profiles/customers/my/", form);
 };
+
 
 // Portfolio
 export const getPortfolios = async (params) => {

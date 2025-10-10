@@ -137,22 +137,18 @@ class CustomerProfileCreateUpdateSerializer(serializers.ModelSerializer):
         return value
 
     def _apply_single_language(self, instance, language_value: str | None):
-        """
-        Bitta inputdan kelgan tilni profilga o‘rnatadi.
-        - Bo‘sh bo‘lsa: hech narsa qilmaydi (yoki xohlasangiz clear()).
-        - Mavjud tilni name bo‘yicha (iexact) topadi; topilmasa KIRITILGANCHA yaratadi.
-        - So‘ng instance.languages.set([lang]) — to‘liq almashtirish (bitta input bo‘lgani uchun).
-        """
-        if language_value is None:
-            return
-        name = language_value.strip()
-        if not name:
-            # Agar bo‘sh yuborilsa, hech narsa qilmaymiz (yoki: instance.languages.clear())
+        if not language_value or not language_value.strip():
             instance.languages.clear()
             return
-        lang = Language.objects.filter(name__iexact=name).first()
-        if not lang:
-            lang = Language.objects.create(name=name)  # aynan kiritilgancha saqlanadi
+
+        name = language_value.strip()
+        # Slug yoki qisqa code yaratamiz (masalan, kichik harflar + _ o‘rniga bo‘shliq)
+        code = name.lower().replace(" ", "_")
+
+        lang, created = Language.objects.get_or_create(
+            code=code,
+            defaults={'name': name}
+        )
         instance.languages.set([lang])
 
     def create(self, validated_data):

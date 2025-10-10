@@ -81,7 +81,7 @@ class City(BaseModel):
 class Language(BaseModel):
 
     code = models.CharField(
-        max_length=5,
+        max_length=30,
         unique=True,
         verbose_name=_("Language code"),
         help_text=_("ISO 639-1 code (e.g., en, ru)"),

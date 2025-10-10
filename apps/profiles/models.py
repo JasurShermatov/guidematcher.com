@@ -171,7 +171,6 @@ class AbstractCustomerRelatedModel(BaseModel):
 
 
 class Portfolio(AbstractCustomerRelatedModel):
-    image = models.ImageField(upload_to="portfolio/%Y/%m/", verbose_name=_("Image"),blank=True, null=True )
     title = models.CharField(max_length=200, blank=True, verbose_name=_("Title"))
     description = models.TextField(blank=True, verbose_name=_("Description"))
     order = models.PositiveIntegerField(default=0, verbose_name=_("Display order"))

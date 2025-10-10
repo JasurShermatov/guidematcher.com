@@ -372,7 +372,6 @@ class PortfolioViewSet(CustomerOwnedModelViewSet):
         qs = super().get_queryset()
         customer_id = self.request.query_params.get("customer")
         if customer_id:
-            # UUID bo‘yicha filterlash
             qs = qs.filter(customer__user__id=customer_id)
         return qs
 

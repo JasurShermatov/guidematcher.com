@@ -366,7 +366,6 @@ class PortfolioSerializer(serializers.ModelSerializer):
     customer_name = serializers.CharField(
         source="customer.user.full_name", read_only=True
     )
-    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Portfolio
@@ -374,8 +373,6 @@ class PortfolioSerializer(serializers.ModelSerializer):
             "id",
             "customer",
             "customer_name",
-            "image",
-            "image_url",
             "title",
             "description",
             "order",
@@ -383,11 +380,6 @@ class PortfolioSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "customer", "customer_name", "created_at"]
 
-    def get_image_url(self, obj):
-        if not obj.image:
-            return None
-        req = self.context.get("request")
-        return req.build_absolute_uri(obj.image.url) if req else obj.image.url
 
     def create(self, validated_data):
         user = self.context["request"].user

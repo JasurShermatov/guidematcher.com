@@ -220,6 +220,18 @@ const translations = {
         "guide.common.service": "Service",
         "guide.common.scheduled": "Scheduled",
         "guide.common.loadFailed": "Failed to load data",
+
+        "guide.common.verified": "Verified",
+        "guide.common.availableNow": "Available Now",
+        "guide.common.respondsWithinHour": "Typically responds within 1 hour",
+        "guide.common.noBio": "Bio information not yet provided",
+
+        // guide/card
+        "guide.card.viewProfile": "View Profile",
+        "guide.card.bookNow": "Book Now",
+        "guide.card.speaks": "Speaks",
+        "guide.card.moreServices": "more",
+
         // guide/nav*
         "guide.nav.overview": "Overview",
         "guide.nav.profileServices": "Profile & Services",
@@ -334,6 +346,10 @@ const translations = {
         "guide.service.descPh": "Describe your service",
         "guide.service.orderLabel": "Order (numeric)",
         "guide.service.preview": "Preview Service",
+        "guide.service.duration": "Duration",
+        "guide.service.bookThisService": "Book This Service",
+
+        "guide.about.title": "About Me",
         // guide/stats*
         "guide.stats.week": "Bookings This Week",
         "guide.stats.month": "Bookings This Month",
@@ -343,6 +359,10 @@ const translations = {
         "guide.stats.noData": "No data available",
         "guide.stats.monthlyPerf": "Monthly Performance",
         "guide.stats.chartPlaceholder": "No data to display",
+        "guide.stats.reviews": "Reviews",
+        "guide.stats.responseRate": "Response Rate",
+        "guide.stats.experience": "Years of Experience",
+        "guide.stats.languages": "Languages",
         // common
         "common.refresh": "Refresh",
         // chat
@@ -707,6 +727,16 @@ const translations = {
         "guide.common.service": "Xizmat",
         "guide.common.scheduled": "Rejalashtirilgan",
         "guide.common.loadFailed": "Ma’lumotlarni yuklab bo‘lmadi",
+        "guide.common.verified": "Tasdiqlangan",
+        "guide.common.availableNow": "Hozir mavjud",
+        "guide.common.respondsWithinHour": "Odatda 1 soat ichida javob beradi",
+        "guide.common.noBio": "Bio ma'lumoti hali kiritilmagan",
+
+        // guide/card
+        "guide.card.viewProfile": "Profilni ko'rish",
+        "guide.card.bookNow": "Hozir band qilish",
+        "guide.card.speaks": "Gapiradi",
+        "guide.card.moreServices": "yana",
 
         // guide/nav*
         "guide.nav.overview": "Umumiy",
@@ -829,6 +859,11 @@ const translations = {
         "guide.service.descPh": "Xizmatingizni tasvirlab bering",
         "guide.service.orderLabel": "Tartib (son)",
         "guide.service.preview": "Xizmatni ko‘rish",
+        "guide.service.duration": "Davomiylik",
+        "guide.service.bookThisService": "Ushbu xizmatni band qilish",
+
+        // guide/about
+        "guide.about.title": "Men haqimda",
 
         // guide/stats*
         "guide.stats.week": "Ushbu haftadagi bronlar",
@@ -839,6 +874,10 @@ const translations = {
         "guide.stats.noData": "Ma’lumot yo‘q",
         "guide.stats.monthlyPerf": "Oylik ko‘rsatkichlar",
         "guide.stats.chartPlaceholder": "Ko‘rsatish uchun ma’lumot yo‘q",
+        "guide.stats.reviews": "Sharhlar",
+        "guide.stats.responseRate": "Javob berish foizi",
+        "guide.stats.experience": "Tajriba yillari",
+        "guide.stats.languages": "Tillar",
 
         // common
         "common.refresh": "Yangilash",
@@ -1199,6 +1238,16 @@ const translations = {
         "guide.common.service": "Услуга",
         "guide.common.scheduled": "Запланировано",
         "guide.common.loadFailed": "Не удалось загрузить данные",
+        "guide.common.verified": "Проверенный",
+        "guide.common.availableNow": "Доступен сейчас",
+        "guide.common.respondsWithinHour": "Обычно отвечает в течение 1 часа",
+        "guide.common.noBio": "Биография еще не добавлена",
+
+        // guide/card
+        "guide.card.viewProfile": "Посмотреть профиль",
+        "guide.card.bookNow": "Забронировать сейчас",
+        "guide.card.speaks": "Говорит",
+        "guide.card.moreServices": "еще",
 
         // guide/nav*
         "guide.nav.overview": "Обзор",
@@ -1321,6 +1370,10 @@ const translations = {
         "guide.service.descPh": "Опишите вашу услугу",
         "guide.service.orderLabel": "Порядок (число)",
         "guide.service.preview": "Предпросмотр услуги",
+        "guide.service.duration": "Продолжительность",
+        "guide.service.bookThisService": "Забронировать эту услугу",
+        // guide/about
+        "guide.about.title": "Обо мне",
 
         // guide/stats*
         "guide.stats.week": "Бронирования за неделю",
@@ -1331,6 +1384,10 @@ const translations = {
         "guide.stats.noData": "Нет данных",
         "guide.stats.monthlyPerf": "Помесячные показатели",
         "guide.stats.chartPlaceholder": "Нет данных для отображения",
+        "guide.stats.reviews": "Отзывы",
+        "guide.stats.responseRate": "Процент ответа",
+        "guide.stats.experience": "Годы опыта",
+        "guide.stats.languages": "Языки",
 
         // common
         "common.refresh": "Обновить",
@@ -1691,6 +1748,15 @@ const translations = {
         "guide.common.service": "Қызмет",
         "guide.common.scheduled": "Жоспарланған",
         "guide.common.loadFailed": "Деректерді жүктеу мүмкін болмады",
+        "guide.common.verified": "Тексерілген",
+        "guide.common.availableNow": "Қазір қолжетімді",
+        "guide.common.respondsWithinHour": "Әдетте 1 сағат ішінде жауап береді",
+        "guide.common.noBio": "Биография әлі енгізілмеген",
+        // guide/card
+        "guide.card.viewProfile": "Профильді қарау",
+        "guide.card.bookNow": "Қазір брондау",
+        "guide.card.speaks": "Сөйлейді",
+        "guide.card.moreServices": "тағы",
 
         // guide/nav*
         "guide.nav.overview": "Шолу",
@@ -1813,6 +1879,11 @@ const translations = {
         "guide.service.descPh": "Қызметіңізді сипаттаңыз",
         "guide.service.orderLabel": "Реті (сан)",
         "guide.service.preview": "Қызметті алдын ала қарау",
+        "guide.service.duration": "Ұзақтығы",
+        "guide.service.bookThisService": "Осы қызметті брондау",
+
+        // guide/about
+        "guide.about.title": "Мен туралы",
 
         // guide/stats*
         "guide.stats.week": "Осы аптадағы броньдар",
@@ -1823,6 +1894,10 @@ const translations = {
         "guide.stats.noData": "Деректер жоқ",
         "guide.stats.monthlyPerf": "Айлық көрсеткіштер",
         "guide.stats.chartPlaceholder": "Көрсетілетін дерек жоқ",
+        "guide.stats.reviews": "Пікірлер",
+        "guide.stats.responseRate": "Жауап беру пайызы",
+        "guide.stats.experience": "Тәжірибе жылдары",
+        "guide.stats.languages": "Тілдер",
 
         // common
         "common.refresh": "Жаңарту",

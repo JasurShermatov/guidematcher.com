@@ -12,6 +12,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - /var/lib/postgresql/backups:/backups
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
       interval: 5s
@@ -63,13 +64,12 @@ services:
       - ./media:/app/media
     ports:
       - "8000:8000"
-      - "587:587"   # Agar backend SMTP relay qilsa, shu port ochiq qoladi
+      - "587:587"
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
-    # Healthcheck: Django ichidagi /health/ endpoint
     healthcheck:
       test: [ "CMD-SHELL", "curl -sSf http://localhost:8000/health/ > /dev/null || exit 1" ]
       interval: 30s
@@ -81,7 +81,7 @@ services:
   bot:
     build:
       context: ./bot
-      dockerfile: DockerfileBot   # <-- MUHIM: DockerfileBot ni ko'rsatdik
+      dockerfile: DockerfileBot
     env_file:
       - ./bot/.env
     restart: always
@@ -105,12 +105,10 @@ services:
       redis:
         condition: service_healthy
       backend:
-        condition: service_started   # settings va broker/DB tayyor bo‘lsin
+        condition: service_started
     networks:
       - app-network
-    # Healthcheck:
-    # Oddiy usul: process mavjudligini tekshirish (pgrep)
-    # (Agar busy-lansa, celery inspect ping ham ishlatish mumkin)
+
     healthcheck:
       test: [ "CMD-SHELL", "pgrep -f 'celery.*worker' >/dev/null" ]
       interval: 30s
@@ -133,8 +131,7 @@ services:
         condition: service_started
     networks:
       - app-network
-    # Healthcheck: nginx static server / (agar alpine nginx image bo‘lsa curl mavjud bo‘ladi;
-    # yo‘q bo‘lsa, `apk add --no-cache curl`ni Dockerfile’da qo‘shing)
+
     healthcheck:
       test: [ "CMD-SHELL", "curl -sSf http://localhost/ >/dev/null || exit 1" ]
       interval: 30s

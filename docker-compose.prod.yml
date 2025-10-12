@@ -146,8 +146,8 @@ services:
       - "443:443"
     volumes:
       - ./nginx:/etc/nginx/conf.d
-      - static_volume:/app/staticfiles
-      - media_volume:/app/media
+      - static_data:/app/staticfiles
+      - media_data:/app/media
       - /etc/letsencrypt:/etc/letsencrypt
     depends_on:
       - backend

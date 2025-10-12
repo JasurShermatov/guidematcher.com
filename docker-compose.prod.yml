@@ -14,13 +14,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - /var/lib/postgresql/backups:/backups
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 3s
       retries: 5
     networks:
       - app-network
-
 
   bot_db:
     image: postgres:15-alpine
@@ -30,7 +29,7 @@ services:
     volumes:
       - bot_postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -42,9 +41,8 @@ services:
   redis:
     image: redis:7-alpine
     restart: unless-stopped
-    # Healthcheck: redis-cli ping (image ichida bor)
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -61,17 +59,16 @@ services:
     volumes:
       - .:/app
       - static_data:/app/staticfiles
-      - ./media:/app/media
-    ports:
-      - "8000:8000"
-      - "587:587"
+      - media_data:/app/media
+    expose:
+      - "8000"
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "curl -sSf http://localhost:8000/health/ > /dev/null || exit 1" ]
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health/ || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -97,7 +94,6 @@ services:
     build: .
     <<: *default-env
     restart: always
-    entrypoint: ""
     command: celery -A config worker -l info --concurrency=4
     depends_on:
       db:
@@ -108,9 +104,8 @@ services:
         condition: service_started
     networks:
       - app-network
-
     healthcheck:
-      test: [ "CMD-SHELL", "pgrep -f 'celery.*worker' >/dev/null" ]
+      test: ["CMD-SHELL", "pgrep -f 'celery.*worker' >/dev/null"]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -121,19 +116,18 @@ services:
       context: ./frontend/travel-front
       dockerfile: Dockerfile
       args:
-        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:8000/api/v1/}
-        - REACT_APP_WS_ORIGIN=${REACT_APP_WS_ORIGIN:-ws://localhost:8000}
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-https://uzguide.com/api/v1/}
+        - REACT_APP_WS_ORIGIN=${REACT_APP_WS_ORIGIN:-wss://uzguide.com}
     restart: unless-stopped
-    ports:
-      - "3003:80"
+    expose:
+      - "80"
     depends_on:
       backend:
         condition: service_started
     networks:
       - app-network
-
     healthcheck:
-      test: [ "CMD-SHELL", "curl -sSf http://localhost/ >/dev/null || exit 1" ]
+      test: ["CMD-SHELL", "curl -fsS http://localhost/ || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -145,13 +139,16 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx:/etc/nginx/conf.d
+      - ./nginx/uzguide.conf:/etc/nginx/conf.d/default.conf:ro
       - static_data:/app/staticfiles
       - media_data:/app/media
-      - /etc/letsencrypt:/etc/letsencrypt
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - backend
+      - frontend
     restart: always
+    networks:
+      - app-network
 
 volumes:
   postgres_data:

@@ -1,4 +1,3 @@
-// src/pages/GuideProfile.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -115,7 +114,7 @@ function normalizeGuideCard(g) {
 }
 
 /* ======= Reusable components ======= */
-function GuideCard({ g, onView, onBook }) {
+function GuideCard({ g, onView, onBook, t }) {
     return (
         <div className="border border-gray-200 dark:border-dark-700 rounded-xl p-4 bg-white dark:bg-dark-900 hover:shadow-sm transition">
             <div className="flex gap-4">
@@ -133,7 +132,7 @@ function GuideCard({ g, onView, onBook }) {
                         <div className="absolute -top-2 -left-2">
               <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-emerald-600 text-white shadow">
                 <CheckCircle className="w-3 h-3" />
-                Tasdiqlangan
+                  {t("guide.common.verified")}
               </span>
                         </div>
                     )}
@@ -141,7 +140,7 @@ function GuideCard({ g, onView, onBook }) {
                         <div className="absolute -bottom-2 left-0">
               <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-white dark:bg-dark-900 border border-emerald-300 text-emerald-700">
                 <CircleDot className="w-3 h-3" />
-                Available Now
+                  {t("guide.common.availableNow")}
               </span>
                         </div>
                     )}
@@ -164,7 +163,7 @@ function GuideCard({ g, onView, onBook }) {
                                     {g.rating.toFixed(1)}
                                     {g.total_reviews ? (
                                         <span className="text-gray-500 dark:text-gray-400 ml-1">
-                      ({g.total_reviews} reviews)
+                      ({g.total_reviews} {t("common.reviews")})
                     </span>
                                     ) : null}
                                 </div>
@@ -189,26 +188,26 @@ function GuideCard({ g, onView, onBook }) {
                             ))}
                             {g.service_types.length > 4 && (
                                 <span className="px-2 py-1 rounded-full text-xs bg-gray-50 dark:bg-dark-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-dark-700">
-                  +{g.service_types.length - 4} more
+                  +{g.service_types.length - 4} {t("guide.card.moreServices")}
                 </span>
                             )}
                         </div>
                     )}
 
                     <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                        {g.languages?.length ? <div>Gapiradi: {g.languages.join(", ")}</div> : null}
-                        <div className="text-gray-500 dark:text-gray-400">Odatda javob beradi within 1 hour</div>
+                        {g.languages?.length ? <div>{t("guide.card.speaks")}: {g.languages.join(", ")}</div> : null}
+                        <div className="text-gray-500 dark:text-gray-400">{t("guide.common.respondsWithinHour")}</div>
                     </div>
 
                     <div className="mt-4 flex flex-wrap gap-3">
                         <button onClick={onView} className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">
-                            Profilni ko'rish
+                            {t("guide.card.viewProfile")}
                         </button>
                         <button
                             onClick={onBook}
                             className="px-4 py-2 rounded-lg border border-gray-300 dark:border-dark-700 hover:bg-gray-50 dark:hover:bg-dark-800 text-gray-800 dark:text-gray-200"
                         >
-                            Hozir band qilish
+                            {t("guide.card.bookNow")}
                         </button>
                     </div>
                 </div>
@@ -217,9 +216,9 @@ function GuideCard({ g, onView, onBook }) {
     );
 }
 
-function ServiceCard({ s, onBook }) {
+function ServiceCard({ s, onBook, t }) {
     const hasDur = s.duration_min || s.duration_max;
-    const durText = hasDur ? `Duration: ${s.duration_min ?? "?"}-${s.duration_max ?? "?"} hours` : "";
+    const durText = hasDur ? `${t("guide.service.duration")}: ${s.duration_min ?? "?"}-${s.duration_max ?? "?"} ${t("booking.perHour")}` : "";
     const priceText = s.price != null ? `${formatPrice(s.price, s.currency)}/hr` : "";
 
     return (
@@ -237,7 +236,7 @@ function ServiceCard({ s, onBook }) {
             <div className="flex flex-col items-end justify-between shrink-0">
                 <div className="text-blue-600 font-semibold text-lg">{priceText}</div>
                 <button onClick={onBook} className="mt-3 px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm">
-                    Book This Service
+                    {t("guide.service.bookThisService")}
                 </button>
             </div>
         </div>
@@ -321,7 +320,7 @@ export default function GuideProfile() {
     const goDetail = (uid) => { if (!uid) return; navigate(`/guides/${encodeURIComponent(uid)}`); };
     const goBookNowFromList = async (uid) => {
         const profileId = await resolveCustomerPk(uid);
-        if (!profileId) return alert("Guide ID aniqlanmadi");
+        if (!profileId) return alert(t("guide.detail.resolveError"));
         navigate(`/booking/${encodeURIComponent(profileId)}`);
     };
 
@@ -336,7 +335,7 @@ export default function GuideProfile() {
         g?.title ||
         (Array.isArray(g?.service_types) && g.service_types.length
             ? `${g.service_types[0]?.name || g.service_types[0]} Guide`
-            : "Professional Local Guide");
+            : t("guide.detail.defaultHeadline"));
 
     const getResponseRate = (g) => {
         if (g?.response_rate != null) {
@@ -380,7 +379,7 @@ export default function GuideProfile() {
                     const pList = Array.isArray(pRes?.results) ? pRes.results : Array.isArray(pRes) ? pRes : [];
                     setPortfolio(pList);
                 } else {
-                   setPortfolio([]);
+                    setPortfolio([]);
                 }
 
                 // 3) My Services — faqat profil ma’lumotidan (hech qanday GET yo‘q)
@@ -389,7 +388,7 @@ export default function GuideProfile() {
                 setLoading(false);
             }
         })();
-    }, [id, isDetail]);
+    }, [id, isDetail, isAuthenticated]);
 
     const fullName = useMemo(() => pickName(guide), [guide]);
     const locationText = useMemo(() => pickLocation(guide || {}), [guide]);
@@ -404,7 +403,6 @@ export default function GuideProfile() {
     const openChat = () => navigate(`/chat?user=${encodeURIComponent(String(id))}`);
 
     // Booking states
-    const { isAuthenticated: authed } = useUser();
     const [showForm, setShowForm] = useState(false);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
@@ -421,7 +419,7 @@ export default function GuideProfile() {
         let pk = customerPk;
         if (!pk) { pk = await resolveCustomerPk(id); setCustomerPk(pk); }
         if (!pk) return alert(t("guide.detail.resolveError"));
-        if (!startDate || !endDate) return alert(t("guide.detail.chooseDates"));
+        if (!startDate || !endDate) return alert(t("guide.detail.selectDates"));
 
         setCheckingAvailability(true);
         try {
@@ -446,12 +444,12 @@ export default function GuideProfile() {
         setResult({ ok: null, msg: "" });
 
         const params = new URLSearchParams({
-           start_date: startDate,
-           end_date: endDate,
-           ...(note ? { description: note } : {}),
+            start_date: startDate,
+            end_date: endDate,
+            ...(note ? { description: note } : {}),
         });
         if (guests !== "" && Number(guests) > 0) {
-           params.set("guests", String(guests));
+            params.set("guests", String(guests));
         }
 
         const profileId = await resolveCustomerPk(bookingTargetId);
@@ -493,7 +491,7 @@ export default function GuideProfile() {
 
                         <div>
                             <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-dark-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-dark-700">
-                                {[t("guide.list.allCountries"), ...Array.from(new Set(allGuides.map(g => g.country).filter(Boolean)))].map((c) => (
+                                {countryOptions.map((c) => (
                                     <option key={c} value={c === t("guide.list.allCountries") ? "" : c}>{c}</option>
                                 ))}
                             </select>
@@ -524,7 +522,7 @@ export default function GuideProfile() {
                             <>
                                 <div className="grid md:grid-cols-2 gap-4">
                                     {pagedGuides.map((g) => (
-                                        <GuideCard key={g.id} g={g} onView={() => goDetail(g.id)} onBook={() => goBookNowFromList(g.id)} />
+                                        <GuideCard key={g.id} g={g} onView={() => goDetail(g.id)} onBook={() => goBookNowFromList(g.id)} t={t} />
                                     ))}
                                 </div>
                                 <div className="flex items-center justify-center gap-2 mt-6 text-gray-800 dark:text-gray-200">
@@ -565,7 +563,7 @@ export default function GuideProfile() {
                                                 <div className="absolute top-2 right-2">
                           <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-emerald-600 text-white shadow">
                             <CheckCircle className="w-3 h-3" />
-                            Verified
+                              {t("guide.common.verified")}
                           </span>
                                                 </div>
                                             )}
@@ -573,7 +571,7 @@ export default function GuideProfile() {
                                                 <div className="absolute bottom-2 left-2">
                           <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-white/90 dark:bg-dark-900/90 border border-emerald-300 text-emerald-700">
                             <CircleDot className="w-3 h-3" />
-                            Available Now
+                              {t("guide.common.availableNow")}
                           </span>
                                                 </div>
                                             )}
@@ -586,32 +584,15 @@ export default function GuideProfile() {
                                                     <span>{countryText}</span>
                                                 </div>
                                             )}
-                                            {/*<div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">*/}
-                                            {/*    <MapPin className="w-5 h-5" />*/}
-                                            {/*    <span>{pickLocation(guide)}</span>*/}
-                                            {/*</div>*/}
-                                            {/*{(typeof guide?.average_rating === "number" || guide?.total_reviews) && (*/}
-                                            {/*    <div className="flex items-center gap-2">*/}
-                                            {/*        <Star className="w-5 h-5 text-yellow-500 fill-current" />*/}
-                                            {/*        <div className="text-lg font-semibold">*/}
-                                            {/*            {Number(guide?.average_rating || 0).toFixed(1)}*/}
-                                            {/*        </div>*/}
-                                            {/*        {guide?.total_reviews ? (*/}
-                                            {/*            <div className="text-gray-500 dark:text-gray-400">*/}
-                                            {/*                ({guide.total_reviews} reviews)*/}
-                                            {/*            </div>*/}
-                                            {/*        ) : null}*/}
-                                            {/*    </div>*/}
-                                            {/*)}*/}
                                             <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                                                 <Clock className="w-5 h-5" />
-                                                <span>Responds within 1 hour</span>
+                                                <span>{t("guide.common.respondsWithinHour")}</span>
                                             </div>
                                             {(guide?.member_since_year || guide?.member_since) && (
                                                 <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                                                     <Award className="w-5 h-5" />
                                                     <span>
-                            Member since {guide?.member_since_year || (guide?.member_since || "").slice(0, 4)}
+                            {t("guide.common.memberSince")} {guide?.member_since_year || (guide?.member_since || "").slice(0, 4)}
                           </span>
                                                 </div>
                                             )}
@@ -635,9 +616,7 @@ export default function GuideProfile() {
                                                     {pickName(guide)}
                                                 </h1>
                                                 <div className="mt-0.5 text-blue-600 text-sm sm:text-base">
-                                                    { (Array.isArray(guide?.service_types) && guide.service_types.length)
-                                                        ? `${guide.service_types[0]?.name || guide.service_types[0]} Guide`
-                                                        : "Professional Local Guide" }
+                                                    {pickHeadline(guide)}
                                                 </div>
                                                 <div className="mt-1 text-gray-600 dark:text-gray-300 flex flex-wrap items-center gap-3 text-xs sm:text-sm">
                           <span className="inline-flex items-center gap-1">
@@ -672,20 +651,20 @@ export default function GuideProfile() {
                                         )}
 
                                         <div className="mt-2 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-                                            {!!languageText && <div>Gapiradi: {languageText}</div>}
-                                            <div className="text-gray-500 dark:text-gray-400">Odatda javob beradi within 1 hour</div>
+                                            {!!languageText && <div>{t("guide.card.speaks")}: {languageText}</div>}
+                                            <div className="text-gray-500 dark:text-gray-400">{t("guide.common.respondsWithinHour")}</div>
                                         </div>
                                     </div>
 
                                     {/* About + Stats */}
                                     <div className="bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-700 rounded-2xl p-4 sm:p-6">
-                                        <h2 className="text-lg font-semibold mb-2">About Me</h2>
+                                        <h2 className="text-lg font-semibold mb-2">{t("guide.about.title")}</h2>
                                         {guide?.professional_bio ? (
                                             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                                                 {guide.professional_bio}
                                             </p>
                                         ) : (
-                                            <p className="text-gray-500">Bio ma’lumoti hali kiritilmagan.</p>
+                                            <p className="text-gray-500">{t("guide.common.noBio")}</p>
                                         )}
 
                                         <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
@@ -693,25 +672,25 @@ export default function GuideProfile() {
                                                 <div className="text-2xl font-semibold text-blue-700">
                                                     {guide?.total_reviews ?? 0}
                                                 </div>
-                                                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1">Reviews</div>
+                                                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1">{t("guide.stats.reviews")}</div>
                                             </div>
                                             <div className="rounded-xl border border-green-100 bg-green-50 dark:bg-dark-800 dark:border-dark-700 p-4 text-center">
                                                 <div className="text-2xl font-semibold text-green-700">
                                                     {getResponseRate(guide)}%
                                                 </div>
-                                                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1">Response Rate</div>
+                                                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1">{t("guide.stats.responseRate")}</div>
                                             </div>
                                             <div className="rounded-xl border border-orange-100 bg-orange-50 dark:bg-dark-800 dark:border-dark-700 p-4 text-center">
                                                 <div className="text-2xl font-semibold text-orange-700">
                                                     {Math.max(1, getYears(guide))}{getYears(guide) >= 5 ? "+" : ""}
                                                 </div>
-                                                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1">Years Experience</div>
+                                                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1">{t("guide.stats.experience")}</div>
                                             </div>
                                             <div className="rounded-xl border border-purple-100 bg-purple-50 dark:bg-dark-800 dark:border-dark-700 p-4 text-center">
                                                 <div className="text-2xl font-semibold text-purple-700">
                                                     {getLangCount(guide)}
                                                 </div>
-                                                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1">Languages</div>
+                                                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1">{t("guide.stats.languages")}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -737,7 +716,7 @@ export default function GuideProfile() {
                                                     className="px-4 py-2 sm:px-5 sm:py-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-dark-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-dark-700 text-xs sm:text-base inline-flex items-center gap-2"
                                                 >
                                                     <MessageCircle className="w-4 h-4" />
-                                                    Chat
+                                                    {t("chat.title")}
                                                 </button>
                                             </div>
                                         ) : (
@@ -767,14 +746,14 @@ export default function GuideProfile() {
                                                         <input
                                                             type="number"
                                                             min={1}
-                                                            placeholder={t("guide.detail.guests")}  // ixtiyoriy: placeholder
+                                                            placeholder={t("guide.detail.guests")}
                                                             value={guests === "" ? "" : String(guests)}
                                                             onChange={(e) => {
-                                                              const v = e.target.value;
-                                                              setGuests(v === "" ? "" : Number(v));
+                                                                const v = e.target.value;
+                                                                setGuests(v === "" ? "" : Number(v));
                                                             }}
-                                                            className="w-full p-2 sm:p-3 border rounded-lg ..."
-                                                          />
+                                                            className="w-full p-2 sm:p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm bg-white dark:bg-dark-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-dark-700"
+                                                        />
                                                         <Users className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 absolute right-2 sm:right-3 top-2.5 sm:top-3.5" />
                                                     </div>
                                                 </div>
@@ -817,17 +796,17 @@ export default function GuideProfile() {
                                                 {t("guide.detail.portfolio")}
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-                                               {portfolio.map((item) => (
-                                                  <div key={item.id} className="border border-gray-200 dark:border-dark-700 rounded-lg p-3 sm:p-4 bg-white dark:bg-dark-900">
-                                                     <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-gray-100">{item.title}</h3>
-                                                     <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">{item.description}</p>
-                                                  </div>
-                                               ))}
-                                               {!portfolio?.length && (
-                                                   <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-300">
-                                                      {t("guide.detail.noPortfolio")}
-                                                   </div>
-                                               )}
+                                                {portfolio.map((item) => (
+                                                    <div key={item.id} className="border border-gray-200 dark:border-dark-700 rounded-lg p-3 sm:p-4 bg-white dark:bg-dark-900">
+                                                        <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-gray-100">{item.title}</h3>
+                                                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">{item.description}</p>
+                                                    </div>
+                                                ))}
+                                                {!portfolio?.length && (
+                                                    <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-300">
+                                                        {t("guide.detail.noPortfolio")}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     )}

@@ -59,7 +59,7 @@ services:
     volumes:
       - .:/app
       - static_data:/app/staticfiles
-      - media_data:/app/media
+      - ./media:/app/media
     expose:
       - "8000"
     depends_on:

@@ -142,7 +142,8 @@ services:
       - ./nginx/uzguide.conf:/etc/nginx/conf.d/default.conf:ro
       - static_data:/app/staticfiles
       - media_data:/app/media
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /etc/letsencrypt/live/uzguide.com/fullchain.pem:/etc/letsencrypt/live/uzguide.com/fullchain.pem:ro
+      - /etc/letsencrypt/live/uzguide.com/privkey.pem:/etc/letsencrypt/live/uzguide.com/privkey.pem:ro
     depends_on:
       - backend
       - frontend

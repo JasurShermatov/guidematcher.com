@@ -121,6 +121,8 @@ services:
     restart: unless-stopped
     expose:
       - "80"
+    ports:
+      - "3003:80"
     depends_on:
       backend:
         condition: service_started

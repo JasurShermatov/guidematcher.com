@@ -144,6 +144,53 @@ const ChatPage = () => {
 
     // Scroll
     const listRef = useRef(null);
+    /** ===== Polling fallback (100 ms) ===== */
+    const POLL_MS = 100; // siz xohlagan interval
+    const lastMsgIdRef = useRef(null);
+
+    const fetchLatestHead = async () => {
+        if (!selectedChat) return;
+        try {
+            const res = await chatApi
+                .getMessages(selectedChat, { page: 1 })
+                .then((r) => r?.data ?? r);
+
+            const arr = Array.isArray(res?.results) ? res.results : Array.isArray(res) ? res : [];
+            if (!arr.length) return;
+
+            // serverdan eng so‘nggi sahifa (desc) kelyapti deb faraz qilamiz — siz yuqorida reverse qilgansiz
+            const asc = [...arr].reverse().map(normalizeMsg);
+
+            const newest = asc[asc.length - 1];
+            const lastSeen = lastMsgIdRef.current;
+
+            // Birinchi sync: agar hali saqlanmagan bo‘lsa, to‘liq set + pointerni qo‘yamiz
+            if (!lastSeen) {
+                if (!messages.length) setMessages(asc);
+                lastMsgIdRef.current = newest?.id ?? null;
+                return;
+            }
+
+            // Oxirgi ko‘rilgan ID ni topib, undan keyingi xabarlarni qo‘shamiz
+            const idx = asc.findIndex((m) => String(m.id) === String(lastSeen));
+            const onlyNew = idx === -1 ? asc : asc.slice(idx + 1);
+
+            if (onlyNew.length) {
+                setMessages((prev) => [...prev, ...onlyNew]);
+                lastMsgIdRef.current = onlyNew[onlyNew.length - 1].id;
+
+                // pastga auto-scroll (faqat foydalanuvchi pastga yaqin bo‘lsa)
+                queueMicrotask(() => {
+                    if (listRef.current && (listRef.current.scrollHeight - listRef.current.scrollTop - listRef.current.clientHeight < 120)) {
+                        listRef.current.scrollTop = listRef.current.scrollHeight;
+                    }
+                });
+            }
+        } catch {
+            // jim qo‘yamiz
+        }
+    };
+
 
     /** ===== Mobile-safe 100vh + safe-area & navbar offset ===== */
     useEffect(() => {
@@ -213,29 +260,31 @@ const ChatPage = () => {
     const appendIncomingMessage = (msg) => {
         const atBottom = isNearBottom(listRef.current);
         const mine =
-           msg?.is_mine ??
-           (msg?.sender?.id && myUserId ? String(msg.sender.id) === String(myUserId) : false);
+            msg?.is_mine ??
+            (msg?.sender?.id && myUserId ? String(msg.sender.id) === String(myUserId) : false);
         const norm = normalizeMsg(msg);
         setMessages((prev) => {
-        // Agar allaqachon shu server-ID bilan bor bo‘lsa — o‘zgartirmaymiz
-           if (prev.some((x) => x.id === norm.id)) return prev;
-           // Menga tegishli xabar bo‘lsa, o‘xshash optimistikni olib tashlaymiz (content bo‘yicha)
-           if (mine) {
-             const idx = [...prev].reverse().findIndex(
-                (x) => x.optimistic && x.sender === "me" && x.content === norm.content
-             );
-             if (idx !== -1) {
-               const realIdx = prev.length - 1 - idx;
-               const copy = prev.slice();
-               copy.splice(realIdx, 1); // optimistikni olib tashladik
-               return [...copy, norm];
-             }
-           }
-           return [...prev, norm];
+            // Agar allaqachon shu server-ID bilan bor bo‘lsa — o‘zgartirmaymiz
+            if (prev.some((x) => x.id === norm.id)) return prev;
+            // Menga tegishli xabar bo‘lsa, o‘xshash optimistikni olib tashlaymiz (content bo‘yicha)
+            if (mine) {
+                const idx = [...prev].reverse().findIndex(
+                    (x) => x.optimistic && x.sender === "me" && x.content === norm.content
+                );
+                if (idx !== -1) {
+                    const realIdx = prev.length - 1 - idx;
+                    const copy = prev.slice();
+                    copy.splice(realIdx, 1); // optimistikni olib tashladik
+                    return [...copy, norm];
+                }
+            }
+            return [...prev, norm];
         });
         queueMicrotask(() => {
             if (atBottom && listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
         });
+
+        lastMsgIdRef.current = norm.id || lastMsgIdRef.current;
     };
 
     const pickName = (chat) => chat?.other_user?.full_name || chat?.other_user?.email || t("chat.user");
@@ -408,6 +457,12 @@ const ChatPage = () => {
                 setMessages(asc.map(normalizeMsg));
                 setHasNextMsgs(Boolean(res?.next));
 
+                // Polling pointer — eng oxirgi ko‘rilgan xabar ID sini belgilash
+                if (asc.length) {
+                    const mapped = asc.map(normalizeMsg);
+                    lastMsgIdRef.current = mapped[mapped.length - 1]?.id ?? null;
+                }
+
                 chatApi.markMessagesRead(selectedChat).catch(() => {});
                 openWebSocket(selectedChat);
 
@@ -492,10 +547,10 @@ const ChatPage = () => {
 
         try {
             const created = await chatApi.createMessage({ conversation: selectedChat, content })
-                            .then(r => r?.data ?? r);
+                .then(r => r?.data ?? r);
             if (created?.id) {
-               // optimistikni server xabari bilan almashtiramiz
-               setMessages(prev => prev.map(m => m.id === optimistic.id ? normalizeMsg(created) : m));
+                // optimistikni server xabari bilan almashtiramiz
+                setMessages(prev => prev.map(m => m.id === optimistic.id ? normalizeMsg(created) : m));
             }
         } catch {
             setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
@@ -540,6 +595,27 @@ const ChatPage = () => {
             }
         };
     }, []);
+
+    // Har 100 ms da yangi xabarlarni tekshirish (faqat ushbu sahifada)
+    useEffect(() => {
+        if (!selectedChat) return;
+
+        // birinchi sync
+        fetchLatestHead();
+
+        const timer = setInterval(() => {
+            if (document.hidden) return; // yashirin tabda zo‘riqmasin
+
+            // Agar WS ishlayotganda pollingni to‘xtatmoqchi bo‘lsangiz, quyidagi satrni UNCOMMENT qiling:
+            // if (wsRef.current && wsRef.current.readyState === 1) return;
+
+            fetchLatestHead();
+        }, POLL_MS);
+
+        return () => clearInterval(timer);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedChat]);
+
 
     /** ================= Render ================= */
     const filteredConvs = useMemo(() => {

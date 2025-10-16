@@ -12,6 +12,10 @@ export const useLanguage = () => {
 
 const translations = {
     en: {
+
+        // errors
+        "guide.common.memberSince": "Started guiding ",
+
         // Navigation*
         "nav.findGuides": "Find Guides",
         "nav.becomeGuide": "Become a Guide",
@@ -339,12 +343,12 @@ const translations = {
         "guide.profile.years": "Years of Experience",
         // guide/service*
         "guide.service.item": "Service",
-        "guide.service.order": "Order #{n}",
+        "guide.service.order": "Order ",
         "guide.service.noDesc": "No description",
         "guide.service.empty": "No services added",
         "guide.service.titlePh": "Enter service title",
         "guide.service.descPh": "Describe your service",
-        "guide.service.orderLabel": "Order (numeric)",
+        "guide.service.orderLabel": "Order ",
         "guide.service.preview": "Preview Service",
         "guide.service.duration": "Duration",
         "guide.service.bookThisService": "Book This Service",
@@ -509,6 +513,10 @@ const translations = {
         "privacy.cookies": "For details about cookies, please see our Cookie Policy."
     },
     uz: {
+
+        // errors
+        "guide.common.memberSince": "Guidelikni boshlagan ",
+
         // Navigation*
         "nav.findGuides": "Gidlarni topish",
         "nav.becomeGuide": "Gid bo‘lish",
@@ -852,12 +860,12 @@ const translations = {
 
         // guide/service*
         "guide.service.item": "Xizmat",
-        "guide.service.order": "Tartib raqami #{n}",
+        "guide.service.order": "Tartib raqami ",
         "guide.service.noDesc": "Tavsif yo‘q",
         "guide.service.empty": "Hali xizmat qo‘shilmagan",
         "guide.service.titlePh": "Xizmat nomini kiriting",
         "guide.service.descPh": "Xizmatingizni tasvirlab bering",
-        "guide.service.orderLabel": "Tartib (son)",
+        "guide.service.orderLabel": "Tartib ",
         "guide.service.preview": "Xizmatni ko‘rish",
         "guide.service.duration": "Davomiylik",
         "guide.service.bookThisService": "Ushbu xizmatni band qilish",
@@ -1020,6 +1028,9 @@ const translations = {
         "privacy.cookies": "Cookie fayllari haqida batafsil ma’lumot uchun Cookie siyosatini ko‘ring."
     },
     ru: {
+
+        "guide.common.memberSince": "Начал работать гидом в ",
+
         // Navigation*
         "nav.findGuides": "Найти гидов",
         "nav.becomeGuide": "Стать гидом",
@@ -1363,12 +1374,12 @@ const translations = {
 
         // guide/service*
         "guide.service.item": "Услуга",
-        "guide.service.order": "Порядок №{n}",
+        "guide.service.order": "Порядок ",
         "guide.service.noDesc": "Без описания",
         "guide.service.empty": "Услуги ещё не добавлены",
         "guide.service.titlePh": "Название услуги",
         "guide.service.descPh": "Опишите вашу услугу",
-        "guide.service.orderLabel": "Порядок (число)",
+        "guide.service.orderLabel": "Порядок ",
         "guide.service.preview": "Предпросмотр услуги",
         "guide.service.duration": "Продолжительность",
         "guide.service.bookThisService": "Забронировать эту услугу",
@@ -1530,6 +1541,9 @@ const translations = {
         "privacy.cookies": "Подробнее о cookie см. в нашей Политике cookie."
     },
     kz: {
+
+        "guide.common.memberSince": "Гид ретінде жұмысын бастаған жылы ",
+
         // Navigation*
         "nav.findGuides": "Гидтерді іздеу",
         "nav.becomeGuide": "Гид болу",
@@ -1872,12 +1886,12 @@ const translations = {
 
         // guide/service*
         "guide.service.item": "Қызмет",
-        "guide.service.order": "Реті №{n}",
+        "guide.service.order": "Реті ",
         "guide.service.noDesc": "Сипаттама жоқ",
         "guide.service.empty": "Қызметтер әлі қосылмаған",
         "guide.service.titlePh": "Қызмет атауын енгізіңіз",
         "guide.service.descPh": "Қызметіңізді сипаттаңыз",
-        "guide.service.orderLabel": "Реті (сан)",
+        "guide.service.orderLabel": "Реті ",
         "guide.service.preview": "Қызметті алдын ала қарау",
         "guide.service.duration": "Ұзақтығы",
         "guide.service.bookThisService": "Осы қызметті брондау",

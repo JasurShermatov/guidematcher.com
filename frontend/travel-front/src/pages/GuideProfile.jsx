@@ -615,9 +615,9 @@ export default function GuideProfile() {
                                                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
                                                     {pickName(guide)}
                                                 </h1>
-                                                <div className="mt-0.5 text-blue-600 text-sm sm:text-base">
-                                                    {pickHeadline(guide)}
-                                                </div>
+                                                {/*<div className="mt-0.5 text-blue-600 text-sm sm:text-base">*/}
+                                                {/*    {pickHeadline(guide)}*/}
+                                                {/*</div>*/}
                                                 <div className="mt-1 text-gray-600 dark:text-gray-300 flex flex-wrap items-center gap-3 text-xs sm:text-sm">
                           <span className="inline-flex items-center gap-1">
                             <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />

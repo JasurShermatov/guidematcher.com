@@ -381,10 +381,13 @@ export default function GuideDashboard() {
             const fd = new FormData();
             if (pfTitle) fd.append("title", pfTitle);
             if (pfDesc) fd.append("description", pfDesc);
-            if (pfOrder) fd.append("order", String(pfOrder));
+            // if (pfOrder) fd.append("order", String(pfOrder));
+            if (pfOrder !== "" && !Number.isNaN(Number(pfOrder))) {
+                fd.append("order", String(pfOrder));
+            }
             const created = await createPortfolio(fd).then((r) => r.data ?? r);
             setPortfolio((xs) => [created, ...xs]);
-            setPfTitle(""); setPfDesc(""); setPfOrder(0); setOpenPortfolioForm(false);
+            setPfTitle(""); setPfDesc(""); setPfOrder(""); setOpenPortfolioForm(false);
             alert(t('guide.dashboard.portfolioCreated'));
         } catch (e) {
             alert(t('guide.dashboard.portfolioCreateFailed'));
@@ -965,7 +968,16 @@ export default function GuideDashboard() {
                                                 <div className="flex items-start justify-between gap-3 mb-2 md:mb-3">
                                                     <div>
                                                         <h4 className="font-medium text-gray-900 dark:text-white text-sm md:text-base">{s.title ?? t('guide.service.item')}</h4>
-                                                        <p className="text-[11px] md:text-xs text-gray-500 dark:text-gray-400">{t('guide.service.order', { n: s.order ?? 0 })}</p>
+                                                        <p className="text-[11px] md:text-xs text-gray-500 dark:text-gray-400">
+                                                            {(s.order !== null && s.order !== undefined)
+                                                                ? (
+                                                                    <>
+                                                                        <span>{t('guide.service.orderLabel')}:</span>{' '}
+                                                                        <strong>{Number(s.order)}</strong>
+                                                                    </>
+                                                                )
+                                                                : t('guide.service.noOrder')}
+                                                        </p>
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         <button title={t('guide.service.preview')} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">

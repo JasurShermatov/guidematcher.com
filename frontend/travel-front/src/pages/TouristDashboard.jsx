@@ -327,19 +327,33 @@ export default function TouristDashboard() {
         setClientProfile(cp);
     };
 
+    // const saveMe = async () => {
+    //     setSavingMe(true);
+    //     const ok = await patchMe({
+    //         first_name: meForm.first_name || "",
+    //         last_name: meForm.last_name || "",
+    //         phone: meForm.phone || undefined,
+    //     });
+    //     setSavingMe(false);
+    //     if (ok) {
+    //         await loadProfileBundle();
+    //         alert(t('dashboard.saved'));
+    //     } else {
+    //         alert(t('dashboard.errSave'));
+    //     }
+    // };
+
     const saveMe = async () => {
         setSavingMe(true);
-        const ok = await patchMe({
-            first_name: meForm.first_name || "",
-            last_name: meForm.last_name || "",
-            phone: meForm.phone || undefined,
-        });
-        setSavingMe(false);
-        if (ok) {
+        try {
+            await patchMe({ first_name: meForm.first_name, last_name: meForm.last_name, phone: meForm.phone || undefined });
             await loadProfileBundle();
             alert(t('dashboard.saved'));
-        } else {
+        } catch (e) {
+            console.error('patchMe failed:', e?.response?.data || e.message);
             alert(t('dashboard.errSave'));
+        } finally {
+            setSavingMe(false);
         }
     };
 

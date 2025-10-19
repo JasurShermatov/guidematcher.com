@@ -342,11 +342,17 @@ export default function GuideDashboard() {
                 ...(countryId ? { country: countryId } : {}),
             });
 
+            // const payload = {
+            //     professional_bio: edit.bio || "",
+            //     years_of_experience: Number(edit.experience_years) || 0,
+            //     // MUHIM: bo‘sh bo‘lsa ham yuboramiz
+            //     language: (edit.languages || "").trim(),
+            // };
             const payload = {
                 professional_bio: edit.bio || "",
                 years_of_experience: Number(edit.experience_years) || 0,
-                // MUHIM: bo‘sh bo‘lsa ham yuboramiz
-                language: (edit.languages || "").trim(),
+                // Backend kutayotgan format: masalan languages: [uuid, uuid]
+                languages: mapLanguagesToIds(edit.languages),   // ✅ shu yerda mapping ishlatamiz
             };
 
             const upd = await updateMyCustomerProfile(payload);
